@@ -12,12 +12,12 @@ public class AttributeRegister {
 
     private static final DeferredRegister<Attribute> Register = DeferredRegister.create(Registries.ATTRIBUTE, Servantry.MODID);
 
-    public static final Holder<Attribute> ServantMaxCount = register("servant_max_count");
-    public static final Holder<Attribute> ServantDamage = register("servant_damage");
-    public static final Holder<Attribute> ServantSpeed = register("servant_speed");
+    public static final Holder<Attribute> ServantMaxCount = register("servant_max_count", 1, 0, 1000);
+    public static final Holder<Attribute> ServantDamage = register("servant_damage", 1, 0, 1000);
+    public static final Holder<Attribute> ServantSpeed = register("servant_speed", 1, 0.1, 10);
 
-    private static Holder<Attribute> register(String name) {
-        return Register.register(name, () -> new RangedAttribute(Servantry.rl(name).toString(), 1, 0.0, Double.MAX_VALUE).setSyncable(true));
+    private static Holder<Attribute> register(String name, double defaultValue, double min, double max) {
+        return Register.register(name, () -> new RangedAttribute(Servantry.rl(name).toString(), defaultValue, min, max).setSyncable(true));
     }
 
     public static void register(IEventBus eventBus) {

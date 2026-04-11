@@ -7,6 +7,8 @@ import first.servantry.common.attachment.ServantData;
 import first.servantry.common.servent.Terraprism;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ServantRegister;
+import first.servantry.register.SoundRegister;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -22,6 +24,11 @@ public class TerraPrismItem extends Item implements IServantWeapon<Terraprism> {
     @Override
     public ServantType<Terraprism> getType() {
         return ServantRegister.TerraPrism.get();
+    }
+
+    @Override
+    public SoundEvent getSoundEvent() {
+        return SoundRegister.UseTerraprism.get();
     }
 
     @Override

@@ -4,12 +4,17 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
 import first.servantry.api.register.ServantType;
 import first.servantry.register.AttributeRegister;
+import first.servantry.register.DamageRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Targeting;
 import net.minecraft.world.entity.monster.Enemy;
@@ -61,6 +66,11 @@ public abstract class Servant {
         }
     }
 
+    public DamageSource getDamageSource() {
+        Registry<DamageType> damageTypes = getOwner().level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        return new DamageSource(damageTypes.getHolderOrThrow(DamageRegister.Servant), getOwner());
+    }
+
     public int getHistoryNodesSize() {
         return 16;
     }
@@ -95,41 +105,30 @@ public abstract class Servant {
             return;
         }
 
-        // 计算受速度影响后的新节点数量
-        // 核心底线：无论多快，一个路径至少保留 2 个节点（首和尾），保证轨迹不会丢失
         int newSize = Math.max(2, (int) Math.round(originalSize / speed));
-
         List<PathNode> resampledNodes = new ArrayList<>(newSize);
 
         for (int i = 0; i < newSize; i++) {
-            // 将离散的节点重采样为 0.0 ~ 1.0 的连续时间 t
             float t = i / (float) (newSize - 1);
-
-            // 将 t 映射回原数组的浮点索引
             float fIdx = t * (originalSize - 1);
 
             int idx0 = (int) Math.floor(fIdx);
             int idx1 = Math.min(idx0 + 1, originalSize - 1);
             float fraction = fIdx - idx0;
 
-            // 获取 Catmull-Rom 插值所需的前后共4个节点（处理边界防越界）
-            PathNode pM1 = nodes.get(Math.max(0, idx0 - 1));
             PathNode p0 = nodes.get(idx0);
             PathNode p1 = nodes.get(idx1);
-            PathNode p2 = nodes.get(Math.min(originalSize - 1, idx1 + 1));
 
-            // 1. 位置计算：使用样条曲线计算动量，生成极其丝滑的平滑弧线
-            Vec3 pos = catmullRom(pM1.pos(), p0.pos(), p1.pos(), p2.pos(), fraction);
+            // 【核心修正】：直接使用 LERP！
+            // 因为原轨迹自带优美的加速度节奏，线性插值可以 100% 完美缩放时间轴，杜绝三次曲线的逆向打结。
+            Vec3 pos = p0.pos().lerp(p1.pos(), fraction);
 
-            // 2. 欧拉角计算：使用 Minecraft 原版的 SLERP 最短路径插值防万向节死锁
+            // 欧拉角使用 SLERP 最短路径插值防万向节死锁
             float yaw = Mth.rotLerp(fraction, p0.yaw(), p1.yaw());
             float pitch = Mth.rotLerp(fraction, p0.pitch(), p1.pitch());
             float roll = Mth.rotLerp(fraction, p0.roll(), p1.roll());
 
-            // 3. 特征保留 (Feature)：如果正好压在节点前半段，继承 p0 特征，否则继承 p1，防止 HIT_CLEAR 等关键标记丢失
             String feature = fraction < 0.5f ? p0.feature() : p1.feature();
-
-            // 确保严格保留第一帧和最后一帧的特殊标记
             if (i == 0) feature = nodes.get(0).feature();
             if (i == newSize - 1) feature = nodes.get(originalSize - 1).feature();
 
@@ -137,22 +136,6 @@ public abstract class Servant {
         }
 
         this.futureNodes.addAll(resampledNodes);
-    }
-
-    private Vec3 catmullRom(Vec3 pM1, Vec3 p0, Vec3 p1, Vec3 p2, float t) {
-        float t2 = t * t;
-        float t3 = t2 * t;
-
-        float fM1 = -0.5f * t3 + t2 - 0.5f * t;
-        float f0 = 1.5f * t3 - 2.5f * t2 + 1.0f;
-        float f1 = -1.5f * t3 + 2.0f * t2 + 0.5f * t;
-        float f2 = 0.5f * t3 - 0.5f * t2;
-
-        return new Vec3(
-                pM1.x * fM1 + p0.x * f0 + p1.x * f1 + p2.x * f2,
-                pM1.y * fM1 + p0.y * f0 + p1.y * f1 + p2.y * f2,
-                pM1.z * fM1 + p0.z * f0 + p1.z * f1 + p2.z * f2
-        );
     }
 
     public boolean isExecutingPath() {

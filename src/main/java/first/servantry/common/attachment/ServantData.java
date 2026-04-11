@@ -20,6 +20,7 @@ import java.util.*;
 public class ServantData implements AttachmentSyncHandler<ServantData> {
 
     private final List<Servant> servants = new ArrayList<>();
+    private boolean change = true;
 
     public List<Servant> getServants() {
         return servants;
@@ -31,6 +32,7 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
     public boolean summon(Player player, Servant servant) {
         if (getMaxSize(player) > getServants().size()) {
             servants.add(servant);
+            change = true;
             return true;
         }
         return false;
@@ -39,7 +41,7 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
     /**
      * 移除仆从栏中最早召唤的某一类仆从
      */
-    public boolean remove(ServantType<?> type) {
+    public void remove(ServantType<?> type) {
         Servant target = null;
         for (Servant servant : servants) {
             if (servant.getType() == type) {
@@ -49,9 +51,8 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
         }
         if (target != null) {
             servants.remove(target);
-            return true;
+            change = true;
         }
-        return false;
     }
 
     /**
@@ -94,11 +95,19 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
         return count;
     }
 
+    public boolean isChange() {
+        return change;
+    }
+
+    public void setChange(boolean change) {
+        this.change = change;
+    }
+
     @Override
     public void write(RegistryFriendlyByteBuf buf, ServantData data, boolean isSelf) {
         buf.writeVarInt(data.servants.size());
         for (Servant servant : data.servants) {
-            ResourceLocation location = Registries.ServantTypes.getKey(servant.getType());
+            ResourceLocation location = Registries.SERVANT_TYPES.getKey(servant.getType());
             assert location != null;
             buf.writeResourceLocation(location);
             buf.writeUUID(servant.getUuid());
@@ -118,7 +127,7 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
         for (int i = 0; i < size; i++) {
             ResourceLocation typeId = buf.readResourceLocation();
             UUID uuid = buf.readUUID();
-            ServantType<?> type = Registries.ServantTypes.get(typeId);
+            ServantType<?> type = Registries.SERVANT_TYPES.get(typeId);
             assert type != null;
             Servant servant = existingServants.get(uuid);
             if (servant == null) {

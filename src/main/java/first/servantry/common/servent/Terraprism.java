@@ -48,18 +48,16 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
         ELLIPSE_SLASH,      // 3: 椭圆循环
         HOURGLASS,          // 4: 沙漏刺击
         CHAIN_STRIKE,       // 5: 连锁斩击
-        RETURN,             // 6: 归来
-        HORIZONTAL_SWEEP;   // 7: 扇形横扫
+        RETURN;              // 6: 归来
 
         public boolean isAttackState() {
-            return this == FIRST_STRIKE || this == ELLIPSE_SLASH || this == HOURGLASS || this == CHAIN_STRIKE || this == HORIZONTAL_SWEEP;
+            return this == FIRST_STRIKE || this == ELLIPSE_SLASH || this == HOURGLASS || this == CHAIN_STRIKE;
         }
     }
 
     private static final List<PrismState> CONTINUOUS_ATTACKS = Arrays.asList(
             PrismState.ELLIPSE_SLASH,
-            PrismState.HOURGLASS,
-            PrismState.HORIZONTAL_SWEEP
+            PrismState.HOURGLASS
     );
 
     private static final String HIT_CLEAR = "hit_clear";
@@ -165,7 +163,7 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
             if (!swingHitTargets.contains(target.getId())) {
                 int invulnerableTime = target.invulnerableTime;
                 target.invulnerableTime = 0; // 破除原版无敌帧
-                target.hurt(owner.damageSources().playerAttack(owner), getDamageValue());
+                target.hurt(getDamageSource(), getDamageValue());
                 target.invulnerableTime = invulnerableTime;
                 swingHitTargets.add(target.getId());
             }
@@ -272,7 +270,6 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
                 case ELLIPSE_SLASH -> generateEllipseSlash(owner, target);
                 case HOURGLASS -> generateHourglass(owner, target);
                 case CHAIN_STRIKE -> generateChainStrike(owner, target);
-                case HORIZONTAL_SWEEP -> generateHorizontalSweep(owner, target);
                 default -> {}
             }
         } else {
@@ -358,7 +355,7 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
 
     private void advanceAttack(Player owner) {
         this.loopCount++;
-        if (this.loopCount >= 3 && owner.getRandom().nextBoolean()) {
+        if (this.loopCount >= 2 && owner.getRandom().nextBoolean()) {
             List<PrismState> pool = new ArrayList<>(CONTINUOUS_ATTACKS);
             pool.remove(this.state);
             this.state = pool.get(owner.getRandom().nextInt(pool.size()));
@@ -584,7 +581,7 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
         int retreatTicks = 8;
 
         Vec3 startPos = this.getPos();
-        Vec3 T = target.position().add(0, target.getBbHeight() / 2.0, 0);
+        Vec3 T = target.getBoundingBox().getCenter();
 
         Vec3 toTarget = T.subtract(startPos);
         if (toTarget.lengthSqr() < 1e-5) toTarget = new Vec3(0, -1, 0);
@@ -596,10 +593,10 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
 
         double dist = Math.max(7.0, startPos.distanceTo(T));
         Vec3 prepPos = T.subtract(attackDir.scale(dist));
-        Vec3 hitPos = T.add(attackDir.scale(1.5));
+        Vec3 hitPos = T.add(attackDir);
 
-        Vector3f v = new Vector3f((float)attackDir.x, (float)attackDir.y, (float)attackDir.z);
-        new Quaternionf().rotateY((float)(Math.PI * 0.8)).transform(v);
+        Vector3f v = new Vector3f((float) attackDir.x, (float) attackDir.y, (float) attackDir.z);
+        new Quaternionf().rotateY((float) (Math.PI * 0.8)).transform(v);
         Vec3 nextAttackDir = new Vec3(v.x(), v.y(), v.z()).normalize();
         Vec3 nextPrepPos = T.subtract(nextAttackDir.scale(dist));
 
@@ -668,111 +665,6 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
             Vec3 tipDir = slerpVector(attackDir, nextAttackDir, easeOut);
             Vec3 bNormal = slerpVector(planeNormal, nextPlaneNormal, easeOut);
             nodes.add(getEulerNode(p, tipDir, bNormal));
-        }
-
-        this.setPath(nodes);
-        advanceAttack(owner);
-    }
-
-    private void generateHorizontalSweep(Player owner, LivingEntity target) {
-        int prepTicks = 10;
-        int sweepTicks = 5;
-
-        Vec3 startPos = this.getPos();
-        Vec3 T = target.position().add(0, target.getBbHeight() / 2, 0);
-
-        float randAngle = owner.getRandom().nextFloat() * (float)Math.PI * 2f;
-        float randRadius = 1.0f + owner.getRandom().nextFloat() * 2.0f;
-        float randY = 1.5f + owner.getRandom().nextFloat() * 2.5f;
-        Vec3 pivot = T.add(Math.cos(randAngle) * randRadius, randY, Math.sin(randAngle) * randRadius);
-
-        Vec3 fwd = T.subtract(pivot);
-        double radius = fwd.length();
-        if (radius < 1e-5) {
-            fwd = new Vec3(0, -1, 0);
-            radius = 3.0;
-        } else {
-            fwd = fwd.normalize();
-        }
-
-        Vec3 randomUp = new Vec3(owner.getRandom().nextDouble() - 0.5, owner.getRandom().nextDouble() - 0.5, owner.getRandom().nextDouble() - 0.5).normalize();
-        Vec3 planeNormal = fwd.cross(randomUp).normalize();
-        if (planeNormal.lengthSqr() < 1e-5) planeNormal = new Vec3(1, 0, 0);
-
-        float side = (loopCount % 2 == 0) ? 1.0f : -1.0f;
-        float angleSpan = (float) Math.PI / 2.5f;
-
-        Vector3f vStart = new Vector3f((float) fwd.x, (float) fwd.y, (float) fwd.z);
-        new Quaternionf().fromAxisAngleRad((float)planeNormal.x, (float)planeNormal.y, (float)planeNormal.z, side * angleSpan).transform(vStart);
-        Vec3 sweepStart = pivot.add(new Vec3(vStart.x(), vStart.y(), vStart.z()).scale(radius));
-
-        Vec3 currentVel = new Vec3(0, 1, 0);
-        LinkedList<PathNode> history = this.getHistoryNodes();
-        if (history.size() > 1) {
-            currentVel = startPos.subtract(history.get(1).pos());
-            if (currentVel.lengthSqr() > 1e-5) currentVel = currentVel.normalize();
-            else currentVel = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        } else {
-            currentVel = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        }
-
-        Vec3 currentTip = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        Quaternionf q = new Quaternionf().rotateY((float) Math.toRadians(-this.getYaw()))
-                .rotateX((float) Math.toRadians(this.getPitch()))
-                .rotateZ((float) Math.toRadians(this.getRoll()));
-        Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
-        Vec3 currentNormal = new Vec3(upV.x(), upV.y(), upV.z()).normalize();
-
-        Vec3 P3 = sweepStart;
-        Vector3f vNext = new Vector3f((float)fwd.x, (float)fwd.y, (float)fwd.z);
-        float nextAngle = side * angleSpan * (1 - 0.01f) + (-side * angleSpan) * 0.01f;
-        new Quaternionf().fromAxisAngleRad((float)planeNormal.x, (float)planeNormal.y, (float)planeNormal.z, nextAngle).transform(vNext);
-        Vec3 pNext = pivot.add(new Vec3(vNext.x(), vNext.y(), vNext.z()).scale(radius));
-        Vec3 E_prime = pNext.subtract(P3).normalize();
-
-        double R = startPos.distanceTo(P3) * 0.4;
-        Vec3 P0 = startPos;
-        Vec3 P1 = startPos.add(currentVel.scale(R));
-        Vec3 P2 = P3.subtract(E_prime.scale(R));
-
-        List<PathNode> nodes = new ArrayList<>();
-
-        for (int i = 1; i <= prepTicks; i++) {
-            float localT = (float) i / prepTicks;
-            float smoothT = localT * localT * (3.0f - 2.0f * localT);
-            float mt = 1.0f - localT;
-
-            Vec3 p = P0.scale(mt*mt*mt)
-                    .add(P1.scale(3*mt*mt*localT))
-                    .add(P2.scale(3*mt*localT*localT))
-                    .add(P3.scale(localT*localT*localT));
-
-            Vec3 targetTip = sweepStart.subtract(pivot).normalize();
-            Vec3 targetNormal = planeNormal;
-
-            Vec3 tipDir = slerpVector(currentTip, targetTip, smoothT);
-            Vec3 bNormal = slerpVector(currentNormal, targetNormal, smoothT);
-
-            nodes.add(getEulerNode(p, tipDir, bNormal));
-        }
-
-        for (int i = 1; i <= sweepTicks; i++) {
-            float rawT = (float) i / sweepTicks;
-            float t = rawT * rawT * (3.0f - 2.0f * rawT);
-
-            float currentAngle = side * angleSpan * (1 - t) + (-side * angleSpan) * t;
-
-            Vector3f vCurr = new Vector3f((float)fwd.x, (float)fwd.y, (float)fwd.z);
-            new Quaternionf().fromAxisAngleRad((float)planeNormal.x, (float)planeNormal.y, (float)planeNormal.z, currentAngle).transform(vCurr);
-
-            Vec3 p = pivot.add(new Vec3(vCurr.x(), vCurr.y(), vCurr.z()).scale(radius));
-            Vec3 tipDir = p.subtract(pivot).normalize();
-
-            PathNode node = getEulerNode(p, tipDir, planeNormal);
-            if (i == 1) {
-                node = node.withFeature(HIT_CLEAR);
-            }
-            nodes.add(node);
         }
 
         this.setPath(nodes);
@@ -937,8 +829,6 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
         }
     }
 
-
-
     @Override
     public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode) {
         Player owner = this.getOwner();
@@ -999,7 +889,6 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
             visualRoll = Mth.rotLerp(blend, renderNode.roll(), idealNode.roll());
         }
 
-        // 渲染坐标偏移，基类传入时的原点为 renderPos, 我们通过 translate 将原点纠正到 visualRenderPos
         poseStack.pushPose();
         Vec3 offset = visualRenderPos.subtract(renderPos);
         poseStack.translate(offset.x, offset.y, offset.z);
@@ -1021,7 +910,6 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
             PoseStack.Pose last = poseStack.last();
             Matrix4f pose = last.pose();
 
-            // 由于当前的 PoseStack 原点已被设定为 visualRenderPos，我们以此为相对中心
             Vec3 currentRenderPos = visualRenderPos;
 
             int endIndex = renderNodesArray.length - 1;

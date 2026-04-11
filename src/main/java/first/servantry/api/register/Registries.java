@@ -13,13 +13,13 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Registries {
 
-    public static final ResourceKey<Registry<ServantType<? extends Servant>>> ServantTypeKey = ResourceKey.createRegistryKey(Servantry.rl("servant_types"));
+    private static final ResourceKey<Registry<ServantType<? extends Servant>>> SERVANT_TYPE_KEY = ResourceKey.createRegistryKey(Servantry.rl("servant_types"));
 
-    public static final Registry<ServantType<? extends Servant>> ServantTypes = new RegistryBuilder<>(ServantTypeKey).sync(true).create();
+    public static final Registry<ServantType<? extends Servant>> SERVANT_TYPES = new RegistryBuilder<>(SERVANT_TYPE_KEY).sync(true).create();
 
     @SubscribeEvent
     public static void createRegistry(NewRegistryEvent event) {
-        event.register(ServantTypes);
+        event.register(SERVANT_TYPES);
     }
 
 }

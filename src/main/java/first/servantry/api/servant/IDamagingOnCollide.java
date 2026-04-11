@@ -21,6 +21,15 @@ import java.util.*;
  */
 public interface IDamagingOnCollide {
 
+    /**
+     * 碰撞采样的节点数量。
+     * 默认为 2（即当前刻与上一刻）。
+     * 如果返回 3，则会拼接计算 [上上刻->上一刻] 和 [上一刻->当前刻] 两段轨迹的碰撞。
+     */
+    default int getCollisionSampleNodes() {
+        return 2;
+    }
+
     default void processCollision(Servant servant) {
         AABB localBox = getHitbox();
         double dx = localBox.getXsize();
@@ -28,54 +37,65 @@ public interface IDamagingOnCollide {
         double dz = localBox.getZsize();
         double minDim = Math.min(Math.min(dx, dy), dz);
         LinkedList<PathNode> historyNodes = servant.getHistoryNodes();
-        if (minDim > 0 && historyNodes.size() >= 2) {
-            PathNode current = historyNodes.getFirst();
-            PathNode prev = historyNodes.get(1);
-            PathNode older = historyNodes.size() > 2 ? historyNodes.get(2) : prev;
+        int sampleNodes = getCollisionSampleNodes();
 
-            Vec3 P1 = current.pos();
-            Vec3 P0 = prev.pos();
-            Vec3 P_minus1 = older.pos();
-
-            Vec3 V0 = P0.subtract(P_minus1);
-            Vec3 C = P0.add(V0.scale(0.5));
-
-            double stepDist = minDim * 0.5;
-            double pathLength = P0.distanceTo(P1);
-            int steps = Math.max(1, (int) Math.ceil(pathLength / stepDist));
+        if (minDim > 0 && historyNodes.size() >= 2 && sampleNodes >= 2) {
+            // 计算需要遍历的历史线段数 (如取3个节点，则有2段轨迹)
+            int segments = Math.min(sampleNodes - 1, historyNodes.size() - 1);
 
             List<OBB> sweepOBBs = new ArrayList<>();
             AABB broadAABB = null;
             Vec3 boxCenterOffset = localBox.getCenter();
             Vec3 boxSize = new Vec3(dx, dy, dz);
 
-            for (int i = 0; i <= steps; i++) {
-                float t = (float) i / steps;
-                double mt = 1.0 - t;
+            // 遍历所需的各个历史线段，分别生成贝塞尔平滑切片
+            for (int s = 0; s < segments; s++) {
+                PathNode current = historyNodes.get(s);         // 线段终点
+                PathNode prev = historyNodes.get(s + 1);        // 线段起点
+                PathNode older = historyNodes.size() > s + 2 ? historyNodes.get(s + 2) : prev; // 动量参考点
 
-                Vec3 pos = P0.scale(mt * mt)
-                        .add(C.scale(2 * mt * t))
-                        .add(P1.scale(t * t));
+                Vec3 P1 = current.pos();
+                Vec3 P0 = prev.pos();
+                Vec3 P_minus1 = older.pos();
 
-                float yaw = Mth.rotLerp(t, prev.yaw(), current.yaw());
-                float pitch = Mth.rotLerp(t, prev.pitch(), current.pitch());
-                float roll = Mth.rotLerp(t, prev.roll(), current.roll());
+                Vec3 V0 = P0.subtract(P_minus1);
+                Vec3 C = P0.add(V0.scale(0.5));
 
-                Vec3 hitCenter = pos;
-                if (boxCenterOffset.lengthSqr() > 1e-5) {
-                    hitCenter = hitCenter.add(boxCenterOffset.xRot((float) Math.toRadians(-pitch)).yRot((float) Math.toRadians(-yaw)));
+                double stepDist = minDim * 0.5;
+                double pathLength = P0.distanceTo(P1);
+                int steps = Math.max(1, (int) Math.ceil(pathLength / stepDist));
+
+                for (int i = 0; i <= steps; i++) {
+                    float t = (float) i / steps;
+                    double mt = 1.0 - t;
+
+                    Vec3 pos = P0.scale(mt * mt)
+                            .add(C.scale(2 * mt * t))
+                            .add(P1.scale(t * t));
+
+                    float yaw = Mth.rotLerp(t, prev.yaw(), current.yaw());
+                    float pitch = Mth.rotLerp(t, prev.pitch(), current.pitch());
+                    float roll = Mth.rotLerp(t, prev.roll(), current.roll());
+
+                    Vec3 hitCenter = pos;
+                    if (boxCenterOffset.lengthSqr() > 1e-5) {
+                        hitCenter = hitCenter.add(boxCenterOffset.xRot((float) Math.toRadians(-pitch)).yRot((float) Math.toRadians(-yaw)));
+                    }
+
+                    OBB obb = new OBB(hitCenter, boxSize, yaw, pitch, roll);
+                    sweepOBBs.add(obb);
+
+                    AABB obbBox = obb.getBoundingBox();
+                    broadAABB = (broadAABB == null) ? obbBox : broadAABB.minmax(obbBox);
                 }
-
-                OBB obb = new OBB(hitCenter, boxSize, yaw, pitch, roll);
-                sweepOBBs.add(obb);
-
-                AABB obbBox = obb.getBoundingBox();
-                broadAABB = (broadAABB == null) ? obbBox : broadAABB.minmax(obbBox);
             }
+
+            if (broadAABB == null) return;
 
             Player owner = servant.getOwner();
             List<LivingEntity> potentialTargets = owner.level().getEntitiesOfClass(LivingEntity.class, broadAABB);
             Set<LivingEntity> hitTargets = new HashSet<>();
+
             for (LivingEntity target : potentialTargets) {
                 if (servant.isTarget(target)) {
                     AABB targetBox = target.getBoundingBox();
@@ -87,6 +107,7 @@ public interface IDamagingOnCollide {
                     }
                 }
             }
+
             if (!hitTargets.isEmpty()) {
                 collisionAttack(hitTargets);
             }
@@ -110,7 +131,7 @@ public interface IDamagingOnCollide {
     AABB getHitbox();
 
     /**
-     * 当仆从在本 tick 的轨迹中发生碰撞时触发。
+     * 当仆从在历史轨迹中发生碰撞时触发。
      * @param hitTargets 撞到的目标
      */
     void collisionAttack(Set<LivingEntity> hitTargets);

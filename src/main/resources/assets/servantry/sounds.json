@@ -1,0 +1,8 @@
+{
+  "use_terraprism": {
+    "subtitle": "subtitle.servantry.summon_servant",
+    "sounds": [
+      "servantry:use_terraprism"
+    ]
+  }
+}

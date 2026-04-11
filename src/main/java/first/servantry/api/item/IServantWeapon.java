@@ -5,6 +5,7 @@ import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.register.AttachmentRegister;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -32,6 +33,13 @@ public interface IServantWeapon<T extends Servant> {
      * @param servant 新加入召唤栏的仆从
      */
     void summon(T servant);
+
+    /**
+     * 获得使用音效
+     */
+    default SoundEvent getSoundEvent() {
+        return null;
+    }
 
     /**
      * 潜行右键试图移除仆从时

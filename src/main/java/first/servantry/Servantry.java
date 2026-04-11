@@ -16,6 +16,7 @@ public class Servantry {
         ServantRegister.register(eventBus);
         ItemRegister.register(eventBus);
         CreativeTabRegister.register(eventBus);
+        SoundRegister.register(eventBus);
     }
 
     public static ResourceLocation rl(String path) {
