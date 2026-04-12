@@ -4,9 +4,12 @@
   "package": "first.servantry.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ItemInHandRendererAccessor",
+    "PlayerMixin",
     "ServantMixin"
   ],
   "client": [
+    "ItemInHandRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

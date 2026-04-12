@@ -22,11 +22,16 @@ public interface IServantWeapon<T extends Servant> {
             weapon.summon(servant);
         }
     }
-
+    
     /**
      * 获取武器的仆从类型
      */
     ServantType<T> getType();
+
+    /**
+     * 获取武器面板，只做显示
+     */
+    float getDamage();
 
     /**
      * 成功召唤仆从时

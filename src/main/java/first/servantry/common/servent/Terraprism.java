@@ -162,7 +162,7 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
         for (LivingEntity target : hitTargets) {
             if (!swingHitTargets.contains(target.getId())) {
                 int invulnerableTime = target.invulnerableTime;
-                target.invulnerableTime = 0; // 破除原版无敌帧
+                target.invulnerableTime = 0;
                 target.hurt(getDamageSource(), getDamageValue());
                 target.invulnerableTime = invulnerableTime;
                 swingHitTargets.add(target.getId());
@@ -306,6 +306,10 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
             double distSqr = e.distanceToSqr(getPos());
             double score = distSqr;
             double DANGER_DIST_SQR = 6.0 * 6.0;
+            if (getOwner().getData(AttachmentRegister.WhipData).getMarkedEntityId() == e.getId()) {
+                score -= 20000.0;
+            }
+
             if (e.distanceToSqr(owner) < DANGER_DIST_SQR) {
                 score -= 10000.0;
             }

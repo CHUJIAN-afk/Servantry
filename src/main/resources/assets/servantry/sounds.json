@@ -1,8 +1,17 @@
 {
   "use_terraprism": {
-    "subtitle": "subtitle.servantry.summon_servant",
     "sounds": [
       "servantry:use_terraprism"
+    ]
+  },
+  "use_whip": {
+    "sounds": [
+      "servantry:use_whip"
+    ]
+  },
+  "shake_whip": {
+    "sounds": [
+      "servantry:shake_whip"
     ]
   }
 }

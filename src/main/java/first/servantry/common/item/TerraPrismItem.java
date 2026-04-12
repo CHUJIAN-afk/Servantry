@@ -27,6 +27,11 @@ public class TerraPrismItem extends Item implements IServantWeapon<Terraprism> {
     }
 
     @Override
+    public float getDamage() {
+        return 5;
+    }
+
+    @Override
     public SoundEvent getSoundEvent() {
         return SoundRegister.UseTerraprism.get();
     }

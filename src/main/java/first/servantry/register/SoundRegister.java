@@ -12,6 +12,8 @@ public class SoundRegister {
     private static final DeferredRegister<SoundEvent> Register = DeferredRegister.create(Registries.SOUND_EVENT, Servantry.MODID);
 
     public static final DeferredHolder<SoundEvent, SoundEvent> UseTerraprism = create("use_terraprism");
+    public static final DeferredHolder<SoundEvent, SoundEvent> UseWhip = create("use_whip");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ShakeWhip = create("shake_whip");
 
     private static DeferredHolder<SoundEvent, SoundEvent> create(String name) {
         return Register.register(name, () -> SoundEvent.createVariableRangeEvent(Servantry.rl(name)));

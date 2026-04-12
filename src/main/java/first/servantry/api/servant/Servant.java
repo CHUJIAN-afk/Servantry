@@ -2,7 +2,9 @@ package first.servantry.api.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
+import first.servantry.api.ServantDamageSource;
 import first.servantry.api.register.ServantType;
+import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import first.servantry.register.DamageRegister;
 import net.minecraft.client.Minecraft;
@@ -13,7 +15,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Targeting;
@@ -49,7 +50,8 @@ public abstract class Servant {
             boolean isActive0 = target instanceof Enemy;
             boolean isActive1 = target instanceof Targeting targeting && targeting.getTarget() == owner;
             boolean isActive2 = owner.getLastHurtByMob() != null && owner.getLastHurtByMob() == target;
-            return isActive0 || isActive1 || isActive2;
+            boolean isActive3 = getOwner().getData(AttachmentRegister.WhipData).getMarkedEntityId() == target.getId();
+            return isActive0 || isActive1 || isActive2 || isActive3;
         }
         return false;
     }
@@ -66,9 +68,10 @@ public abstract class Servant {
         }
     }
 
-    public DamageSource getDamageSource() {
+    public ServantDamageSource getDamageSource() {
         Registry<DamageType> damageTypes = getOwner().level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
-        return new DamageSource(damageTypes.getHolderOrThrow(DamageRegister.Servant), getOwner());
+        ServantDamageSource damageSource = new ServantDamageSource(damageTypes.getHolderOrThrow(DamageRegister.Servant), null, getOwner(), getPos(), this);
+        return damageSource;
     }
 
     public int getHistoryNodesSize() {

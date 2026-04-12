@@ -1,6 +1,7 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -18,7 +19,10 @@ public class CreativeTabRegister {
                 CreativeModeTab.Builder builder = CreativeModeTab.builder();
                 builder.title(Component.translatable("modid.servantry"));
                 builder.icon(ItemRegister.TerraPrism.get()::getDefaultInstance);
-                builder.displayItems((parameters, output) -> output.accept(ItemRegister.TerraPrism));
+                builder.displayItems((parameters, output) -> BuiltInRegistries.ITEM.stream()
+                        .filter(item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Servantry.MODID))
+                        .forEach(output::accept)
+                );
                 return builder.build();
             });
 
