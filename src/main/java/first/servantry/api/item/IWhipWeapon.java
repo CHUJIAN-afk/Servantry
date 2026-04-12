@@ -1,16 +1,17 @@
 package first.servantry.api.item;
 
 import first.servantry.api.Marker;
-import net.minecraft.network.chat.Component;
+import first.servantry.api.QuadConsumer;
+import first.servantry.api.servant.Servant;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.function.TriConsumer;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 /**
@@ -19,6 +20,7 @@ import java.util.function.BiConsumer;
 public interface IWhipWeapon {
 
     WhipProperties getWhipProperties();
+
 
     /**
      * 鞭子的基础数据面板
@@ -34,6 +36,14 @@ public interface IWhipWeapon {
             @Nullable SoundEvent swingSound,
             int baseSoundDurationTicks
     ) {}
+
+
+    /**
+     * 如果这个鞭子拥有标记能力，那么仆从攻击带有此标记的目标时触发
+     */
+    default void onHitMarker(LivingEntity target, Servant servant, Marker marker, float amount) {
+
+    }
 
     /**
      * 当鞭子在挥动过程中命中任何敌人时触发 (每个敌人在单次挥击中只触发一次)。
@@ -52,7 +62,7 @@ public interface IWhipWeapon {
     /**
      * 鞭子末端每tick双端触发
      */
-    default void sweepTip(Player player, Vec3 pos) {
+    default void tipTick(Player player, Vec3 pos) {
 
     }
 
@@ -71,6 +81,7 @@ public interface IWhipWeapon {
         private BiConsumer<Player, LivingEntity> onHit = null;
         private BiConsumer<Player, LivingEntity> onLastHit = null;
         private BiConsumer<Player, Vec3> sweepTipAction = null;
+        private QuadConsumer<LivingEntity, Servant, Marker, Float> onHitMarkerAction = null;
 
         public Builder useTime(int useTime) { this.useTime = useTime; return this; }
         public Builder damage(float damage) { this.damage = damage; return this; }
@@ -90,8 +101,13 @@ public interface IWhipWeapon {
             return this;
         }
 
-        public Builder sweepTip(BiConsumer<Player, Vec3> sweepTipAction){
+        public Builder tipTick(BiConsumer<Player, Vec3> sweepTipAction){
             this.sweepTipAction = sweepTipAction;
+            return this;
+        }
+
+        public Builder onHitMarker(QuadConsumer<LivingEntity, Servant, Marker, Float> onHitMarkerAction) {
+            this.onHitMarkerAction = onHitMarkerAction;
             return this;
         }
 
@@ -119,6 +135,17 @@ public interface IWhipWeapon {
                 public void onLastTargetHit(Player player, LivingEntity target) {
                     if (onLastHit != null) onLastHit.accept(player, target);
                 }
+
+                @Override
+                public void tipTick(Player player, Vec3 pos) {
+                    if (sweepTipAction != null) sweepTipAction.accept(player, pos);
+                }
+
+                @Override
+                public void onHitMarker(LivingEntity target, Servant servant, Marker marker, float amount) {
+                    if (onHitMarkerAction != null) onHitMarkerAction.accept(target, servant, marker, amount);
+                }
+
             };
         }
 
@@ -143,6 +170,16 @@ public interface IWhipWeapon {
                 @Override
                 public void onLastTargetHit(Player player, LivingEntity target) {
                     if (onLastHit != null) onLastHit.accept(player, target);
+                }
+
+                @Override
+                public void tipTick(Player player, Vec3 pos) {
+                    if (sweepTipAction != null) sweepTipAction.accept(player, pos);
+                }
+
+                @Override
+                public void onHitMarker(LivingEntity target, Servant servant, Marker marker, float amount) {
+                    if (onHitMarkerAction != null) onHitMarkerAction.accept(target, servant, marker, amount);
                 }
 
             }

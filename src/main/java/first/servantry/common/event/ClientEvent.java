@@ -141,7 +141,10 @@ public class ClientEvent {
             if (location != null) {
                 String key = "servant." + location.getNamespace() + "." + location.getPath();
                 ServantData data = player.getData(AttachmentRegister.ServantData);
-                toolTip.add(Component.translatable("item.servantry.tooltip.5").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(iServantWeapon.getDamage())).withStyle(ChatFormatting.BLUE)));
+                float damage = iServantWeapon.getDamage();
+                if (damage != 0) {
+                    toolTip.add(Component.translatable("item.servantry.tooltip.5").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(damage)).withStyle(ChatFormatting.BLUE)));
+                }
                 toolTip.add(Component.translatable("item.servantry.tooltip.1").withStyle(ChatFormatting.GRAY).append(Component.translatable(key).withStyle(ChatFormatting.BLUE)));
                 toolTip.add(Component.translatable("item.servantry.tooltip.2").withStyle(ChatFormatting.GRAY).append(Component.literal(data.getServants().size() + "/" + data.getMaxSize(player)).withStyle(ChatFormatting.BLUE)));
                 toolTip.add(Component.translatable("item.servantry.tooltip.3").withStyle(ChatFormatting.GRAY));

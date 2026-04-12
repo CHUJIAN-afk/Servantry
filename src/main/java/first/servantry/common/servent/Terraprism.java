@@ -48,7 +48,7 @@ public class Terraprism extends Servant implements IDamagingOnCollide {
         ELLIPSE_SLASH,      // 3: 椭圆循环
         HOURGLASS,          // 4: 沙漏刺击
         CHAIN_STRIKE,       // 5: 连锁斩击
-        RETURN;              // 6: 归来
+        RETURN;             // 6: 归来
 
         public boolean isAttackState() {
             return this == FIRST_STRIKE || this == ELLIPSE_SLASH || this == HOURGLASS || this == CHAIN_STRIKE;

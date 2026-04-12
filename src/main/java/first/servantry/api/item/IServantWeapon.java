@@ -31,13 +31,16 @@ public interface IServantWeapon<T extends Servant> {
     /**
      * 获取武器面板，只做显示
      */
-    float getDamage();
+    default float getDamage(){
+        return 0;
+    }
 
     /**
-     * 成功召唤仆从时
-     * @param servant 新加入召唤栏的仆从
+     * 成功召唤仆从时触发，可以根据需要对仆从位置进行首次修正
      */
-    void summon(T servant);
+    default void summon(T servant) {
+
+    }
 
     /**
      * 获得使用音效

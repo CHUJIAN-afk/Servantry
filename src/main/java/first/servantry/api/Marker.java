@@ -9,6 +9,7 @@ public class Marker {
     private final float extraDamage;           // 额外伤害
     private int remainingTicks;          // 剩余持续时间 (单位：Tick)
     private final float critRate;              // 额外暴击率 (0.0 ~ 1.0)
+    private boolean hited;
 
     /**
      * @param type           标记的唯一标识类型
@@ -21,6 +22,7 @@ public class Marker {
         this.extraDamage = extraDamage;
         this.remainingTicks = durationTicks;
         this.critRate = critRate;
+        this.hited = false;
     }
 
     /**
@@ -40,6 +42,14 @@ public class Marker {
     }
 
     // --- Getter & Setter ---
+
+    public boolean isHited() {
+        return hited;
+    }
+
+    public void setHited(boolean hited) {
+        this.hited = hited;
+    }
 
     public ResourceLocation getType() {
         return type;
@@ -66,15 +76,18 @@ public class Marker {
         buf.writeFloat(this.extraDamage);
         buf.writeInt(this.remainingTicks);
         buf.writeFloat(this.critRate);
+        buf.writeBoolean(this.hited);
     }
 
     public static Marker read(RegistryFriendlyByteBuf buf) {
-        return new Marker(
+        Marker marker = new Marker(
                 buf.readResourceLocation(),
                 buf.readFloat(),
                 buf.readInt(),
                 buf.readFloat()
         );
+        marker.setHited(buf.readBoolean());
+        return marker;
     }
 
 }

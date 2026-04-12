@@ -9,6 +9,9 @@
   "item.servantry.slime_whip.tooltip.1": "末端打击可点燃目标",
   "item.servantry.soulscourge": "魂笞",
   "item.servantry.soulscourge.tooltip.1": "“用邪恶化身的残余鞭打你的敌人”",
+  "item.servantry.starcrash": "星坠",
+  "item.servantry.starcrash.tooltip.1": "用激发能打击敌人",
+  "item.servantry.starcrash.tooltip.2": "仆从击中被激发的敌人时，将引发小爆炸",
   "item.servantry.terraprism": "泰拉棱镜",
   "item.servantry.tooltip.1": "仆从类型:",
   "item.servantry.tooltip.10": "伤害衰减: ",
@@ -23,6 +26,8 @@
   "item.servantry.tooltip.7": "召唤暴击率: ",
   "item.servantry.tooltip.8": "延展长度: ",
   "item.servantry.tooltip.9": "挥动时间: ",
+  "item.servantry.vasculash": "脉管鞭",
+  "item.servantry.vasculash.tooltip.1": "“动脉、静脉和肌腱！”",
   "modid.servantry": "仆从学",
   "servant.servantry.terraprism": "泰拉棱镜"
 }

@@ -40,8 +40,11 @@ public class SoulLangProvider extends LanguageProvider {
         add("item.servantry.leather_whip.tooltip.1", "\"Die monster!\"", "“该死的怪物！”");
         add("item.servantry.soulscourge", "Soulscourge", "魂笞");
         add("item.servantry.soulscourge.tooltip.1", "\"Whip your enemies with the remnants of the incarnation of evil\"", "“用邪恶化身的残余鞭打你的敌人”");
-
-
+        add("item.servantry.starcrash", "Starcrash", "星坠");
+        add("item.servantry.starcrash.tooltip.1", "Strike enemies with Excited Energy", "用激发能打击敌人");
+        add("item.servantry.starcrash.tooltip.2", "When a servant hits an excited enemy, it triggers a small explosion", "仆从击中被激发的敌人时，将引发小爆炸");
+        add("item.servantry.vasculash", "Vasculash", "脉管鞭");
+        add("item.servantry.vasculash.tooltip.1", "\"Arteries, veins, and tendons!\"", "“动脉、静脉和肌腱！”");
     }
 
     private void add(String key, String enDesc, String zhDesc) {

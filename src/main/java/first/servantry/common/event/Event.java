@@ -3,6 +3,7 @@ package first.servantry.common.event;
 import first.servantry.Servantry;
 import first.servantry.api.Marker;
 import first.servantry.api.ServantDamageSource;
+import first.servantry.api.event.ServantAttackEvent;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.item.IWhipWeapon;
 import first.servantry.api.servant.Servant;
@@ -10,6 +11,8 @@ import first.servantry.common.attachment.ServantData;
 import first.servantry.common.attachment.WhipData;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -22,13 +25,16 @@ import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
@@ -84,14 +90,31 @@ public class Event {
             event.setAmount(event.getAmount() * scale);
             WhipData data = owner.getData(AttachmentRegister.WhipData);
             Marker activeMarker = data.getActiveMarker();
-            if (activeMarker != null && data.getMarkedEntityId() == target.getId()) {
+            if (data.isMarkTarget(target)) {
                 event.setAmount(event.getAmount() + activeMarker.getExtraDamage());
                 if (owner.getRandom().nextDouble() < activeMarker.getCritRate()) {
                     event.setAmount(event.getAmount() * 2);
                 }
             }
+            ServantAttackEvent attackEvent = new ServantAttackEvent(damageSource, target, event.getAmount());
+            NeoForge.EVENT_BUS.post(attackEvent);
+            event.setAmount(attackEvent.getAmount());
+            if (activeMarker != null) {
+                IWhipWeapon whipWeapon = Cache.computeIfAbsent(activeMarker.getType(), location -> BuiltInRegistries.ITEM.stream()
+                        .filter(item -> item instanceof IWhipWeapon)
+                        .map(item -> (IWhipWeapon) item)
+                        .filter(iWhipWeapon -> iWhipWeapon.getWhipProperties().marker() != null && iWhipWeapon.getWhipProperties().marker().getType().equals(location))
+                        .findFirst()
+                        .orElse(null)
+                );
+                if (whipWeapon != null) {
+                    whipWeapon.onHitMarker(target, servant, activeMarker, event.getAmount());
+                }
+            }
         }
     }
+
+    private static final Map<ResourceLocation, IWhipWeapon> Cache = new HashMap<>();
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void summon(PlayerInteractEvent.RightClickItem event) {

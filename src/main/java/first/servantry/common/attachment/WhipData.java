@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.Marker;
 import first.servantry.api.OBB;
 import first.servantry.api.item.IWhipWeapon;
-import first.servantry.register.AttachmentRegister;
 import first.servantry.register.DamageRegister;
 import first.servantry.register.SoundRegister;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -41,8 +40,8 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
     private float lastProgress = 0;
     private boolean isAttacking = false;
 
-    // 1 为右到左扫，-1 为左到右扫
     private int sweepDirection = 1;
+    private int attackSlot = -1;
 
     private final Set<Integer> hitTargets = new HashSet<>();
     private int lastHitEntityId = -1;
@@ -51,12 +50,17 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
     private Marker activeMarker = null;
 
     private static final double WHIP_THICKNESS = 0.25;
+    private static final int TOTAL_COLLISION_SAMPLES = 60;
 
     public float getProgress() { return progress; }
-    public float getLastProgress() { return lastProgress; }
     public boolean isAttacking() { return isAttacking; }
     public int getMarkedEntityId() { return markedEntityId; }
-    public Marker getActiveMarker() { return activeMarker; }
+    public Marker getActiveMarker() {
+        return activeMarker;
+    }
+    public boolean isMarkTarget(LivingEntity target) {
+        return activeMarker != null && target.getId() == markedEntityId;
+    }
 
     public void startAttack(Player player) {
         if (!this.isAttacking) {
@@ -65,6 +69,9 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
             this.lastProgress = 0;
             this.hitTargets.clear();
             this.lastHitEntityId = -1;
+
+            // 【锁定槽位】：记录当前玩家选中的快捷栏 (0-8)
+            this.attackSlot = player.getInventory().selected;
 
             this.sweepDirection = (this.sweepDirection == 1) ? -1 : 1;
 
@@ -89,56 +96,66 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
         if (!isAttacking) return;
 
         ItemStack itemStack = player.getItemInHand(InteractionHand.MAIN_HAND);
-        if (itemStack.getItem() instanceof IWhipWeapon whipWeapon) {
-            IWhipWeapon.WhipProperties props = whipWeapon.getWhipProperties();
 
-            this.lastProgress = this.progress;
-            this.progress += 1.0f / props.useTime();
-            player.resetAttackStrengthTicker();
+        if (!(itemStack.getItem() instanceof IWhipWeapon whipWeapon) || player.getInventory().selected != this.attackSlot) {
+            this.isAttacking = false;
+            this.progress = 0;
+            this.lastProgress = 0;
+            this.hitTargets.clear();
+            this.lastHitEntityId = -1;
+            return;
+        }
 
-            if (this.lastProgress < 0.5f && this.progress >= 0.5f) {
-                if (!player.level().isClientSide()) {
-                    SoundEvent sound = props.swingSound() != null ? props.swingSound() : SoundRegister.ShakeWhip.get();
-                    player.level().playSound(null, player.getX(), player.getY(), player.getZ(), sound, player.getSoundSource(), 1, 1);
-                }
-            }
+        IWhipWeapon.WhipProperties props = whipWeapon.getWhipProperties();
 
-            boolean finished = false;
-            if (this.progress >= 1.0f) {
-                player.swingTime = 0;
-                this.progress = 1.0f;
-                finished = true;
-            }
+        this.lastProgress = this.progress;
+        this.progress += 1.0f / props.useTime();
+        player.resetAttackStrengthTicker();
 
+        if (this.lastProgress < 0.5f && this.progress >= 0.5f) {
             if (!player.level().isClientSide()) {
-                performSegmentedCollision(player, whipWeapon, props);
-                if (finished && this.lastHitEntityId != -1) {
-                    if (player.level().getEntity(lastHitEntityId) instanceof LivingEntity lastTarget) {
-                        whipWeapon.onLastTargetHit(player, lastTarget);
-                        Marker markerTemplate = props.marker();
-                        if (!(lastTarget instanceof Player) && markerTemplate != null) {
-                            this.markedEntityId = lastTarget.getId();
-                            this.activeMarker = new Marker(markerTemplate.getType(), markerTemplate.getExtraDamage(), markerTemplate.getRemainingTicks(), markerTemplate.getCritRate());
-                        }
+                SoundEvent sound = props.swingSound() != null ? props.swingSound() : SoundRegister.ShakeWhip.get();
+                player.level().playSound(null, player.getX(), player.getY(), player.getZ(), sound, player.getSoundSource(), 1, 1);
+            }
+        }
+
+        boolean finished = false;
+        if (this.progress >= 1.0f) {
+            player.swingTime = 0;
+            this.progress = 1.0f;
+            finished = true;
+        }
+
+        if (!player.level().isClientSide()) {
+            performSegmentedCollision(player, whipWeapon, props);
+            if (finished && this.lastHitEntityId != -1) {
+                if (player.level().getEntity(lastHitEntityId) instanceof LivingEntity lastTarget) {
+                    whipWeapon.onLastTargetHit(player, lastTarget);
+                    Marker markerTemplate = props.marker();
+                    if (!(lastTarget instanceof Player) && markerTemplate != null) {
+                        this.markedEntityId = lastTarget.getId();
+                        this.activeMarker = new Marker(markerTemplate.getType(), markerTemplate.getExtraDamage(), markerTemplate.getRemainingTicks(), markerTemplate.getCritRate());
                     }
                 }
             }
-            whipWeapon.sweepTip(player, getTipPosition(player, 0));
-            if (finished) {
-                this.isAttacking = false;
-                this.progress = 0;
-                this.lastProgress = 0;
-            }
-        } else {
+        }
+
+        if (finished) {
             this.isAttacking = false;
+            this.progress = 0;
+            this.lastProgress = 0;
+            this.hitTargets.clear();
         }
     }
 
     private void performSegmentedCollision(Player player, IWhipWeapon whipWeapon, IWhipWeapon.WhipProperties props) {
-        int steps = Math.max(1, (int) Math.ceil((progress - lastProgress) / 0.02f));
-
-        for (int step = 1; step <= steps; step++) {
-            float t = lastProgress + (progress - lastProgress) * ((float) step / steps);
+        // 固定全局绝对采样，消除攻速波动导致的漏检问题
+        int startSample = (int) Math.floor(this.lastProgress * TOTAL_COLLISION_SAMPLES);
+        int endSample = (int) Math.floor(this.progress * TOTAL_COLLISION_SAMPLES);
+        // 如果一帧跨越了多个采样点，统统补上；如果攻速很慢跨度为 0，则本帧不检测，节约性能
+        for (int step = startSample + 1; step <= endSample; step++) {
+            float t = (float) step / TOTAL_COLLISION_SAMPLES;
+            if (t > 1.0f) t = 1.0f;
             List<Vec3> points = getWhipPoints(player, t, props.length(), 1.0f);
 
             if (points.size() < 2) continue;
@@ -198,7 +215,9 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
     }
 
     private List<Vec3> getWhipPoints(Player player, float rawP, double totalLength, float partialTick) {
-        float p = rawP < 0.5f ? 4.0f * rawP * rawP * rawP : 1.0f - (float) Math.pow(-2.0f * rawP + 2.0f, 3.0f) / 2.0f;
+        float swingP = rawP < 0.5f ? 16.0f * rawP * rawP * rawP * rawP * rawP : 1.0f - (float) Math.pow(-2.0f * rawP + 2.0f, 5.0f) / 2.0f;
+
+        float lengthMod = (float) Math.sin(rawP * Math.PI);
 
         Vec3 eyePos = player.getEyePosition(partialTick);
         float viewYaw = player.getViewYRot(partialTick);
@@ -224,8 +243,9 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
         }
         Vec3 upDir = rightDir.cross(forwardDir).normalize();
 
-        float maxTheta = (float) Math.toRadians(70);
-        double theta = maxTheta * this.sweepDirection * (1.0 - 2.0 * p);
+        float maxTheta = (float) Math.toRadians(30);
+
+        double theta = maxTheta * this.sweepDirection * (1.0 - 2.0 * swingP);
         Vec3 currentLook = forwardDir.scale(Math.cos(theta)).add(rightDir.scale(Math.sin(theta))).normalize();
 
         Vec3 startPos = pivotPos.add(currentLook.scale(0.4));
@@ -235,13 +255,13 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
         List<Vec3> points = new ArrayList<>(segments + 1);
         points.add(startPos);
 
-        float lengthMod = 1.0f - Math.abs(p - 0.5f) * 2.0f;
         double currentLen = totalLength * lengthMod;
         if (currentLen < 0.1) return points;
         double ds = currentLen / segments;
 
         float maxPhi = 2.0f * (float) Math.PI;
-        float currentPhi = maxPhi * (1.0f - 2.0f * p);
+
+        float currentPhi = maxPhi * (1.0f - 2.0f * swingP);
 
         Vec3 currentPos = startPos;
         for (int i = 0; i < segments; i++) {
@@ -266,11 +286,6 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
         List<Vec3> points = getWhipPoints(player, rawP, props.length(), partialTick);
         if (points.size() < 2) return;
 
-        Vec3 eyePos = player.getEyePosition(partialTick);
-        float viewYaw = player.getViewYRot(partialTick);
-        float viewPitch = player.getViewXRot(partialTick);
-        Vec3 eyeLook = Vec3.directionFromRotation(viewPitch, viewYaw);
-
         Vec3 cameraPos = net.minecraft.client.Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         com.mojang.blaze3d.vertex.VertexConsumer consumer = bufferSource.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(props.texture()));
 
@@ -280,6 +295,10 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
         int light = LevelRenderer.getLightColor(player.level(), player.blockPosition());
         float thickness = (float) WHIP_THICKNESS * 0.5f;
 
+        float viewYaw = player.getViewYRot(partialTick);
+        float viewPitch = player.getViewXRot(partialTick);
+        Vec3 cameraUp = Vec3.directionFromRotation(viewPitch - 90f, viewYaw);
+
         for (int i = 0; i < points.size() - 1; i++) {
             float u1 = (float) i / (points.size() - 1);
             float u2 = (float) (i + 1) / (points.size() - 1);
@@ -288,9 +307,11 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
 
             Vec3 dir = p2.subtract(p1).normalize();
 
-            Vec3 renderUp = eyeLook.cross(dir).normalize();
-            if (renderUp.lengthSqr() < 1e-5) renderUp = new Vec3(0, 1, 0);
-            Vec3 renderRight = dir.cross(renderUp).normalize();
+            Vec3 renderRight = dir.cross(cameraUp).normalize();
+            if (renderRight.lengthSqr() < 1e-5) {
+                renderRight = Vec3.directionFromRotation(0, viewYaw + 90f).normalize();
+            }
+            Vec3 renderUp = renderRight.cross(dir).normalize();
 
             Vec3 sideVec = renderRight.scale(thickness);
             Vec3 upVec = renderUp.scale(thickness);
@@ -299,12 +320,13 @@ public class WhipData implements AttachmentSyncHandler<WhipData> {
             drawWhipQuad(poseStack, consumer, p1.add(upVec), p1.subtract(upVec), p2.subtract(upVec), p2.add(upVec), u1, u2, light);
         }
         poseStack.popPose();
+
+        whipWeapon.tipTick(player, getTipPosition(player, partialTick));
     }
 
     private void drawWhipQuad(com.mojang.blaze3d.vertex.PoseStack poseStack, com.mojang.blaze3d.vertex.VertexConsumer consumer, Vec3 v1, Vec3 v2, Vec3 v3, Vec3 v4, float u1, float u2, int light) {
         PoseStack.Pose pose = poseStack.last();
         org.joml.Matrix4f matrix = pose.pose();
-
         consumer.addVertex(matrix, (float) v1.x, (float) v1.y, (float) v1.z).setColor(255, 255, 255, 255).setUv(u1, 0).setOverlay(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
         consumer.addVertex(matrix, (float) v2.x, (float) v2.y, (float) v2.z).setColor(255, 255, 255, 255).setUv(u1, 1).setOverlay(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);
         consumer.addVertex(matrix, (float) v3.x, (float) v3.y, (float) v3.z).setColor(255, 255, 255, 255).setUv(u2, 1).setOverlay(net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY).setLight(light).setNormal(pose, 0, 1, 0);

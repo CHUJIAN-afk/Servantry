@@ -9,6 +9,9 @@
   "item.servantry.slime_whip.tooltip.1": "Slows hit targets",
   "item.servantry.soulscourge": "Soulscourge",
   "item.servantry.soulscourge.tooltip.1": "\"Whip your enemies with the remnants of the incarnation of evil\"",
+  "item.servantry.starcrash": "Starcrash",
+  "item.servantry.starcrash.tooltip.1": "Strike enemies with Excited Energy",
+  "item.servantry.starcrash.tooltip.2": "When a servant hits an excited enemy, it triggers a small explosion",
   "item.servantry.terraprism": "Terraprism",
   "item.servantry.tooltip.1": "Servant type:",
   "item.servantry.tooltip.10": "Damage Decay: ",
@@ -23,6 +26,8 @@
   "item.servantry.tooltip.7": "Summon Crit Rate: ",
   "item.servantry.tooltip.8": "Extension Length: ",
   "item.servantry.tooltip.9": "Swing Duration: ",
+  "item.servantry.vasculash": "Vasculash",
+  "item.servantry.vasculash.tooltip.1": "\"Arteries, veins, and tendons!\"",
   "modid.servantry": "Servantry",
   "servant.servantry.terraprism": "Terraprism"
 }
