@@ -7,9 +7,7 @@ import first.servantry.register.AttachmentRegister;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +26,6 @@ public record WhipAttackPacket() implements CustomPacketPayload {
             Player player = context.player();
             if (player.getMainHandItem().getItem() instanceof IWhipWeapon) {
                 WhipData whipData = player.getData(AttachmentRegister.WhipData);
-                player.swing(InteractionHand.MAIN_HAND, true);
                 whipData.startAttack(player);
             }
         });

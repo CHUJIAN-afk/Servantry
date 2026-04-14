@@ -1,6 +1,8 @@
 package first.servantry.mixin;
 
 import first.servantry.api.item.IWhipWeapon;
+import first.servantry.common.attachment.WhipData;
+import first.servantry.register.AttachmentRegister;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,7 +20,10 @@ public class PlayerMixin {
     public void getAttackStrengthScale(float adjustTicks, CallbackInfoReturnable<Float> cir) {
         Player player = (Player) (Object) this;
         if (player.getMainHandItem().getItem() instanceof IWhipWeapon) {
-            cir.setReturnValue(1f);
+            WhipData data = player.getData(AttachmentRegister.WhipData);
+            if (data.isAttacking()) {
+                cir.setReturnValue(0F);
+            }
         }
     }
 

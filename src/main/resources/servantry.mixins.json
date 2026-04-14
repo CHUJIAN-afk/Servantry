@@ -9,7 +9,8 @@
     "ServantMixin"
   ],
   "client": [
-    "ItemInHandRendererMixin"
+    "ItemInHandRendererMixin",
+    "MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

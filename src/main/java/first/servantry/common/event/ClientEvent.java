@@ -1,11 +1,10 @@
 package first.servantry.common.event;
 
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
-import first.servantry.api.Marker;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.item.IWhipWeapon;
+import first.servantry.api.register.MarkerType;
 import first.servantry.api.register.Registries;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
@@ -18,6 +17,7 @@ import first.servantry.register.NetworkPacketRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -39,7 +39,6 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,10 +51,12 @@ public class ClientEvent {
     @SubscribeEvent
     public static void onInteractionKey(InputEvent.InteractionKeyMappingTriggered event) {
         if (event.isAttack()) {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.player != null && mc.player.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof IWhipWeapon) {
-                event.setCanceled(true);
-                event.setSwingHand(false);
+            LocalPlayer player = Minecraft.getInstance().player;
+            if (player != null) {
+                WhipData data = player.getData(AttachmentRegister.WhipData);
+                if (data.isAttacking() || player.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof IWhipWeapon) {
+                    event.setCanceled(true);
+                }
             }
         }
     }
@@ -82,8 +83,7 @@ public class ClientEvent {
             Player player = mc.player;
             if (player != null) {
                 WhipData data = player.getData(AttachmentRegister.WhipData);
-                boolean isAttackingOrHolding = data.isAttacking() || mc.options.keyAttack.isDown();
-                if (isAttackingOrHolding && event.getItemStack().getItem() instanceof IWhipWeapon) {
+                if ((data.isAttacking() || mc.options.keyAttack.isDown()) && event.getItemStack().getItem() instanceof IWhipWeapon) {
                     event.setCanceled(true);
                 }
             }
@@ -91,9 +91,9 @@ public class ClientEvent {
     }
 
     @SubscribeEvent
-    public static void lift(PlayerInteractEvent.LeftClickEmpty event) {
+    public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         if (event.getItemStack().getItem() instanceof IWhipWeapon) {
-            NetworkPacketRegister.playToServer(new WhipAttackPacket());
+            event.setCanceled(true);
         }
     }
 
@@ -135,6 +135,7 @@ public class ClientEvent {
         Player player = event.getEntity();
         ItemStack itemStack = event.getItemStack();
         List<Component> toolTip = event.getToolTip();
+
         if (itemStack.getItem() instanceof IServantWeapon<?> iServantWeapon && player != null) {
             ServantType<?> type = iServantWeapon.getType();
             ResourceLocation location = Registries.SERVANT_TYPES.getKey(type);
@@ -151,12 +152,9 @@ public class ClientEvent {
                 toolTip.add(Component.translatable("item.servantry.tooltip.4").withStyle(ChatFormatting.GRAY));
             }
         }
+
         if (itemStack.getItem() instanceof IWhipWeapon iWhipWeapon) {
-            IWhipWeapon.WhipProperties properties = iWhipWeapon.getWhipProperties();
-
-
-            // 5: 召唤伤害
-            float damage = properties.damage();
+            float damage = iWhipWeapon.getDamage();
             if (player != null && player.getAttribute(AttributeRegister.ServantDamage) instanceof AttributeInstance instance) {
                 damage *= (float) instance.getValue();
             }
@@ -165,53 +163,42 @@ public class ClientEvent {
                     .withStyle(ChatFormatting.GRAY)
                     .append(Component.literal(String.valueOf(damage)).withStyle(ChatFormatting.BLUE)));
 
-            // 8: 延展长度
             toolTip.add(Component.translatable("item.servantry.tooltip.8")
                     .withStyle(ChatFormatting.GRAY)
-                    .append(Component.literal(String.valueOf(properties.length())).withStyle(ChatFormatting.BLUE)));
+                    .append(Component.literal(String.valueOf(iWhipWeapon.getLength())).withStyle(ChatFormatting.BLUE)));
 
-            // 9: 挥动时间
             toolTip.add(Component.translatable("item.servantry.tooltip.9")
                     .withStyle(ChatFormatting.GRAY)
-                    .append(Component.literal(String.valueOf(properties.useTime())).withStyle(ChatFormatting.BLUE)));
+                    .append(Component.literal(String.valueOf(iWhipWeapon.getUseTime())).withStyle(ChatFormatting.BLUE)));
 
-            // 10: 伤害衰减 (将浮点数转换为百分比显示，例如 0.8 转换为 80%)
-            int falloffPercent = (int) (properties.damageFalloff() * 100);
+            int falloffPercent = (int) (iWhipWeapon.getDamageFalloff() * 100);
             toolTip.add(Component.translatable("item.servantry.tooltip.10")
                     .withStyle(ChatFormatting.GRAY)
                     .append(Component.literal(falloffPercent + "%").withStyle(ChatFormatting.BLUE)));
 
-            // 11/12: 能穿透方块 / 不能穿透方块
-            if (properties.penetrateBlocks()){
+            if (iWhipWeapon.canPenetrateBlocks()){
                 toolTip.add(Component.translatable("item.servantry.tooltip.11")
                         .withStyle(ChatFormatting.GRAY));
             }
 
-            // --- 标记相关属性 ---
-            Marker marker = properties.marker();
-            if (marker != null) {
-                // 加一个空行，让基础属性和标记特效在视觉上分开，排版更美观
-                toolTip.add(Component.empty());
+            MarkerType markerType = iWhipWeapon.getBoundMarker();
+            toolTip.add(Component.empty());
 
-                // 6: 召唤标记伤害
-                toolTip.add(Component.translatable("item.servantry.tooltip.6")
+            toolTip.add(Component.translatable("item.servantry.tooltip.6")
+                    .withStyle(ChatFormatting.GRAY)
+                    .append(Component.literal(String.valueOf(markerType.getExtraDamage())).withStyle(ChatFormatting.BLUE)));
+
+            float critRate = markerType.getCritRate();
+            if (critRate > 0) {
+                int critPercent = (int) (critRate * 100);
+                toolTip.add(Component.translatable("item.servantry.tooltip.7")
                         .withStyle(ChatFormatting.GRAY)
-                        .append(Component.literal(String.valueOf(marker.getExtraDamage())).withStyle(ChatFormatting.BLUE)));
-
-                // 7: 召唤暴击率
-                float critRate = marker.getCritRate();
-                if (critRate > 0) {
-                    // 修复了你原本代码里暴击率显示的逻辑错误。假设 critRate 是 0.15，这里会正确显示为 15%
-                    int critPercent = (int) (critRate * 100);
-                    toolTip.add(Component.translatable("item.servantry.tooltip.7")
-                            .withStyle(ChatFormatting.GRAY)
-                            .append(Component.literal(critPercent + "%").withStyle(ChatFormatting.BLUE)));
-                }
-
-                // 机制说明文本
-                toolTip.add(Component.translatable("item.servantry.tooltip.13").withStyle(ChatFormatting.DARK_GRAY));
+                        .append(Component.literal(critPercent + "%").withStyle(ChatFormatting.BLUE)));
             }
+
+            toolTip.add(Component.translatable("item.servantry.tooltip.13").withStyle(ChatFormatting.DARK_GRAY));
         }
+
         Item item = itemStack.getItem();
         ResourceLocation registryName = BuiltInRegistries.ITEM.getKey(item);
         if (registryName.getNamespace().equals(Servantry.MODID)) {
@@ -232,5 +219,4 @@ public class ClientEvent {
             }
         }
     }
-
 }

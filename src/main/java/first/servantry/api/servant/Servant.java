@@ -50,7 +50,7 @@ public abstract class Servant {
             boolean isActive0 = target instanceof Enemy;
             boolean isActive1 = target instanceof Targeting targeting && targeting.getTarget() == owner;
             boolean isActive2 = owner.getLastHurtByMob() != null && owner.getLastHurtByMob() == target;
-            boolean isActive3 = getOwner().getData(AttachmentRegister.WhipData).getMarkedEntityId() == target.getId();
+            boolean isActive3 = owner.getData(AttachmentRegister.WhipData).isMarkTarget(target);
             return isActive0 || isActive1 || isActive2 || isActive3;
         }
         return false;

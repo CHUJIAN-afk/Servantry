@@ -1,17 +1,17 @@
 package first.servantry.common.event;
 
 import first.servantry.Servantry;
-import first.servantry.api.Marker;
+import first.servantry.api.ActiveMarker;
 import first.servantry.api.ServantDamageSource;
 import first.servantry.api.event.ServantAttackEvent;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.item.IWhipWeapon;
+import first.servantry.api.register.MarkerType;
 import first.servantry.api.servant.Servant;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.common.attachment.WhipData;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
@@ -85,32 +85,39 @@ public class Event {
         if (!target.level().isClientSide() && source instanceof ServantDamageSource damageSource) {
             Servant servant = damageSource.getServant();
             Player owner = servant.getOwner();
+
             AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantDamage);
             float scale = instance != null ? (float) instance.getValue() : 1;
             event.setAmount(event.getAmount() * scale);
+
             WhipData data = owner.getData(AttachmentRegister.WhipData);
-            Marker activeMarker = data.getActiveMarker();
-            if (data.isMarkTarget(target)) {
-                event.setAmount(event.getAmount() + activeMarker.getExtraDamage());
-                if (owner.getRandom().nextDouble() < activeMarker.getCritRate()) {
-                    event.setAmount(event.getAmount() * 2);
+            ActiveMarker activeMarker = data.getActiveMarker();
+
+            // 如果目标被标记，直接通过 ID 从注册表中 O(1) 获取标记逻辑！
+            if (activeMarker != null && data.isMarkTarget(target)) {
+                MarkerType markerType = activeMarker.getType();
+                if (markerType != null) {
+                    // 1. 附加基础属性
+                    event.setAmount(event.getAmount() + markerType.getExtraDamage());
+                    if (owner.getRandom().nextDouble() < markerType.getCritRate()) {
+                        event.setAmount(event.getAmount() * 2);
+                    }
+
+                    // 2. 抛出并应用攻击事件
+                    ServantAttackEvent attackEvent = new ServantAttackEvent(damageSource, target, event.getAmount());
+                    NeoForge.EVENT_BUS.post(attackEvent);
+                    event.setAmount(attackEvent.getAmount());
+
+                    // 3. 【极简触发】：直接调用该标记自身重写的方法！
+                    markerType.onServantHit(target, servant, owner, activeMarker, event.getAmount());
+                    return; // 直接返回，逻辑结束
                 }
             }
+
+            // 未被标记的情况
             ServantAttackEvent attackEvent = new ServantAttackEvent(damageSource, target, event.getAmount());
             NeoForge.EVENT_BUS.post(attackEvent);
             event.setAmount(attackEvent.getAmount());
-            if (activeMarker != null) {
-                IWhipWeapon whipWeapon = Cache.computeIfAbsent(activeMarker.getType(), location -> BuiltInRegistries.ITEM.stream()
-                        .filter(item -> item instanceof IWhipWeapon)
-                        .map(item -> (IWhipWeapon) item)
-                        .filter(iWhipWeapon -> iWhipWeapon.getWhipProperties().marker() != null && iWhipWeapon.getWhipProperties().marker().getType().equals(location))
-                        .findFirst()
-                        .orElse(null)
-                );
-                if (whipWeapon != null) {
-                    whipWeapon.onHitMarker(target, servant, activeMarker, event.getAmount());
-                }
-            }
         }
     }
 

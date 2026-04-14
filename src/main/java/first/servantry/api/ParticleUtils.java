@@ -1,7 +1,9 @@
 package first.servantry.api;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Random;
@@ -16,6 +18,12 @@ public class ParticleUtils {
 
     public static Random getRandom() {
         return ThreadLocalRandom.current();
+    }
+
+    public static void addParticle(Level level, ParticleOptions particleOptions, Vec3 pos, Vec3 speed) {
+        if (level.isClientSide() && !Minecraft.getInstance().isPaused()) {
+            level.addParticle(particleOptions, pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
+        }
     }
 
     /**
