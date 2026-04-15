@@ -4,13 +4,11 @@
   "package": "first.servantry.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ItemInHandRendererAccessor",
-    "PlayerMixin",
+    "CombatRulesMixin",
+    "CommonHooksMixin",
     "ServantMixin"
   ],
   "client": [
-    "ItemInHandRendererMixin",
-    "MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

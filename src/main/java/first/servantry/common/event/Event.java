@@ -1,21 +1,15 @@
 package first.servantry.common.event;
 
 import first.servantry.Servantry;
-import first.servantry.api.ActiveMarker;
 import first.servantry.api.ServantDamageSource;
-import first.servantry.api.event.ServantAttackEvent;
+import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.item.IServantWeapon;
-import first.servantry.api.item.IWhipWeapon;
-import first.servantry.api.register.MarkerType;
 import first.servantry.api.servant.Servant;
 import first.servantry.common.attachment.ServantData;
-import first.servantry.common.attachment.WhipData;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -25,33 +19,14 @@ import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
-
-    @SubscribeEvent
-    public static void attackEntity(AttackEntityEvent event) {
-        if (event.getEntity().getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof IWhipWeapon) {
-            event.setCanceled(true);
-        }
-    }
-
-    @SubscribeEvent
-    public static void interactBlock(PlayerInteractEvent.LeftClickBlock event) {
-        if (event.getEntity().getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof IWhipWeapon) {
-            event.setCanceled(true);
-        }
-    }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onPlayerTick(PlayerTickEvent.Post event) {
@@ -71,57 +46,20 @@ public class Event {
             data.setChange(false);
             player.syncData(AttachmentRegister.ServantData);
         }
-
-        player.getData(AttachmentRegister.WhipData).tick(player);
-        if (!player.level().isClientSide()) {
-            player.syncData(AttachmentRegister.WhipData);
-        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void ServantDamage(LivingIncomingDamageEvent event) {
-        DamageSource source = event.getSource();
+    public static void ServantDamage(ServantIncomingDamageEvent event) {
+        ServantDamageSource source = event.getSource();
         LivingEntity target = event.getEntity();
-        if (!target.level().isClientSide() && source instanceof ServantDamageSource damageSource) {
-            Servant servant = damageSource.getServant();
+        if (!target.level().isClientSide()) {
+            Servant servant = source.getServant();
             Player owner = servant.getOwner();
-
             AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantDamage);
             float scale = instance != null ? (float) instance.getValue() : 1;
             event.setAmount(event.getAmount() * scale);
-
-            WhipData data = owner.getData(AttachmentRegister.WhipData);
-            ActiveMarker activeMarker = data.getActiveMarker();
-
-            // 如果目标被标记，直接通过 ID 从注册表中 O(1) 获取标记逻辑！
-            if (activeMarker != null && data.isMarkTarget(target)) {
-                MarkerType markerType = activeMarker.getType();
-                if (markerType != null) {
-                    // 1. 附加基础属性
-                    event.setAmount(event.getAmount() + markerType.getExtraDamage());
-                    if (owner.getRandom().nextDouble() < markerType.getCritRate()) {
-                        event.setAmount(event.getAmount() * 2);
-                    }
-
-                    // 2. 抛出并应用攻击事件
-                    ServantAttackEvent attackEvent = new ServantAttackEvent(damageSource, target, event.getAmount());
-                    NeoForge.EVENT_BUS.post(attackEvent);
-                    event.setAmount(attackEvent.getAmount());
-
-                    // 3. 【极简触发】：直接调用该标记自身重写的方法！
-                    markerType.onServantHit(target, servant, owner, activeMarker, event.getAmount());
-                    return; // 直接返回，逻辑结束
-                }
-            }
-
-            // 未被标记的情况
-            ServantAttackEvent attackEvent = new ServantAttackEvent(damageSource, target, event.getAmount());
-            NeoForge.EVENT_BUS.post(attackEvent);
-            event.setAmount(attackEvent.getAmount());
         }
     }
-
-    private static final Map<ResourceLocation, IWhipWeapon> Cache = new HashMap<>();
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void summon(PlayerInteractEvent.RightClickItem event) {

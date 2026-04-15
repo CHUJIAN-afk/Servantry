@@ -2,8 +2,8 @@ package first.servantry.dadageneeator;
 
 import first.servantry.Servantry;
 import first.servantry.api.item.IServantWeapon;
-import first.servantry.api.item.IWhipWeapon;
 import first.servantry.dadageneeator.provider.SoulLangProvider;
+import first.servantry.register.ItemRegister;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -25,12 +25,12 @@ public class DataGeneratorEvent {
         generator.addProvider(event.includeServer(), new SoulLangProvider(packOutput, Servantry.MODID, "en_us"));
         generator.addProvider(event.includeServer(), new SoulLangProvider(packOutput, Servantry.MODID, "zh_cn"));
         //物品模型模型
-        generator.addProvider(event.includeClient(), new ItemModelProvider(packOutput, Servantry.MODID, existingFileHelper){
+        generator.addProvider(event.includeClient(), new ItemModelProvider(packOutput, Servantry.MODID, existingFileHelper) {
 
             @Override
             protected void registerModels() {
                 BuiltInRegistries.ITEM.stream()
-                        .filter(item -> item instanceof IWhipWeapon || item instanceof IServantWeapon<?>)
+                        .filter(item -> item instanceof IServantWeapon<?>)
                         .forEach(this::handheldItem);
             }
 

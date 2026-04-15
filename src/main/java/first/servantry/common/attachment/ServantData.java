@@ -7,8 +7,12 @@ import first.servantry.api.servant.Servant;
 import first.servantry.register.AttributeRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.attachment.AttachmentSyncHandler;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
@@ -22,13 +26,17 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
     private final List<Servant> servants = new ArrayList<>();
     private boolean change = true;
 
+    // =======================================================
+    // 【核心性能优化】：单 Tick 生命周期的实体空间缓存池
+    // 避免多仆从情况下，每个仆从每 Tick 都要遍历查询周围区块
+    // =======================================================
+    private int lastCacheTick = -1;
+    private final List<LivingEntity> cachedEnemies = new ArrayList<>();
+
     public List<Servant> getServants() {
         return servants;
     }
 
-    /**
-     * 添加仆从
-     */
     public boolean summon(Player player, Servant servant) {
         if (getMaxSize(player) > getServants().size()) {
             servants.add(servant);
@@ -38,9 +46,6 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
         return false;
     }
 
-    /**
-     * 移除仆从栏中最早召唤的某一类仆从
-     */
     public void remove(ServantType<?> type) {
         Servant target = null;
         for (Servant servant : servants) {
@@ -55,9 +60,6 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
         }
     }
 
-    /**
-     * 获得玩家的最大仆从数量
-     */
     public int getMaxSize(Player player) {
         AttributeInstance attribute = player.getAttribute(AttributeRegister.ServantMaxCount);
         if (attribute != null) {
@@ -66,42 +68,55 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
         return 0;
     }
 
-    /**
-     * 获得在同类型仆从中的次序
-     */
     public int getOrder(Servant target) {
         int order = 0;
         for (Servant s : servants) {
-            if (s == target) {
-                return order;
-            }
-            if (s.getType().equals(target.getType())) {
-                order++;
-            }
+            if (s == target) return order;
+            if (s.getType().equals(target.getType())) order++;
         }
         return -1;
     }
 
-    /**
-     * 获得同类型仆从的总数量
-     */
     public int getSameSize(Servant target) {
         int count = 0;
         for (Servant s : servants) {
-            if (s.getType().equals(target.getType())) {
-                count++;
-            }
+            if (s.getType().equals(target.getType())) count++;
         }
         return count;
     }
 
-    public boolean isChange() {
-        return change;
+    // =======================================================
+    // 统一寻敌接口：提供基于仆从距离和可见性的过滤筛选，O(1)缓存
+    // =======================================================
+    public List<LivingEntity> getNearbyTargets(Player player, Servant servant, double distance, boolean requireLineOfSight) {
+        if (player.tickCount != lastCacheTick) {
+            cachedEnemies.clear();
+            AABB searchBox = player.getBoundingBox().inflate(48.0);
+            cachedEnemies.addAll(player.level().getEntitiesOfClass(LivingEntity.class, searchBox, e -> e.isAlive() && e != player));
+            lastCacheTick = player.tickCount;
+        }
+
+        List<LivingEntity> result = new ArrayList<>();
+        Vec3 servantPos = servant.getPos();
+        double distSqr = distance * distance;
+
+        for (LivingEntity target : cachedEnemies) {
+            if (!servant.isTarget(target)) continue;
+            if (target.distanceToSqr(servantPos) > distSqr) continue;
+
+            if (requireLineOfSight) {
+                ClipContext context = new ClipContext(servantPos, target.getEyePosition(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
+                if (player.level().clip(context).getType() != HitResult.Type.MISS) {
+                    continue;
+                }
+            }
+            result.add(target);
+        }
+        return result;
     }
 
-    public void setChange(boolean change) {
-        this.change = change;
-    }
+    public boolean isChange() { return change; }
+    public void setChange(boolean change) { this.change = change; }
 
     @Override
     public void write(RegistryFriendlyByteBuf buf, ServantData data, boolean isSelf) {
@@ -139,5 +154,4 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
         }
         return data;
     }
-
 }

@@ -4,14 +4,9 @@
       "servantry:use_terraprism"
     ]
   },
-  "use_whip": {
+  "use_servant_weapon": {
     "sounds": [
-      "servantry:use_whip"
-    ]
-  },
-  "shake_whip": {
-    "sounds": [
-      "servantry:shake_whip"
+      "servantry:use_servant_weapon"
     ]
   }
 }
