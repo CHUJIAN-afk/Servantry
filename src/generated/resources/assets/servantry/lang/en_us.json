@@ -4,6 +4,7 @@
   "item.servantry.blade_staff": "Blade Staff",
   "item.servantry.blade_staff.tooltip.1": "Ignores 2.5 points of enemy Defense",
   "item.servantry.blade_staff.tooltip.2": "'Don't let their small size fool you'",
+  "item.servantry.sanguine_staff": "Sanguine Staff",
   "item.servantry.slime_staff": "Slime Staff",
   "item.servantry.terraprism": "Terraprism",
   "item.servantry.tooltip.1": "Servant type:",
@@ -13,6 +14,7 @@
   "item.servantry.tooltip.5": "Summon Damage: ",
   "modid.servantry": "Servantry",
   "servant.servantry.enchanted_throwing_knives": "Enchanted Throwing Knives",
+  "servant.servantry.sanguine_bat": "sanguine_bat",
   "servant.servantry.slime_baby": "Slime Baby",
   "servant.servantry.terraprism": "Terraprism"
 }

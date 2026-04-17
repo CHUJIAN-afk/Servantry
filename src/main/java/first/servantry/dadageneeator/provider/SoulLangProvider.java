@@ -30,6 +30,8 @@ public class SoulLangProvider extends LanguageProvider {
         add("item.servantry.blade_staff.tooltip.2", "'Don't let their small size fool you'", "“别被它们小小的个头给骗了”");
         add("item.servantry.slime_staff", "Slime Staff", "史莱姆法杖");
         add("servant.servantry.slime_baby", "Slime Baby", "史莱姆宝宝");
+        add("item.servantry.sanguine_staff", "Sanguine Staff", "血红法杖");
+        add("servant.servantry.sanguine_bat", "sanguine_bat", "血蝙蝠");
     }
 
     private void add(String key, String enDesc, String zhDesc) {

@@ -1,8 +1,12 @@
 package first.servantry.api.servant;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import first.servantry.Servantry;
 import first.servantry.api.PathNode;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 
@@ -128,4 +132,24 @@ public interface ITrailRenderer {
      * 自定义顶点构建方法（在此使用 BufferBuilder 和从 smoothNodes 得到的数据画光效）
      */
     void drawTrailVertices(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, Servant servant, PathNode visualRenderNode, List<TrailNode> smoothNodes);
+
+    class TrailRenderType extends RenderType {
+        private TrailRenderType(String name, VertexFormat fmt, VertexFormat.Mode mode, int bufSize, boolean affectsCrumbling, boolean sort, Runnable setup, Runnable clear) {
+            super(name, fmt, mode, bufSize, affectsCrumbling, sort, setup, clear);
+        }
+
+        public static RenderType getTrail() {
+            CompositeState state = CompositeState.builder()
+                    .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+                    .setTextureState(new TextureStateShard(Servantry.rl("textures/trail.png"), false, false))
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setCullState(NO_CULL)
+                    .setLightmapState(LIGHTMAP)
+                    .setOverlayState(OVERLAY)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false);
+            return create("trail", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, true, state);
+        }
+    }
+
 }

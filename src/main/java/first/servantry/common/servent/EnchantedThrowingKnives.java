@@ -1,9 +1,7 @@
 package first.servantry.common.servent;
 
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import first.servantry.Servantry;
 import first.servantry.api.PathNode;
@@ -18,8 +16,6 @@ import first.servantry.register.ServantRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -40,8 +36,6 @@ public class EnchantedThrowingKnives extends Servant implements IDamagingOnColli
     public enum KnifeState {
         IDLE, DASHING, RETURN
     }
-
-    private static final ResourceLocation TRAIL_TEXTURE = Servantry.rl("textures/trail.png");
 
     private KnifeState state = KnifeState.IDLE;
     private int trailTimer = 0;
@@ -315,24 +309,6 @@ public class EnchantedThrowingKnives extends Servant implements IDamagingOnColli
         this.setPath(Collections.singletonList(new PathNode("", nextPos, nextYaw, nextPitch, nextRoll)));
     }
 
-    private static class TrailRenderType extends RenderType {
-        private TrailRenderType(String name, VertexFormat fmt, VertexFormat.Mode mode, int bufSize, boolean affectsCrumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, fmt, mode, bufSize, affectsCrumbling, sort, setup, clear);
-        }
-        public static RenderType getTrail(ResourceLocation texture) {
-            RenderType.CompositeState state = RenderType.CompositeState.builder()
-                    .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-                    .setTextureState(new RenderStateShard.TextureStateShard(texture, false, false))
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                    .setCullState(NO_CULL)
-                    .setLightmapState(LIGHTMAP)
-                    .setOverlayState(OVERLAY)
-                    .setWriteMaskState(COLOR_WRITE)
-                    .createCompositeState(false);
-            return create("knife_trail", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, true, state);
-        }
-    }
-
 // ============== ITrailRenderer 接口实现 ==============
 
     @Override
@@ -364,7 +340,7 @@ public class EnchantedThrowingKnives extends Servant implements IDamagingOnColli
 
     @Override
     public void drawTrailVertices(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, Servant servant, PathNode visualRenderNode, List<TrailNode> smoothNodes) {
-        VertexConsumer consumer = bufferSource.getBuffer(TrailRenderType.getTrail(TRAIL_TEXTURE));
+        VertexConsumer consumer = bufferSource.getBuffer(TrailRenderType.getTrail());
         Matrix4f pose = poseStack.last().pose();
         int cr = 136, cg = 204, cb = 255;
         Vec3 visualRenderPos = visualRenderNode.pos();

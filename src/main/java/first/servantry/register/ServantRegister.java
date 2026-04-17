@@ -4,7 +4,7 @@ import first.servantry.Servantry;
 import first.servantry.api.register.Registries;
 import first.servantry.api.register.ServantType;
 import first.servantry.common.servent.EnchantedThrowingKnives;
-import first.servantry.common.servent.SlimeBaby;
+import first.servantry.common.servent.SanguineBat;
 import first.servantry.common.servent.Terraprism;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -18,7 +18,7 @@ public class ServantRegister {
 
     public static final DeferredHolder<ServantType<?>, ServantType<EnchantedThrowingKnives>> EnchantedThrowingKnives = Register.register("enchanted_throwing_knives", () -> new ServantType<>(EnchantedThrowingKnives::new));
 
-    public static final DeferredHolder<ServantType<?>, ServantType<SlimeBaby>> SlimeBaby = Register.register("slime_baby", () -> new ServantType<>(SlimeBaby::new));
+    public static final DeferredHolder<ServantType<?>, ServantType<SanguineBat>> SanguineBat = Register.register("sanguine_bat", () -> new ServantType<>(SanguineBat::new));
 
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);

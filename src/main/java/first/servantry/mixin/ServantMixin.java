@@ -3,7 +3,7 @@ package first.servantry.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
-import first.servantry.api.servant.IBlockCollider;
+import first.servantry.api.servant.IConeTrailRenderer;
 import first.servantry.api.servant.IDamagingOnCollide;
 import first.servantry.api.servant.ITrailRenderer;
 import first.servantry.api.servant.Servant;
@@ -16,19 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Servant.class)
 public class ServantMixin {
-
-    // 【新增】：在 Tick 头部执行方块碰撞预测
-    @Inject(
-            method = "tick",
-            at = @At("HEAD")
-    )
-    private void preTick(CallbackInfo ci) {
-        Servant servant = (Servant) (Object) this;
-        // 如果实现了方块碰撞接口，在应用路径节点前进行修正滑动
-        if (servant instanceof IBlockCollider iBlockCollider) {
-            iBlockCollider.processBlockCollision(servant);
-        }
-    }
 
     // 【保留原本的尾部注入】：伤害碰撞判定（需要在移动之后判定）
     @Inject(

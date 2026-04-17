@@ -4,6 +4,7 @@
   "item.servantry.blade_staff": "刃杖",
   "item.servantry.blade_staff.tooltip.1": "忽略敌人2.5防御力",
   "item.servantry.blade_staff.tooltip.2": "“别被它们小小的个头给骗了”",
+  "item.servantry.sanguine_staff": "血红法杖",
   "item.servantry.slime_staff": "史莱姆法杖",
   "item.servantry.terraprism": "泰拉棱镜",
   "item.servantry.tooltip.1": "仆从类型:",
@@ -13,6 +14,7 @@
   "item.servantry.tooltip.5": "召唤伤害: ",
   "modid.servantry": "仆从学",
   "servant.servantry.enchanted_throwing_knives": "附魔飞刀",
+  "servant.servantry.sanguine_bat": "血蝙蝠",
   "servant.servantry.slime_baby": "史莱姆宝宝",
   "servant.servantry.terraprism": "泰拉棱镜"
 }

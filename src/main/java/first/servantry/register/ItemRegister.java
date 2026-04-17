@@ -36,7 +36,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> BladeStaff = Register.register("blade_staff", () ->
             new IServantWeapon.Builder<>(ServantRegister.EnchantedThrowingKnives)
                     .damage(0.6f)
-                    .sound(SoundRegister.UseServantWeapon::get)
+                    .sound(SoundRegister.UseServantWeapon)
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();
                         ServantData data = owner.getData(AttachmentRegister.ServantData);
@@ -47,10 +47,10 @@ public class ItemRegister {
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
 
-    public static final DeferredItem<Item> SlimeSummonStaff = Register.register("slime_staff", () ->
-            new IServantWeapon.Builder<>(ServantRegister.SlimeBaby)
-                    .damage(0.8f)
-                    .sound(SoundRegister.UseServantWeapon::get)
+    public static final DeferredItem<Item> SanguineStaff = Register.register("sanguine_staff", () ->
+            new IServantWeapon.Builder<>(ServantRegister.SanguineBat)
+                    .damage(3.5f)
+                    .sound(SoundRegister.UseServantWeapon)
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();
                         servant.setPath(List.of(new PathNode("", owner.position(), owner.yBodyRot, 0, 0)));
