@@ -36,9 +36,6 @@ public abstract class Servant {
     private final LinkedList<PathNode> futureNodes = new LinkedList<>();
     private boolean firstSync = true;
 
-    // ========================================================
-    // 【底层 AI 状态管理】：规范化游戏开发中的状态机数据
-    // ========================================================
     protected int targetId = -1;
     protected int stateTick = 0;
 
@@ -48,8 +45,9 @@ public abstract class Servant {
         this.historyNodes.addFirst(node);
     }
 
+    public abstract float getBaseDamage();
+    public abstract float getBaseKnockback();
     public abstract void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode);
-
     public abstract ServantType<? extends Servant> getType();
 
     public boolean isTarget(LivingEntity target) {
@@ -132,10 +130,6 @@ public abstract class Servant {
         return !this.futureNodes.isEmpty();
     }
 
-    // ========================================================================
-    // 🧠 统一 AI 感知系统：所有仆从共享的感知大脑
-    // ========================================================================
-
     public LivingEntity getTarget() {
         if (owner == null || targetId == -1) return null;
         Entity e = owner.level().getEntity(targetId);
@@ -146,64 +140,6 @@ public abstract class Servant {
 
     public void setTarget(LivingEntity target) {
         this.targetId = target != null ? target.getId() : -1;
-    }
-
-    /**
-     * AI 感知方法：使用高性能管理器缓存查询最优目标
-     */
-    public void findNewTarget(double maxRange, boolean requireVisibility) {
-        if (owner == null) return;
-        ServantData data = owner.getData(AttachmentRegister.ServantData);
-        List<LivingEntity> targets = data.getNearbyTargets(owner, this, maxRange, requireVisibility);
-
-        if (targets.isEmpty()) {
-            setTarget(null);
-            return;
-        }
-
-        int order = data.getOrder(this);
-        targets.sort(Comparator.comparingDouble(e -> {
-            double score = e.distanceToSqr(getPos());
-            if (e.distanceToSqr(owner) < 36.0) score -= 10000.0;
-            if (e.getId() == targetId) score -= 1000.0;
-            // 阵型防扎堆偏移
-            score += ((e.getId() * 31 + order * 17) % 5) * 40.0;
-            return score;
-        }));
-
-        setTarget(targets.getFirst());
-    }
-
-    // ========================================================================
-    // 🛠 通用底层行动控制辅助方法 (大大降低子类开发难度)
-    // ========================================================================
-
-    public Vec3 getCurrentTip() {
-        return Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-    }
-
-    public Vec3 getCurrentNormal() {
-        Quaternionf q = new Quaternionf()
-                .rotateY((float) Math.toRadians(-this.getYaw()))
-                .rotateX((float) Math.toRadians(this.getPitch()))
-                .rotateZ((float) Math.toRadians(this.getRoll()));
-        Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
-        return new Vec3(upV.x(), upV.y(), upV.z()).normalize();
-    }
-
-    public Vec3 getCurrentVelocityDir() {
-        if (this.historyNodes.size() > 1) {
-            Vec3 vel = this.getPos().subtract(this.historyNodes.get(1).pos());
-            if (vel.lengthSqr() > 1e-5) return vel.normalize();
-        }
-        return getCurrentTip();
-    }
-
-    public double getCurrentSpeed() {
-        if (this.historyNodes.size() > 1) {
-            return this.getPos().subtract(this.historyNodes.get(1).pos()).length();
-        }
-        return 1.0;
     }
 
     public Vec3 slerpVector(Vec3 v1, Vec3 v2, float t) {
@@ -233,40 +169,6 @@ public abstract class Servant {
 
         return new PathNode(feature == null ? "" : feature, pos, yaw, pitch, roll);
     }
-
-    public List<PathNode> buildBezierPath(Vec3 p0, Vec3 p1, Vec3 p2, Vec3 p3, int ticks, Vec3 startTip, Vec3 endTip, Vec3 startNormal, Vec3 endNormal, String startFeature) {
-        List<PathNode> nodes = new ArrayList<>(ticks);
-        for (int i = 1; i <= ticks; i++) {
-            float t = (float) i / ticks;
-            float mt = 1.0f - t;
-            Vec3 pos = p0.scale(mt * mt * mt).add(p1.scale(3 * mt * mt * t)).add(p2.scale(3 * mt * t * t)).add(p3.scale(t * t * t));
-            Vec3 tip = slerpVector(startTip, endTip, t);
-            Vec3 normal = slerpVector(startNormal, endNormal, t);
-            nodes.add(getEulerNode(pos, tip, normal, i == 1 ? startFeature : null));
-        }
-        return nodes;
-    }
-
-    public List<PathNode> buildLinearPath(Vec3 start, Vec3 end, int ticks, Vec3 startTip, Vec3 endTip, Vec3 startNormal, Vec3 endNormal, String startFeature, boolean easeIn, boolean easeOut) {
-        List<PathNode> nodes = new ArrayList<>(ticks);
-        for (int i = 1; i <= ticks; i++) {
-            float t = (float) i / ticks;
-            float easeT = t;
-            if (easeIn && !easeOut) easeT = t * t;
-            else if (!easeIn && easeOut) easeT = t * (2.0f - t);
-            else if (easeIn && easeOut) easeT = t * t * (3.0f - 2.0f * t);
-
-            Vec3 pos = start.lerp(end, easeT);
-            Vec3 tip = slerpVector(startTip, endTip, easeT);
-            Vec3 normal = slerpVector(startNormal, endNormal, easeT);
-            nodes.add(getEulerNode(pos, tip, normal, i == 1 ? startFeature : null));
-        }
-        return nodes;
-    }
-
-    // ========================================================================
-    // 渲染与网络同步
-    // ========================================================================
 
     public void renderInternal(float partialTick, PoseStack poseStack, MultiBufferSource bufferSource) {
         PathNode current = this.historyNodes.getFirst();

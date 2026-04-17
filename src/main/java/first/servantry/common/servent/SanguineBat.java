@@ -59,6 +59,16 @@ public class SanguineBat extends Servant implements IDamagingOnCollide, IConeTra
     }
 
     @Override
+    public float getBaseDamage() {
+        return 3.5f;
+    }
+
+    @Override
+    public float getBaseKnockback() {
+        return 0.1f;
+    }
+
+    @Override
     public AABB getHitbox() {
         return new AABB(-0.1, -0.1, -0.1, 0.1, 0.1, 0.1);
     }
@@ -69,7 +79,7 @@ public class SanguineBat extends Servant implements IDamagingOnCollide, IConeTra
             if (!swingHitTargets.contains(target.getId())) {
                 int invulnerableTime = target.invulnerableTime;
                 target.invulnerableTime = 0;
-                target.hurt(getDamageSource(), 1.2f);
+                target.hurt(getDamageSource(), getBaseDamage());
                 target.invulnerableTime = invulnerableTime;
                 swingHitTargets.add(target.getId());
             }
@@ -394,13 +404,6 @@ public class SanguineBat extends Servant implements IDamagingOnCollide, IConeTra
         return rawRenderNode;
     }
 
-    // ==========================================
-    // 渲染系统：分离式的客户端 ModelPart 渲染
-    // ==========================================
-
-    /**
-     * 包装在客户端私有类中，确保 ModelPart 绝对不会被服务端类加载器触碰到，防止服务端崩溃
-     */
     private static class ClientBatModel {
         private static ModelPart ROOT_MODEL = null;
         private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/entity/bat.png");
@@ -419,68 +422,50 @@ public class SanguineBat extends Servant implements IDamagingOnCollide, IConeTra
 
     @Override
     public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode) {
-        // 获取用于平滑视觉的拟合节点
         PathNode visualNode = getVisualRenderNode(this, partialTick, renderNode);
 
         poseStack.pushPose();
 
-        // 父类 renderInternal 已将原点定在 renderNode.pos()。
-        // 这里只追加视觉拟合带来的“局部相对位移”（掩盖高速移动时的 Tick 闪烁）
         Vec3 offset = visualNode.pos().subtract(renderNode.pos());
         poseStack.translate(offset.x, offset.y, offset.z);
 
-        // 应用朝向和倾斜
         poseStack.mulPose(Axis.YN.rotationDegrees(visualNode.yaw()));
         poseStack.mulPose(Axis.XP.rotationDegrees(visualNode.pitch()));
         poseStack.mulPose(Axis.ZP.rotationDegrees(visualNode.roll()));
         poseStack.translate(0, 0, 1.5);
 
-        // --- 模型本体坐标轴修正 ---
-        // 1. Minecraft 实体模型默认是倒挂的，需将其 180 度翻转正位
         poseStack.mulPose(Axis.XP.rotationDegrees(180f));
 
         ModelPart model = ClientBatModel.getModel();
-
-        // 强制抬头：让蝙蝠彻底平飞（原版蝙蝠往往是悬挂姿态），使其头部完全面向突刺前进方向
         model.xRot = (float) Math.PI / 2f;
 
-        // --- 动画引擎高频振翅运算 ---
         float time = this.age + partialTick;
         ModelPart body = model.getChild("body");
+        ModelPart head = model.getChild("head");
         ModelPart rightWing = body.getChild("right_wing");
         ModelPart leftWing = body.getChild("left_wing");
         ModelPart rightWingTip = rightWing.getChild("right_wing_tip");
         ModelPart leftWingTip = leftWing.getChild("left_wing_tip");
 
+        body.xRot = -(float) Math.PI / 5f;
+        head.xRot = -(float) Math.PI / 2f;
+
         float flapSpeed = 1.8f;
         float flapMag = 0.85f;
-        // 基础摆角并带有 0.1f 后掠角
         rightWing.yRot = Mth.cos(time * flapSpeed) * flapMag + 0.1f;
         leftWing.yRot = -rightWing.yRot;
-        // 翼尖进一步折叠振动
         rightWingTip.yRot = Mth.cos(time * flapSpeed) * flapMag * 0.5f;
         leftWingTip.yRot = -rightWingTip.yRot;
 
-        // --- 渲染血色涂层 ---
-        // 纯净材质染成深红色 (Alpha=255, R=255, G=30, B=30)
-        int bloodRedTint = FastColor.ARGB32.color(255, 255, 30, 30);
+        int bloodRedTint = FastColor.ARGB32.color(255, 255, 90, 90);
         VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(ClientBatModel.getTexture()));
         model.render(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY, bloodRedTint);
 
         poseStack.popPose();
     }
-    // ==========================================
-    // 轨迹实现
-    // ==========================================
 
     @Override
     public int getTrailTimer() { return trailTimer; }
-
-    @Override
-    public int getTrailHistoryLength() { return 6; }
-
-    @Override
-    public int getTrailSegmentsPerNode() { return 4; }
 
     @Override
     public float getTrailMaxRadius() { return 0.1f; }
@@ -508,7 +493,7 @@ public class SanguineBat extends Servant implements IDamagingOnCollide, IConeTra
             VertexConsumer consumer = bufferSource.getBuffer(TrailRenderType.getTrail());
             Matrix4f pose = poseStack.last().pose();
             Vec3 renderPos = visualRenderNode.pos();
-            Vec3 headPos = smoothNodes.get(0).pos.subtract(renderPos);
+            Vec3 headPos = smoothNodes.getFirst().pos.subtract(renderPos);
 
             float radius = getTrailMaxRadius();
             int colorRGB = getTrailColorRGB(0f);

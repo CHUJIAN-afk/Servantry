@@ -80,6 +80,16 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
     }
 
     @Override
+    public float getBaseDamage() {
+        return 9;
+    }
+
+    @Override
+    public float getBaseKnockback() {
+        return 0.1f;
+    }
+
+    @Override
     public AABB getHitbox() {
         return new AABB(-0.1, -0.04, -0.75, 0.1, 0.04, 0.25);
     }
@@ -137,10 +147,6 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
         return getInterpolatedIdleState(owner, order, total, 1f);
     }
 
-    public float getDamageValue() {
-        return 9f;
-    }
-
     @Override
     public void collisionAttack(Set<LivingEntity> hitTargets) {
         if (isExecutingPath()) {
@@ -148,7 +154,7 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
                 if (!swingHitTargets.contains(target.getId())) {
                     int invulnerableTime = target.invulnerableTime;
                     target.invulnerableTime = 0;
-                    target.hurt(getDamageSource(), getDamageValue());
+                    target.hurt(getDamageSource(), getBaseDamage());
                     target.invulnerableTime = invulnerableTime;
                     swingHitTargets.add(target.getId());
                 }

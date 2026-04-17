@@ -20,8 +20,7 @@ public class ItemRegister {
 
     public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
             new IServantWeapon.Builder<>(ServantRegister.TerraPrism)
-                    .damage(9f)
-                    .sound(SoundRegister.UseTerraprism::get)
+                    .sound(SoundRegister.UseTerraprism)
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();
                         ServantData data = owner.getData(AttachmentRegister.ServantData);
@@ -34,7 +33,6 @@ public class ItemRegister {
     public static final DeferredItem<Item> EnchantedThrowingKnives = Register.registerItem("enchanted_throwing_knives_render_item", Item::new);
     public static final DeferredItem<Item> BladeStaff = Register.register("blade_staff", () ->
             new IServantWeapon.Builder<>(ServantRegister.EnchantedThrowingKnives)
-                    .damage(0.6f)
                     .sound(SoundRegister.UseServantWeapon)
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();
@@ -48,7 +46,6 @@ public class ItemRegister {
 
     public static final DeferredItem<Item> SanguineStaff = Register.register("sanguine_staff", () ->
             new IServantWeapon.Builder<>(ServantRegister.SanguineBat)
-                    .damage(3.5f)
                     .sound(SoundRegister.UseServantWeapon)
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();

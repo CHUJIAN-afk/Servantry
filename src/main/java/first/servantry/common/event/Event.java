@@ -49,19 +49,6 @@ public class Event {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void ServantDamage(ServantIncomingDamageEvent event) {
-        ServantDamageSource source = event.getSource();
-        LivingEntity target = event.getEntity();
-        if (!target.level().isClientSide()) {
-            Servant servant = source.getServant();
-            Player owner = servant.getOwner();
-            AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantDamage);
-            float scale = instance != null ? (float) instance.getValue() : 1;
-            event.setAmount(event.getAmount() * scale);
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void summon(PlayerInteractEvent.RightClickItem event) {
         ItemStack itemStack = event.getItemStack();
         Player player = event.getEntity();

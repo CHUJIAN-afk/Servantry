@@ -5,15 +5,14 @@
   "item.servantry.blade_staff.tooltip.1": "Ignores 2.5 points of enemy Defense",
   "item.servantry.blade_staff.tooltip.2": "'Don't let their small size fool you'",
   "item.servantry.sanguine_staff": "Sanguine Staff",
-  "item.servantry.slime_staff": "Slime Staff",
   "item.servantry.terraprism": "Terraprism",
   "item.servantry.tooltip.damage": " Summon Damage",
+  "item.servantry.tooltip.knockback": " Knockback",
   "item.servantry.tooltip.remove_all": "Sneak + Use to dismiss all servants of this type",
   "item.servantry.tooltip.slots": "Servant Slots: %s / %s",
   "item.servantry.tooltip.summon": "Summons %s to fight for you",
   "modid.servantry": "Servantry",
   "servant.servantry.enchanted_throwing_knives": "Enchanted Throwing Knives",
   "servant.servantry.sanguine_bat": "Sanguine Bat",
-  "servant.servantry.slime_baby": "Slime Baby",
   "servant.servantry.terraprism": "Terraprism"
 }

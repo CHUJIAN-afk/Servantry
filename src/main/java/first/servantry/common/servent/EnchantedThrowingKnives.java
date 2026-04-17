@@ -58,6 +58,16 @@ public class EnchantedThrowingKnives extends Servant implements IDamagingOnColli
     }
 
     @Override
+    public float getBaseDamage() {
+        return 0.6f;
+    }
+
+    @Override
+    public float getBaseKnockback() {
+        return 0;
+    }
+
+    @Override
     public AABB getHitbox() {
         return new AABB(-0.2, -0.05, -0.8, 0.2, 0.05, -0.2);
     }
@@ -68,7 +78,7 @@ public class EnchantedThrowingKnives extends Servant implements IDamagingOnColli
             if (!swingHitTargets.contains(target.getId())) {
                 int invulnerableTime = target.invulnerableTime;
                 target.invulnerableTime = 0; // 无视无敌帧
-                target.hurt(getDamageSource(), 0.6f);
+                target.hurt(getDamageSource(),getBaseDamage());
                 target.invulnerableTime = invulnerableTime;
                 swingHitTargets.add(target.getId());
             }

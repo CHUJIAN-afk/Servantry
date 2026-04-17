@@ -18,6 +18,7 @@ public class SoulLangProvider extends LanguageProvider {
 
         // --- 重构后的 UI 提示词条 ---
         add("item.servantry.tooltip.damage", " Summon Damage", " 召唤伤害");
+        add("item.servantry.tooltip.knockback", " Knockback", " 击退强度");
         add("item.servantry.tooltip.summon", "Summons %s to fight for you", "召唤%s为你而战");
         add("item.servantry.tooltip.slots", "Servant Slots: %s / %s", "仆从栏位: %s / %s");
         add("item.servantry.tooltip.remove_all", "Sneak + Use to dismiss all servants of this type", "潜行右键以遣散此类型的所有仆从");
@@ -35,11 +36,8 @@ public class SoulLangProvider extends LanguageProvider {
         add("item.servantry.blade_staff.tooltip.1", "Ignores 2.5 points of enemy Defense", "忽略敌人2.5防御力");
         add("item.servantry.blade_staff.tooltip.2", "'Don't let their small size fool you'", "“别被它们小小的个头给骗了”");
 
-        add("item.servantry.slime_staff", "Slime Staff", "史莱姆法杖");
-        add("servant.servantry.slime_baby", "Slime Baby", "史莱姆宝宝");
-
         add("item.servantry.sanguine_staff", "Sanguine Staff", "血红法杖");
-        add("servant.servantry.sanguine_bat", "Sanguine Bat", "血蝙蝠"); // 修正了原本的纯小写
+        add("servant.servantry.sanguine_bat", "Sanguine Bat", "血蝙蝠");
     }
 
     private void add(String key, String enDesc, String zhDesc) {

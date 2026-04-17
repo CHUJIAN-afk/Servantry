@@ -2,7 +2,11 @@ package first.servantry.mixin;
 
 import first.servantry.api.ServantDamageSource;
 import first.servantry.api.event.ServantIncomingDamageEvent;
+import first.servantry.api.servant.Servant;
+import first.servantry.register.AttributeRegister;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
@@ -23,8 +27,14 @@ public class CommonHooksMixin {
             cancellable = true
     )
     private static void onEntityIncomingDamage(LivingEntity entity, DamageContainer container, CallbackInfoReturnable<Boolean> cir) {
-        if (container.getSource() instanceof ServantDamageSource) {
-            cir.setReturnValue(NeoForge.EVENT_BUS.post(new ServantIncomingDamageEvent(entity, container)).isCanceled());
+        if (container.getSource() instanceof ServantDamageSource source) {
+            ServantIncomingDamageEvent event = new ServantIncomingDamageEvent(entity, container);
+            Servant servant = source.getServant();
+            Player owner = servant.getOwner();
+            AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantDamage);
+            float scale = instance != null ? (float) instance.getValue() : 1;
+            event.setAmount(event.getAmount() * scale);
+            cir.setReturnValue(NeoForge.EVENT_BUS.post(event).isCanceled());
         }
     }
 

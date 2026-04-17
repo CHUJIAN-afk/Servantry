@@ -76,25 +76,31 @@ public class ClientEvent {
                 String key = "servant." + location.getNamespace() + "." + location.getPath();
                 ServantData data = player.getData(AttachmentRegister.ServantData);
                 float damage = iServantWeapon.getDamage();
+                float knockback = iServantWeapon.getKnockback();
 
                 // 1. 伤害 (例如: "9 召唤伤害")
-                if (damage != 0) {
-                    // 这里为了简洁，可以考虑判断如果 damage 是整数就去掉.0，但保留原始强转也行
+                if (damage > 0) {
                     String damageStr = damage == (long) damage ? String.format("%d", (long) damage) : String.valueOf(damage);
-                    toolTip.add(Component.literal(damageStr).withStyle(ChatFormatting.WHITE)
+                    toolTip.add(Component.literal(damageStr).withStyle(ChatFormatting.BLUE)
                             .append(Component.translatable("item.servantry.tooltip.damage").withStyle(ChatFormatting.GRAY)));
                 }
 
-                // 2. 召唤宣言 (例如: "召唤 泰拉棱镜 为你而战")
+                // 2. 击退 (例如: "0.5 击退力")
+                String kbStr = knockback == (long) knockback ? String.format("%d", (long) knockback) : String.valueOf(knockback);
+                toolTip.add(Component.literal(kbStr).withStyle(ChatFormatting.BLUE)
+                        .append(Component.translatable("item.servantry.tooltip.knockback").withStyle(ChatFormatting.GRAY)));
+
+
+                // 3. 召唤宣言 (例如: "召唤 泰拉棱镜 为你而战")
                 toolTip.add(Component.translatable("item.servantry.tooltip.summon",
-                        Component.translatable(key).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
+                        Component.translatable(key).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
 
-                // 3. 栏位消耗 (例如: "仆从栏位: 3 / 5")
+                // 4. 栏位消耗 (例如: "仆从栏位: 3 / 5")
                 toolTip.add(Component.translatable("item.servantry.tooltip.slots",
-                        Component.literal(String.valueOf(data.getServants().size())).withStyle(ChatFormatting.WHITE),
-                        Component.literal(String.valueOf(data.getMaxSize(player))).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
+                        Component.literal(String.valueOf(data.getServants().size())).withStyle(ChatFormatting.BLUE),
+                        Component.literal(String.valueOf(data.getMaxSize(player))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
 
-                // 4. 移除操作提示 (深灰色，避免喧宾夺主)
+                // 5. 移除操作提示 (深灰色，避免喧宾夺主)
                 toolTip.add(Component.translatable("item.servantry.tooltip.remove_all").withStyle(ChatFormatting.DARK_GRAY));
             }
         }

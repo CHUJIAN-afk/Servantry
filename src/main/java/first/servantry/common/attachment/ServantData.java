@@ -84,26 +84,22 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
     public List<LivingEntity> getNearbyTargets(Player player, Servant servant, double distance, boolean requireLineOfSight) {
         if (player.tickCount != lastCacheTick) {
             cachedEnemies.clear();
-            AABB searchBox = player.getBoundingBox().inflate(48.0);
-            cachedEnemies.addAll(player.level().getEntitiesOfClass(LivingEntity.class, searchBox, e -> e.isAlive() && e != player));
+            AABB searchBox = player.getBoundingBox().inflate(64.0);
+            cachedEnemies.addAll(player.level().getEntitiesOfClass(LivingEntity.class, searchBox, living -> living.isAlive() && living != player));
             lastCacheTick = player.tickCount;
         }
-
         List<LivingEntity> result = new ArrayList<>();
         Vec3 servantPos = servant.getPos();
-        double distSqr = distance * distance;
-
         for (LivingEntity target : cachedEnemies) {
-            if (!servant.isTarget(target)) continue;
-            if (target.distanceToSqr(servantPos) > distSqr) continue;
-
-            if (requireLineOfSight) {
-                ClipContext context = new ClipContext(servantPos, target.getEyePosition(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
-                if (player.level().clip(context).getType() != HitResult.Type.MISS) {
-                    continue;
+            if (servant.isTarget(target) && target.distanceToSqr(servantPos) <= distance * distance) {
+                if (requireLineOfSight) {
+                    ClipContext context = new ClipContext(servantPos, target.getEyePosition(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
+                    if (player.level().clip(context).getType() != HitResult.Type.MISS) {
+                        continue;
+                    }
                 }
+                result.add(target);
             }
-            result.add(target);
         }
         return result;
     }
