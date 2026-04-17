@@ -29,6 +29,7 @@ public class DataGeneratorEvent {
 
             @Override
             protected void registerModels() {
+                handheldItem(ItemRegister.EnchantedThrowingKnives.get());
                 BuiltInRegistries.ITEM.stream()
                         .filter(item -> item instanceof IServantWeapon<?>)
                         .forEach(this::handheldItem);

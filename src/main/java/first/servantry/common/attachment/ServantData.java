@@ -26,10 +26,6 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
     private final List<Servant> servants = new ArrayList<>();
     private boolean change = true;
 
-    // =======================================================
-    // 【核心性能优化】：单 Tick 生命周期的实体空间缓存池
-    // 避免多仆从情况下，每个仆从每 Tick 都要遍历查询周围区块
-    // =======================================================
     private int lastCacheTick = -1;
     private final List<LivingEntity> cachedEnemies = new ArrayList<>();
 
@@ -85,9 +81,6 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
         return count;
     }
 
-    // =======================================================
-    // 统一寻敌接口：提供基于仆从距离和可见性的过滤筛选，O(1)缓存
-    // =======================================================
     public List<LivingEntity> getNearbyTargets(Player player, Servant servant, double distance, boolean requireLineOfSight) {
         if (player.tickCount != lastCacheTick) {
             cachedEnemies.clear();

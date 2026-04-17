@@ -18,7 +18,6 @@ public class ItemRegister {
 
     private static final DeferredRegister.Items Register = DeferredRegister.createItems(Servantry.MODID);
 
-    public static final DeferredItem<Item> TerraPrismRenderItem = Register.registerItem("terra_prism_render_item", Item::new);
     public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
             new IServantWeapon.Builder<>(ServantRegister.TerraPrism)
                     .damage(9f)

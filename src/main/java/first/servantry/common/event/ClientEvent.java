@@ -71,17 +71,31 @@ public class ClientEvent {
         if (itemStack.getItem() instanceof IServantWeapon<?> iServantWeapon && player != null) {
             ServantType<?> type = iServantWeapon.getType();
             ResourceLocation location = Registries.SERVANT_TYPES.getKey(type);
+
             if (location != null) {
                 String key = "servant." + location.getNamespace() + "." + location.getPath();
                 ServantData data = player.getData(AttachmentRegister.ServantData);
                 float damage = iServantWeapon.getDamage();
+
+                // 1. 伤害 (例如: "9 召唤伤害")
                 if (damage != 0) {
-                    toolTip.add(Component.translatable("item.servantry.tooltip.5").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(damage)).withStyle(ChatFormatting.BLUE)));
+                    // 这里为了简洁，可以考虑判断如果 damage 是整数就去掉.0，但保留原始强转也行
+                    String damageStr = damage == (long) damage ? String.format("%d", (long) damage) : String.valueOf(damage);
+                    toolTip.add(Component.literal(damageStr).withStyle(ChatFormatting.WHITE)
+                            .append(Component.translatable("item.servantry.tooltip.damage").withStyle(ChatFormatting.GRAY)));
                 }
-                toolTip.add(Component.translatable("item.servantry.tooltip.1").withStyle(ChatFormatting.GRAY).append(Component.translatable(key).withStyle(ChatFormatting.BLUE)));
-                toolTip.add(Component.translatable("item.servantry.tooltip.2").withStyle(ChatFormatting.GRAY).append(Component.literal(data.getServants().size() + "/" + data.getMaxSize(player)).withStyle(ChatFormatting.BLUE)));
-                toolTip.add(Component.translatable("item.servantry.tooltip.3").withStyle(ChatFormatting.GRAY));
-                toolTip.add(Component.translatable("item.servantry.tooltip.4").withStyle(ChatFormatting.GRAY));
+
+                // 2. 召唤宣言 (例如: "召唤 泰拉棱镜 为你而战")
+                toolTip.add(Component.translatable("item.servantry.tooltip.summon",
+                        Component.translatable(key).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
+
+                // 3. 栏位消耗 (例如: "仆从栏位: 3 / 5")
+                toolTip.add(Component.translatable("item.servantry.tooltip.slots",
+                        Component.literal(String.valueOf(data.getServants().size())).withStyle(ChatFormatting.WHITE),
+                        Component.literal(String.valueOf(data.getMaxSize(player))).withStyle(ChatFormatting.WHITE)).withStyle(ChatFormatting.GRAY));
+
+                // 4. 移除操作提示 (深灰色，避免喧宾夺主)
+                toolTip.add(Component.translatable("item.servantry.tooltip.remove_all").withStyle(ChatFormatting.DARK_GRAY));
             }
         }
 

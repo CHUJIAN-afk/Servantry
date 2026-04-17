@@ -70,7 +70,9 @@ public class Event {
             if (!player.isShiftKeyDown()) {
                 IServantWeapon.handleSummon(player, iServantWeapon);
             } else {
-                iServantWeapon.remove(player);
+                ServantData data = player.getData(AttachmentRegister.ServantData);
+                data.getServants().removeIf(servant -> servant.getType() == iServantWeapon.getType());
+                data.setChange(true);
             }
             player.swing(InteractionHand.MAIN_HAND, true);
             SoundEvent soundEvent = iServantWeapon.getSoundEvent();
