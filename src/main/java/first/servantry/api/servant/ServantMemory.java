@@ -1,4 +1,4 @@
-package first.servantry.api;
+package first.servantry.api.servant;
 
 import java.util.HashMap;
 import java.util.Map;

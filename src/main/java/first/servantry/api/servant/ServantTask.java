@@ -1,6 +1,4 @@
-package first.servantry.api;
-
-import first.servantry.api.servant.Servant;
+package first.servantry.api.servant;
 
 public abstract class ServantTask {
     // 任务优先级：数值越小优先级越高

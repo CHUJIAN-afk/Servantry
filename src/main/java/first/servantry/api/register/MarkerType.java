@@ -1,6 +1,6 @@
 package first.servantry.api.register;
 
-import first.servantry.api.ActiveMarker;
+import first.servantry.api.marker.ActiveMarker;
 import first.servantry.api.servant.Servant;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;

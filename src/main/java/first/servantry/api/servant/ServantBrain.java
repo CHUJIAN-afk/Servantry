@@ -1,6 +1,4 @@
-package first.servantry.api;
-
-import first.servantry.api.servant.Servant;
+package first.servantry.api.servant;
 
 import java.util.ArrayList;
 import java.util.Comparator;

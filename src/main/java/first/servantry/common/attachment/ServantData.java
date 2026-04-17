@@ -1,6 +1,6 @@
 package first.servantry.common.attachment;
 
-import first.servantry.api.PathNode;
+import first.servantry.api.servant.PathNode;
 import first.servantry.api.register.Registries;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;

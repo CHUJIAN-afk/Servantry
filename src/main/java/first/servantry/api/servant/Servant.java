@@ -1,11 +1,7 @@
 package first.servantry.api.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.PathNode;
-import first.servantry.api.ServantDamageSource;
 import first.servantry.api.register.ServantType;
-import first.servantry.common.attachment.ServantData;
-import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import first.servantry.register.DamageRegister;
 import net.minecraft.client.Minecraft;
@@ -23,8 +19,6 @@ import net.minecraft.world.entity.Targeting;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.*;
 

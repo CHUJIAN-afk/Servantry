@@ -1,6 +1,5 @@
-package first.servantry.api;
+package first.servantry.api.servant;
 
-import first.servantry.api.servant.Servant;
 import net.minecraft.core.Holder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;

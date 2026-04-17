@@ -1,6 +1,6 @@
 package first.servantry.api.event;
 
-import first.servantry.api.ServantDamageSource;
+import first.servantry.api.servant.ServantDamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;

@@ -1,6 +1,6 @@
 package first.servantry.mixin;
 
-import first.servantry.api.ServantDamageSource;
+import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttributeRegister;

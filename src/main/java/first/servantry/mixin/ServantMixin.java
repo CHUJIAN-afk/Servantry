@@ -2,7 +2,7 @@ package first.servantry.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.PathNode;
+import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.IDamagingOnCollide;
 import first.servantry.api.servant.ITrailRenderer;
 import first.servantry.api.servant.Servant;

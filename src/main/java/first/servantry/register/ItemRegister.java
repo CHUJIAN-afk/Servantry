@@ -1,7 +1,7 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import first.servantry.api.PathNode;
+import first.servantry.api.servant.PathNode;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.common.attachment.ServantData;
 import net.minecraft.world.entity.player.Player;

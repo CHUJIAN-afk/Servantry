@@ -1,6 +1,6 @@
 package first.servantry.mixin;
 
-import first.servantry.api.ServantDamageSource;
+import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.servent.EnchantedThrowingKnives;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;

@@ -3,7 +3,7 @@ package first.servantry.common.servent;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import first.servantry.api.PathNode;
+import first.servantry.api.servant.PathNode;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.IConeTrailRenderer;
 import first.servantry.api.servant.IDamagingOnCollide;

@@ -1,8 +1,6 @@
 package first.servantry.common.event;
 
 import first.servantry.Servantry;
-import first.servantry.api.ServantDamageSource;
-import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.servant.Servant;
 import first.servantry.common.attachment.ServantData;
@@ -11,8 +9,6 @@ import first.servantry.register.AttributeRegister;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;

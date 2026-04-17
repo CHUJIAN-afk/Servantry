@@ -1,7 +1,7 @@
 package first.servantry.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import first.servantry.api.ServantDamageSource;
+import first.servantry.api.servant.ServantDamageSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;

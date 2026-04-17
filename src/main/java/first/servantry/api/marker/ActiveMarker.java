@@ -1,4 +1,4 @@
-package first.servantry.api;
+package first.servantry.api.marker;
 
 import first.servantry.api.register.MarkerType;
 import first.servantry.api.register.Registries;
