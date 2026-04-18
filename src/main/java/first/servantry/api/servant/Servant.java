@@ -1,6 +1,8 @@
 package first.servantry.api.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.ai.ActionController;
+import first.servantry.api.ai.ServantAction;
 import first.servantry.api.register.ServantType;
 import first.servantry.register.AttributeRegister;
 import first.servantry.register.DamageRegister;
@@ -20,7 +22,10 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 public abstract class Servant {
 
@@ -33,6 +38,9 @@ public abstract class Servant {
     protected int targetId = -1;
     protected int stateTick = 0;
 
+    // 【新增】：下沉到基类的动作控制器
+    protected ActionController<?> ai;
+
     public Servant(PathNode node) {
         this.uuid = UUID.randomUUID();
         this.owner = null;
@@ -43,6 +51,10 @@ public abstract class Servant {
     public abstract float getBaseKnockback();
     public abstract void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode);
     public abstract ServantType<? extends Servant> getType();
+    public void onPathNodeConsumed(PathNode node) {}
+
+    // 【新增】：强制子类提供实例化特定 ID Action 的工厂方法
+    public abstract ServantAction<?> createAction(String id);
 
     public boolean isTarget(LivingEntity target) {
         if (owner != target) {
@@ -62,7 +74,9 @@ public abstract class Servant {
             }
         }
         if (!this.futureNodes.isEmpty()) {
-            this.historyNodes.set(0, this.futureNodes.poll());
+            PathNode consumed = this.futureNodes.poll();
+            this.historyNodes.set(0, consumed);
+            this.onPathNodeConsumed(consumed);
         }
     }
 
@@ -120,9 +134,7 @@ public abstract class Servant {
         this.futureNodes.addAll(resampledNodes);
     }
 
-    public boolean isExecutingPath() {
-        return !this.futureNodes.isEmpty();
-    }
+    public boolean isExecutingPath() { return !this.futureNodes.isEmpty(); }
 
     public LivingEntity getTarget() {
         if (owner == null || targetId == -1) return null;
@@ -134,6 +146,120 @@ public abstract class Servant {
 
     public void setTarget(LivingEntity target) {
         this.targetId = target != null ? target.getId() : -1;
+    }
+
+    public void renderInternal(float partialTick, PoseStack poseStack, MultiBufferSource bufferSource) {
+        PathNode current = this.historyNodes.getFirst();
+        PathNode last = this.historyNodes.size() > 1 ? this.historyNodes.get(1) : current;
+        PathNode renderNode = last.lerp(current, partialTick);
+        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        poseStack.pushPose();
+        poseStack.translate(renderNode.pos().x - cameraPos.x, renderNode.pos().y - cameraPos.y, renderNode.pos().z - cameraPos.z);
+        int packedLight = LevelRenderer.getLightColor(owner.level(), BlockPos.containing(renderNode.pos().x, renderNode.pos().y, renderNode.pos().z));
+        render(poseStack, bufferSource, partialTick, packedLight, renderNode);
+        poseStack.popPose();
+    }
+
+    public void writeBase(RegistryFriendlyByteBuf buf) {
+        PathNode current = this.historyNodes.getFirst();
+        buf.writeUtf(current.feature());
+        buf.writeDouble(current.pos().x);
+        buf.writeDouble(current.pos().y);
+        buf.writeDouble(current.pos().z);
+        buf.writeFloat(current.yaw());
+        buf.writeFloat(current.pitch());
+        buf.writeFloat(current.roll());
+
+        buf.writeInt(this.targetId);
+        buf.writeInt(this.stateTick);
+
+        buf.writeInt(this.futureNodes.size());
+        for (PathNode node : this.futureNodes) {
+            buf.writeUtf(node.feature());
+            buf.writeDouble(node.pos().x);
+            buf.writeDouble(node.pos().y);
+            buf.writeDouble(node.pos().z);
+            buf.writeFloat(node.yaw());
+            buf.writeFloat(node.pitch());
+            buf.writeFloat(node.roll());
+        }
+
+        // 【核心修改】：序列化写入当前的 Action ID
+        buf.writeUtf(this.ai != null && this.ai.getCurrentAction() != null ? this.ai.getCurrentAction().getId() : "idle");
+
+        writeAdditional(buf);
+    }
+
+    @SuppressWarnings("unchecked")
+    public void readBase(RegistryFriendlyByteBuf buf) {
+        PathNode syncCurrent = new PathNode(
+                buf.readUtf(),
+                new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()),
+                buf.readFloat(),
+                buf.readFloat(),
+                buf.readFloat()
+        );
+
+        this.targetId = buf.readInt();
+        this.stateTick = buf.readInt();
+
+        int pathSize = buf.readInt();
+        this.futureNodes.clear();
+        for (int i = 0; i < pathSize; i++) {
+            this.futureNodes.add(new PathNode(
+                    buf.readUtf(),
+                    new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()),
+                    buf.readFloat(),
+                    buf.readFloat(),
+                    buf.readFloat()
+            ));
+        }
+
+        // 【核心修改】：读取 Action ID 并执行幽灵同步更新客户端状态
+        String actionId = buf.readUtf();
+        if (this.ai != null) {
+            if (this.ai.getCurrentAction() == null || !this.ai.getCurrentAction().getId().equals(actionId)) {
+                ((ActionController<Servant>) this.ai).setClientAction((ServantAction<Servant>) this.createAction(actionId));
+            }
+        }
+
+        if (this.firstSync || this.historyNodes.isEmpty() || this.historyNodes.getFirst().pos().distanceToSqr(syncCurrent.pos()) > 100.0) {
+            this.historyNodes.clear();
+            this.historyNodes.addFirst(syncCurrent);
+            this.historyNodes.addFirst(syncCurrent);
+            this.firstSync = false;
+        }
+        readAdditional(buf);
+    }
+
+    public void writeAdditional(RegistryFriendlyByteBuf buf) {}
+    public void readAdditional(RegistryFriendlyByteBuf buf) {}
+
+    public LinkedList<PathNode> getPathQueue() { return this.futureNodes; }
+    public UUID getUuid() { return uuid; }
+    public void setUuid(UUID uuid) { this.uuid = uuid; }
+    public Player getOwner() { return owner; }
+    public void setOwner(Player owner) { this.owner = owner; }
+    public Vec3 getPos() { return this.historyNodes.getFirst().pos(); }
+    public void setPos(Vec3 pos) {
+        PathNode n = this.historyNodes.getFirst();
+        this.historyNodes.set(0, new PathNode(n.feature(), pos, n.yaw(), n.pitch(), n.roll()));
+    }
+    public Vec3 getLastPos() { return this.historyNodes.size() > 1 ? this.historyNodes.get(1).pos() : getPos(); }
+    public float getYaw() { return this.historyNodes.getFirst().yaw(); }
+    public void setYaw(float yaw) {
+        PathNode n = this.historyNodes.getFirst();
+        this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), yaw, n.pitch(), n.roll()));
+    }
+    public float getPitch() { return this.historyNodes.getFirst().pitch(); }
+    public void setPitch(float pitch) {
+        PathNode n = this.historyNodes.getFirst();
+        this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), n.yaw(), pitch, n.roll()));
+    }
+    public float getRoll() { return this.historyNodes.getFirst().roll(); }
+    public void setRoll(float roll) {
+        PathNode n = this.historyNodes.getFirst();
+        this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), n.yaw(), n.pitch(), roll));
     }
 
     public Vec3 slerpVector(Vec3 v1, Vec3 v2, float t) {
@@ -164,106 +290,4 @@ public abstract class Servant {
         return new PathNode(feature == null ? "" : feature, pos, yaw, pitch, roll);
     }
 
-    public void renderInternal(float partialTick, PoseStack poseStack, MultiBufferSource bufferSource) {
-        PathNode current = this.historyNodes.getFirst();
-        PathNode last = this.historyNodes.size() > 1 ? this.historyNodes.get(1) : current;
-        PathNode renderNode = last.lerp(current, partialTick);
-        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        poseStack.pushPose();
-        poseStack.translate(renderNode.pos().x - cameraPos.x, renderNode.pos().y - cameraPos.y, renderNode.pos().z - cameraPos.z);
-        int packedLight = LevelRenderer.getLightColor(owner.level(), BlockPos.containing(renderNode.pos().x, renderNode.pos().y, renderNode.pos().z));
-        render(poseStack, bufferSource, partialTick, packedLight, renderNode);
-        poseStack.popPose();
-    }
-
-    public void writeBase(RegistryFriendlyByteBuf buf) {
-        PathNode current = this.historyNodes.getFirst();
-        buf.writeUtf(current.feature());
-        buf.writeDouble(current.pos().x);
-        buf.writeDouble(current.pos().y);
-        buf.writeDouble(current.pos().z);
-        buf.writeFloat(current.yaw());
-        buf.writeFloat(current.pitch());
-        buf.writeFloat(current.roll());
-
-        // 写入AI基础数据
-        buf.writeInt(this.targetId);
-        buf.writeInt(this.stateTick);
-
-        buf.writeInt(this.futureNodes.size());
-        for (PathNode node : this.futureNodes) {
-            buf.writeUtf(node.feature());
-            buf.writeDouble(node.pos().x);
-            buf.writeDouble(node.pos().y);
-            buf.writeDouble(node.pos().z);
-            buf.writeFloat(node.yaw());
-            buf.writeFloat(node.pitch());
-            buf.writeFloat(node.roll());
-        }
-        writeAdditional(buf);
-    }
-
-    public void readBase(RegistryFriendlyByteBuf buf) {
-        PathNode syncCurrent = new PathNode(
-                buf.readUtf(),
-                new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()),
-                buf.readFloat(),
-                buf.readFloat(),
-                buf.readFloat()
-        );
-
-        // 读入AI基础数据
-        this.targetId = buf.readInt();
-        this.stateTick = buf.readInt();
-
-        int pathSize = buf.readInt();
-        this.futureNodes.clear();
-        for (int i = 0; i < pathSize; i++) {
-            this.futureNodes.add(new PathNode(
-                    buf.readUtf(),
-                    new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()),
-                    buf.readFloat(),
-                    buf.readFloat(),
-                    buf.readFloat()
-            ));
-        }
-        if (this.firstSync || this.historyNodes.isEmpty() || this.historyNodes.getFirst().pos().distanceToSqr(syncCurrent.pos()) > 100.0) {
-            this.historyNodes.clear();
-            this.historyNodes.addFirst(syncCurrent);
-            this.historyNodes.addFirst(syncCurrent);
-            this.firstSync = false;
-        }
-        readAdditional(buf);
-    }
-
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {}
-    public void readAdditional(RegistryFriendlyByteBuf buf) {}
-
-    // Getters & Setters
-    public LinkedList<PathNode> getPathQueue() { return this.futureNodes; }
-    public UUID getUuid() { return uuid; }
-    public void setUuid(UUID uuid) { this.uuid = uuid; }
-    public Player getOwner() { return owner; }
-    public void setOwner(Player owner) { this.owner = owner; }
-    public Vec3 getPos() { return this.historyNodes.getFirst().pos(); }
-    public void setPos(Vec3 pos) {
-        PathNode n = this.historyNodes.getFirst();
-        this.historyNodes.set(0, new PathNode(n.feature(), pos, n.yaw(), n.pitch(), n.roll()));
-    }
-    public Vec3 getLastPos() { return this.historyNodes.size() > 1 ? this.historyNodes.get(1).pos() : getPos(); }
-    public float getYaw() { return this.historyNodes.getFirst().yaw(); }
-    public void setYaw(float yaw) {
-        PathNode n = this.historyNodes.getFirst();
-        this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), yaw, n.pitch(), n.roll()));
-    }
-    public float getPitch() { return this.historyNodes.getFirst().pitch(); }
-    public void setPitch(float pitch) {
-        PathNode n = this.historyNodes.getFirst();
-        this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), n.yaw(), pitch, n.roll()));
-    }
-    public float getRoll() { return this.historyNodes.getFirst().roll(); }
-    public void setRoll(float roll) {
-        PathNode n = this.historyNodes.getFirst();
-        this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), n.yaw(), n.pitch(), roll));
-    }
 }

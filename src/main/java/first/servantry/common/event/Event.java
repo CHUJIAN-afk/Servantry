@@ -3,6 +3,7 @@ package first.servantry.common.event;
 import first.servantry.Servantry;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.servant.Servant;
+import first.servantry.common.attachment.LevelProjectileData;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
@@ -17,12 +18,24 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.List;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
+
+    @SubscribeEvent
+    public static void onLevelTick(LevelTickEvent.Post event) {
+        Level level = event.getLevel();
+        LevelProjectileData data = level.getData(AttachmentRegister.LevelProjectileData);
+        data.tickProjectiles();
+        if (!level.isClientSide() && data.isChange()) {
+            data.setChange(false);
+            level.syncData(AttachmentRegister.LevelProjectileData);
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onPlayerTick(PlayerTickEvent.Post event) {

@@ -30,6 +30,8 @@ public class SoulLangProvider extends LanguageProvider {
         // --- 物品与实体名 ---
         add("item.servantry.terraprism", "Terraprism", "泰拉棱镜");
         add("servant.servantry.terraprism", "Terraprism", "泰拉棱镜");
+        add("item.servantry.terraprism.tooltip.1", "'Summons a light prism blade to perform near-flawless attacks'", "召唤一柄光棱剑，施展近乎完美的攻击");
+        add("item.servantry.terraprism.tooltip.2", "'A flawless blade once hailed as the \"Prism of the Earth\"'", "——曾被冠以“大地棱彩”美名的无暇之剑");
 
         add("item.servantry.blade_staff", "Blade Staff", "刃杖");
         add("servant.servantry.enchanted_throwing_knives", "Enchanted Throwing Knives", "附魔飞刀");
@@ -38,6 +40,10 @@ public class SoulLangProvider extends LanguageProvider {
 
         add("item.servantry.sanguine_staff", "Sanguine Staff", "血红法杖");
         add("servant.servantry.sanguine_bat", "Sanguine Bat", "血蝙蝠");
+
+        add("item.servantry.stardust_cell_staff", "Stardust Cell Staff", "星尘细胞法杖");
+        add("servant.servantry.stardust_cell", "Stardust Cell", "星尘细胞");
+        add("item.servantry.stardust_cell_staff.tooltip.1", "'Cultivate the most beautiful cellular infection'", "“培养最美丽的细胞感染”");
     }
 
     private void add(String key, String enDesc, String zhDesc) {

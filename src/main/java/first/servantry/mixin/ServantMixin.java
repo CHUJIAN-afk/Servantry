@@ -2,9 +2,9 @@ package first.servantry.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.IDamagingOnCollide;
 import first.servantry.api.servant.ITrailRenderer;
+import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.Servant;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -32,7 +32,7 @@ public class ServantMixin {
             method = "renderInternal",
             at = @At(
                     value = "INVOKE",
-                    target = "Lfirst/servantry/api/servant/Servant;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;FILfirst/servantry/api/PathNode;)V"
+                    target = "Lfirst/servantry/api/servant/Servant;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;FILfirst/servantry/api/servant/PathNode;)V"
             )
     )
     private void renderHook(CallbackInfo ci, @Local(argsOnly = true) float partialTick, @Local(argsOnly = true) PoseStack poseStack, @Local(argsOnly = true) MultiBufferSource bufferSource, @Local(name = "renderNode") PathNode renderNode) {

@@ -18,6 +18,7 @@ public class Servantry {
         CreativeTabRegister.register(eventBus);
         SoundRegister.register(eventBus);
         MarkerRegister.register(eventBus);
+        AdvancedProjectileRegister.register(eventBus);
     }
 
     public static ResourceLocation rl(String path) {

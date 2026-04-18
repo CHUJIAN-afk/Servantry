@@ -1,8 +1,8 @@
 package first.servantry.mixin;
 
-import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.servant.Servant;
+import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.register.AttributeRegister;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;

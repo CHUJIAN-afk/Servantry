@@ -3,11 +3,12 @@ package first.servantry.common.servent;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import first.servantry.Servantry;
-import first.servantry.api.servant.PathNode;
+import first.servantry.api.ai.ActionController;
+import first.servantry.api.ai.ServantAction;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.IDamagingOnCollide;
 import first.servantry.api.servant.ITrailRenderer;
+import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.register.AttachmentRegister;
@@ -17,12 +18,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -36,85 +33,165 @@ import java.util.*;
 
 public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRenderer {
 
-    public enum PrismState {
-        IDLE,               // 0: 待机
-        PREP,               // 1: 准备
-        FIRST_STRIKE,       // 2: 初次斩击
-        ELLIPSE_SLASH,      // 3: 椭圆循环
-        HOURGLASS,          // 4: 沙漏刺击
-        CHAIN_STRIKE,       // 5: 连锁斩击
-        RETURN;             // 6: 归来
-
-        public boolean isAttackState() {
-            return this == FIRST_STRIKE || this == ELLIPSE_SLASH || this == HOURGLASS || this == CHAIN_STRIKE;
-        }
-    }
-
-    private static final List<PrismState> CONTINUOUS_ATTACKS = Arrays.asList(
-            PrismState.ELLIPSE_SLASH,
-            PrismState.HOURGLASS
-    );
-
-    private static final String HIT_CLEAR = "hit_clear";
-
-    private PrismState state = PrismState.IDLE;
-    private int stateTick = 0;
-    private int loopCount = 0;
-
-    private int targetId = -1;
-    private Vec3 lastTargetPos = null;
-    private Vec3 prepPos = null;
-    private Vec3 lastPlayerPos = null;
-
-    private boolean returnLocked = false;
     private int trailTimer = 0;
-
     private float idleBlend = 0f;
     private float idleBlendO = 0f;
-
     private final Set<Integer> swingHitTargets = new HashSet<>();
-    private static final ResourceLocation TRAIL_TEXTURE = Servantry.rl("textures/trail.png");
+
+    public int loopCount = 0;
+    public LivingEntity currentTarget = null;
+    public Vec3 lastPlayerPos = null;
 
     public Terraprism(PathNode node) {
         super(node);
+        this.ai = new ActionController<>(this, new ActionPrismIdle(this));
+    }
+
+    @SuppressWarnings("unchecked")
+    public ActionController<Terraprism> getAi() {
+        return (ActionController<Terraprism>) ai;
     }
 
     @Override
-    public float getBaseDamage() {
-        return 9;
+    public float getBaseDamage() { return 9; }
+
+    @Override
+    public float getBaseKnockback() { return 0.1f; }
+
+    @Override
+    public AABB getHitbox() { return new AABB(-0.1, -0.04, -0.75, 0.1, 0.04, 0.25); }
+
+    public float accelerate(float t) { return t * t; }
+
+    @Override
+    public void onPathNodeConsumed(PathNode node) {
+        if ("hit_clear".equals(node.feature())) {
+            swingHitTargets.clear();
+        }
     }
 
     @Override
-    public float getBaseKnockback() {
-        return 0.1f;
+    public void collisionAttack(Set<LivingEntity> hitTargets) {
+        if (isExecutingPath()) {
+            for (LivingEntity target : hitTargets) {
+                if (!swingHitTargets.contains(target.getId())) {
+                    int invulnerableTime = target.invulnerableTime;
+                    target.invulnerableTime = 0;
+                    target.hurt(getDamageSource(), getBaseDamage());
+                    target.invulnerableTime = invulnerableTime;
+                    swingHitTargets.add(target.getId());
+                }
+            }
+        }
     }
 
     @Override
-    public AABB getHitbox() {
-        return new AABB(-0.1, -0.04, -0.75, 0.1, 0.04, 0.25);
+    public void tick() {
+        super.tick();
+        Player owner = getOwner();
+        if (owner != null) {
+            if (owner.level().isClientSide()) {
+                clientTick();
+            } else {
+                serverTick(owner);
+            }
+        }
     }
 
-    private float accelerate(float t) {
-        return t * t;
+    private void clientTick() {
+        if (getAi().getCurrentAction().isAttack()) {
+            trailTimer = 12;
+        } else if (trailTimer > 0) {
+            trailTimer--;
+        }
+        idleBlendO = idleBlend;
+        if (getAi().getCurrentAction() instanceof ActionPrismIdle) {
+            idleBlend = Math.min(1.0f, idleBlend + 0.1f);
+        } else {
+            idleBlend = Math.max(0.0f, idleBlend - 0.25f);
+        }
     }
 
-    private PathNode getEulerNode(Vec3 pos, Vec3 tipDir, Vec3 bladeNormal) {
-        if (tipDir.lengthSqr() < 1e-4) tipDir = new Vec3(0, 0, 1);
-        tipDir = tipDir.normalize();
+    private void serverTick(Player owner) {
+        if (this.getPos().distanceToSqr(owner.position()) > 4096.0 && !(getAi().getCurrentAction() instanceof ActionPrismReturn)) {
+            getAi().forceAction(new ActionPrismReturn(this), null);
+            currentTarget = null;
+            return;
+        }
 
-        float yaw = (float) (Math.atan2(-tipDir.x, tipDir.z) * (180D / Math.PI));
-        double horiz = Math.sqrt(tipDir.x * tipDir.x + tipDir.z * tipDir.z);
-        float pitch = (float) (Math.atan2(-tipDir.y, horiz) * (180D / Math.PI));
+        LivingEntity newTarget = verifyTarget(owner);
 
-        Vec3 defaultUp = new Vec3(0, 1, 0).xRot((float) Math.toRadians(pitch)).yRot((float) Math.toRadians(yaw));
-        Vec3 projNormal = bladeNormal.subtract(tipDir.scale(bladeNormal.dot(tipDir))).normalize();
-        if (projNormal.lengthSqr() < 1e-4) projNormal = defaultUp;
+        if (currentTarget != null && newTarget != null && currentTarget.getId() != newTarget.getId() && !(getAi().getCurrentAction() instanceof ActionPrismIdle) && !(getAi().getCurrentAction() instanceof ActionPrismReturn)) {
+            this.loopCount = 0;
+            getAi().forceAction(new ActionPrismChainStrike(this), newTarget);
+        }
 
-        double dot = defaultUp.dot(projNormal);
-        Vec3 cross = defaultUp.cross(projNormal);
-        float roll = (float) (Math.atan2(cross.dot(tipDir), dot) * (180D / Math.PI));
+        if (newTarget == null && !(getAi().getCurrentAction() instanceof ActionPrismIdle) && !(getAi().getCurrentAction() instanceof ActionPrismReturn)) {
+            getAi().forceAction(new ActionPrismReturn(this), null);
+        }
 
-        return new PathNode(pos, yaw, pitch, roll);
+        this.currentTarget = newTarget;
+        getAi().tick(newTarget);
+
+        if (!this.isExecutingPath()) {
+            this.lastPlayerPos = owner.position();
+        }
+    }
+
+    private LivingEntity verifyTarget(Player owner) {
+        ServantData data = owner.getData(AttachmentRegister.ServantData);
+        List<LivingEntity> potentialTargets = data.getNearbyTargets(owner, this, 32.0, getAi().getCurrentAction() instanceof ActionPrismIdle);
+
+        if (potentialTargets.isEmpty()) return null;
+
+        int order = data.getOrder(this);
+        int currentTargetId = currentTarget != null ? currentTarget.getId() : -1;
+
+        potentialTargets.sort(Comparator.comparingDouble(e -> {
+            double distSqr = e.distanceToSqr(getPos());
+            double score = distSqr;
+            if (e.distanceToSqr(owner) < 36.0) score -= 10000.0;
+            if (e.getId() == currentTargetId) score -= 1000.0;
+            int hashBias = (e.getId() * 31 + order * 17) % 5;
+            score += hashBias * 40.0;
+            return score;
+        }));
+
+        return potentialTargets.getFirst();
+    }
+
+    public boolean canTransitionToPrep(Player owner) {
+        ServantData data = owner.getData(AttachmentRegister.ServantData);
+        int maxOrder = -1;
+        Servant chosen = null;
+        for (Servant s : data.getServants()) {
+            if (s instanceof Terraprism ts && ts.getAi().getCurrentAction() instanceof ActionPrismIdle) {
+                int order = data.getOrder(s);
+                if (order > maxOrder) {
+                    maxOrder = order;
+                    chosen = s;
+                }
+            }
+        }
+        return chosen == this;
+    }
+
+    public Vec3 applyTargetTracking(LivingEntity target, Vec3 lastTargetPos) {
+        if (target == null || lastTargetPos == null) return lastTargetPos;
+        Vec3 currentTargetCenter = target.position().add(0, target.getBbHeight() / 2.0, 0);
+        Vec3 offset = currentTargetCenter.subtract(lastTargetPos);
+
+        if (offset.lengthSqr() > 1e-5) {
+            LinkedList<PathNode> queue = this.getPathQueue();
+            int qSize = queue.size();
+            for (int i = 0; i < qSize; i++) {
+                PathNode node = queue.get(i);
+                float weight = (float) (i + 1) / qSize;
+                Vec3 blendedOffset = offset.scale(weight);
+                queue.set(i, new PathNode(node.feature(), node.pos().add(blendedOffset), node.yaw(), node.pitch(), node.roll()));
+            }
+        }
+        return currentTargetCenter;
     }
 
     public PathNode getInterpolatedIdleState(Player owner, int order, int total, float partialTick) {
@@ -143,612 +220,491 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
         return new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
     }
 
-    public PathNode getIdleState(Player owner, int order, int total) {
-        return getInterpolatedIdleState(owner, order, total, 1f);
+    @Override
+    public ServantAction<?> createAction(String id) {
+        return switch (id) {
+            case "prep" -> new ActionPrismPrep(this);
+            case "first_strike" -> new ActionPrismFirstStrike(this);
+            case "ellipse" -> new ActionPrismEllipseSlash(this);
+            case "hourglass" -> new ActionPrismHourglass(this);
+            case "chain" -> new ActionPrismChainStrike(this);
+            case "return" -> new ActionPrismReturn(this);
+            default -> new ActionPrismIdle(this);
+        };
     }
 
-    @Override
-    public void collisionAttack(Set<LivingEntity> hitTargets) {
-        if (isExecutingPath()) {
-            for (LivingEntity target : hitTargets) {
-                if (!swingHitTargets.contains(target.getId())) {
-                    int invulnerableTime = target.invulnerableTime;
-                    target.invulnerableTime = 0;
-                    target.hurt(getDamageSource(), getBaseDamage());
-                    target.invulnerableTime = invulnerableTime;
-                    swingHitTargets.add(target.getId());
+    public static class ActionPrismIdle extends ServantAction<Terraprism> {
+        public ActionPrismIdle(Terraprism servant) { super(servant); }
+        @Override public String getId() { return "idle"; }
+
+        @Override
+        public void tick(LivingEntity target) {
+            Player owner = servant.getOwner();
+            if (target != null && servant.canTransitionToPrep(owner)) {
+                servant.getAi().trySetAction(new ActionPrismPrep(servant), target);
+                return;
+            }
+            ServantData data = owner.getData(AttachmentRegister.ServantData);
+            PathNode idleState = servant.getInterpolatedIdleState(owner, data.getOrder(servant), data.getServants().size(), 1f);
+
+            Vec3 nextPos = servant.getPos().lerp(idleState.pos(), 0.25f);
+            float nextYaw = Mth.rotLerp(0.25f, servant.getYaw(), idleState.yaw());
+            float nextPitch = Mth.rotLerp(0.25f, servant.getPitch(), idleState.pitch());
+            float nextRoll = Mth.rotLerp(0.25f, servant.getRoll(), idleState.roll());
+
+            servant.setPath(Collections.singletonList(new PathNode(nextPos, nextYaw, nextPitch, nextRoll)));
+        }
+    }
+
+    public static class ActionPrismReturn extends ServantAction<Terraprism> {
+        public ActionPrismReturn(Terraprism servant) { super(servant); }
+        @Override public String getId() { return "return"; }
+        @Override public boolean canBeInterrupted() { return false; }
+
+        @Override
+        public void tick(LivingEntity target) {
+            Player owner = servant.getOwner();
+            if (target != null && servant.canTransitionToPrep(owner)) {
+                servant.getAi().forceAction(new ActionPrismPrep(servant), target);
+                return;
+            }
+            ServantData data = owner.getData(AttachmentRegister.ServantData);
+            PathNode idleState = servant.getInterpolatedIdleState(owner, data.getOrder(servant), data.getServants().size(), 1f);
+
+            Vec3 playerVel = Vec3.ZERO;
+            if (servant.lastPlayerPos != null) {
+                playerVel = owner.position().subtract(servant.lastPlayerPos);
+            }
+
+            Vec3 nextPos = servant.getPos().add(playerVel).lerp(idleState.pos(), 0.45f);
+            float nextYaw = Mth.rotLerp(0.3f, servant.getYaw(), idleState.yaw());
+            float nextPitch = Mth.rotLerp(0.3f, servant.getPitch(), idleState.pitch());
+            float nextRoll = Mth.rotLerp(0.3f, servant.getRoll(), idleState.roll());
+
+            servant.setPath(Collections.singletonList(new PathNode(nextPos, nextYaw, nextPitch, nextRoll)));
+
+            double threshold = 1.5 + playerVel.lengthSqr() * 10.0;
+            if (servant.getPos().distanceToSqr(idleState.pos()) < threshold) {
+                servant.getAi().forceAction(new ActionPrismIdle(servant), target);
+            }
+        }
+        @Override public boolean isFinished() { return false; }
+    }
+
+    public static class ActionPrismPrep extends ServantAction<Terraprism> {
+        private Vec3 prepPos;
+        private int stateTick = 0;
+
+        public ActionPrismPrep(Terraprism servant) { super(servant); }
+        @Override public String getId() { return "prep"; }
+
+        @Override
+        public void onStart(LivingEntity target) {
+            this.prepPos = servant.getPos().add(0, 2, 0);
+        }
+
+        @Override
+        public void tick(LivingEntity target) {
+            if (target == null) return;
+
+            Vec3 nextPos = servant.getPos().lerp(prepPos, 0.2f);
+            float nextYaw = servant.getYaw();
+            float nextPitch = servant.getPitch();
+            float nextRoll = servant.getRoll();
+
+            Vec3 toTarget = target.getEyePosition().subtract(servant.getPos());
+            if (toTarget.lengthSqr() > 1e-4) {
+                Vec3 bladeNormal = toTarget.cross(new Vec3(0, 1, 0)).normalize();
+                PathNode prepNode = servant.getEulerNode(servant.getPos(), toTarget, bladeNormal, "");
+                nextYaw = Mth.rotLerp(0.3f, servant.getYaw(), prepNode.yaw());
+                nextPitch = Mth.rotLerp(0.3f, servant.getPitch(), prepNode.pitch());
+                nextRoll = Mth.rotLerp(0.3f, servant.getRoll(), prepNode.roll());
+            }
+
+            servant.setPath(Collections.singletonList(new PathNode(nextPos, nextYaw, nextPitch, nextRoll)));
+
+            if (servant.getPos().distanceToSqr(prepPos) < 0.5) {
+                stateTick++;
+                if (stateTick > 4) {
+                    servant.getAi().trySetAction(new ActionPrismFirstStrike(servant), target);
                 }
             }
         }
+        @Override public boolean isFinished() { return false; }
     }
 
-    @Override
-    public void tick() {
-        super.tick();
-        if (!getHistoryNodes().isEmpty() && HIT_CLEAR.equals(getHistoryNodes().getFirst().feature())) {
-            swingHitTargets.clear();
+    public static class ActionPrismFirstStrike extends ServantAction<Terraprism> {
+        public ActionPrismFirstStrike(Terraprism servant) { super(servant); }
+        @Override public String getId() { return "first_strike"; }
+        @Override public boolean isAttack() { return true; }
+
+        @Override
+        public void onStart(LivingEntity target) {
+            if (target == null) return;
+            int duration = 6;
+            Vec3 start = servant.getPos();
+            Vec3 end = target.position().add(0, target.getBbHeight() / 2, 0);
+
+            List<PathNode> nodes = new ArrayList<>();
+            Vec3 moveDir = end.subtract(start);
+            if (moveDir.lengthSqr() < 1e-4) moveDir = new Vec3(0, 0, 1);
+
+            Vec3 planeNormal = moveDir.cross(new Vec3(0, 1, 0)).normalize();
+            if (planeNormal.lengthSqr() < 1e-4) planeNormal = new Vec3(1, 0, 0);
+
+            for (int i = 1; i <= duration; i++) {
+                float t = servant.accelerate((float) i / duration);
+                Vec3 p = start.lerp(end, t);
+                PathNode node = servant.getEulerNode(p, moveDir, planeNormal, i == 1 ? "hit_clear" : "");
+                nodes.add(node);
+            }
+            servant.setPath(nodes);
+            servant.loopCount = 0;
         }
 
-        Player owner = getOwner();
-        if (owner != null) {
-            if (owner.level().isClientSide()) {
-                clientTick();
+        @Override
+        public void tick(LivingEntity target) {
+            if (!servant.isExecutingPath()) {
+                if (target != null) {
+                    boolean isEllipse = servant.getOwner().getRandom().nextBoolean();
+                    servant.getAi().forceAction(isEllipse ? new ActionPrismEllipseSlash(servant) : new ActionPrismHourglass(servant), target);
+                } else {
+                    servant.getAi().forceAction(new ActionPrismIdle(servant), null);
+                }
+            }
+        }
+        @Override public boolean isFinished() { return false; }
+    }
+
+    public static abstract class ActionPrismContinuousAttack extends ServantAction<Terraprism> {
+        protected Vec3 lastTargetPos;
+        public ActionPrismContinuousAttack(Terraprism servant) { super(servant); }
+        @Override public boolean isAttack() { return true; }
+
+        @Override
+        public void tick(LivingEntity target) {
+            if (!servant.isExecutingPath() && target != null) {
+                servant.loopCount++;
+                Player owner = servant.getOwner();
+                if (servant.loopCount >= 2 && owner.getRandom().nextBoolean()) {
+                    servant.loopCount = 0;
+                    ServantAction<Terraprism> nextAction = this instanceof ActionPrismHourglass ?
+                            new ActionPrismEllipseSlash(servant) : new ActionPrismHourglass(servant);
+                    servant.getAi().forceAction(nextAction, target);
+                } else {
+                    this.onStart(target);
+                }
+            } else if (servant.isExecutingPath()) {
+                this.lastTargetPos = servant.applyTargetTracking(target, this.lastTargetPos);
+            }
+        }
+        @Override public boolean isFinished() { return false; }
+    }
+
+    public static class ActionPrismEllipseSlash extends ActionPrismContinuousAttack {
+        public ActionPrismEllipseSlash(Terraprism servant) { super(servant); }
+        @Override public String getId() { return "ellipse"; }
+
+        @Override
+        public void onStart(LivingEntity target) {
+            if (target == null) return;
+            this.lastTargetPos = target.position().add(0, target.getBbHeight() / 2.0, 0);
+
+            Player owner = servant.getOwner();
+            int duration = 16;
+            int blendTicks = 6;
+            Vec3 currentPos = servant.getPos();
+            Vec3 T = lastTargetPos;
+
+            float randAngle = owner.getRandom().nextFloat() * (float)Math.PI * 2f;
+            float randRadius = 3.0f + owner.getRandom().nextFloat() * 2.0f;
+            float randY = 0.5f + owner.getRandom().nextFloat() * 2.5f;
+            Vec3 farPoint = T.add(Math.cos(randAngle) * randRadius, randY, Math.sin(randAngle) * randRadius);
+
+            Vec3 diff = farPoint.subtract(T);
+            Vec3 major = diff.scale(0.5);
+            Vec3 center = T.add(major);
+            Vec3 majorDir = major.normalize();
+
+            Vec3 randomUp = new Vec3(owner.getRandom().nextDouble() - 0.5, owner.getRandom().nextDouble() - 0.5, owner.getRandom().nextDouble() - 0.5).normalize();
+            Vec3 minorDir = majorDir.cross(randomUp).normalize();
+            if (minorDir.lengthSqr() < 1e-5) minorDir = new Vec3(0, 1, 0);
+
+            double minorRadius = major.length() * 0.75;
+            Vec3 minor = minorDir.scale(minorRadius);
+
+            Vec3 currentVel;
+            LinkedList<PathNode> history = servant.getHistoryNodes();
+            if (history.size() > 1) {
+                currentVel = currentPos.subtract(history.get(1).pos());
+                if (currentVel.lengthSqr() > 1e-5) currentVel = currentVel.normalize();
+                else currentVel = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
             } else {
-                serverTick();
+                currentVel = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
             }
-        }
-    }
 
-    private void clientTick() {
-        if (state.isAttackState()) {
-            trailTimer = 12;
-        } else if (trailTimer > 0) {
-            trailTimer--;
-        }
-        idleBlendO = idleBlend;
-        if (state == PrismState.IDLE) {
-            idleBlend = Math.min(1.0f, idleBlend + 0.1f);
-        } else {
-            idleBlend = Math.max(0.0f, idleBlend - 0.25f);
-        }
-    }
+            Vec3 currentTip = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
+            Quaternionf q = new Quaternionf().rotateY((float) Math.toRadians(-servant.getYaw()))
+                    .rotateX((float) Math.toRadians(servant.getPitch()))
+                    .rotateZ((float) Math.toRadians(servant.getRoll()));
+            Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
+            Vec3 currentNormal = new Vec3(upV.x(), upV.y(), upV.z()).normalize();
 
-    private void serverTick() {
-        Player owner = getOwner();
+            float tBlend = (float) blendTicks / duration;
+            float biasedTBlend = tBlend - 0.08f * Mth.sin(tBlend * Mth.TWO_PI);
+            float thetaBlend = biasedTBlend * 2.0f * (float)Math.PI;
 
-        if (this.isExecutingPath() && this.targetId != -1 && owner.level() instanceof ServerLevel serverLevel) {
-            Entity targetEntity = serverLevel.getEntity(this.targetId);
-            if (targetEntity instanceof LivingEntity livingTarget) {
-                Vec3 currentTargetCenter = livingTarget.position().add(0, livingTarget.getBbHeight() / 2.0, 0);
-                if (this.lastTargetPos != null) {
-                    Vec3 offset = currentTargetCenter.subtract(this.lastTargetPos);
-                    if (offset.lengthSqr() > 1e-5) {
-                        LinkedList<PathNode> queue = this.getPathQueue();
-                        int qSize = queue.size();
-                        for (int i = 0; i < qSize; i++) {
-                            PathNode node = queue.get(i);
-                            float weight = (float) (i + 1) / qSize;
-                            Vec3 blendedOffset = offset.scale(weight);
+            Vec3 P3 = center.add(major.scale(Math.cos(thetaBlend))).add(minor.scale(Math.sin(thetaBlend)));
+            Vec3 E_prime = major.scale(-Math.sin(thetaBlend)).add(minor.scale(Math.cos(thetaBlend))).normalize();
 
-                            queue.set(i, new PathNode(
-                                    node.feature(),
-                                    node.pos().add(blendedOffset),
-                                    node.yaw(),
-                                    node.pitch(),
-                                    node.roll()
-                            ));
-                        }
-                    }
+            double R = currentPos.distanceTo(P3) * 0.4;
+            Vec3 P0 = currentPos;
+            Vec3 P1 = currentPos.add(currentVel.scale(R));
+            Vec3 P2 = P3.subtract(E_prime.scale(R));
+
+            List<PathNode> nodes = new ArrayList<>();
+            for (int i = 1; i <= duration; i++) {
+                float progress = (float) i / duration;
+                Vec3 p, tipDir, planeNormal;
+
+                float biasedT = progress - 0.08f * Mth.sin(progress * Mth.TWO_PI);
+                float theta = biasedT * 2.0f * (float)Math.PI;
+                Vec3 targetP = center.add(major.scale(Math.cos(theta))).add(minor.scale(Math.sin(theta)));
+                Vec3 targetTrueTangent = major.scale(-Math.sin(theta)).add(minor.scale(Math.cos(theta))).normalize();
+
+                Vec3 targetTip = targetP.subtract(center).normalize();
+                Vec3 targetNormal = targetTip.cross(targetTrueTangent).normalize();
+                if (targetNormal.lengthSqr() < 1e-5) targetNormal = majorDir.cross(targetTip).normalize();
+
+                if (i <= blendTicks) {
+                    float localT = (float) i / blendTicks;
+                    float smoothT = localT * localT * (3.0f - 2.0f * localT);
+                    float mt = 1.0f - localT;
+
+                    p = P0.scale(mt*mt*mt).add(P1.scale(3*mt*mt*localT)).add(P2.scale(3*mt*localT*localT)).add(P3.scale(localT*localT*localT));
+                    tipDir = servant.slerpVector(currentTip, targetTip, smoothT);
+                    planeNormal = servant.slerpVector(currentNormal, targetNormal, smoothT);
+                } else {
+                    p = targetP; tipDir = targetTip; planeNormal = targetNormal;
                 }
-                this.lastTargetPos = currentTargetCenter;
+                nodes.add(servant.getEulerNode(p, tipDir, planeNormal, i == 1 ? "hit_clear" : ""));
             }
-        }
-
-        if (this.getPos().distanceToSqr(owner.position()) > 4096.0) {
-            if (!returnLocked) {
-                state = PrismState.RETURN;
-                stateTick = 0;
-                targetId = -1;
-                returnLocked = true;
-                this.setPath(new ArrayList<>());
-            }
-        }
-
-        LivingEntity target = null;
-        if (!returnLocked) {
-            target = verifyTarget(owner);
-            if (target == null && state != PrismState.IDLE && state != PrismState.RETURN) {
-                state = PrismState.RETURN;
-                stateTick = 0;
-                this.setPath(new ArrayList<>());
-            }
-        }
-
-        if (this.isExecutingPath()) {
-            this.lastPlayerPos = owner.position();
-            return;
-        }
-
-        if (target != null && state.isAttackState()) {
-            switch (state) {
-                case FIRST_STRIKE -> generateFirstStrike(owner, target);
-                case ELLIPSE_SLASH -> generateEllipseSlash(owner, target);
-                case HOURGLASS -> generateHourglass(owner, target);
-                case CHAIN_STRIKE -> generateChainStrike(owner, target);
-                default -> {}
-            }
-        } else {
-            switch (state) {
-                case IDLE -> handleIdle(owner, target);
-                case PREP -> handlePrep(target);
-                case RETURN -> handleReturn(owner, target);
-                default -> {}
-            }
+            servant.setPath(nodes);
         }
     }
 
-    private LivingEntity verifyTarget(Player owner) {
-        ServantData data = owner.getData(AttachmentRegister.ServantData);
-        // 【核心优化接入】：使用缓存方法代替原版的每 Tick O(N) 扫描，完美解决性能卡顿
-        List<LivingEntity> potentialTargets = data.getNearbyTargets(owner, this, 32.0, state == PrismState.IDLE);
+    public static class ActionPrismHourglass extends ActionPrismContinuousAttack {
+        public ActionPrismHourglass(Terraprism servant) { super(servant); }
+        @Override public String getId() { return "hourglass"; }
 
-        if (potentialTargets.isEmpty()) {
-            targetId = -1;
-            return null;
-        }
+        @Override
+        public void onStart(LivingEntity target) {
+            if (target == null) return;
+            this.lastTargetPos = target.position().add(0, target.getBbHeight() / 2.0, 0);
 
-        int order = data.getOrder(this);
+            int prepTicks = 4;
+            int attackTicks = 4;
+            int retreatTicks = 8;
 
-        potentialTargets.sort(Comparator.comparingDouble(e -> {
-            double distSqr = e.distanceToSqr(getPos());
-            double score = distSqr;
-            double DANGER_DIST_SQR = 6.0 * 6.0;
+            Vec3 startPos = servant.getPos();
+            Vec3 T = target.getBoundingBox().getCenter();
+            Vec3 toTarget = T.subtract(startPos);
+            if (toTarget.lengthSqr() < 1e-5) toTarget = new Vec3(0, -1, 0);
+            Vec3 attackDir = toTarget.normalize();
 
-            if (e.distanceToSqr(owner) < DANGER_DIST_SQR) {
-                score -= 10000.0;
+            if (attackDir.y > -0.2) {
+                attackDir = new Vec3(attackDir.x, Math.min(-0.5, attackDir.y - 0.5), attackDir.z).normalize();
             }
-            if (e.getId() == targetId) {
-                score -= 1000.0;
+
+            double dist = Math.max(7.0, startPos.distanceTo(T));
+            Vec3 prepPos = T.subtract(attackDir.scale(dist));
+            Vec3 hitPos = T.add(attackDir);
+
+            Vector3f v = new Vector3f((float) attackDir.x, (float) attackDir.y, (float) attackDir.z);
+            new Quaternionf().rotateY((float) (Math.PI * 0.8)).transform(v);
+            Vec3 nextAttackDir = new Vec3(v.x(), v.y(), v.z()).normalize();
+            Vec3 nextPrepPos = T.subtract(nextAttackDir.scale(dist));
+
+            Vec3 currentVel = new Vec3(0, 1, 0);
+            LinkedList<PathNode> history = servant.getHistoryNodes();
+            if (history.size() > 1) {
+                currentVel = startPos.subtract(history.get(1).pos());
+                if (currentVel.lengthSqr() > 1e-5) currentVel = currentVel.normalize();
+                else currentVel = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
+            } else {
+                currentVel = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
             }
-            int hashBias = (e.getId() * 31 + order * 17) % 5;
-            score += hashBias * 40.0;
-            return score;
-        }));
 
-        LivingEntity newTarget = potentialTargets.getFirst();
+            Vec3 currentTip = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
+            Quaternionf q = new Quaternionf().rotateY((float) Math.toRadians(-servant.getYaw()))
+                    .rotateX((float) Math.toRadians(servant.getPitch()))
+                    .rotateZ((float) Math.toRadians(servant.getRoll()));
+            Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
+            Vec3 currentNormal = new Vec3(upV.x(), upV.y(), upV.z()).normalize();
 
-        if (targetId != -1 && targetId != newTarget.getId() && lastTargetPos != null) {
-            state = PrismState.CHAIN_STRIKE;
-            loopCount = 0;
-            this.setPath(new ArrayList<>());
-        }
+            Vec3 planeNormal = attackDir.cross(new Vec3(0, 1, 0)).normalize();
+            if (planeNormal.lengthSqr() < 1e-4) planeNormal = new Vec3(1, 0, 0);
 
-        targetId = newTarget.getId();
-        lastTargetPos = newTarget.position().add(0, newTarget.getBbHeight() / 2, 0);
-        return newTarget;
-    }
+            Vec3 P3 = prepPos;
+            Vec3 E_prime = attackDir;
+            double R = startPos.distanceTo(P3) * 0.4;
+            Vec3 P0 = startPos;
+            Vec3 P1 = startPos.add(currentVel.scale(R));
+            Vec3 P2 = P3.subtract(E_prime.scale(R));
 
-    private boolean canTransitionToPrep(Player owner) {
-        ServantData data = owner.getData(AttachmentRegister.ServantData);
-        int maxOrder = -1;
-        Servant chosen = null;
-        for (Servant s : data.getServants()) {
-            if (s instanceof Terraprism ts && ts.state == PrismState.IDLE) {
-                int order = data.getOrder(s);
-                if (order > maxOrder) {
-                    maxOrder = order;
-                    chosen = s;
-                }
-            }
-        }
-        return chosen == this;
-    }
-
-    private void pickRandomAttack(Player owner) {
-        this.loopCount = 0;
-        this.state = CONTINUOUS_ATTACKS.get(owner.getRandom().nextInt(CONTINUOUS_ATTACKS.size()));
-    }
-
-    private void advanceAttack(Player owner) {
-        this.loopCount++;
-        if (this.loopCount >= 2 && owner.getRandom().nextBoolean()) {
-            List<PrismState> pool = new ArrayList<>(CONTINUOUS_ATTACKS);
-            pool.remove(this.state);
-            this.state = pool.get(owner.getRandom().nextInt(pool.size()));
-            this.loopCount = 0;
-        }
-    }
-
-    private void handleIdle(Player owner, LivingEntity target) {
-        if (target != null && canTransitionToPrep(owner)) {
-            state = PrismState.PREP; stateTick = 0; prepPos = this.getPos().add(0, 3.5, 0); return;
-        }
-        ServantData data = owner.getData(AttachmentRegister.ServantData);
-        PathNode idleState = getIdleState(owner, data.getOrder(this), data.getServants().size());
-
-        Vec3 nextPos = this.getPos().lerp(idleState.pos(), 0.25f);
-        float nextYaw = Mth.rotLerp(0.25f, this.getYaw(), idleState.yaw());
-        float nextPitch = Mth.rotLerp(0.25f, this.getPitch(), idleState.pitch());
-        float nextRoll = Mth.rotLerp(0.25f, this.getRoll(), idleState.roll());
-
-        this.setPath(Collections.singletonList(new PathNode(nextPos, nextYaw, nextPitch, nextRoll)));
-    }
-
-    private void handleReturn(Player owner, LivingEntity target) {
-        if (!returnLocked && target != null && canTransitionToPrep(owner)) {
-            state = PrismState.PREP;
-            stateTick = 0;
-            prepPos = this.getPos().add(0, 1.5, 0);
-            return;
-        }
-        ServantData data = owner.getData(AttachmentRegister.ServantData);
-        PathNode idleState = getIdleState(owner, data.getOrder(this), data.getServants().size());
-
-        Vec3 playerVel = Vec3.ZERO;
-        if (this.lastPlayerPos != null) {
-            playerVel = owner.position().subtract(this.lastPlayerPos);
-        }
-
-        Vec3 nextPos = this.getPos().add(playerVel).lerp(idleState.pos(), 0.45f);
-
-        float nextYaw = Mth.rotLerp(0.3f, this.getYaw(), idleState.yaw());
-        float nextPitch = Mth.rotLerp(0.3f, this.getPitch(), idleState.pitch());
-        float nextRoll = Mth.rotLerp(0.3f, this.getRoll(), idleState.roll());
-
-        this.setPath(Collections.singletonList(new PathNode(nextPos, nextYaw, nextPitch, nextRoll)));
-
-        double playerSpeedSqr = playerVel.lengthSqr();
-        double threshold = 1.5 + playerSpeedSqr * 10.0;
-
-        if (this.getPos().distanceToSqr(idleState.pos()) < threshold) {
-            state = PrismState.IDLE;
-            stateTick = 0;
-            returnLocked = false;
-        }
-
-    }
-
-    private void handlePrep(LivingEntity target) {
-        // 【核心漏洞修复】：当处于 PREP 但怪物意外死亡或超距导致 target 为 null 时
-        // 直接打断进入 RETURN 状态，彻底消灭 `target.getEyePosition()` 引发的 NPE！
-        if (target == null) {
-            state = PrismState.RETURN;
-            stateTick = 0;
-            this.setPath(new ArrayList<>());
-            return;
-        }
-
-        if (prepPos == null) prepPos = this.getPos().add(0, 2, 0);
-
-        Vec3 nextPos = this.getPos().lerp(prepPos, 0.2f);
-        float nextYaw = this.getYaw();
-        float nextPitch = this.getPitch();
-        float nextRoll = this.getRoll();
-
-        Vec3 toTarget = target.getEyePosition().subtract(this.getPos());
-        if (toTarget.lengthSqr() > 1e-4) {
-            Vec3 bladeNormal = toTarget.cross(new Vec3(0, 1, 0)).normalize();
-            PathNode prepNode = getEulerNode(this.getPos(), toTarget, bladeNormal);
-
-            nextYaw = Mth.rotLerp(0.3f, this.getYaw(), prepNode.yaw());
-            nextPitch = Mth.rotLerp(0.3f, this.getPitch(), prepNode.pitch());
-            nextRoll = Mth.rotLerp(0.3f, this.getRoll(), prepNode.roll());
-        }
-
-        this.setPath(Collections.singletonList(new PathNode(nextPos, nextYaw, nextPitch, nextRoll)));
-
-        if (this.getPos().distanceToSqr(prepPos) < 0.5) {
-            stateTick++;
-            if (stateTick > 4) {
-                state = PrismState.FIRST_STRIKE;
-                stateTick = 0;
-            }
-        }
-    }
-
-    private void generateFirstStrike(Player owner, LivingEntity target) {
-        int duration = 6;
-        Vec3 start = this.getPos();
-        Vec3 end = target.position().add(0, target.getBbHeight() / 2, 0);
-
-        List<PathNode> nodes = new ArrayList<>();
-        Vec3 moveDir = end.subtract(start);
-        if (moveDir.lengthSqr() < 1e-4) moveDir = new Vec3(0, 0, 1);
-
-        Vec3 planeNormal = moveDir.cross(new Vec3(0, 1, 0)).normalize();
-        if (planeNormal.lengthSqr() < 1e-4) planeNormal = new Vec3(1, 0, 0);
-
-        for (int i = 1; i <= duration; i++) {
-            float t = accelerate((float) i / duration);
-            Vec3 p = start.lerp(end, t);
-            PathNode node = getEulerNode(p, moveDir, planeNormal);
-            if (i == 1) {
-                node = node.withFeature(HIT_CLEAR);
-            }
-            nodes.add(node);
-        }
-
-        this.setPath(nodes);
-        pickRandomAttack(owner);
-    }
-
-    private void generateEllipseSlash(Player owner, LivingEntity target) {
-        int duration = 16;
-        int blendTicks = 6;
-
-        Vec3 currentPos = this.getPos();
-        Vec3 T = target.position().add(0, target.getBbHeight() / 2.0, 0);
-
-        float randAngle = owner.getRandom().nextFloat() * (float)Math.PI * 2f;
-        float randRadius = 3.0f + owner.getRandom().nextFloat() * 2.0f;
-        float randY = 0.5f + owner.getRandom().nextFloat() * 2.5f;
-        Vec3 farPoint = T.add(Math.cos(randAngle) * randRadius, randY, Math.sin(randAngle) * randRadius);
-
-        Vec3 diff = farPoint.subtract(T);
-        Vec3 major = diff.scale(0.5);
-        Vec3 center = T.add(major);
-        Vec3 majorDir = major.normalize();
-
-        Vec3 randomUp = new Vec3(owner.getRandom().nextDouble() - 0.5, owner.getRandom().nextDouble() - 0.5, owner.getRandom().nextDouble() - 0.5).normalize();
-        Vec3 minorDir = majorDir.cross(randomUp).normalize();
-        if (minorDir.lengthSqr() < 1e-5) minorDir = new Vec3(0, 1, 0);
-
-        double minorRadius = major.length() * 0.75;
-        Vec3 minor = minorDir.scale(minorRadius);
-
-        Vec3 currentVel;
-        LinkedList<PathNode> history = this.getHistoryNodes();
-        if (history.size() > 1) {
-            currentVel = currentPos.subtract(history.get(1).pos());
-            if (currentVel.lengthSqr() > 1e-5) currentVel = currentVel.normalize();
-            else currentVel = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        } else {
-            currentVel = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        }
-
-        Vec3 currentTip = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        Quaternionf q = new Quaternionf().rotateY((float) Math.toRadians(-this.getYaw()))
-                .rotateX((float) Math.toRadians(this.getPitch()))
-                .rotateZ((float) Math.toRadians(this.getRoll()));
-        Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
-        Vec3 currentNormal = new Vec3(upV.x(), upV.y(), upV.z()).normalize();
-
-        float tBlend = (float) blendTicks / duration;
-        float biasedTBlend = tBlend - 0.08f * Mth.sin(tBlend * Mth.TWO_PI);
-        float thetaBlend = biasedTBlend * 2.0f * (float)Math.PI;
-
-        Vec3 P3 = center.add(major.scale(Math.cos(thetaBlend))).add(minor.scale(Math.sin(thetaBlend)));
-        Vec3 E_prime = major.scale(-Math.sin(thetaBlend)).add(minor.scale(Math.cos(thetaBlend))).normalize();
-
-        double R = currentPos.distanceTo(P3) * 0.4;
-        Vec3 P0 = currentPos;
-        Vec3 P1 = currentPos.add(currentVel.scale(R));
-        Vec3 P2 = P3.subtract(E_prime.scale(R));
-
-        List<PathNode> nodes = new ArrayList<>();
-
-        for (int i = 1; i <= duration; i++) {
-            float progress = (float) i / duration;
-            Vec3 p, tipDir, planeNormal;
-
-            float biasedT = progress - 0.08f * Mth.sin(progress * Mth.TWO_PI);
-            float theta = biasedT * 2.0f * (float)Math.PI;
-            Vec3 targetP = center.add(major.scale(Math.cos(theta))).add(minor.scale(Math.sin(theta)));
-            Vec3 targetTrueTangent = major.scale(-Math.sin(theta)).add(minor.scale(Math.cos(theta))).normalize();
-
-            Vec3 targetTip = targetP.subtract(center).normalize();
-            Vec3 targetNormal = targetTip.cross(targetTrueTangent).normalize();
-            if (targetNormal.lengthSqr() < 1e-5) targetNormal = majorDir.cross(targetTip).normalize();
-
-            if (i <= blendTicks) {
-                float localT = (float) i / blendTicks;
+            List<PathNode> nodes = new ArrayList<>();
+            for (int i = 1; i <= prepTicks; i++) {
+                float localT = (float) i / prepTicks;
                 float smoothT = localT * localT * (3.0f - 2.0f * localT);
                 float mt = 1.0f - localT;
 
-                p = P0.scale(mt*mt*mt)
-                        .add(P1.scale(3*mt*mt*localT))
-                        .add(P2.scale(3*mt*localT*localT))
-                        .add(P3.scale(localT*localT*localT));
+                Vec3 p = P0.scale(mt*mt*mt).add(P1.scale(3*mt*mt*localT)).add(P2.scale(3*mt*localT*localT)).add(P3.scale(localT*localT*localT));
+                Vec3 tipDir = servant.slerpVector(currentTip, attackDir, smoothT);
+                Vec3 bNormal = servant.slerpVector(currentNormal, planeNormal, smoothT);
+                nodes.add(servant.getEulerNode(p, tipDir, bNormal, ""));
+            }
 
-                tipDir = slerpVector(currentTip, targetTip, smoothT);
-                planeNormal = slerpVector(currentNormal, targetNormal, smoothT);
+            for (int i = 1; i <= attackTicks; i++) {
+                float t = servant.accelerate((float) i / attackTicks);
+                Vec3 p = prepPos.lerp(hitPos, t);
+                nodes.add(servant.getEulerNode(p, attackDir, planeNormal, i == 1 ? "hit_clear" : ""));
+            }
+
+            Vec3 nextPlaneNormal = nextAttackDir.cross(new Vec3(0, 1, 0)).normalize();
+            if (nextPlaneNormal.lengthSqr() < 1e-4) nextPlaneNormal = new Vec3(1, 0, 0);
+
+            for (int i = 1; i <= retreatTicks; i++) {
+                float t = (float) i / retreatTicks;
+                float easeOut = t * (2.0f - t);
+                Vec3 p = hitPos.lerp(nextPrepPos, easeOut);
+                Vec3 tipDir = servant.slerpVector(attackDir, nextAttackDir, easeOut);
+                Vec3 bNormal = servant.slerpVector(planeNormal, nextPlaneNormal, easeOut);
+                nodes.add(servant.getEulerNode(p, tipDir, bNormal, ""));
+            }
+            servant.setPath(nodes);
+        }
+    }
+
+    public static class ActionPrismChainStrike extends ServantAction<Terraprism> {
+        private Vec3 lastTargetPos;
+        public ActionPrismChainStrike(Terraprism servant) { super(servant); }
+        @Override public String getId() { return "chain"; }
+        @Override public boolean isAttack() { return true; }
+
+        @Override
+        public void onStart(LivingEntity target) {
+            if (target == null) return;
+            this.lastTargetPos = target.position().add(0, target.getBbHeight() / 2.0, 0);
+            Player owner = servant.getOwner();
+
+            double thrustAngleThreshold = 0.9;
+            int thrustAttackTicks = 2;
+            int sweepAttackTicks = 10 + owner.getRandom().nextInt(1, 4);
+            double curvePullOutward = 0.8;
+
+            Vec3 startPos = servant.getPos();
+            Vec3 T = lastTargetPos;
+
+            Vec3 fwd = T.subtract(startPos);
+            double dist = fwd.length();
+            if (dist < 1e-5) fwd = new Vec3(0, 0, 1);
+            fwd = fwd.normalize();
+
+            // 【核心优化：方案A - 强制过穿透】
+            // 当目标距离过近（小于 6 格）时，强制将落点延展，保持高速和凌厉感
+            if (dist < 6.0) {
+                T = T.add(fwd.scale(4.5)); // 强制向后穿透 4.5 格
+                dist = T.subtract(startPos).length(); // 更新真实曲线距离
+            }
+
+            double speed = 1.0;
+            Vec3 currentVel = new Vec3(0, 1, 0);
+            LinkedList<PathNode> history = servant.getHistoryNodes();
+            if (history.size() > 1) {
+                Vec3 rawVel = startPos.subtract(history.get(1).pos());
+                speed = rawVel.length();
+                if (speed > 1e-5) currentVel = rawVel.normalize();
+                else currentVel = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
             } else {
-                p = targetP;
-                tipDir = targetTip;
-                planeNormal = targetNormal;
+                currentVel = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
             }
-            PathNode node = getEulerNode(p, tipDir, planeNormal);
-            if (i == 1) {
-                node = node.withFeature(HIT_CLEAR);
+
+            Vec3 currentTip = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
+            Quaternionf q = new Quaternionf().rotateY((float) Math.toRadians(-servant.getYaw()))
+                    .rotateX((float) Math.toRadians(servant.getPitch()))
+                    .rotateZ((float) Math.toRadians(servant.getRoll()));
+            Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
+            Vec3 currentNormal = new Vec3(upV.x(), upV.y(), upV.z()).normalize();
+
+            boolean isThrustMode = currentTip.dot(fwd) > thrustAngleThreshold;
+            List<PathNode> nodes = new ArrayList<>();
+
+            if (isThrustMode) {
+                Vec3 thrustDir = T.subtract(startPos).normalize();
+                Vec3 thrustNormal = thrustDir.cross(new Vec3(0, 1, 0)).normalize();
+                if (thrustNormal.lengthSqr() < 1e-4) thrustNormal = new Vec3(1, 0, 0);
+
+                Vec3 P0 = startPos;
+                Vec3 P3 = T.add(thrustDir.scale(1.5));
+                double R = Math.max(dist * 0.3, speed * 2.0);
+                Vec3 P1 = startPos.add(currentVel.scale(R));
+                Vec3 P2 = P3.subtract(thrustDir.scale(R));
+
+                for (int i = 1; i <= thrustAttackTicks; i++) {
+                    float t = (float) i / thrustAttackTicks;
+                    float mt = 1.0f - t;
+                    Vec3 p = P0.scale(mt * mt * mt).add(P1.scale(3 * mt * mt * t)).add(P2.scale(3 * mt * t * t)).add(P3.scale(t * t * t));
+                    Vec3 tipDir = servant.slerpVector(currentTip, thrustDir, t);
+                    Vec3 bNormal = servant.slerpVector(currentNormal, thrustNormal, t);
+                    nodes.add(servant.getEulerNode(p, tipDir, bNormal, i == 1 ? "hit_clear" : ""));
+                }
+            } else {
+                Vec3 sweepUp = currentNormal;
+                Vec3 chord = T.subtract(startPos);
+                Vec3 chordDir = chord.normalize();
+                Vec3 outward = chordDir.cross(sweepUp).normalize();
+                if (outward.lengthSqr() < 1e-4) outward = chordDir.cross(new Vec3(0, 1, 0)).normalize();
+
+                Vec3 pivot = startPos.add(chord.scale(0.5)).add(outward.scale(-dist * curvePullOutward * 0.5));
+                Vec3 P0 = startPos;
+                Vec3 P3 = T.add(chordDir.scale(0.5));
+                double R = Math.max(dist * 0.4, speed * 3.0);
+                Vec3 P1 = startPos.add(currentVel.scale(R));
+                Vec3 P2 = P3.subtract(chordDir.scale(R)).add(outward.scale(-dist * curvePullOutward));
+
+                for (int i = 1; i <= sweepAttackTicks; i++) {
+                    float t = (float) i / sweepAttackTicks;
+                    float mt = 1.0f - t;
+                    Vec3 p = P0.scale(mt * mt * mt).add(P1.scale(3 * mt * mt * t)).add(P2.scale(3 * mt * t * t)).add(P3.scale(t * t * t));
+                    Vec3 targetTip = p.subtract(pivot).normalize();
+                    Vec3 tipDir = servant.slerpVector(currentTip, targetTip, t);
+                    Vec3 bNormal = servant.slerpVector(currentNormal, sweepUp, t);
+                    nodes.add(servant.getEulerNode(p, tipDir, bNormal, i == 1 ? "hit_clear" : ""));
+                }
             }
-            nodes.add(node);
+            servant.setPath(nodes);
         }
 
-        this.setPath(nodes);
-        advanceAttack(owner);
+        @Override
+        public void tick(LivingEntity target) {
+            if (servant.isExecutingPath()) {
+                this.lastTargetPos = servant.applyTargetTracking(target, this.lastTargetPos);
+            } else {
+                if (target != null) {
+                    servant.loopCount = 0;
+                    boolean isEllipse = servant.getOwner().getRandom().nextBoolean();
+                    servant.getAi().forceAction(isEllipse ? new ActionPrismEllipseSlash(servant) : new ActionPrismHourglass(servant), target);
+                } else {
+                    servant.getAi().forceAction(new ActionPrismIdle(servant), null);
+                }
+            }
+        }
+        @Override public boolean isFinished() { return false; }
     }
 
-    private void generateHourglass(Player owner, LivingEntity target) {
-        int prepTicks = 4;
-        int attackTicks = 4;
-        int retreatTicks = 8;
 
-        Vec3 startPos = this.getPos();
-        Vec3 T = target.getBoundingBox().getCenter();
+    // ================== 渲染逻辑 (完全保留) ==================
 
-        Vec3 toTarget = T.subtract(startPos);
-        if (toTarget.lengthSqr() < 1e-5) toTarget = new Vec3(0, -1, 0);
-        Vec3 attackDir = toTarget.normalize();
-
-        if (attackDir.y > -0.2) {
-            attackDir = new Vec3(attackDir.x, Math.min(-0.5, attackDir.y - 0.5), attackDir.z).normalize();
-        }
-
-        double dist = Math.max(7.0, startPos.distanceTo(T));
-        Vec3 prepPos = T.subtract(attackDir.scale(dist));
-        Vec3 hitPos = T.add(attackDir);
-
-        Vector3f v = new Vector3f((float) attackDir.x, (float) attackDir.y, (float) attackDir.z);
-        new Quaternionf().rotateY((float) (Math.PI * 0.8)).transform(v);
-        Vec3 nextAttackDir = new Vec3(v.x(), v.y(), v.z()).normalize();
-        Vec3 nextPrepPos = T.subtract(nextAttackDir.scale(dist));
-
-        Vec3 currentVel = new Vec3(0, 1, 0);
-        LinkedList<PathNode> history = this.getHistoryNodes();
-        if (history.size() > 1) {
-            currentVel = startPos.subtract(history.get(1).pos());
-            if (currentVel.lengthSqr() > 1e-5) currentVel = currentVel.normalize();
-            else currentVel = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        } else {
-            currentVel = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        }
-
-        Vec3 currentTip = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        Quaternionf q = new Quaternionf().rotateY((float) Math.toRadians(-this.getYaw()))
-                .rotateX((float) Math.toRadians(this.getPitch()))
-                .rotateZ((float) Math.toRadians(this.getRoll()));
-        Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
-        Vec3 currentNormal = new Vec3(upV.x(), upV.y(), upV.z()).normalize();
-
-        Vec3 planeNormal = attackDir.cross(new Vec3(0, 1, 0)).normalize();
-        if (planeNormal.lengthSqr() < 1e-4) planeNormal = new Vec3(1, 0, 0);
-
-        Vec3 P3 = prepPos;
-        Vec3 E_prime = attackDir;
-        double R = startPos.distanceTo(P3) * 0.4;
-        Vec3 P0 = startPos;
-        Vec3 P1 = startPos.add(currentVel.scale(R));
-        Vec3 P2 = P3.subtract(E_prime.scale(R));
-
-        List<PathNode> nodes = new ArrayList<>();
-
-        for (int i = 1; i <= prepTicks; i++) {
-            float localT = (float) i / prepTicks;
-            float smoothT = localT * localT * (3.0f - 2.0f * localT);
-            float mt = 1.0f - localT;
-
-            Vec3 p = P0.scale(mt*mt*mt)
-                    .add(P1.scale(3*mt*mt*localT))
-                    .add(P2.scale(3*mt*localT*localT))
-                    .add(P3.scale(localT*localT*localT));
-
-            Vec3 tipDir = slerpVector(currentTip, attackDir, smoothT);
-            Vec3 bNormal = slerpVector(currentNormal, planeNormal, smoothT);
-            nodes.add(getEulerNode(p, tipDir, bNormal));
-        }
-
-        for (int i = 1; i <= attackTicks; i++) {
-            float t = accelerate((float) i / attackTicks);
-            Vec3 p = prepPos.lerp(hitPos, t);
-            PathNode node = getEulerNode(p, attackDir, planeNormal);
-            if (i == 1) {
-                node = node.withFeature(HIT_CLEAR);
-            }
-            nodes.add(node);
-        }
-
-        Vec3 nextPlaneNormal = nextAttackDir.cross(new Vec3(0, 1, 0)).normalize();
-        if (nextPlaneNormal.lengthSqr() < 1e-4) nextPlaneNormal = new Vec3(1, 0, 0);
-
-        for (int i = 1; i <= retreatTicks; i++) {
-            float t = (float) i / retreatTicks;
-            float easeOut = t * (2.0f - t);
-            Vec3 p = hitPos.lerp(nextPrepPos, easeOut);
-
-            Vec3 tipDir = slerpVector(attackDir, nextAttackDir, easeOut);
-            Vec3 bNormal = slerpVector(planeNormal, nextPlaneNormal, easeOut);
-            nodes.add(getEulerNode(p, tipDir, bNormal));
-        }
-
-        this.setPath(nodes);
-        advanceAttack(owner);
-    }
-
-    private void generateChainStrike(Player owner, LivingEntity target) {
-        double thrustAngleThreshold = 0.9;
-        int thrustAttackTicks = 2;
-        int sweepAttackTicks = 10 + owner.getRandom().nextInt(1, 4);
-        double curvePullOutward = 0.8;
-
-        Vec3 startPos = this.getPos();
-        Vec3 T = target.position().add(0, target.getBbHeight() / 2.0, 0);
-
-        Vec3 fwd = T.subtract(startPos);
-        double dist = fwd.length();
-        if (dist < 1e-5) fwd = new Vec3(0, 0, 1);
-        fwd = fwd.normalize();
-
-        double speed = 1.0;
-        Vec3 currentVel = new Vec3(0, 1, 0);
-        LinkedList<PathNode> history = this.getHistoryNodes();
-        if (history.size() > 1) {
-            Vec3 rawVel = startPos.subtract(history.get(1).pos());
-            speed = rawVel.length();
-            if (speed > 1e-5) currentVel = rawVel.normalize();
-            else currentVel = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        } else {
-            currentVel = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        }
-
-        Vec3 currentTip = Vec3.directionFromRotation(this.getPitch(), this.getYaw()).normalize();
-        Quaternionf q = new Quaternionf().rotateY((float) Math.toRadians(-this.getYaw()))
-                .rotateX((float) Math.toRadians(this.getPitch()))
-                .rotateZ((float) Math.toRadians(this.getRoll()));
-        Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
-        Vec3 currentNormal = new Vec3(upV.x(), upV.y(), upV.z()).normalize();
-
-        boolean isThrustMode = currentTip.dot(fwd) > thrustAngleThreshold;
-
-        List<PathNode> nodes = new ArrayList<>();
-
-        if (isThrustMode) {
-            Vec3 thrustDir = T.subtract(startPos).normalize();
-            Vec3 thrustNormal = thrustDir.cross(new Vec3(0, 1, 0)).normalize();
-            if (thrustNormal.lengthSqr() < 1e-4) thrustNormal = new Vec3(1, 0, 0);
-
-            Vec3 P0 = startPos;
-            Vec3 P3 = T.add(thrustDir.scale(1.5));
-
-            double R = Math.max(dist * 0.3, speed * 2.0);
-            Vec3 P1 = startPos.add(currentVel.scale(R));
-            Vec3 P2 = P3.subtract(thrustDir.scale(R));
-
-            for (int i = 1; i <= thrustAttackTicks; i++) {
-                float t = (float) i / thrustAttackTicks;
-                float mt = 1.0f - t;
-
-                Vec3 p = P0.scale(mt * mt * mt)
-                        .add(P1.scale(3 * mt * mt * t))
-                        .add(P2.scale(3 * mt * t * t))
-                        .add(P3.scale(t * t * t));
-
-                Vec3 tipDir = slerpVector(currentTip, thrustDir, t);
-                Vec3 bNormal = slerpVector(currentNormal, thrustNormal, t);
-
-                PathNode node = getEulerNode(p, tipDir, bNormal);
-                if (i == 1) node = node.withFeature(HIT_CLEAR);
-                nodes.add(node);
-            }
-        } else {
-            Vec3 sweepUp = currentNormal;
-            Vec3 chord = T.subtract(startPos);
-            Vec3 chordDir = chord.normalize();
-            Vec3 outward = chordDir.cross(sweepUp).normalize();
-            if (outward.lengthSqr() < 1e-4) outward = chordDir.cross(new Vec3(0, 1, 0)).normalize();
-
-            Vec3 pivot = startPos.add(chord.scale(0.5)).add(outward.scale(-dist * curvePullOutward * 0.5));
-
-            Vec3 P0 = startPos;
-            Vec3 P3 = T.add(chordDir.scale(0.5));
-
-            double R = Math.max(dist * 0.4, speed * 3.0);
-            Vec3 P1 = startPos.add(currentVel.scale(R));
-            Vec3 P2 = P3.subtract(chordDir.scale(R)).add(outward.scale(-dist * curvePullOutward));
-
-            for (int i = 1; i <= sweepAttackTicks; i++) {
-                float t = (float) i / sweepAttackTicks;
-                float mt = 1.0f - t;
-
-                Vec3 p = P0.scale(mt * mt * mt)
-                        .add(P1.scale(3 * mt * mt * t))
-                        .add(P2.scale(3 * mt * t * t))
-                        .add(P3.scale(t * t * t));
-
-                Vec3 targetTip = p.subtract(pivot).normalize();
-
-                Vec3 tipDir = slerpVector(currentTip, targetTip, t);
-                Vec3 bNormal = slerpVector(currentNormal, sweepUp, t);
-
-                PathNode node = getEulerNode(p, tipDir, bNormal);
-
-                if (i == 1) node = node.withFeature(HIT_CLEAR);
-                nodes.add(node);
-            }
-        }
-
-        this.setPath(nodes);
-        pickRandomAttack(owner);
-    }
     private void buildRibbon(VertexConsumer consumer, Matrix4f pose, PoseStack.Pose last, Vec3 cRel, Vec3 pRel, Vector3f cTip, Vector3f pTip, Vector3f cBase, Vector3f pBase, int cTipC, int pTipC, int cBaseC, int pBaseC) {
         consumer.addVertex(pose, (float) cRel.x + cBase.x(), (float) cRel.y + cBase.y(), (float) cRel.z + cBase.z()).setColor(cBaseC).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
         consumer.addVertex(pose, (float) cRel.x + cTip.x(), (float) cRel.y + cTip.y(), (float) cRel.z + cTip.z()).setColor(cTipC).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
@@ -761,21 +717,10 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
         consumer.addVertex(pose, (float) cRel.x + cTip.x(), (float) cRel.y + cTip.y(), (float) cRel.z + cTip.z()).setColor(cTipC).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
     }
 
-    // ============== ITrailRenderer 接口实现 ==============
-
-    @Override
-    public int getTrailTimer() { return trailTimer; }
-
-    @Override
-    public int getTrailHistoryLength() { return 4; }
-
-    @Override
-    public int getTrailSegmentsPerNode() { return 8; }
-
-    @Override
-    public int getTrailStartIndex() {
-        return Math.max(0, 10 - trailTimer); // 保证拖尾具有收缩消散特性
-    }
+    @Override public int getTrailTimer() { return trailTimer; }
+    @Override public int getTrailHistoryLength() { return 4; }
+    @Override public int getTrailSegmentsPerNode() { return 8; }
+    @Override public int getTrailStartIndex() { return Math.max(0, 10 - trailTimer); }
 
     @Override
     public PathNode getVisualRenderNode(Servant servant, float partialTick, PathNode rawRenderNode) {
@@ -798,7 +743,11 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
         VertexConsumer consumer = bufferSource.getBuffer(TrailRenderType.getTrail());
         PoseStack.Pose last = poseStack.last();
         Matrix4f pose = last.pose();
-        Vec3 currentRenderPos = visualRenderNode.pos();
+
+        // 【核心优化：方案A - 相对偏移绑定法】
+        // 彻底解决拖尾与模型分离的错位问题。通过将锚点从 visual 切换到 logic head，
+        // 使得整条拖尾完美继承模型产生的视觉偏移量，死死黏在剑尖上。
+        Vec3 logicalAnchorPos = smoothNodes.isEmpty() ? visualRenderNode.pos() : smoothNodes.getFirst().pos;
 
         Player owner = getOwner();
         ServantData data = owner.getData(AttachmentRegister.ServantData);
@@ -809,29 +758,24 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
         float hueShift = ((float) order / total + timeShift) % 1.0f;
 
         for (int i = 0; i < smoothNodes.size() - 1; i++) {
-            TrailNode curr = smoothNodes.get(i);
-            TrailNode prev = smoothNodes.get(i + 1);
-            TrailNode nextOfPrev = (i + 2 < smoothNodes.size()) ? smoothNodes.get(i + 2) : prev;
-
-            // 动态截面与挥动判定
+            TrailNode curr = smoothNodes.get(i), prev = smoothNodes.get(i + 1), nextOfPrev = (i + 2 < smoothNodes.size()) ? smoothNodes.get(i + 2) : prev;
             Vec3 currFwd = curr.pos.subtract(prev.pos);
             if (currFwd.lengthSqr() > 1e-5) currFwd = currFwd.normalize(); else currFwd = new Vec3(0, 1, 0);
             Vector3f cTipDir = new Vector3f(0, 0, 1).rotate(curr.rot);
             float cScale = Math.max(0.0f, 1.0f - (float) i / (smoothNodes.size() - 1));
             float cStab = Math.abs((float) currFwd.dot(new Vec3(cTipDir.x(), cTipDir.y(), cTipDir.z())));
-            float cXBase = (0.05f + 0.25f * (1.0f - cStab) + 0.25f * cStab) * cScale;
-            float cYBase = (0.05f + 0.15f * cStab) * cScale;
+            float cXBase = (0.05f + 0.25f * (1.0f - cStab) + 0.25f * cStab) * cScale, cYBase = (0.05f + 0.15f * cStab) * cScale;
 
             Vec3 prevFwd = prev.pos.subtract(nextOfPrev.pos);
             if (prevFwd.lengthSqr() > 1e-5) prevFwd = prevFwd.normalize(); else prevFwd = new Vec3(0, 1, 0);
             Vector3f pTipDir = new Vector3f(0, 0, 1).rotate(prev.rot);
             float pScale = Math.max(0.0f, 1.0f - (float) (i + 1) / (smoothNodes.size() - 1));
             float pStab = Math.abs((float) prevFwd.dot(new Vec3(pTipDir.x(), pTipDir.y(), pTipDir.z())));
-            float pXBase = (0.05f + 0.25f * (1.0f - pStab) + 0.25f * pStab) * pScale;
-            float pYBase = (0.05f + 0.15f * pStab) * pScale;
+            float pXBase = (0.05f + 0.25f * (1.0f - pStab) + 0.25f * pStab) * pScale, pYBase = (0.05f + 0.15f * pStab) * pScale;
 
-            Vec3 currRel = curr.pos.subtract(currentRenderPos);
-            Vec3 prevRel = prev.pos.subtract(currentRenderPos);
+            // 应用完美粘合锚点
+            Vec3 currRel = curr.pos.subtract(logicalAnchorPos);
+            Vec3 prevRel = prev.pos.subtract(logicalAnchorPos);
 
             Vector3f cTip = new Vector3f(0, 0, 0.6f).rotate(curr.rot), cR = new Vector3f(cXBase, 0, -0.2f).rotate(curr.rot), cL = new Vector3f(-cXBase, 0, -0.2f).rotate(curr.rot), cT = new Vector3f(0, cYBase, -0.2f).rotate(curr.rot), cB = new Vector3f(0, -cYBase, -0.2f).rotate(curr.rot);
             Vector3f pTip = new Vector3f(0, 0, 0.6f).rotate(prev.rot), pR = new Vector3f(pXBase, 0, -0.2f).rotate(prev.rot), pL = new Vector3f(-pXBase, 0, -0.2f).rotate(prev.rot), pT = new Vector3f(0, pYBase, -0.2f).rotate(prev.rot), pB = new Vector3f(0, -pYBase, -0.2f).rotate(prev.rot);
@@ -843,10 +787,8 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
             int cr = (cColorRGB >> 16) & 0xFF, cg = (cColorRGB >> 8) & 0xFF, cb = cColorRGB & 0xFF;
             int pr = (pColorRGB >> 16) & 0xFF, pg = (pColorRGB >> 8) & 0xFF, pb = pColorRGB & 0xFF;
 
-            int cTipA = Math.round(cScale * 0.1f * 255);
-            int cBaseA = Math.round(Math.max(0f, 1.0f - ((float) i / (smoothNodes.size() - 1)) * 2.5f) * 0.04f * 255);
-            int pTipA = Math.round(pScale * 0.1f * 255);
-            int pBaseA = Math.round(Math.max(0f, 1.0f - ((float) (i + 1) / (smoothNodes.size() - 1)) * 2.5f) * 0.04f * 255);
+            int cTipA = Math.round(cScale * 0.1f * 255), cBaseA = Math.round(Math.max(0f, 1.0f - ((float) i / (smoothNodes.size() - 1)) * 2.5f) * 0.04f * 255);
+            int pTipA = Math.round(pScale * 0.1f * 255), pBaseA = Math.round(Math.max(0f, 1.0f - ((float) (i + 1) / (smoothNodes.size() - 1)) * 2.5f) * 0.04f * 255);
 
             int cTipC = FastColor.ARGB32.color(cTipA, cr, cg, cb), cBaseC = FastColor.ARGB32.color(cBaseA, cr, cg, cb);
             int pTipC = FastColor.ARGB32.color(pTipA, pr, pg, pb), pBaseC = FastColor.ARGB32.color(pBaseA, pr, pg, pb);
@@ -857,9 +799,6 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
             buildRibbon(consumer, pose, last, currRel, prevRel, cTip, pTip, cB, pB, cTipC, pTipC, cBaseC, pBaseC);
         }
     }
-
-
-    // ============== 主机体渲染 ==============
 
     @Override
     public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode) {
@@ -901,11 +840,7 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
             };
         };
 
-        Minecraft.getInstance().getItemRenderer().renderStatic(
-                ItemRegister.TerraPrism.get().getDefaultInstance(),
-                ItemDisplayContext.FIXED, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
-                poseStack, baseSolidColorBuffer, owner.level(), 0
-        );
+        Minecraft.getInstance().getItemRenderer().renderStatic(ItemRegister.TerraPrism.get().getDefaultInstance(), ItemDisplayContext.FIXED, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, poseStack, baseSolidColorBuffer, owner.level(), 0);
 
         if (trailTimer > 0) {
             poseStack.pushPose();
@@ -923,11 +858,7 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
                     @Override public VertexConsumer setNormal(float x, float y, float z) { base.setNormal(x, y, z); return this; }
                 };
             };
-            Minecraft.getInstance().getItemRenderer().renderStatic(
-                    ItemRegister.TerraPrism.get().getDefaultInstance(),
-                    ItemDisplayContext.FIXED, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
-                    poseStack, auraBufferSource, owner.level(), 0
-            );
+            Minecraft.getInstance().getItemRenderer().renderStatic(ItemRegister.TerraPrism.get().getDefaultInstance(), ItemDisplayContext.FIXED, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, poseStack, auraBufferSource, owner.level(), 0);
             poseStack.popPose();
         }
         poseStack.popPose();
@@ -935,18 +866,5 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
     }
 
     @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeEnum(state);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        this.state = buf.readEnum(PrismState.class);
-    }
-
-    @Override
-    public ServantType<? extends Servant> getType() {
-        return ServantRegister.TerraPrism.get();
-    }
-
+    public ServantType<? extends Servant> getType() { return ServantRegister.TerraPrism.get(); }
 }

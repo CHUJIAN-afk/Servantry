@@ -1,8 +1,8 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import first.servantry.api.servant.PathNode;
 import first.servantry.api.item.IServantWeapon;
+import first.servantry.api.servant.PathNode;
 import first.servantry.common.attachment.ServantData;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -24,7 +24,7 @@ public class ItemRegister {
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();
                         ServantData data = owner.getData(AttachmentRegister.ServantData);
-                        PathNode node = servant.getIdleState(owner, data.getOrder(servant), data.getSameSize(servant));
+                        PathNode node = servant.getInterpolatedIdleState(owner, data.getOrder(servant), data.getSameSize(servant), 1);
                         servant.setPath(List.of(node));
                     })
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
@@ -51,7 +51,15 @@ public class ItemRegister {
                         Player owner = servant.getOwner();
                         servant.setPath(List.of(new PathNode("", owner.position(), owner.yBodyRot, 0, 0)));
                     })
-                    .buildItem(new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(1))
+                    .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
+    );
+
+    public static final DeferredItem<Item> StardustCell = Register.registerItem("stardust_cell_render_item", Item::new);
+    public static final DeferredItem<Item> StardustCellStaff = Register.register("stardust_cell_staff", () ->
+            new IServantWeapon.Builder<>(ServantRegister.StardustCell)
+                    .sound(SoundRegister.UseServantWeapon)
+                    .onSummon(servant -> servant.setPos(servant.getOwner().position().add(0, 2, 0)))
+                    .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
 
     public static void register(IEventBus eventBus) {

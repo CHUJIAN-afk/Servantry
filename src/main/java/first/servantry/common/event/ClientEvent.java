@@ -101,7 +101,7 @@ public class ClientEvent {
                         Component.literal(String.valueOf(data.getMaxSize(player))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
 
                 // 5. 移除操作提示 (深灰色，避免喧宾夺主)
-                toolTip.add(Component.translatable("item.servantry.tooltip.remove_all").withStyle(ChatFormatting.DARK_GRAY));
+                toolTip.add(Component.translatable("item.servantry.tooltip.remove_all").withStyle(ChatFormatting.GRAY));
             }
         }
 
@@ -119,6 +119,7 @@ public class ClientEvent {
                 return lines;
             });
             if (!cachedLore.isEmpty()) {
+                toolTip.add(Component.empty());
                 for (MutableComponent component : cachedLore) {
                     toolTip.add(component.withStyle(ChatFormatting.DARK_GRAY));
                 }

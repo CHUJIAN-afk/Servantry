@@ -1,8 +1,8 @@
 package first.servantry.common.attachment;
 
-import first.servantry.api.servant.PathNode;
 import first.servantry.api.register.Registries;
 import first.servantry.api.register.ServantType;
+import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttributeRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -91,7 +91,7 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
         List<LivingEntity> result = new ArrayList<>();
         Vec3 servantPos = servant.getPos();
         for (LivingEntity target : cachedEnemies) {
-            if (servant.isTarget(target) && target.distanceToSqr(servantPos) <= distance * distance) {
+            if (servant.isTarget(target) && player.distanceToSqr(target) <= distance * distance) {
                 if (requireLineOfSight) {
                     ClipContext context = new ClipContext(servantPos, target.getEyePosition(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
                     if (player.level().clip(context).getType() != HitResult.Type.MISS) {
