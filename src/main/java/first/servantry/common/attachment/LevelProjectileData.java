@@ -35,7 +35,7 @@ public class LevelProjectileData implements AttachmentSyncHandler<LevelProjectil
             proj.tick();
         }
         if (removedAny || !projectiles.isEmpty()) {
-            change = true; // 只要有射弹存活或被移除，就触发同步
+            change = true;
         }
     }
 

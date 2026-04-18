@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -19,8 +19,11 @@ import java.util.UUID;
 public abstract class AdvancedProjectile {
 
     private UUID uuid;
-    private Level level;
-    private LivingEntity owner;
+    private final Level level;
+
+    // 【核心修复】：强约束为 Player，并引入 UUID 同步机制
+    private Player owner;
+    private UUID ownerUuid;
 
     private int tickCount = 0;
     private int maxAge = 200;
@@ -30,21 +33,26 @@ public abstract class AdvancedProjectile {
     private final LinkedList<PathNode> futureNodes = new LinkedList<>();
     private boolean firstSync = true;
 
-    public AdvancedProjectile(Level level, LivingEntity owner, PathNode startNode) {
+    public AdvancedProjectile(Level level, Player owner, PathNode startNode) {
         this.uuid = UUID.randomUUID();
         this.level = level;
         this.owner = owner;
-        this.historyNodes.addFirst(startNode);
+        this.ownerUuid = owner != null ? owner.getUUID() : null;
+        this.historyNodes.addFirst(startNode != null ? startNode : PathNode.Empty);
     }
 
     public abstract ProjectileType<? extends AdvancedProjectile> getType();
 
-    // 子类实现具体的模型渲染
     public abstract void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode);
 
-    // 核心生命周期
     public void tick() {
         if (removed) return;
+
+        // 如果在服务端，玩家离线或死亡，直接销毁孤儿射弹
+        if (getOwner() == null && !level.isClientSide()) {
+            discard();
+            return;
+        }
 
         tickCount++;
         if (tickCount >= maxAge) {
@@ -52,7 +60,6 @@ public abstract class AdvancedProjectile {
             return;
         }
 
-        // 1. 推进历史队列
         if (!this.historyNodes.isEmpty()) {
             this.historyNodes.addFirst(this.historyNodes.getFirst());
             if (this.historyNodes.size() > getHistoryNodesSize()) {
@@ -60,22 +67,20 @@ public abstract class AdvancedProjectile {
             }
         }
 
-        // 2. 消费未来队列
         if (!this.futureNodes.isEmpty()) {
             PathNode consumed = this.futureNodes.poll();
             this.historyNodes.set(0, consumed);
             onPathNodeConsumed(consumed);
         }
+        if (this instanceof IProjectileCollider iProjectileCollider) {
+            iProjectileCollider.processCollision(this);
+        }
+        if (getFutureNodes().isEmpty() && this instanceof IProjectileMomentum iProjectileMomentum) {
+            iProjectileMomentum.processMomentum(this);
+        }
     }
 
-    // ========== 开放给子类的事件钩子 ==========
-
-    /**
-     * 当路径节点被消费时触发，可用于触发 "fire" 等自定义特征事件
-     */
     public void onPathNodeConsumed(PathNode node) {}
-
-    // =======================================
 
     public void renderInternal(float partialTick, PoseStack poseStack, MultiBufferSource bufferSource) {
         PathNode current = this.historyNodes.getFirst();
@@ -88,11 +93,16 @@ public abstract class AdvancedProjectile {
 
         int packedLight = LevelRenderer.getLightColor(level, BlockPos.containing(renderNode.pos()));
         render(poseStack, bufferSource, partialTick, packedLight, renderNode);
-
+        if (this instanceof IProjectileTrail iProjectileTrail) {
+            iProjectileTrail.processTrailRender(poseStack, bufferSource, partialTick, this, renderNode);
+        }
+        if (this instanceof IProjectileCollider iProjectileCollider) {
+            if (Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes()) {
+                iProjectileCollider.renderDebugHitbox(poseStack, bufferSource, renderNode.yaw(), renderNode.pitch(), renderNode.roll());
+            }
+        }
         poseStack.popPose();
     }
-
-    // ========== 序列化与反序列化 ==========
 
     public void writeSyncData(RegistryFriendlyByteBuf buf) {
         PathNode current = this.historyNodes.getFirst();
@@ -102,6 +112,12 @@ public abstract class AdvancedProjectile {
 
         buf.writeBoolean(removed);
         buf.writeInt(this.tickCount);
+
+        // 【核心修复】：序列化主人 UUID 供客户端读取
+        buf.writeBoolean(this.ownerUuid != null);
+        if (this.ownerUuid != null) {
+            buf.writeUUID(this.ownerUuid);
+        }
 
         buf.writeInt(this.futureNodes.size());
         for (PathNode node : this.futureNodes) {
@@ -117,6 +133,13 @@ public abstract class AdvancedProjectile {
 
         this.removed = buf.readBoolean();
         this.tickCount = buf.readInt();
+
+        // 【核心修复】：反序列化主人 UUID
+        if (buf.readBoolean()) {
+            this.ownerUuid = buf.readUUID();
+        } else {
+            this.ownerUuid = null;
+        }
 
         int pathSize = buf.readInt();
         this.futureNodes.clear();
@@ -136,7 +159,13 @@ public abstract class AdvancedProjectile {
     protected void writeAdditional(RegistryFriendlyByteBuf buf) {}
     protected void readAdditional(RegistryFriendlyByteBuf buf) {}
 
-    // ========== Getters & Setters ==========
+    // 【核心修复】：双端懒加载解析主人 Player
+    public Player getOwner() {
+        if (this.owner == null && this.ownerUuid != null && this.level != null) {
+            this.owner = this.level.getPlayerByUUID(this.ownerUuid);
+        }
+        return this.owner;
+    }
 
     public int getHistoryNodesSize() { return 16; }
     public void discard() { this.removed = true; }
@@ -144,7 +173,6 @@ public abstract class AdvancedProjectile {
     public UUID getUuid() { return uuid; }
     public void setUuid(UUID uuid) { this.uuid = uuid; }
     public Level getLevel() { return level; }
-    public LivingEntity getOwner() { return owner; }
     public int getTickCount() { return tickCount; }
     public void setMaxAge(int maxAge) { this.maxAge = maxAge; }
 

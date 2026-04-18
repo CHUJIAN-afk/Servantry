@@ -15,7 +15,6 @@ import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ServantRegister;
 import net.minecraft.client.model.BatModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -26,8 +25,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import java.util.*;
 
@@ -497,57 +494,6 @@ public class SanguineBat extends Servant implements IDamagingOnCollide, IConeTra
     @Override public int getTrailColorRGB(float progress) { return 0xE22A2A; }
     @Override public int getTrailResolution() { return 16; }
     @Override public float getTrailFadeOut(float progress) { return (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0); }
-
-    @Override
-    public void drawTrailVertices(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, Servant servant, PathNode visualRenderNode, List<TrailNode> smoothNodes) {
-        IConeTrailRenderer.super.drawTrailVertices(poseStack, bufferSource, partialTick, servant, visualRenderNode, smoothNodes);
-
-        if (!smoothNodes.isEmpty()) {
-            VertexConsumer consumer = bufferSource.getBuffer(TrailRenderType.getTrail());
-            Matrix4f pose = poseStack.last().pose();
-            Vec3 renderPos = visualRenderNode.pos();
-            Vec3 headPos = smoothNodes.getFirst().pos.subtract(renderPos);
-
-            float radius = getTrailMaxRadius();
-            int colorRGB = getTrailColorRGB(0f);
-            int r = (colorRGB >> 16) & 0xFF;
-            int g = (colorRGB >> 8) & 0xFF;
-            int b = colorRGB & 0xFF;
-            int colorVal = FastColor.ARGB32.color(200, r, g, b);
-
-            drawSphere(consumer, pose, headPos, radius, colorVal);
-        }
-    }
-
-    private void drawSphere(VertexConsumer consumer, Matrix4f pose, Vec3 center, float radius, int color) {
-        int rings = 8;
-        int sectors = 8;
-        for (int i = 0; i < rings; i++) {
-            float phi1 = (float) (Math.PI * (float) i / rings);
-            float phi2 = (float) (Math.PI * (float) (i + 1) / rings);
-            for (int j = 0; j < sectors; j++) {
-                float theta1 = (float) (2.0 * Math.PI * (float) j / sectors);
-                float theta2 = (float) (2.0 * Math.PI * (float) (j + 1) / sectors);
-
-                Vector3f v1 = getSphereVertex(center, radius, theta1, phi1);
-                Vector3f v2 = getSphereVertex(center, radius, theta2, phi1);
-                Vector3f v3 = getSphereVertex(center, radius, theta2, phi2);
-                Vector3f v4 = getSphereVertex(center, radius, theta1, phi2);
-
-                consumer.addVertex(pose, v1.x(), v1.y(), v1.z()).setColor(color).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-                consumer.addVertex(pose, v2.x(), v2.y(), v2.z()).setColor(color).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-                consumer.addVertex(pose, v3.x(), v3.y(), v3.z()).setColor(color).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-                consumer.addVertex(pose, v4.x(), v4.y(), v4.z()).setColor(color).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-            }
-        }
-    }
-
-    private Vector3f getSphereVertex(Vec3 center, float radius, float theta, float phi) {
-        float x = (float) (center.x + radius * Math.sin(phi) * Math.cos(theta));
-        float y = (float) (center.y + radius * Math.cos(phi));
-        float z = (float) (center.z + radius * Math.sin(phi) * Math.sin(theta));
-        return new Vector3f(x, y, z);
-    }
 
     @Override
     public ServantType<? extends Servant> getType() {

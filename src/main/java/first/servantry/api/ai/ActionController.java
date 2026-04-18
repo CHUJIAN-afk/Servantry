@@ -24,7 +24,7 @@ public class ActionController<T extends Servant> {
 
     public void forceAction(ServantAction<T> newAction, LivingEntity target) {
         if (isChangingAction) {
-            throw new IllegalStateException("禁止在 onStop() 或 onStart() 中触发新状态！请在 tick() 中通过检测条件进行状态转换。");
+            throw new IllegalStateException("禁止在 onStop() 或 onStart() 中触发新状态！在 tick() 中通过检测条件进行状态转换。");
         }
         isChangingAction = true;
         try {

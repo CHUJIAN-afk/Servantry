@@ -58,7 +58,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> StardustCellStaff = Register.register("stardust_cell_staff", () ->
             new IServantWeapon.Builder<>(ServantRegister.StardustCell)
                     .sound(SoundRegister.UseServantWeapon)
-                    .onSummon(servant -> servant.setPos(servant.getOwner().position().add(0, 2, 0)))
+                    .onSummon(servant -> servant.setPos(servant.getOwner().position().add(0, 3, 0)))
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
 

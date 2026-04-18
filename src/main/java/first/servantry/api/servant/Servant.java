@@ -45,13 +45,19 @@ public abstract class Servant {
         this.uuid = UUID.randomUUID();
         this.owner = null;
         this.historyNodes.addFirst(node);
+        this.historyNodes.addFirst(node);
     }
 
     public abstract float getBaseDamage();
+
     public abstract float getBaseKnockback();
+
     public abstract void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode);
+
     public abstract ServantType<? extends Servant> getType();
-    public void onPathNodeConsumed(PathNode node) {}
+
+    public void onPathNodeConsumed(PathNode node) {
+    }
 
     // 【新增】：强制子类提供实例化特定 ID Action 的工厂方法
     public abstract ServantAction<?> createAction(String id);
@@ -78,6 +84,12 @@ public abstract class Servant {
             this.historyNodes.set(0, consumed);
             this.onPathNodeConsumed(consumed);
         }
+        if (this instanceof IDamagingOnCollide iDamagingOnCollide) {
+            iDamagingOnCollide.processCollision(this);
+        }
+        if (this instanceof IMomentumControlled iMomentumControlled) {
+            iMomentumControlled.tickMomentum(this);
+        }
     }
 
     public ServantDamageSource getDamageSource() {
@@ -85,9 +97,17 @@ public abstract class Servant {
         return new ServantDamageSource(damageTypes.getHolderOrThrow(DamageRegister.Servant), null, getOwner(), getPos(), this);
     }
 
-    public int getHistoryNodesSize() { return 16; }
-    public LinkedList<PathNode> getHistoryNodes() { return historyNodes; }
-    public LinkedList<PathNode> getFutureNodes() { return futureNodes; }
+    public int getHistoryNodesSize() {
+        return 16;
+    }
+
+    public LinkedList<PathNode> getHistoryNodes() {
+        return historyNodes;
+    }
+
+    public LinkedList<PathNode> getFutureNodes() {
+        return futureNodes;
+    }
 
     public void setPath(List<PathNode> nodes) {
         this.futureNodes.clear();
@@ -134,7 +154,9 @@ public abstract class Servant {
         this.futureNodes.addAll(resampledNodes);
     }
 
-    public boolean isExecutingPath() { return !this.futureNodes.isEmpty(); }
+    public boolean isExecutingPath() {
+        return !this.futureNodes.isEmpty();
+    }
 
     public LivingEntity getTarget() {
         if (owner == null || targetId == -1) return null;
@@ -157,6 +179,14 @@ public abstract class Servant {
         poseStack.translate(renderNode.pos().x - cameraPos.x, renderNode.pos().y - cameraPos.y, renderNode.pos().z - cameraPos.z);
         int packedLight = LevelRenderer.getLightColor(owner.level(), BlockPos.containing(renderNode.pos().x, renderNode.pos().y, renderNode.pos().z));
         render(poseStack, bufferSource, partialTick, packedLight, renderNode);
+        if (this instanceof ITrailRenderer trailRenderer) {
+            trailRenderer.processTrailRender(poseStack, bufferSource, partialTick, this, renderNode);
+        }
+        if (this instanceof IDamagingOnCollide iDamagingOnCollide) {
+            if (Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes()) {
+                iDamagingOnCollide.renderDebugHitbox(poseStack, bufferSource, renderNode.yaw(), renderNode.pitch(), renderNode.roll());
+            }
+        }
         poseStack.popPose();
     }
 
@@ -232,31 +262,67 @@ public abstract class Servant {
         readAdditional(buf);
     }
 
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {}
-    public void readAdditional(RegistryFriendlyByteBuf buf) {}
+    public void writeAdditional(RegistryFriendlyByteBuf buf) {
+    }
 
-    public LinkedList<PathNode> getPathQueue() { return this.futureNodes; }
-    public UUID getUuid() { return uuid; }
-    public void setUuid(UUID uuid) { this.uuid = uuid; }
-    public Player getOwner() { return owner; }
-    public void setOwner(Player owner) { this.owner = owner; }
-    public Vec3 getPos() { return this.historyNodes.getFirst().pos(); }
+    public void readAdditional(RegistryFriendlyByteBuf buf) {
+    }
+
+    public LinkedList<PathNode> getPathQueue() {
+        return this.futureNodes;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public Player getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Player owner) {
+        this.owner = owner;
+    }
+
+    public Vec3 getPos() {
+        return this.historyNodes.getFirst().pos();
+    }
+
     public void setPos(Vec3 pos) {
         PathNode n = this.historyNodes.getFirst();
         this.historyNodes.set(0, new PathNode(n.feature(), pos, n.yaw(), n.pitch(), n.roll()));
     }
-    public Vec3 getLastPos() { return this.historyNodes.size() > 1 ? this.historyNodes.get(1).pos() : getPos(); }
-    public float getYaw() { return this.historyNodes.getFirst().yaw(); }
+
+    public Vec3 getLastPos() {
+        return this.historyNodes.size() > 1 ? this.historyNodes.get(1).pos() : getPos();
+    }
+
+    public float getYaw() {
+        return this.historyNodes.getFirst().yaw();
+    }
+
     public void setYaw(float yaw) {
         PathNode n = this.historyNodes.getFirst();
         this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), yaw, n.pitch(), n.roll()));
     }
-    public float getPitch() { return this.historyNodes.getFirst().pitch(); }
+
+    public float getPitch() {
+        return this.historyNodes.getFirst().pitch();
+    }
+
     public void setPitch(float pitch) {
         PathNode n = this.historyNodes.getFirst();
         this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), n.yaw(), pitch, n.roll()));
     }
-    public float getRoll() { return this.historyNodes.getFirst().roll(); }
+
+    public float getRoll() {
+        return this.historyNodes.getFirst().roll();
+    }
+
     public void setRoll(float roll) {
         PathNode n = this.historyNodes.getFirst();
         this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), n.yaw(), n.pitch(), roll));

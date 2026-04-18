@@ -1,8 +1,8 @@
 package first.servantry.api.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.ITrailRenderer.TrailNode;
+import first.servantry.api.servant.PathNode;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -14,6 +14,7 @@ import java.util.List;
 
 public interface IProjectileTrail {
 
+    default int getTrailTimer(){return 4;}
     default int getTrailHistoryLength() { return 4; }
     default int getTrailSegmentsPerNode() { return 4; }
 
@@ -23,6 +24,7 @@ public interface IProjectileTrail {
      * 核心逻辑：曲线平滑插值
      */
     default void processTrailRender(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, AdvancedProjectile projectile, PathNode renderNode) {
+        if (getTrailTimer() <= 0) return;
         LinkedList<PathNode> history = projectile.getHistoryNodes();
         int actualLength = Math.min(history.size(), getTrailHistoryLength());
         if (actualLength < 3) return;

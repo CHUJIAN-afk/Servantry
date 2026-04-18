@@ -10,7 +10,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class AdvancedProjectileRegister {
 
-    public static final DeferredRegister<ProjectileType<?>> Register = DeferredRegister.create(Registries.PROJECTILE_TYPES, Servantry.MODID);
+    private static final DeferredRegister<ProjectileType<?>> Register = DeferredRegister.create(Registries.PROJECTILE_TYPES, Servantry.MODID);
 
     public static final DeferredHolder<ProjectileType<?>, ProjectileType<StardustLaser>> StardustLaser = Register.register("stardust_laser", () -> new ProjectileType<>(StardustLaser::new));
 

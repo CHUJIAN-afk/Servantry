@@ -105,6 +105,7 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
     }
 
     public boolean isChange() { return change; }
+
     public void setChange(boolean change) { this.change = change; }
 
     @Override

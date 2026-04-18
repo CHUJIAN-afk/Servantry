@@ -9,6 +9,8 @@ public interface IProjectileMomentum {
 
     Vec3 getVelocity();
     void setVelocity(Vec3 velocity);
+    float getMaxSpeed();
+    float getFriction();
 
     default void applyForce(Vec3 force) {
         setVelocity(getVelocity().add(force));
@@ -17,10 +19,10 @@ public interface IProjectileMomentum {
     /**
      * 核心逻辑：推算下一帧的物理坐标与欧拉角，并送入未来队列
      */
-    default void processMomentum(AdvancedProjectile projectile, float friction, float maxSpeed) {
+    default void processMomentum(AdvancedProjectile projectile) {
         Vec3 vel = getVelocity();
-        if (vel.lengthSqr() > maxSpeed * maxSpeed) {
-            vel = vel.normalize().scale(maxSpeed);
+        if (vel.lengthSqr() > getMaxSpeed() * getMaxSpeed()) {
+            vel = vel.normalize().scale(getMaxSpeed());
         }
 
         Vec3 nextPos = projectile.getPos().add(vel);
@@ -40,6 +42,6 @@ public interface IProjectileMomentum {
                 new PathNode("", nextPos, yaw, pitch, projectile.getRoll())
         ));
 
-        setVelocity(vel.scale(friction));
+        setVelocity(vel.scale(getFriction()));
     }
 }

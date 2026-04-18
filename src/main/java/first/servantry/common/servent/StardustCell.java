@@ -9,7 +9,9 @@ import first.servantry.api.servant.IConeTrailRenderer;
 import first.servantry.api.servant.IMomentumControlled;
 import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.Servant;
+import first.servantry.common.attachment.LevelProjectileData;
 import first.servantry.common.attachment.ServantData;
+import first.servantry.common.projectile.StardustLaser;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ItemRegister;
 import first.servantry.register.ServantRegister;
@@ -18,17 +20,15 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 public class StardustCell extends Servant implements IConeTrailRenderer, IMomentumControlled {
 
@@ -37,6 +37,8 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
 
     // 接口要求的动量状态
     private Vec3 velocity = Vec3.ZERO;
+    private float maxSpeed = 1;
+    private float friction = 0.85f;
 
     private float renderYaw = 0f;
     private float renderPitch = 0f;
@@ -54,8 +56,21 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
     public ActionController<StardustCell> getAi() { return (ActionController<StardustCell>) ai; }
 
     @Override public Vec3 getVelocity() { return this.velocity; }
-
     @Override public void setVelocity(Vec3 velocity) { this.velocity = velocity; }
+    @Override
+    public void setFriction(float friction) {
+        this.friction = friction;
+    }
+    @Override
+    public void setMaxSpeed(float maxSpeed) {
+        this.maxSpeed = maxSpeed;
+    }
+    @Override
+    public float getMaxSpeed() {
+        return maxSpeed ;
+    }
+
+    @Override public float getFriction() { return friction; }
 
     @Override
     public float getBaseDamage() { return 6f; }
@@ -85,14 +100,13 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
         renderPitchO = renderPitch;
         renderRollO = renderRoll;
 
-        renderYaw += 12f;
-        renderPitch += 8f;
-        renderRoll += 15f;
+        renderYaw += 2f;
+        renderPitch += 2f;
+        renderRoll += 2f;
     }
 
     private void serverTickAI(Player owner) {
         LivingEntity newTarget = verifyTarget(owner);
-
         if (newTarget != null) {
             double distSqr = newTarget.distanceToSqr(this.getPos());
             if (distSqr >= 28.75 * 28.75 && distSqr <= 53.75 * 53.75) {
@@ -112,15 +126,23 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
         ServantData data = owner.getData(AttachmentRegister.ServantData);
         List<LivingEntity> potentialTargets = data.getNearbyTargets(owner, this, 64.0, currentTarget == null);
         if (potentialTargets.isEmpty()) return null;
-        potentialTargets.sort(Comparator.comparingDouble(e -> e.distanceToSqr(owner)));
+        int order = data.getOrder(this);
+        potentialTargets.sort(Comparator.comparingDouble(e -> {
+            double distSqr = e.distanceToSqr(getPos());
+            double score = distSqr;
+            if (e.distanceToSqr(owner) < 36.0) score -= 10000.0;
+            if (e.getId() == targetId) score -= 1000.0;
+            int hashBias = (e.getId() * 31 + order * 17) % 5;
+            score += hashBias * 40.0;
+            return score;
+        }));
         return potentialTargets.getFirst();
     }
 
-    // 【核心修复】：基于节点消费的射击逻辑
     @Override
     public void onPathNodeConsumed(PathNode node) {
         super.onPathNodeConsumed(node);
-        if ("fire".equals(node.feature()) && currentTarget != null) {
+        if ("fire".equals(node.feature()) && currentTarget != null && currentTarget.isAlive()) {
             fireCellProjectile(currentTarget);
         }
     }
@@ -128,36 +150,89 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
     public void fireCellProjectile(LivingEntity target) {
         Player owner = getOwner();
         if (owner == null || target == null) return;
-        Vec3 targetCenter = target.position().add(0, target.getBbHeight() / 2.0, 0);
-        Vec3 shootDir = targetCenter.subtract(this.getPos()).normalize();
 
-        Arrow arrow = new Arrow(EntityType.ARROW, owner.level());
-        arrow.setPos(this.getPos());
-        arrow.setOwner(owner);
-        arrow.shoot(shootDir.x, shootDir.y, shootDir.z, 2.5f, 1.0f);
-        owner.level().addFreshEntity(arrow);
+        Vec3 startPos = this.getPos();
+        Vec3 targetCenter = target.getBoundingBox().getCenter();
+        Vec3 baseShootDir = targetCenter.subtract(startPos);
 
-        // 动量接口内建支持
-        this.applyForce(shootDir.scale(-1.0));
+        if (baseShootDir.lengthSqr() > 1e-4) {
+            baseShootDir = baseShootDir.normalize();
+        } else {
+            baseShootDir = new Vec3(0, -1, 0);
+        }
+
+        // 计算直指目标的基准 Yaw 和 Pitch
+        float baseYaw = (float) (Math.atan2(-baseShootDir.x, baseShootDir.z) * (180D / Math.PI));
+        double horiz = Math.sqrt(baseShootDir.x * baseShootDir.x + baseShootDir.z * baseShootDir.z);
+        float basePitch = (float) (Math.atan2(-baseShootDir.y, horiz) * (180D / Math.PI));
+
+        // 随机发射 1 到 3 枚
+        int projectileCount = 1 + owner.getRandom().nextInt(3);
+
+        for (int i = 0; i < projectileCount; i++) {
+            float scatterYaw = baseYaw + (owner.getRandom().nextFloat() - 0.5f) * 40f;
+            float scatterPitch = basePitch + (owner.getRandom().nextFloat() - 0.5f) * 40f;
+
+            // 将叠加了随机偏移的 Yaw 和 Pitch 重新转回三维方向向量
+            float f = (float) Math.cos(-scatterYaw * ((float) Math.PI / 180F) - (float) Math.PI);
+            float f1 = (float) Math.sin(-scatterYaw * ((float) Math.PI / 180F) - (float) Math.PI);
+            float f2 = (float) -Math.cos(-scatterPitch * ((float) Math.PI / 180F));
+            float f3 = (float) Math.sin(-scatterPitch * ((float) Math.PI / 180F));
+            Vec3 finalShootDir = new Vec3(f1 * f2, f3, f * f2).normalize();
+
+            // 依据新角度生成轨迹起点
+            PathNode startNode = new PathNode("", startPos, scatterYaw, scatterPitch, this.getRoll());
+            StardustLaser laser = new StardustLaser(owner.level(), owner, startNode);
+            laser.setStardustCell(this);
+            laser.setTarget(target);
+
+            // 赋予偏转后的初始动量，射弹飞出后会被 tick() 里的追尾逻辑慢慢拉回目标
+            laser.setVelocity(finalShootDir.scale(1.0));
+
+            LevelProjectileData data = owner.level().getData(AttachmentRegister.LevelProjectileData);
+            data.addProjectile(laser);
+        }
+
+        // 细胞自身的后坐力依然基于最开始直指目标的基准方向 baseShootDir
+        // 这样能保证细胞在视觉上的后退受力显得稳定且符合物理直觉
+        this.applyForce(baseShootDir.scale(-1));
     }
 
     /**
-     * 【核心光环算法】：计算头顶的圆环阵列，随时间缓慢旋转
+     * 计算目标周围的有机蜂群/星云驻点
      */
     public Vec3 getHaloAnchorPos(Player owner, LivingEntity target, int order) {
-        int cellsPerTier = 10; // 每层5个，形成好看的五芒星站位
-        int tier = order / cellsPerTier;
+        // 利用目标 ID 和细胞次序生成一个固定的随机种子
+        // 这样可以保证同一个细胞打同一个怪时，它的相对位置是稳定的，不会乱闪
+        long seed = target.getId() * 31337L + order * 1021L;
+        Random rand = new Random(seed);
 
-        double radius = 3.5 + tier * 1.5; // 阶梯状半径变化
-        double baseAngle = (order % cellsPerTier) * (Math.PI * 2.0 / cellsPerTier);
+        // 生成随机的球面坐标
+        double baseTheta = rand.nextDouble() * Math.PI * 2.0; // 水平环绕角度 (0 ~ 360度)
 
-        // 缓慢而优雅的自然旋转
-        double slowRotation = owner.tickCount * 0.025;
-        double angle = baseAngle + slowRotation;
+        // 限制高度角 (Phi)，让细胞主要分布在目标的上半球及周围，避免它们钻进地里
+        // Math.acos 配合 1.0 ~ -0.4 的范围，使其分布在顶部到略低于腰部的位置
+        double phi = Math.acos(1.0 - rand.nextDouble() * 1.4);
 
-        Vec3 targetCenter = target.position().add(0, target.getBbHeight() + 2.5 + tier * 0.8, 0);
+        // 随机基础半径，并且随着细胞数量 (order) 的增加稍微向外扩散，防止重叠
+        double radius = 3.5 + rand.nextDouble() * 2.0 + (order * 0.15);
 
-        return targetCenter.add(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+        // 为每个细胞分配独一无二的缓慢公转速度和方向（顺时针或逆时针）
+        double rotationSpeed = (rand.nextDouble() * 0.02 + 0.01) * (rand.nextBoolean() ? 1 : -1);
+        double currentTheta = baseTheta + owner.tickCount * rotationSpeed;
+
+        // 球面坐标转笛卡尔坐标 (x, y, z)
+        double offsetX = radius * Math.sin(phi) * Math.cos(currentTheta);
+        double offsetY = radius * Math.cos(phi);
+        double offsetZ = radius * Math.sin(phi) * Math.sin(currentTheta);
+
+        // 增加一点独有相位的上下“呼吸”浮动感 (振幅 0.5 格)
+        offsetY += Math.sin(owner.tickCount * 0.05 + rand.nextDouble() * Math.PI) * 0.5;
+
+        // 以目标的中心偏上作为基准原点
+        Vec3 targetCenter = target.position().add(0, target.getBbHeight() / 2.0, 0);
+
+        return targetCenter.add(offsetX, offsetY, offsetZ);
     }
 
     @Override
@@ -184,24 +259,25 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
                 servant.getAi().forceAction(new ActionCellAttack(servant), target);
                 return;
             }
-
-            if (wanderOffset.equals(Vec3.ZERO) || owner.tickCount % 60 == 0) {
-                wanderOffset = new Vec3(
-                        (owner.getRandom().nextDouble() - 0.5) * 12,
-                        owner.getRandom().nextDouble() * 3 + 1.5,
-                        (owner.getRandom().nextDouble() - 0.5) * 12
-                );
+            if (wanderOffset.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || wanderOffset.distanceToSqr(servant.getPos()) < 4) {
+                wanderOffset = new Vec3((owner.getRandom().nextDouble() - 0.5) * 8, owner.getRandom().nextDouble() * 3 + 2, (owner.getRandom().nextDouble() - 0.5) * 8);
             }
-
             Vec3 targetPos = owner.position().add(wanderOffset);
             Vec3 dir = targetPos.subtract(servant.getPos());
             double dist = dir.length();
             if (dist > 1e-4) dir = dir.normalize();
 
-            double speedBias = dist > 12.0 ? 0.25 : 0.06;
-            servant.applyForce(dir.scale(speedBias));
-            servant.tickMomentum(servant, 0.82f, dist > 12.0 ? 1.6f : 0.45f);
+            double pullForce = Math.min(dist * 0.05, 0.3);
+            servant.applyForce(dir.scale(pullForce));
+
+            if (servant instanceof IMomentumControlled iMomentumControlled) {
+                float maxSpeed = (float) Math.min(1.3, 0.1 + dist * 0.125);
+                float friction = dist < 1.0 ? 0.6f : 0.82f;
+                iMomentumControlled.setMaxSpeed(maxSpeed);
+                iMomentumControlled.setFriction(friction);
+            }
         }
+
     }
 
     public static class ActionCellAttack extends ServantAction<StardustCell> {
@@ -213,7 +289,7 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
 
         @Override
         public void tick(LivingEntity target) {
-            if (target == null) {
+            if (target == null || !target.isAlive()) {
                 servant.getAi().forceAction(new ActionCellIdle(servant), null);
                 return;
             }
@@ -227,19 +303,32 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
             Vec3 toAnchor = anchorPos.subtract(servant.getPos());
             double distToAnchor = toAnchor.length();
 
-            if (distToAnchor > 0.1) {
-                servant.applyForce(toAnchor.normalize().scale(distToAnchor * 0.12));
+            // 【核心修复：临界阻尼防抖科技】
+            // 1. 设置拉力上限，防止离得太远时积攒恐怖的加速度
+            double pullForce = Math.min(distToAnchor * 0.08, 0.4);
+            if (distToAnchor > 0.05) {
+                servant.applyForce(toAnchor.normalize().scale(pullForce));
             }
-            float friction = distToAnchor < 0.4 ? 0.4f : 0.85f;
-            servant.tickMomentum(servant, friction, 1.8f);
+
+            // 2. 磁悬浮式刹车：越靠近锚点，摩擦力越大（数值越小），且最高速度被强制压缩
+            float friction = distToAnchor < 1.5 ? 0.55f : 0.85f;
+            float maxSpeed = (float) Math.min(1.8, distToAnchor * 0.8 + 0.05);
+
+            // 执行动量更新
+            Vec3 vel = servant.getVelocity();
+            if (vel.lengthSqr() > maxSpeed * maxSpeed) vel = vel.normalize().scale(maxSpeed);
+            Vec3 nextPos = servant.getPos().add(vel);
+            servant.setVelocity(vel.scale(friction));
 
             shootTimer--;
             if (shootTimer <= 0) {
-                servant.fireCellProjectile(target);
+                // 打上射击特征，在下一刻被消费时触发开火
+                servant.setPath(Collections.singletonList(new PathNode("fire", nextPos, servant.getYaw(), servant.getPitch(), servant.getRoll())));
                 shootTimer = 12 + owner.getRandom().nextInt(4);
+            } else {
+                servant.setPath(Collections.singletonList(new PathNode("", nextPos, servant.getYaw(), servant.getPitch(), servant.getRoll())));
             }
         }
-
         @Override public boolean isFinished() { return false; }
     }
 
@@ -247,7 +336,7 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
         private Vec3 startPos;
         private Vec3 targetPos;
         private int ticks = 0;
-        private final int duration = 4;
+        private final int duration = 6;
 
         public ActionCellTeleport(StardustCell servant) { super(servant); }
         @Override public String getId() { return "teleport"; }
@@ -261,8 +350,8 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
             Player owner = servant.getOwner();
             ServantData data = owner.getData(AttachmentRegister.ServantData);
 
-            // 预测抵达时的光环位置
-            this.targetPos = servant.getHaloAnchorPos(owner, target, data.getOrder(servant));
+            // 直接预测抵达时的光环位置
+            this.targetPos = target.getBoundingBox().getCenter();
         }
 
         @Override
@@ -272,10 +361,14 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
                 float t = (float) ticks / duration;
                 float ease = 1.0f - (float) Math.pow(1.0f - t, 3);
                 Vec3 currentPos = this.startPos.lerp(this.targetPos, ease);
-                // 【核心修复】：将最后一次冲刺的节点打上 "fire" 标签！
-                String featureTag = (ticks == duration) ? "fire" : "";
-                servant.setPath(Collections.singletonList(new PathNode(featureTag, currentPos, servant.getYaw(), servant.getPitch(), servant.getRoll())));
+                servant.setPath(Collections.singletonList(new PathNode("", currentPos, servant.getYaw(), servant.getPitch(), servant.getRoll())));
             } else {
+                if (target != null) {
+                    int invulnerableTime = target.invulnerableTime;
+                    target.invulnerableTime = 0;
+                    target.hurt(servant.getDamageSource(), servant.getBaseDamage());
+                    target.invulnerableTime = invulnerableTime;
+                }
                 servant.getAi().forceAction(new ActionCellAttack(servant), target);
             }
         }
@@ -315,7 +408,7 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
     }
 
     @Override public int getTrailTimer() { return trailTimer; }
-    @Override public float getTrailMaxRadius() { return 0.5f; }
+    @Override public float getTrailMaxRadius() { return 0.2f; }
     @Override public int getTrailColorRGB(float progress) { return 0x8AE0FF; }
     @Override public int getTrailResolution() { return 12; }
     @Override public float getTrailFadeOut(float progress) { return (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0); }

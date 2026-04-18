@@ -23,6 +23,8 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.List;
 
+import static java.lang.Double.NaN;
+
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
 

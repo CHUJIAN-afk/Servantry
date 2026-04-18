@@ -99,5 +99,43 @@ public interface IConeTrailRenderer extends ITrailRenderer {
                 consumer.addVertex(pose, (float)pRel.x + pV1.x(), (float)pRel.y + pV1.y(), (float)pRel.z + pV1.z()).setColor(pColorVal).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
             }
         }
+        if (!smoothNodes.isEmpty()) {
+            Vec3 headPos = smoothNodes.getFirst().pos.subtract(renderPos);
+            float radius = getTrailMaxRadius();
+            int colorRGB = getTrailColorRGB(0f);
+            int r = (colorRGB >> 16) & 0xFF;
+            int g = (colorRGB >> 8) & 0xFF;
+            int b = colorRGB & 0xFF;
+            int colorVal = FastColor.ARGB32.color(200, r, g, b);
+
+            int rings = 8;
+            int sectors = 8;
+            for (int i = 0; i < rings; i++) {
+                float phi1 = (float) (Math.PI * (float) i / rings);
+                float phi2 = (float) (Math.PI * (float) (i + 1) / rings);
+                for (int j = 0; j < sectors; j++) {
+                    float theta1 = (float) (2.0 * Math.PI * (float) j / sectors);
+                    float theta2 = (float) (2.0 * Math.PI * (float) (j + 1) / sectors);
+
+                    Vector3f v1 = getSphereVertex(headPos, radius, theta1, phi1);
+                    Vector3f v2 = getSphereVertex(headPos, radius, theta2, phi1);
+                    Vector3f v3 = getSphereVertex(headPos, radius, theta2, phi2);
+                    Vector3f v4 = getSphereVertex(headPos, radius, theta1, phi2);
+
+                    consumer.addVertex(pose, v1.x(), v1.y(), v1.z()).setColor(colorVal).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    consumer.addVertex(pose, v2.x(), v2.y(), v2.z()).setColor(colorVal).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    consumer.addVertex(pose, v3.x(), v3.y(), v3.z()).setColor(colorVal).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    consumer.addVertex(pose, v4.x(), v4.y(), v4.z()).setColor(colorVal).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                }
+            }
+        }
     }
+
+    private Vector3f getSphereVertex(Vec3 center, float radius, float theta, float phi) {
+        float x = (float) (center.x + radius * Math.sin(phi) * Math.cos(theta));
+        float y = (float) (center.y + radius * Math.cos(phi));
+        float z = (float) (center.z + radius * Math.sin(phi) * Math.sin(theta));
+        return new Vector3f(x, y, z);
+    }
+
 }

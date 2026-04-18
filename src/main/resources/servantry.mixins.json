@@ -4,11 +4,9 @@
   "package": "first.servantry.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "AdvancedProjectileMixin",
     "CombatRulesMixin",
     "CommonHooksMixin",
-    "LivingEntityMixin",
-    "ServantMixin"
+    "LivingEntityMixin"
   ],
   "client": [
   ],

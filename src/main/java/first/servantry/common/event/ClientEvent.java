@@ -3,9 +3,11 @@ package first.servantry.common.event;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
 import first.servantry.api.item.IServantWeapon;
+import first.servantry.api.projectile.AdvancedProjectile;
 import first.servantry.api.register.Registries;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
+import first.servantry.common.attachment.LevelProjectileData;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.ChatFormatting;
@@ -56,6 +58,11 @@ public class ClientEvent {
                     servant.setOwner(player);
                     servant.renderInternal(partialTick, poseStack, bufferSource);
                 }
+            }
+            LevelProjectileData data = clientLevel.getData(AttachmentRegister.LevelProjectileData);
+            List<AdvancedProjectile> projectiles = data.getProjectiles();
+            for (AdvancedProjectile projectile : projectiles) {
+                projectile.renderInternal(partialTick, poseStack, bufferSource);
             }
         }
     }
@@ -119,7 +126,9 @@ public class ClientEvent {
                 return lines;
             });
             if (!cachedLore.isEmpty()) {
-                toolTip.add(Component.empty());
+                if (player != null) {
+                    toolTip.add(Component.empty());
+                }
                 for (MutableComponent component : cachedLore) {
                     toolTip.add(component.withStyle(ChatFormatting.DARK_GRAY));
                 }
