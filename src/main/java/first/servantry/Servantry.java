@@ -11,14 +11,18 @@ public class Servantry {
     public static final String MODID = "servantry";
 
     public Servantry(IEventBus eventBus) {
-        AttributeRegister.register(eventBus);
-        AttachmentRegister.register(eventBus);
-        ServantRegister.register(eventBus);
-        ItemRegister.register(eventBus);
-        CreativeTabRegister.register(eventBus);
-        SoundRegister.register(eventBus);
-        MarkerRegister.register(eventBus);
         AdvancedProjectileRegister.register(eventBus);
+        ArmorMaterialRegister.register(eventBus);
+        AttachmentRegister.register(eventBus);
+        AttributeRegister.register(eventBus);
+        CreativeTabRegister.register(eventBus);
+        ItemRegister.register(eventBus);
+        MarkerRegister.register(eventBus);
+        MobEffectRegister.register(eventBus);
+        ParticleRegister.register(eventBus);
+        PotionRegister.register(eventBus);
+        ServantRegister.register(eventBus);
+        SoundRegister.register(eventBus);
     }
 
     public static ResourceLocation rl(String path) {

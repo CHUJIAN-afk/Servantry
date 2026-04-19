@@ -3,7 +3,6 @@ package first.servantry.api.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import first.servantry.api.servant.ITrailRenderer;
-import first.servantry.api.servant.ITrailRenderer.TrailNode;
 import first.servantry.api.servant.PathNode;
 import first.servantry.common.projectile.StardustLaser;
 import net.minecraft.client.renderer.LightTexture;
@@ -12,11 +11,29 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
-public interface IProjectileConeTrail extends IProjectileTrail {
+public interface IProjectileConeTrail {
+
+    class TrailNode {
+        public Vec3 pos;
+        public Quaternionf rot;
+
+        public TrailNode(Vec3 pos, Quaternionf rot) {
+            this.pos = pos;
+            this.rot = rot;
+        }
+    }
+
+    default int getTrailTimer() { return 4; }
+    default int getTrailHistoryLength() { return 4; }
+    default int getTrailSegmentsPerNode() { return 4; }
 
     default float getTrailMaxRadius() { return 0.2f; }
     default int getTrailResolution() { return 6; }
@@ -27,9 +44,72 @@ public interface IProjectileConeTrail extends IProjectileTrail {
         return (float) Math.pow(Math.max(0.0f, 1.0f - progress), 1.5);
     }
 
-    @Override
+    /**
+     * 核心逻辑：平滑节点计算及圆锥模型生成
+     */
+    default void processTrailRender(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, AdvancedProjectile projectile, PathNode renderNode) {
+        if (getTrailTimer() <= 0) {
+            return;
+        }
+        LinkedList<PathNode> history = projectile.getHistoryNodes();
+        int actualLength = Math.min(history.size(), getTrailHistoryLength());
+        if (actualLength < 3) {
+            return;
+        }
+
+        PathNode[] renderNodesArray = new PathNode[actualLength];
+        Iterator<PathNode> iterator = history.iterator();
+        for (int i = 0; i < actualLength; i++) {
+            renderNodesArray[i] = iterator.next();
+        }
+        renderNodesArray[0] = renderNode;
+
+        int segments = getTrailSegmentsPerNode();
+        List<TrailNode> smoothNodes = new ArrayList<>((actualLength - 1) * segments + 1);
+        Quaternionf tempQ = new Quaternionf();
+
+        // 曲线平滑插值
+        for (int i = 0; i < actualLength - 1; i++) {
+            PathNode p0 = renderNodesArray[Math.max(i - 1, 0)];
+            PathNode p1 = renderNodesArray[i];
+            PathNode p2 = renderNodesArray[i + 1];
+            PathNode p3 = renderNodesArray[Math.min(i + 2, actualLength - 1)];
+
+            Quaternionf q1 = new Quaternionf().rotateY((float) Math.toRadians(-p1.yaw())).rotateX((float) Math.toRadians(p1.pitch())).rotateZ((float) Math.toRadians(p1.roll()));
+            Quaternionf q2 = new Quaternionf().rotateY((float) Math.toRadians(-p2.yaw())).rotateX((float) Math.toRadians(p2.pitch())).rotateZ((float) Math.toRadians(p2.roll()));
+
+            for (int j = 0; j < segments; j++) {
+                float t = (float) j / segments;
+                float t2 = t * t, t3 = t2 * t;
+                float f0 = -0.5f * t3 + t2 - 0.5f * t;
+                float f1 = 1.5f * t3 - 2.5f * t2 + 1.0f;
+                float f2 = -1.5f * t3 + 2.0f * t2 + 0.5f * t;
+                float f3 = 0.5f * t3 - 0.5f * t2;
+
+                Vec3 pos = new Vec3(
+                        p0.pos().x * f0 + p1.pos().x * f1 + p2.pos().x * f2 + p3.pos().x * f3,
+                        p0.pos().y * f0 + p1.pos().y * f1 + p2.pos().y * f2 + p3.pos().y * f3,
+                        p0.pos().z * f0 + p1.pos().z * f1 + p2.pos().z * f2 + p3.pos().z * f3
+                );
+                tempQ.set(q1).slerp(q2, t);
+                smoothNodes.add(new TrailNode(pos, new Quaternionf(tempQ)));
+            }
+        }
+
+        poseStack.pushPose();
+        // 抵消实体本身的坐标位移，完全依赖 smoothNodes 的世界坐标相对值绘制
+        Vec3 offset = renderNode.pos().subtract(renderNode.pos());
+        poseStack.translate(offset.x, offset.y, offset.z);
+
+        drawTrailVertices(poseStack, bufferSource, partialTick, projectile, renderNode, smoothNodes);
+
+        poseStack.popPose();
+    }
+
     default void drawTrailVertices(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, AdvancedProjectile projectile, PathNode visualRenderNode, List<TrailNode> smoothNodes) {
-        if (smoothNodes.size() < 2) return;
+        if (smoothNodes.size() < 2) {
+            return;
+        }
 
         // 【新增】获取消散进度（如果适用）
         float deathProgress = 0.0f;
@@ -71,7 +151,9 @@ public interface IProjectileConeTrail extends IProjectileTrail {
             int pA = Math.round(prevAlphaFade * 200);
 
             // 如果已经完全透明则跳过顶点渲染优化性能
-            if (cA <= 0 && pA <= 0) continue;
+            if (cA <= 0 && pA <= 0) {
+                continue;
+            }
 
             int cr = (currColor >> 16) & 0xFF, cg = (currColor >> 8) & 0xFF, cb = currColor & 0xFF;
             int pr = (prevColor >> 16) & 0xFF, pg = (prevColor >> 8) & 0xFF, pb = prevColor & 0xFF;

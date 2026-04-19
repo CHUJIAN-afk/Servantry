@@ -4,44 +4,54 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.projectile.AdvancedProjectile;
+import first.servantry.api.projectile.IProjectileCollider;
+import first.servantry.api.projectile.IProjectileConeTrail;
 import first.servantry.api.register.Registries;
 import first.servantry.api.register.ServantType;
-import first.servantry.api.servant.Servant;
+import first.servantry.api.servant.*;
 import first.servantry.common.attachment.LevelProjectileData;
 import first.servantry.common.attachment.ServantData;
+import first.servantry.common.particle.StardustScatterParticle;
+import first.servantry.register.ArmorMaterialRegister;
 import first.servantry.register.AttachmentRegister;
+import first.servantry.register.AttributeRegister;
+import first.servantry.register.ParticleRegister;
+import first.servantry.utils.ArmorSetUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @EventBusSubscriber(modid = Servantry.MODID, value = Dist.CLIENT)
 public class ClientEvent {
 
     @SubscribeEvent
-    public static void registerModels(ModelEvent.RegisterAdditional event) {
-        event.register(ModelResourceLocation.standalone(Servantry.rl("servant/enchanted_throwing_knives")));
+    public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ParticleRegister.StardustScatter.get(), StardustScatterParticle.Provider::new);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -53,16 +63,53 @@ public class ClientEvent {
             float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
             MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();
             for (Player player : clientLevel.players()) {
-                ServantData data = player.getData(AttachmentRegister.ServantData);
-                for (Servant servant : data.getServants()) {
+                List<Servant> servants = player.getData(AttachmentRegister.ServantData).getServants();
+                Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+                for (Servant servant : servants) {
                     servant.setOwner(player);
-                    servant.renderInternal(partialTick, poseStack, bufferSource);
+                    LinkedList<PathNode> historyNodes = servant.getHistoryNodes();
+                    PathNode current = historyNodes.getFirst();
+                    PathNode last = historyNodes.size() > 1 ? historyNodes.get(1) : current;
+                    PathNode renderNode = last.lerp(current, partialTick);
+                    poseStack.pushPose();
+                    poseStack.translate(renderNode.pos().x() - cameraPos.x(), renderNode.pos().y() - cameraPos.y(), renderNode.pos().z() - cameraPos.z());
+                    int packedLight = LevelRenderer.getLightColor(clientLevel, BlockPos.containing(renderNode.pos().x(), renderNode.pos().y(), renderNode.pos().z()));
+                    servant.render(poseStack, bufferSource, partialTick, packedLight, renderNode);
+                    if (servant instanceof ITrailRenderer trailRenderer) {
+                        trailRenderer.processTrailRender(poseStack, bufferSource, partialTick, servant, renderNode);
+                    }
+                    if (servant instanceof IConeTrailRenderer coneTrailRenderer) {
+                        coneTrailRenderer.processConeTrailRender(poseStack, bufferSource, partialTick, servant, renderNode);
+                    }
+                    if (servant instanceof IDamagingOnCollide iDamagingOnCollide) {
+                        if (Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes()) {
+                            iDamagingOnCollide.renderDebugHitbox(poseStack, bufferSource, renderNode.yaw(), renderNode.pitch(), renderNode.roll());
+                        }
+                    }
+                    poseStack.popPose();
                 }
             }
             LevelProjectileData data = clientLevel.getData(AttachmentRegister.LevelProjectileData);
             List<AdvancedProjectile> projectiles = data.getProjectiles();
             for (AdvancedProjectile projectile : projectiles) {
-                projectile.renderInternal(partialTick, poseStack, bufferSource);
+                LinkedList<PathNode> historyNodes = projectile.getHistoryNodes();
+                PathNode current = historyNodes.getFirst();
+                PathNode last = historyNodes.size() > 1 ? historyNodes.get(1) : current;
+                PathNode renderNode = last.lerp(current, partialTick);
+                Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+                poseStack.pushPose();
+                poseStack.translate(renderNode.pos().x - cameraPos.x, renderNode.pos().y - cameraPos.y, renderNode.pos().z - cameraPos.z);
+                int packedLight = LevelRenderer.getLightColor(clientLevel, BlockPos.containing(renderNode.pos()));
+                projectile.render(poseStack, bufferSource, partialTick, packedLight, renderNode);
+                if (projectile instanceof IProjectileConeTrail iProjectileConeTrail) {
+                    iProjectileConeTrail.processTrailRender(poseStack, bufferSource, partialTick, projectile, renderNode);
+                }
+                if (projectile instanceof IProjectileCollider iProjectileCollider) {
+                    if (Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes()) {
+                        iProjectileCollider.renderDebugHitbox(poseStack, bufferSource, renderNode.yaw(), renderNode.pitch(), renderNode.roll());
+                    }
+                }
+                poseStack.popPose();
             }
         }
     }
@@ -87,7 +134,9 @@ public class ClientEvent {
 
                 // 1. 伤害 (例如: "9 召唤伤害")
                 if (damage > 0) {
-                    String damageStr = damage == (long) damage ? String.format("%d", (long) damage) : String.valueOf(damage);
+                    AttributeInstance attribute = player.getAttribute(AttributeRegister.ServantDamage);
+                    damage = attribute != null ? (float) (damage * attribute.getValue()) : damage;
+                    String damageStr = String.format("%.1f", damage);
                     toolTip.add(Component.literal(damageStr).withStyle(ChatFormatting.BLUE)
                             .append(Component.translatable("item.servantry.tooltip.damage").withStyle(ChatFormatting.GRAY)));
                 }
@@ -133,6 +182,10 @@ public class ClientEvent {
                     toolTip.add(component.withStyle(ChatFormatting.DARK_GRAY));
                 }
             }
+        }
+        Holder<ArmorMaterial> hallowedArmorMaterial = ArmorMaterialRegister.HallowedArmorMaterial;
+        if (itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getMaterial().equals(hallowedArmorMaterial)) {
+            ArmorSetUtil.addSetBonusTooltip(player, hallowedArmorMaterial, toolTip);
         }
     }
 }

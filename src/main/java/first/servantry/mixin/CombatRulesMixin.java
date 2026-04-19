@@ -1,7 +1,10 @@
 package first.servantry.mixin;
 
+import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.servent.EnchantedThrowingKnives;
+import first.servantry.register.ArmorMaterialRegister;
+import first.servantry.utils.ArmorSetUtil;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,8 +23,12 @@ public class CombatRulesMixin {
     )
     private static float modifyArmorValue(float armorValue, LivingEntity entity, float damage, DamageSource damageSource, float armorToughness) {
         if (damageSource instanceof ServantDamageSource servantDamageSource) {
-            if (servantDamageSource.getServant() instanceof EnchantedThrowingKnives) {
+            Servant servant = servantDamageSource.getServant();
+            if (servant instanceof EnchantedThrowingKnives) {
                 armorValue -= 2.5f;
+            }
+            if (ArmorSetUtil.hasFullSet(servant.getOwner(), ArmorMaterialRegister.HallowedArmorMaterial)) {
+                armorValue -= 4f;
             }
         }
         return Math.max(armorValue, 0);

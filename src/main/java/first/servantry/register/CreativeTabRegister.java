@@ -1,7 +1,6 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import first.servantry.api.item.IServantWeapon;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -22,9 +21,8 @@ public class CreativeTabRegister {
                 builder.icon(ItemRegister.TerraPrism.get()::getDefaultInstance);
                 builder.displayItems((parameters, output) -> BuiltInRegistries.ITEM.stream()
                         .filter(item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Servantry.MODID))
-                        .filter(item -> item instanceof IServantWeapon<?>)
-                        .forEach(output::accept)
-                );
+                        .filter(item -> !(item instanceof ItemRegister.RenderItem))
+                        .forEach(output::accept));
                 return builder.build();
             });
 

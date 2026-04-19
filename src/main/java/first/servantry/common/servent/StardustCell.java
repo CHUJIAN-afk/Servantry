@@ -9,17 +9,19 @@ import first.servantry.api.servant.IConeTrailRenderer;
 import first.servantry.api.servant.IMomentumControlled;
 import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.Servant;
-import first.servantry.common.attachment.LevelProjectileData;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.common.projectile.StardustLaser;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ItemRegister;
+import first.servantry.register.ParticleRegister;
 import first.servantry.register.ServantRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -109,7 +111,7 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
         LivingEntity newTarget = verifyTarget(owner);
         if (newTarget != null) {
             double distSqr = newTarget.distanceToSqr(this.getPos());
-            if (distSqr >= 28.75 * 28.75 && distSqr <= 53.75 * 53.75) {
+            if (distSqr >= 28.75 * 28.75 && distSqr <= 53.75 * 53.75 || distSqr > 128 * 128) {
                 if (!(getAi().getCurrentAction() instanceof ActionCellTeleport)) {
                     getAi().forceAction(new ActionCellTeleport(this), newTarget);
                 }
@@ -125,13 +127,13 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
     private LivingEntity verifyTarget(Player owner) {
         ServantData data = owner.getData(AttachmentRegister.ServantData);
         List<LivingEntity> potentialTargets = data.getNearbyTargets(owner, this, 64.0, currentTarget == null);
+        potentialTargets.removeIf(e -> !owner.hasLineOfSight(e));
         if (potentialTargets.isEmpty()) return null;
         int order = data.getOrder(this);
         potentialTargets.sort(Comparator.comparingDouble(e -> {
             double distSqr = e.distanceToSqr(getPos());
             double score = distSqr;
             if (e.distanceToSqr(owner) < 36.0) score -= 10000.0;
-            if (e.getId() == targetId) score -= 1000.0;
             int hashBias = (e.getId() * 31 + order * 17) % 5;
             score += hashBias * 40.0;
             return score;
@@ -157,45 +159,59 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
 
         if (baseShootDir.lengthSqr() > 1e-4) {
             baseShootDir = baseShootDir.normalize();
-        } else {
-            baseShootDir = new Vec3(0, -1, 0);
+
+            // ================= 【客户端专属】自定义粒子生成 =================
+            RandomSource rand = owner.getRandom();
+            int particleCount = 2 + rand.nextInt(2);
+
+            // 构建正交基准面，用于计算精准的锥形散射
+            Vec3 upDir = new Vec3(0, 1, 0);
+            if (Math.abs(baseShootDir.y) > 0.99) upDir = new Vec3(1, 0, 0);
+            Vec3 rightDir = baseShootDir.cross(upDir).normalize();
+            Vec3 trueUpDir = rightDir.cross(baseShootDir).normalize();
+
+            for (int i = 0; i < particleCount; i++) {
+                double spreadAngle = (rand.nextDouble() * 35.0) * (Math.PI / 180.0);
+                double rollAngle = rand.nextDouble() * Math.PI * 2.0;
+
+                double dx = Math.sin(spreadAngle) * Math.cos(rollAngle);
+                double dy = Math.sin(spreadAngle) * Math.sin(rollAngle);
+                double dz = Math.cos(spreadAngle);
+
+                Vec3 particleDir = rightDir.scale(dx)
+                        .add(trueUpDir.scale(dy))
+                        .add(baseShootDir.scale(dz))
+                        .normalize();
+
+                double speedMultiplier = 0.15 + rand.nextDouble() * 0.15;
+                Vec3 particleVel = particleDir.scale(speedMultiplier);
+
+                // 直接在客户端本地添加我们刚注册的自定义粒子
+                ((ServerLevel) owner.level()).sendParticles(
+                        ParticleRegister.StardustScatter.get(),
+                        startPos.x, startPos.y, startPos.z,
+                        0,             // count=0 启用速度矢量模式
+                        particleVel.x,
+                        particleVel.y,
+                        particleVel.z,
+                        1.0            // 速度标量
+                );
+            }
+            // =============================================================
+
+            // 细胞自身的后坐力（双端都执行，保持物理位置同步）
+            this.applyForce(baseShootDir.scale(-1));
         }
 
-        // 计算直指目标的基准 Yaw 和 Pitch
-        float baseYaw = (float) (Math.atan2(-baseShootDir.x, baseShootDir.z) * (180D / Math.PI));
-        double horiz = Math.sqrt(baseShootDir.x * baseShootDir.x + baseShootDir.z * baseShootDir.z);
-        float basePitch = (float) (Math.atan2(-baseShootDir.y, horiz) * (180D / Math.PI));
-
-        // 随机发射 1 到 3 枚
-        int projectileCount = 1 + owner.getRandom().nextInt(3);
-
-        for (int i = 0; i < projectileCount; i++) {
-            float scatterYaw = baseYaw + (owner.getRandom().nextFloat() - 0.5f) * 40f;
-            float scatterPitch = basePitch + (owner.getRandom().nextFloat() - 0.5f) * 40f;
-
-            // 将叠加了随机偏移的 Yaw 和 Pitch 重新转回三维方向向量
-            float f = (float) Math.cos(-scatterYaw * ((float) Math.PI / 180F) - (float) Math.PI);
-            float f1 = (float) Math.sin(-scatterYaw * ((float) Math.PI / 180F) - (float) Math.PI);
-            float f2 = (float) -Math.cos(-scatterPitch * ((float) Math.PI / 180F));
-            float f3 = (float) Math.sin(-scatterPitch * ((float) Math.PI / 180F));
-            Vec3 finalShootDir = new Vec3(f1 * f2, f3, f * f2).normalize();
-
-            // 依据新角度生成轨迹起点
-            PathNode startNode = new PathNode("", startPos, scatterYaw, scatterPitch, this.getRoll());
+        // ================= 【服务端专属】生成真实射弹实体 =================
+        if (!owner.level().isClientSide()) {
+            PathNode startNode = new PathNode("", startPos, 0, 0, 0);
             StardustLaser laser = new StardustLaser(owner.level(), owner, startNode);
+
             laser.setStardustCell(this);
             laser.setTarget(target);
-
-            // 赋予偏转后的初始动量，射弹飞出后会被 tick() 里的追尾逻辑慢慢拉回目标
-            laser.setVelocity(finalShootDir.scale(1.0));
-
-            LevelProjectileData data = owner.level().getData(AttachmentRegister.LevelProjectileData);
-            data.addProjectile(laser);
+            owner.level().getData(AttachmentRegister.LevelProjectileData).addProjectile(laser);
         }
-
-        // 细胞自身的后坐力依然基于最开始直指目标的基准方向 baseShootDir
-        // 这样能保证细胞在视觉上的后退受力显得稳定且符合物理直觉
-        this.applyForce(baseShootDir.scale(-1));
     }
 
     /**
@@ -269,13 +285,6 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
 
             double pullForce = Math.min(dist * 0.05, 0.3);
             servant.applyForce(dir.scale(pullForce));
-
-            if (servant instanceof IMomentumControlled iMomentumControlled) {
-                float maxSpeed = (float) Math.min(1.3, 0.1 + dist * 0.125);
-                float friction = dist < 1.0 ? 0.6f : 0.82f;
-                iMomentumControlled.setMaxSpeed(maxSpeed);
-                iMomentumControlled.setFriction(friction);
-            }
         }
 
     }
@@ -372,6 +381,7 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
                 servant.getAi().forceAction(new ActionCellAttack(servant), target);
             }
         }
+
         @Override public boolean isFinished() { return false; }
     }
 
@@ -414,12 +424,13 @@ public class StardustCell extends Servant implements IConeTrailRenderer, IMoment
     @Override public float getTrailFadeOut(float progress) { return (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0); }
 
     @Override
-    public void drawTrailVertices(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, Servant servant, PathNode visualRenderNode, List<TrailNode> smoothNodes) {
-        if (trailTimer > 0 && !smoothNodes.isEmpty()) {
-            IConeTrailRenderer.super.drawTrailVertices(poseStack, bufferSource, partialTick, servant, visualRenderNode, smoothNodes);
+    public void processConeTrailRender(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, Servant servant, PathNode rawRenderNode) {
+        if (trailTimer > 0 ) {
+            IConeTrailRenderer.super.processConeTrailRender(poseStack, bufferSource, partialTick, servant, rawRenderNode);
         }
     }
 
     @Override
     public ServantType<? extends Servant> getType() { return ServantRegister.StardustCell.get(); }
+
 }

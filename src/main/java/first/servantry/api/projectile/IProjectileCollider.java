@@ -3,16 +3,16 @@ package first.servantry.api.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import first.servantry.api.servant.OBB;
+import first.servantry.api.OBB;
 import first.servantry.api.servant.PathNode;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.phys.*;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -20,17 +20,9 @@ import java.util.List;
 
 public interface IProjectileCollider {
 
-    boolean onHitBlock(AdvancedProjectile projectile, BlockHitResult hitResult);
-    boolean onHitEntity(AdvancedProjectile projectile, EntityHitResult hitResult);
-    AABB getHitbox();
+    boolean onHitEntity(AdvancedProjectile projectile, LivingEntity hitResult);
 
-    default boolean canHitEntity(AdvancedProjectile projectile, Entity entity) {
-        Player owner = projectile.getOwner();
-        if (!entity.isSpectator() && entity.isAlive() && entity.isPickable()) {
-            return owner == null || (!entity.is(owner) && !entity.isAlliedTo(owner));
-        }
-        return false;
-    }
+    AABB getHitbox();
 
     /**
      * 碰撞采样的节点数量。
@@ -44,28 +36,15 @@ public interface IProjectileCollider {
         if (projectile.isRemoved()) return;
 
         Player owner = projectile.getOwner();
-        // 【防崩溃拦截】：客户端在读取时，可能 owner 实体尚未在当前区块加载出来
         if (owner == null) return;
 
         LinkedList<PathNode> historyNodes = projectile.getHistoryNodes();
         int sampleNodes = getCollisionSampleNodes();
         if (historyNodes.size() < 2) return;
 
-        Vec3 start = historyNodes.get(1).pos();
-        Vec3 end = historyNodes.get(0).pos();
-
-        // 1. 方块射线检测，以获取最大的合法飞行终点，防止穿墙
-        ClipContext context = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner);
-        BlockHitResult blockHit = projectile.getLevel().clip(context);
-
-        boolean hitBlock = false;
-        if (blockHit.getType() != HitResult.Type.MISS) {
-            end = blockHit.getLocation();
-            hitBlock = true;
-        }
-
-        // 2. 高级实体碰撞逻辑 (OBB平滑扫描)
+        // 高级实体碰撞逻辑 (OBB平滑扫描)
         AABB localBox = getHitbox();
+        if (localBox == null) return;
         double dx = localBox.getXsize();
         double dy = localBox.getYsize();
         double dz = localBox.getZsize();
@@ -87,11 +66,6 @@ public interface IProjectileCollider {
                 Vec3 P1 = current.pos();
                 Vec3 P0 = prev.pos();
                 Vec3 P_minus1 = older.pos();
-
-                // 若检测到方块，且当前是最新线段，将终点截断至方块表面
-                if (s == 0 && hitBlock) {
-                    P1 = end;
-                }
 
                 Vec3 V0 = P0.subtract(P_minus1);
                 Vec3 C = P0.add(V0.scale(0.5));
@@ -127,34 +101,22 @@ public interface IProjectileCollider {
 
             if (broadAABB != null) {
                 // 使用宽泛 AABB 初步筛出可能命中的实体
-                List<Entity> potentialTargets = projectile.getLevel().getEntitiesOfClass(Entity.class, broadAABB, e -> canHitEntity(projectile, e));
+                List<LivingEntity> potentialTargets = projectile.getLevel().getEntitiesOfClass(LivingEntity.class, broadAABB);
                 boolean hitRegistered = false;
 
                 // 按照生成的时序，逐个切片检测 OBB 相交，实现精准防穿透判断
                 for (OBB obb : sweepOBBs) {
-                    for (Entity target : potentialTargets) {
+                    for (LivingEntity target : potentialTargets) {
                         if (obb.intersects(target.getBoundingBox())) {
-                            if (onHitEntity(projectile, new EntityHitResult(target))) {
+                            if (onHitEntity(projectile, target)) {
                                 projectile.discard();
                                 hitRegistered = true;
                                 break;
                             }
                         }
                     }
-                    // 一旦射弹击中并被销毁，立刻停止后续时段的扫描
                     if (hitRegistered) break;
                 }
-
-                // 若已拦截到实体，直接返回，不再执行后方方块碰撞
-                if (hitRegistered) return;
-            }
-        }
-
-        // 3. 处理方块击中（只有没撞到实体才会进入方块计算）
-        if (hitBlock) {
-            if (onHitBlock(projectile, blockHit)) {
-                projectile.setPos(end);
-                projectile.discard();
             }
         }
     }

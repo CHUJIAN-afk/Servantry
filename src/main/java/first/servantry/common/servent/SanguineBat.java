@@ -124,7 +124,9 @@ public class SanguineBat extends Servant implements IDamagingOnCollide, IConeTra
         }
 
         ServantData data = owner.getData(AttachmentRegister.ServantData);
-        List<LivingEntity> potentialTargets = data.getNearbyTargets(owner, this, 24.0, true);
+        List<LivingEntity> potentialTargets = data.getNearbyTargets(owner, this, 24.0, currentTarget == null);
+
+
 
         if (potentialTargets.isEmpty()) {
             setTarget(null);
@@ -135,6 +137,9 @@ public class SanguineBat extends Servant implements IDamagingOnCollide, IConeTra
         double bestScore = Double.MAX_VALUE;
         for (LivingEntity e : potentialTargets) {
             double score = e.distanceToSqr(getOwner());
+            if (e == currentTarget) {
+                score /= 2;
+            }
             if (score < bestScore) {
                 bestScore = score;
                 bestTarget = e;

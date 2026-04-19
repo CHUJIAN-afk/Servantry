@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -21,9 +22,8 @@ public abstract class AdvancedProjectile {
     private UUID uuid;
     private final Level level;
 
-    // 【核心修复】：强约束为 Player，并引入 UUID 同步机制
-    private Player owner;
-    private UUID ownerUuid;
+    // 主人字段
+    private final Player owner;
 
     private int tickCount = 0;
     private int maxAge = 200;
@@ -33,11 +33,13 @@ public abstract class AdvancedProjectile {
     private final LinkedList<PathNode> futureNodes = new LinkedList<>();
     private boolean firstSync = true;
 
+    // --- 动量属性 ---
+    private Vec3 velocity = Vec3.ZERO;
+
     public AdvancedProjectile(Level level, Player owner, PathNode startNode) {
         this.uuid = UUID.randomUUID();
         this.level = level;
         this.owner = owner;
-        this.ownerUuid = owner != null ? owner.getUUID() : null;
         this.historyNodes.addFirst(startNode != null ? startNode : PathNode.Empty);
     }
 
@@ -45,10 +47,65 @@ public abstract class AdvancedProjectile {
 
     public abstract void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode);
 
-    public void tick() {
-        if (removed) return;
+    // --- 主人与伤害源 ---
+    public Player getOwner() {
+        return this.owner;
+    }
 
-        // 如果在服务端，玩家离线或死亡，直接销毁孤儿射弹
+    // --- 动量核心方法 ---
+    public Vec3 getVelocity() {
+        return this.velocity;
+    }
+
+    public void setVelocity(Vec3 velocity) {
+        this.velocity = velocity;
+    }
+
+    public float getMaxSpeed() {
+        return 3.0f; // 默认最大速度，可被子类重写
+    }
+
+    public float getFriction() {
+        return 0.99f; // 默认摩擦力，可被子类重写
+    }
+
+    public void applyForce(Vec3 force) {
+        setVelocity(getVelocity().add(force));
+    }
+
+    public void processMomentum() {
+        Vec3 vel = getVelocity();
+        if (vel.lengthSqr() > getMaxSpeed() * getMaxSpeed()) {
+            vel = vel.normalize().scale(getMaxSpeed());
+        }
+
+        Vec3 nextPos = getPos().add(vel);
+
+        float yaw = getYaw();
+        float pitch = getPitch();
+
+        // 自动根据速度向量推导朝向
+        if (vel.lengthSqr() > 1e-5) {
+            Vec3 dir = vel.normalize();
+            yaw = (float) (Math.atan2(-dir.x, dir.z) * (180D / Math.PI));
+            double horiz = Math.sqrt(dir.x * dir.x + dir.z * dir.z);
+            pitch = (float) (Math.atan2(-dir.y, horiz) * (180D / Math.PI));
+        }
+
+        setPath(Collections.singletonList(
+                new PathNode("", nextPos, yaw, pitch, getRoll())
+        ));
+
+        setVelocity(vel.scale(getFriction()));
+    }
+    // ---------------------------------------------
+
+    public void tick() {
+        if (removed) {
+            return;
+        }
+
+        // 服务端主人离线则销毁
         if (getOwner() == null && !level.isClientSide()) {
             discard();
             return;
@@ -72,11 +129,14 @@ public abstract class AdvancedProjectile {
             this.historyNodes.set(0, consumed);
             onPathNodeConsumed(consumed);
         }
+
         if (this instanceof IProjectileCollider iProjectileCollider) {
             iProjectileCollider.processCollision(this);
         }
-        if (getFutureNodes().isEmpty() && this instanceof IProjectileMomentum iProjectileMomentum) {
-            iProjectileMomentum.processMomentum(this);
+
+        // 动量推算
+        if (getFutureNodes().isEmpty()) {
+            processMomentum();
         }
     }
 
@@ -93,9 +153,12 @@ public abstract class AdvancedProjectile {
 
         int packedLight = LevelRenderer.getLightColor(level, BlockPos.containing(renderNode.pos()));
         render(poseStack, bufferSource, partialTick, packedLight, renderNode);
-        if (this instanceof IProjectileTrail iProjectileTrail) {
-            iProjectileTrail.processTrailRender(poseStack, bufferSource, partialTick, this, renderNode);
+
+        // 渲染圆锥形轨迹
+        if (this instanceof IProjectileConeTrail iProjectileConeTrail) {
+            iProjectileConeTrail.processTrailRender(poseStack, bufferSource, partialTick, this, renderNode);
         }
+
         if (this instanceof IProjectileCollider iProjectileCollider) {
             if (Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes()) {
                 iProjectileCollider.renderDebugHitbox(poseStack, bufferSource, renderNode.yaw(), renderNode.pitch(), renderNode.roll());
@@ -113,18 +176,18 @@ public abstract class AdvancedProjectile {
         buf.writeBoolean(removed);
         buf.writeInt(this.tickCount);
 
-        // 【核心修复】：序列化主人 UUID 供客户端读取
-        buf.writeBoolean(this.ownerUuid != null);
-        if (this.ownerUuid != null) {
-            buf.writeUUID(this.ownerUuid);
-        }
-
         buf.writeInt(this.futureNodes.size());
         for (PathNode node : this.futureNodes) {
             buf.writeUtf(node.feature());
             buf.writeDouble(node.pos().x); buf.writeDouble(node.pos().y); buf.writeDouble(node.pos().z);
             buf.writeFloat(node.yaw()); buf.writeFloat(node.pitch()); buf.writeFloat(node.roll());
         }
+
+        // 同步速度以维持客户端的平滑预测
+        buf.writeDouble(this.velocity.x);
+        buf.writeDouble(this.velocity.y);
+        buf.writeDouble(this.velocity.z);
+
         writeAdditional(buf);
     }
 
@@ -134,18 +197,13 @@ public abstract class AdvancedProjectile {
         this.removed = buf.readBoolean();
         this.tickCount = buf.readInt();
 
-        // 【核心修复】：反序列化主人 UUID
-        if (buf.readBoolean()) {
-            this.ownerUuid = buf.readUUID();
-        } else {
-            this.ownerUuid = null;
-        }
-
         int pathSize = buf.readInt();
         this.futureNodes.clear();
         for (int i = 0; i < pathSize; i++) {
             this.futureNodes.add(new PathNode(buf.readUtf(), new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()), buf.readFloat(), buf.readFloat(), buf.readFloat()));
         }
+
+        this.velocity = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
 
         if (this.firstSync || this.historyNodes.isEmpty() || this.historyNodes.getFirst().pos().distanceToSqr(syncCurrent.pos()) > 100.0) {
             this.historyNodes.clear();
@@ -158,14 +216,6 @@ public abstract class AdvancedProjectile {
 
     protected void writeAdditional(RegistryFriendlyByteBuf buf) {}
     protected void readAdditional(RegistryFriendlyByteBuf buf) {}
-
-    // 【核心修复】：双端懒加载解析主人 Player
-    public Player getOwner() {
-        if (this.owner == null && this.ownerUuid != null && this.level != null) {
-            this.owner = this.level.getPlayerByUUID(this.ownerUuid);
-        }
-        return this.owner;
-    }
 
     public int getHistoryNodesSize() { return 16; }
     public void discard() { this.removed = true; }
@@ -181,7 +231,9 @@ public abstract class AdvancedProjectile {
 
     public void setPath(List<PathNode> nodes) {
         this.futureNodes.clear();
-        if (nodes != null) this.futureNodes.addAll(nodes);
+        if (nodes != null) {
+            this.futureNodes.addAll(nodes);
+        }
     }
 
     public Vec3 getPos() { return this.historyNodes.getFirst().pos(); }

@@ -702,7 +702,6 @@ public class Terraprism extends Servant implements IDamagingOnCollide, ITrailRen
         @Override public boolean isFinished() { return false; }
     }
 
-
     // ================== 渲染逻辑 (完全保留) ==================
 
     private void buildRibbon(VertexConsumer consumer, Matrix4f pose, PoseStack.Pose last, Vec3 cRel, Vec3 pRel, Vector3f cTip, Vector3f pTip, Vector3f cBase, Vector3f pBase, int cTipC, int pTipC, int cBaseC, int pBaseC) {

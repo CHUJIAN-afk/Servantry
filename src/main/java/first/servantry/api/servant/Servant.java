@@ -6,16 +6,12 @@ import first.servantry.api.ai.ServantAction;
 import first.servantry.api.register.ServantType;
 import first.servantry.register.AttributeRegister;
 import first.servantry.register.DamageRegister;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Targeting;
 import net.minecraft.world.entity.monster.Enemy;
@@ -34,12 +30,10 @@ public abstract class Servant {
     private final LinkedList<PathNode> historyNodes = new LinkedList<>();
     private final LinkedList<PathNode> futureNodes = new LinkedList<>();
     private boolean firstSync = true;
+    private LivingEntity target = null;
 
-    protected int targetId = -1;
-    protected int stateTick = 0;
-
-    // 【新增】：下沉到基类的动作控制器
     protected ActionController<?> ai;
+
 
     public Servant(PathNode node) {
         this.uuid = UUID.randomUUID();
@@ -159,35 +153,11 @@ public abstract class Servant {
     }
 
     public LivingEntity getTarget() {
-        if (owner == null || targetId == -1) return null;
-        Entity e = owner.level().getEntity(targetId);
-        if (e instanceof LivingEntity le && le.isAlive()) return le;
-        targetId = -1;
-        return null;
+        return target;
     }
 
     public void setTarget(LivingEntity target) {
-        this.targetId = target != null ? target.getId() : -1;
-    }
-
-    public void renderInternal(float partialTick, PoseStack poseStack, MultiBufferSource bufferSource) {
-        PathNode current = this.historyNodes.getFirst();
-        PathNode last = this.historyNodes.size() > 1 ? this.historyNodes.get(1) : current;
-        PathNode renderNode = last.lerp(current, partialTick);
-        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-        poseStack.pushPose();
-        poseStack.translate(renderNode.pos().x - cameraPos.x, renderNode.pos().y - cameraPos.y, renderNode.pos().z - cameraPos.z);
-        int packedLight = LevelRenderer.getLightColor(owner.level(), BlockPos.containing(renderNode.pos().x, renderNode.pos().y, renderNode.pos().z));
-        render(poseStack, bufferSource, partialTick, packedLight, renderNode);
-        if (this instanceof ITrailRenderer trailRenderer) {
-            trailRenderer.processTrailRender(poseStack, bufferSource, partialTick, this, renderNode);
-        }
-        if (this instanceof IDamagingOnCollide iDamagingOnCollide) {
-            if (Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes()) {
-                iDamagingOnCollide.renderDebugHitbox(poseStack, bufferSource, renderNode.yaw(), renderNode.pitch(), renderNode.roll());
-            }
-        }
-        poseStack.popPose();
+        this.target = target;
     }
 
     public void writeBase(RegistryFriendlyByteBuf buf) {
@@ -199,9 +169,6 @@ public abstract class Servant {
         buf.writeFloat(current.yaw());
         buf.writeFloat(current.pitch());
         buf.writeFloat(current.roll());
-
-        buf.writeInt(this.targetId);
-        buf.writeInt(this.stateTick);
 
         buf.writeInt(this.futureNodes.size());
         for (PathNode node : this.futureNodes) {
@@ -229,9 +196,6 @@ public abstract class Servant {
                 buf.readFloat(),
                 buf.readFloat()
         );
-
-        this.targetId = buf.readInt();
-        this.stateTick = buf.readInt();
 
         int pathSize = buf.readInt();
         this.futureNodes.clear();

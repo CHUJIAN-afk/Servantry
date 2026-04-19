@@ -19,7 +19,6 @@ public class Registries {
     private static final ResourceKey<Registry<MarkerType>> MARKER_TYPE_KEY = ResourceKey.createRegistryKey(Servantry.rl("marker_types"));
     public static final Registry<MarkerType> MARKER_TYPES = new RegistryBuilder<>(MARKER_TYPE_KEY).sync(true).create();
 
-    // 【新增】：射弹类型的注册表
     private static final ResourceKey<Registry<ProjectileType<? extends AdvancedProjectile>>> PROJECTILE_TYPE_KEY = ResourceKey.createRegistryKey(Servantry.rl("projectile_types"));
     public static final Registry<ProjectileType<? extends AdvancedProjectile>> PROJECTILE_TYPES = new RegistryBuilder<>(PROJECTILE_TYPE_KEY).sync(true).create();
 
@@ -27,6 +26,6 @@ public class Registries {
     public static void createRegistry(NewRegistryEvent event) {
         event.register(SERVANT_TYPES);
         event.register(MARKER_TYPES);
-        event.register(PROJECTILE_TYPES); // 注册射弹
+        event.register(PROJECTILE_TYPES);
     }
 }

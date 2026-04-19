@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "N": {
+      "item": "minecraft:nether_star"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "  N",
+    " N ",
+    "S  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "servantry:stardust_cell_staff"
+  }
+}
