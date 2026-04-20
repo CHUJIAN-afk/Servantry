@@ -3,11 +3,20 @@ package first.servantry.api.ai;
 import first.servantry.api.servant.Servant;
 import net.minecraft.world.entity.LivingEntity;
 
-public class ActionController<T extends Servant> {
+public class ActionController<T extends Servant> implements ServantAi {
     private final T servant;
     private final ServantAction<T> defaultAction;
     private ServantAction<T> currentAction;
     private boolean isChangingAction = false;
+
+    @Override public String getCurrentId() {
+        return currentAction != null ? currentAction.getId() : "idle";
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override public void setClientState(String id) {
+        this.currentAction = (ServantAction<T>) servant.createAction(id);
+    }
 
     public ActionController(T servant, ServantAction<T> defaultAction) {
         this.servant = servant;

@@ -2,6 +2,7 @@ package first.servantry.api.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.ai.ActionController;
+import first.servantry.api.ai.ServantAi;
 import first.servantry.api.ai.ServantAction;
 import first.servantry.api.register.ServantType;
 import first.servantry.register.AttributeRegister;
@@ -32,7 +33,7 @@ public abstract class Servant {
     private boolean firstSync = true;
     private LivingEntity target = null;
 
-    protected ActionController<?> ai;
+    protected ServantAi ai;
 
 
     public Servant(PathNode node) {
@@ -182,7 +183,7 @@ public abstract class Servant {
         }
 
         // 【核心修改】：序列化写入当前的 Action ID
-        buf.writeUtf(this.ai != null && this.ai.getCurrentAction() != null ? this.ai.getCurrentAction().getId() : "idle");
+        buf.writeUtf(this.ai != null ? this.ai.getCurrentId() : "idle");
 
         writeAdditional(buf);
     }
@@ -211,10 +212,8 @@ public abstract class Servant {
 
         // 【核心修改】：读取 Action ID 并执行幽灵同步更新客户端状态
         String actionId = buf.readUtf();
-        if (this.ai != null) {
-            if (this.ai.getCurrentAction() == null || !this.ai.getCurrentAction().getId().equals(actionId)) {
-                ((ActionController<Servant>) this.ai).setClientAction((ServantAction<Servant>) this.createAction(actionId));
-            }
+        if (this.ai != null && !actionId.equals(this.ai.getCurrentId())) {
+            this.ai.setClientState(actionId);
         }
 
         if (this.firstSync || this.historyNodes.isEmpty() || this.historyNodes.getFirst().pos().distanceToSqr(syncCurrent.pos()) > 100.0) {
