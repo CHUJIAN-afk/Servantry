@@ -93,7 +93,7 @@ public abstract class AdvancedProjectile {
         }
 
         setPath(Collections.singletonList(
-                new PathNode("", nextPos, yaw, pitch, getRoll())
+                new PathNode( nextPos, yaw, pitch, getRoll())
         ));
 
         setVelocity(vel.scale(getFriction()));
@@ -169,16 +169,20 @@ public abstract class AdvancedProjectile {
 
     public void writeSyncData(RegistryFriendlyByteBuf buf) {
         PathNode current = this.historyNodes.getFirst();
-        buf.writeUtf(current.feature());
-        buf.writeDouble(current.pos().x); buf.writeDouble(current.pos().y); buf.writeDouble(current.pos().z);
-        buf.writeFloat(current.yaw()); buf.writeFloat(current.pitch()); buf.writeFloat(current.roll());
+        //buf.writeUtf(current.feature());
+        buf.writeDouble(current.pos().x);
+        buf.writeDouble(current.pos().y);
+        buf.writeDouble(current.pos().z);
+        buf.writeFloat(current.yaw());
+        buf.writeFloat(current.pitch());
+        buf.writeFloat(current.roll());
 
         buf.writeBoolean(removed);
         buf.writeInt(this.tickCount);
 
         buf.writeInt(this.futureNodes.size());
         for (PathNode node : this.futureNodes) {
-            buf.writeUtf(node.feature());
+            //buf.writeUtf(node.feature());
             buf.writeDouble(node.pos().x); buf.writeDouble(node.pos().y); buf.writeDouble(node.pos().z);
             buf.writeFloat(node.yaw()); buf.writeFloat(node.pitch()); buf.writeFloat(node.roll());
         }
@@ -192,7 +196,7 @@ public abstract class AdvancedProjectile {
     }
 
     public void readSyncData(RegistryFriendlyByteBuf buf) {
-        PathNode syncCurrent = new PathNode(buf.readUtf(), new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()), buf.readFloat(), buf.readFloat(), buf.readFloat());
+        //PathNode syncCurrent = new PathNode(buf.readUtf(), new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()), buf.readFloat(), buf.readFloat(), buf.readFloat());
 
         this.removed = buf.readBoolean();
         this.tickCount = buf.readInt();
@@ -200,17 +204,18 @@ public abstract class AdvancedProjectile {
         int pathSize = buf.readInt();
         this.futureNodes.clear();
         for (int i = 0; i < pathSize; i++) {
-            this.futureNodes.add(new PathNode(buf.readUtf(), new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()), buf.readFloat(), buf.readFloat(), buf.readFloat()));
+            //this.futureNodes.add(new PathNode(buf.readUtf(), new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()), buf.readFloat(), buf.readFloat(), buf.readFloat()));
         }
 
         this.velocity = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
-
+/*
         if (this.firstSync || this.historyNodes.isEmpty() || this.historyNodes.getFirst().pos().distanceToSqr(syncCurrent.pos()) > 100.0) {
             this.historyNodes.clear();
-            this.historyNodes.addFirst(syncCurrent);
-            this.historyNodes.addFirst(syncCurrent);
+            //this.historyNodes.addFirst(syncCurrent);
+            //this.historyNodes.addFirst(syncCurrent);
             this.firstSync = false;
         }
+        */
         readAdditional(buf);
     }
 
@@ -239,7 +244,7 @@ public abstract class AdvancedProjectile {
     public Vec3 getPos() { return this.historyNodes.getFirst().pos(); }
     public void setPos(Vec3 pos) {
         PathNode n = this.historyNodes.getFirst();
-        this.historyNodes.set(0, new PathNode(n.feature(), pos, n.yaw(), n.pitch(), n.roll()));
+        //this.historyNodes.set(0, new PathNode(n.feature(), pos, n.yaw(), n.pitch(), n.roll()));
     }
     public float getYaw() { return this.historyNodes.getFirst().yaw(); }
     public float getPitch() { return this.historyNodes.getFirst().pitch(); }

@@ -1,12 +1,6 @@
 package first.servantry.api.servant;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import first.servantry.api.OBB;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -15,19 +9,11 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
 
-/**
- * 为仆从实现此接口让仆从拥有对目标的碰撞判定
- */
-public interface IDamagingOnCollide {
+public interface ICollide {
 
-    /**
-     * 碰撞采样的节点数量。
-     * 默认为 2（即当前刻与上一刻）。
-     * 如果返回 3，则会拼接计算 [上上刻->上一刻] 和 [上一刻->当前刻] 两段轨迹的碰撞。
-     */
-    default int getCollisionSampleNodes() {
-        return 2;
-    }
+    AABB getHitbox();
+
+    void collisionAttack(Set<LivingEntity> hitTargets);
 
     default void processCollision(Servant servant) {
         AABB localBox = getHitbox();
@@ -113,26 +99,8 @@ public interface IDamagingOnCollide {
         }
     }
 
-    default void renderDebugHitbox(PoseStack poseStack, MultiBufferSource bufferSource, float yaw, float pitch, float roll) {
-        poseStack.pushPose();
-        poseStack.mulPose(Axis.YN.rotationDegrees(yaw));
-        poseStack.mulPose(Axis.XP.rotationDegrees(pitch));
-        poseStack.translate(0, 0, 0.5);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(roll));
-        VertexConsumer consumer = bufferSource.getBuffer(RenderType.lines());
-        LevelRenderer.renderLineBox(poseStack, consumer, this.getHitbox(), 1.0F, 0.0F, 0.0F, 1.0F);
-        poseStack.popPose();
+    default int getCollisionSampleNodes() {
+        return 2;
     }
-
-    /**
-     * 仆从碰撞箱大小与偏移，以当前位置为原点，会同时在客户端以红框渲染
-     */
-    AABB getHitbox();
-
-    /**
-     * 当仆从在历史轨迹中发生碰撞时触发。
-     * @param hitTargets 撞到的目标
-     */
-    void collisionAttack(Set<LivingEntity> hitTargets);
 
 }

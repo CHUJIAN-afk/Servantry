@@ -28,7 +28,7 @@ public interface IMomentumControlled {
         Vec3 nextPos = servant.getPos().add(vel);
 
         // 自动利用 Servant 的路径系统执行位移
-        servant.setPath(Collections.singletonList(new PathNode("", nextPos, servant.getYaw(), servant.getPitch(), servant.getRoll())));
+        servant.setPath(Collections.singletonList(new PathNode( nextPos, servant.getYaw(), servant.getPitch(), servant.getRoll())));
         // 摩擦力衰减
         setVelocity(vel.scale(getFriction()));
     }

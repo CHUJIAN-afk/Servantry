@@ -1,13 +1,9 @@
 package first.servantry.api.servant;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.ai.ActionController;
-import first.servantry.api.ai.ServantAi;
-import first.servantry.api.ai.ServantAction;
+import first.servantry.api.ai.ServantGoalSelector;
 import first.servantry.api.register.ServantType;
-import first.servantry.register.AttributeRegister;
+import first.servantry.register.AttachmentRegister;
 import first.servantry.register.DamageRegister;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -19,7 +15,6 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -28,68 +23,120 @@ public abstract class Servant {
 
     private UUID uuid;
     private Player owner;
+    private PlannedPath currentPlannedPath = null;
     private final LinkedList<PathNode> historyNodes = new LinkedList<>();
-    private final LinkedList<PathNode> futureNodes = new LinkedList<>();
-    private boolean firstSync = true;
+    private PathNode currentPathNode;
+    private PathNode clientTargetNode;
+    private final ServantGoalSelector goalSelector = new ServantGoalSelector();
     private LivingEntity target = null;
+    private boolean targetChange = false;
 
-    protected ServantAi ai;
-
-
-    public Servant(PathNode node) {
+    public Servant(PathNode pathNode) {
         this.uuid = UUID.randomUUID();
-        this.owner = null;
-        this.historyNodes.addFirst(node);
-        this.historyNodes.addFirst(node);
+        this.currentPathNode = pathNode;
+        historyNodes.addFirst(pathNode);
+        historyNodes.addFirst(pathNode);
+        registerGoals(goalSelector);
     }
 
-    public abstract float getBaseDamage();
+    public abstract void registerGoals(ServantGoalSelector goalSelector);
 
-    public abstract float getBaseKnockback();
+    public abstract void writeAdditional(RegistryFriendlyByteBuf buf);
 
-    public abstract void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode);
+    public abstract void readAdditional(RegistryFriendlyByteBuf buf);
+
+    public abstract float getDamage();
+
+    public abstract float getKnockback();
 
     public abstract ServantType<? extends Servant> getType();
 
-    public void onPathNodeConsumed(PathNode node) {
+    public void tick() {
+        if (!owner.level().isClientSide()) {
+            setTargetChange(false);
+            setTarget(searchTarget());
+            this.goalSelector.tick();
+            if (this instanceof ICollide iCollide) {
+                iCollide.processCollision(this);
+            }
+            if (this.currentPlannedPath != null && !this.currentPlannedPath.isFinished()) {
+                this.currentPathNode = this.currentPlannedPath.advance();
+            }
+        } else {
+            this.currentPathNode = clientTargetNode;
+        }
+        this.historyNodes.addFirst(this.currentPathNode);
+        if (this.historyNodes.size() > getHistoryNodesSize()) {
+            this.historyNodes.removeLast();
+        }
     }
 
-    // 【新增】：强制子类提供实例化特定 ID Action 的工厂方法
-    public abstract ServantAction<?> createAction(String id);
+    public int getOrder() {
+        return getOwner().getData(AttachmentRegister.ServantData).getOrder(this);
+    }
+
+    public void attack(LivingEntity target) {
+        int invulnerableTime = target.invulnerableTime;
+        target.invulnerableTime = 0;
+        target.hurt(getDamageSource(), getDamage());
+        target.invulnerableTime = invulnerableTime;
+    }
+
+    public void setPlannedPath(PlannedPath path) {
+        this.currentPlannedPath = path;
+    }
+
+    public PlannedPath getCurrentPath() {
+        return this.currentPlannedPath;
+    }
+
+    public PathNode getCurrentPathNode() {
+        return currentPathNode;
+    }
+
+    public boolean isExecutingPath() {
+        return this.currentPlannedPath != null && !this.currentPlannedPath.isFinished();
+    }
+
+    public PathNode getRenderNode(float partialTick) {
+        return historyNodes.get(1).lerp(currentPathNode, partialTick);
+    }
+
+    public LivingEntity searchTarget() {
+        return owner.level().getEntitiesOfClass(LivingEntity.class, owner.getBoundingBox().inflate(16)).stream()
+                .filter(this::isTarget)
+                .findFirst()
+                .orElse(null);
+    }
 
     public boolean isTarget(LivingEntity target) {
-        if (owner != target) {
-            boolean isActive0 = target instanceof Enemy;
-            boolean isActive1 = target instanceof Targeting targeting && targeting.getTarget() == owner;
-            boolean isActive2 = owner.getLastHurtByMob() != null && owner.getLastHurtByMob() == target;
-            return isActive0 || isActive1 || isActive2;
+        if (target != null && owner != target && target.isAlive()) {
+            boolean condition0 = target instanceof Enemy;
+            boolean condition1 = target instanceof Targeting targeting && targeting.getTarget() == owner;
+            boolean condition2 = owner.getLastHurtByMob() == target;
+            return condition0 || condition1 || condition2;
         }
         return false;
     }
 
-    public void tick() {
-        if (!this.historyNodes.isEmpty()) {
-            this.historyNodes.addFirst(this.historyNodes.getFirst());
-            if (this.historyNodes.size() > getHistoryNodesSize()) {
-                this.historyNodes.removeLast();
-            }
-        }
-        if (!this.futureNodes.isEmpty()) {
-            PathNode consumed = this.futureNodes.poll();
-            this.historyNodes.set(0, consumed);
-            this.onPathNodeConsumed(consumed);
-        }
-        if (this instanceof IDamagingOnCollide iDamagingOnCollide) {
-            iDamagingOnCollide.processCollision(this);
-        }
-        if (this instanceof IMomentumControlled iMomentumControlled) {
-            iMomentumControlled.tickMomentum(this);
-        }
+    public ServantDamageSource getDamageSource() {
+        Registry<DamageType> damageTypes = owner.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        return new ServantDamageSource(damageTypes.getHolderOrThrow(DamageRegister.Servant), null, owner, currentPathNode.pos(), this);
     }
 
-    public ServantDamageSource getDamageSource() {
-        Registry<DamageType> damageTypes = getOwner().level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
-        return new ServantDamageSource(damageTypes.getHolderOrThrow(DamageRegister.Servant), null, getOwner(), getPos(), this);
+    public void writeBase(RegistryFriendlyByteBuf buf) {
+        buf.writeDouble(currentPathNode.pos().x());
+        buf.writeDouble(currentPathNode.pos().y());
+        buf.writeDouble(currentPathNode.pos().z());
+        buf.writeFloat(currentPathNode.yaw());
+        buf.writeFloat(currentPathNode.pitch());
+        buf.writeFloat(currentPathNode.roll());
+        writeAdditional(buf);
+    }
+
+    public void readBase(RegistryFriendlyByteBuf buf) {
+        this.clientTargetNode = new PathNode(new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()), buf.readFloat(), buf.readFloat(), buf.readFloat());
+        readAdditional(buf);
     }
 
     public int getHistoryNodesSize() {
@@ -100,195 +147,41 @@ public abstract class Servant {
         return historyNodes;
     }
 
-    public LinkedList<PathNode> getFutureNodes() {
-        return futureNodes;
-    }
+    public Vec3 getPos() { return currentPathNode.pos(); }
+    public float getYaw() { return currentPathNode.yaw(); }
+    public float getPitch() { return currentPathNode.pitch(); }
+    public float getRoll() { return currentPathNode.roll(); }
 
     public void setPath(List<PathNode> nodes) {
-        this.futureNodes.clear();
-        if (nodes == null || nodes.isEmpty()) return;
-
-        int originalSize = nodes.size();
-        double speed = 1.0;
-
-        if (getOwner() != null && getOwner().getAttribute(AttributeRegister.ServantSpeed) != null) {
-            speed = getOwner().getAttribute(AttributeRegister.ServantSpeed).getValue();
-        }
-        speed = Math.max(0.01, speed);
-
-        if (originalSize < 2 || Math.abs(speed - 1.0) < 0.01) {
-            this.futureNodes.addAll(nodes);
-            return;
-        }
-
-        int newSize = Math.max(2, (int) Math.round(originalSize / speed));
-        List<PathNode> resampledNodes = new ArrayList<>(newSize);
-
-        for (int i = 0; i < newSize; i++) {
-            float t = i / (float) (newSize - 1);
-            float fIdx = t * (originalSize - 1);
-
-            int idx0 = (int) Math.floor(fIdx);
-            int idx1 = Math.min(idx0 + 1, originalSize - 1);
-            float fraction = fIdx - idx0;
-
-            PathNode p0 = nodes.get(idx0);
-            PathNode p1 = nodes.get(idx1);
-
-            Vec3 pos = p0.pos().lerp(p1.pos(), fraction);
-            float yaw = Mth.rotLerp(fraction, p0.yaw(), p1.yaw());
-            float pitch = Mth.rotLerp(fraction, p0.pitch(), p1.pitch());
-            float roll = Mth.rotLerp(fraction, p0.roll(), p1.roll());
-
-            String feature = fraction < 0.5f ? p0.feature() : p1.feature();
-            if (i == 0) feature = nodes.get(0).feature();
-            if (i == newSize - 1) feature = nodes.get(originalSize - 1).feature();
-
-            resampledNodes.add(new PathNode(feature, pos, yaw, pitch, roll));
-        }
-        this.futureNodes.addAll(resampledNodes);
-    }
-
-    public boolean isExecutingPath() {
-        return !this.futureNodes.isEmpty();
-    }
-
-    public LivingEntity getTarget() {
-        return target;
-    }
-
-    public void setTarget(LivingEntity target) {
-        this.target = target;
-    }
-
-    public void writeBase(RegistryFriendlyByteBuf buf) {
-        PathNode current = this.historyNodes.getFirst();
-        buf.writeUtf(current.feature());
-        buf.writeDouble(current.pos().x);
-        buf.writeDouble(current.pos().y);
-        buf.writeDouble(current.pos().z);
-        buf.writeFloat(current.yaw());
-        buf.writeFloat(current.pitch());
-        buf.writeFloat(current.roll());
-
-        buf.writeInt(this.futureNodes.size());
-        for (PathNode node : this.futureNodes) {
-            buf.writeUtf(node.feature());
-            buf.writeDouble(node.pos().x);
-            buf.writeDouble(node.pos().y);
-            buf.writeDouble(node.pos().z);
-            buf.writeFloat(node.yaw());
-            buf.writeFloat(node.pitch());
-            buf.writeFloat(node.roll());
-        }
-
-        // 【核心修改】：序列化写入当前的 Action ID
-        buf.writeUtf(this.ai != null ? this.ai.getCurrentId() : "idle");
-
-        writeAdditional(buf);
-    }
-
-    @SuppressWarnings("unchecked")
-    public void readBase(RegistryFriendlyByteBuf buf) {
-        PathNode syncCurrent = new PathNode(
-                buf.readUtf(),
-                new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()),
-                buf.readFloat(),
-                buf.readFloat(),
-                buf.readFloat()
-        );
-
-        int pathSize = buf.readInt();
-        this.futureNodes.clear();
-        for (int i = 0; i < pathSize; i++) {
-            this.futureNodes.add(new PathNode(
-                    buf.readUtf(),
-                    new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()),
-                    buf.readFloat(),
-                    buf.readFloat(),
-                    buf.readFloat()
-            ));
-        }
-
-        // 【核心修改】：读取 Action ID 并执行幽灵同步更新客户端状态
-        String actionId = buf.readUtf();
-        if (this.ai != null && !actionId.equals(this.ai.getCurrentId())) {
-            this.ai.setClientState(actionId);
-        }
-
-        if (this.firstSync || this.historyNodes.isEmpty() || this.historyNodes.getFirst().pos().distanceToSqr(syncCurrent.pos()) > 100.0) {
-            this.historyNodes.clear();
-            this.historyNodes.addFirst(syncCurrent);
-            this.historyNodes.addFirst(syncCurrent);
-            this.firstSync = false;
-        }
-        readAdditional(buf);
-    }
-
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-    }
-
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
+        this.currentPlannedPath = new PlannedPath("default", nodes);
     }
 
     public LinkedList<PathNode> getPathQueue() {
-        return this.futureNodes;
+        if (currentPlannedPath == null) return new LinkedList<>();
+        return new LinkedList<>(currentPlannedPath.getNodes().subList(currentPlannedPath.getCurrentIndex(), currentPlannedPath.getNodes().size()));
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public ServantGoalSelector getGoalSelector() { return goalSelector; }
+
+    public UUID getUuid() { return uuid; }
+    public void setUuid(UUID uuid) { this.uuid = uuid; }
+    public Player getOwner() { return owner; }
+    public void setOwner(Player owner) { this.owner = owner; }
+    public LivingEntity getTarget() { return target; }
+
+    public void setTarget(LivingEntity target) {
+        if (this.target != target) {
+            setTargetChange(true);
+        }
+        this.target = target;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public boolean isTargetChange() {
+        return targetChange;
     }
 
-    public Player getOwner() {
-        return owner;
-    }
-
-    public void setOwner(Player owner) {
-        this.owner = owner;
-    }
-
-    public Vec3 getPos() {
-        return this.historyNodes.getFirst().pos();
-    }
-
-    public void setPos(Vec3 pos) {
-        PathNode n = this.historyNodes.getFirst();
-        this.historyNodes.set(0, new PathNode(n.feature(), pos, n.yaw(), n.pitch(), n.roll()));
-    }
-
-    public Vec3 getLastPos() {
-        return this.historyNodes.size() > 1 ? this.historyNodes.get(1).pos() : getPos();
-    }
-
-    public float getYaw() {
-        return this.historyNodes.getFirst().yaw();
-    }
-
-    public void setYaw(float yaw) {
-        PathNode n = this.historyNodes.getFirst();
-        this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), yaw, n.pitch(), n.roll()));
-    }
-
-    public float getPitch() {
-        return this.historyNodes.getFirst().pitch();
-    }
-
-    public void setPitch(float pitch) {
-        PathNode n = this.historyNodes.getFirst();
-        this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), n.yaw(), pitch, n.roll()));
-    }
-
-    public float getRoll() {
-        return this.historyNodes.getFirst().roll();
-    }
-
-    public void setRoll(float roll) {
-        PathNode n = this.historyNodes.getFirst();
-        this.historyNodes.set(0, new PathNode(n.feature(), n.pos(), n.yaw(), n.pitch(), roll));
+    public void setTargetChange(boolean targetChange) {
+        this.targetChange = targetChange;
     }
 
     public Vec3 slerpVector(Vec3 v1, Vec3 v2, float t) {
@@ -300,7 +193,7 @@ public abstract class Servant {
         return v1.scale(Math.cos(theta)).add(relativeVec.scale(Math.sin(theta)));
     }
 
-    public PathNode getEulerNode(Vec3 pos, Vec3 tipDir, Vec3 bladeNormal, String feature) {
+    public PathNode getEulerNode(Vec3 pos, Vec3 tipDir, Vec3 bladeNormal) {
         if (tipDir.lengthSqr() < 1e-4) tipDir = new Vec3(0, 0, 1);
         tipDir = tipDir.normalize();
 
@@ -316,7 +209,7 @@ public abstract class Servant {
         Vec3 cross = defaultUp.cross(projNormal);
         float roll = (float) (Math.atan2(cross.dot(tipDir), dot) * (180D / Math.PI));
 
-        return new PathNode(feature == null ? "" : feature, pos, yaw, pitch, roll);
+        return new PathNode(pos, yaw, pitch, roll);
     }
 
 }

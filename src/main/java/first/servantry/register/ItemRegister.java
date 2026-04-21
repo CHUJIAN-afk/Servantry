@@ -8,7 +8,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -20,11 +19,9 @@ public class ItemRegister {
     private static final DeferredRegister.Items Register = DeferredRegister.createItems(Servantry.MODID);
 
     public static class RenderItem extends Item {
-
         public RenderItem(Properties properties) {
             super(properties);
         }
-
     }
 
     public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
@@ -33,12 +30,12 @@ public class ItemRegister {
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();
                         ServantData data = owner.getData(AttachmentRegister.ServantData);
-                        PathNode node = servant.getInterpolatedIdleState(owner, data.getOrder(servant), data.getSameSize(servant), 1);
+                        PathNode node = servant.getInterpolatedIdleState(owner, 1);
                         servant.setPath(List.of(node));
                     })
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
-
+/*
     public static final DeferredItem<Item> EnchantedThrowingKnives = Register.registerItem("enchanted_throwing_knives_render_item", RenderItem::new);
     public static final DeferredItem<Item> BladeStaff = Register.register("blade_staff", () ->
             new IServantWeapon.Builder<>(ServantRegister.EnchantedThrowingKnives)
@@ -70,7 +67,7 @@ public class ItemRegister {
                     .onSummon(servant -> servant.setPos(servant.getOwner().position().add(0, 3, 0)))
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
-
+*/
     // 2. 注册套装物品
     public static final DeferredItem<Item> HallowedHelmet = Register.register("hallowed_helmet", () -> new ArmorItem(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET, new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(6)).rarity(Rarity.UNCOMMON)));
 

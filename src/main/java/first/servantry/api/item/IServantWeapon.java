@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 public interface IServantWeapon<T extends Servant> {
 
     static <T extends Servant> void handleSummon(Player player, IServantWeapon<T> weapon) {
-        T servant = weapon.getType().factory().apply(new PathNode("", Vec3.ZERO, 0, 0, 0));
+        T servant = weapon.getType().factory().apply(new PathNode(Vec3.ZERO, 0, 0, 0));
         servant.setOwner(player);
         ServantData data = player.getData(AttachmentRegister.ServantData);
         if (data.summon(player, servant)) {
@@ -36,14 +36,14 @@ public interface IServantWeapon<T extends Servant> {
      * 武器面板伤害：直接读取仆从的真实伤害
      */
     default float getDamage() {
-        return getDummyServant().getBaseDamage();
+        return getDummyServant().getDamage();
     }
 
     /**
      * 武器面板击退：直接读取仆从的真实击退
      */
     default float getKnockback() {
-        return getDummyServant().getBaseKnockback();
+        return getDummyServant().getKnockback();
     }
 
     default void summon(T servant) {}
@@ -93,7 +93,7 @@ public interface IServantWeapon<T extends Servant> {
                 @Override
                 public T getDummyServant() {
                     if (dummyServant == null) {
-                        dummyServant = getType().factory().apply(new PathNode("", Vec3.ZERO, 0, 0, 0));
+                        dummyServant = getType().factory().apply(new PathNode(Vec3.ZERO, 0, 0, 0));
                     }
                     return dummyServant;
                 }

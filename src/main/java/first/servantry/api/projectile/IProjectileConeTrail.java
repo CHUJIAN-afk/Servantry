@@ -2,9 +2,8 @@ package first.servantry.api.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import first.servantry.api.servant.ITrailRenderer;
+import first.servantry.api.client.ITrailRenderer;
 import first.servantry.api.servant.PathNode;
-import first.servantry.common.projectile.StardustLaser;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -113,9 +112,9 @@ public interface IProjectileConeTrail {
 
         // 【新增】获取消散进度（如果适用）
         float deathProgress = 0.0f;
-        if (projectile instanceof StardustLaser laser) {
-            deathProgress = laser.getDeathProgress();
-        }
+        //if (projectile instanceof StardustLaser laser) {
+           // deathProgress = laser.getDeathProgress();
+        //}
 
         VertexConsumer consumer = bufferSource.getBuffer(ITrailRenderer.TrailRenderType.getTrail());
         Matrix4f pose = poseStack.last().pose();

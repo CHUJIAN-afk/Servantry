@@ -1,9 +1,11 @@
-package first.servantry.api.servant;
+package first.servantry.api.client;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import first.servantry.Servantry;
+import first.servantry.api.servant.PathNode;
+import first.servantry.api.servant.Servant;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.Vec3;
@@ -76,7 +78,7 @@ public interface ITrailRenderer {
         for (int i = 0; i < actualLength; i++) {
             renderNodesArray[i] = iterator.next();
         }
-        renderNodesArray[0] = new PathNode("", visualRenderPos, visualNode.yaw(), visualNode.pitch(), visualNode.roll());
+        renderNodesArray[0] = new PathNode(visualRenderPos, visualNode.yaw(), visualNode.pitch(), visualNode.roll());
 
         int endIndex = renderNodesArray.length - 1;
         int startIndex = Math.max(0, getTrailStartIndex());

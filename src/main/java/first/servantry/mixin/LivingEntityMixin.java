@@ -21,7 +21,7 @@ public class LivingEntityMixin {
     )
     private double knockback(double strength, @Local(argsOnly = true) DamageSource damageSource) {
         if (damageSource instanceof ServantDamageSource servantDamageSource) {
-            return servantDamageSource.getServant().getBaseKnockback();
+            return servantDamageSource.getServant().getKnockback();
         }
         return strength;
     }

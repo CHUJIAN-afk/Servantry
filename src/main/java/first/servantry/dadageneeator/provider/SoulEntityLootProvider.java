@@ -35,7 +35,7 @@ public class SoulEntityLootProvider extends EntityLootSubProvider {
                         )
                 )
         );
-
+/*
         // 2. 生成并覆盖蝙蝠 (Bat) 的掉落表
         this.add(EntityType.BAT, LootTable.lootTable()
                 .withPool(LootPool.lootPool()
@@ -45,6 +45,7 @@ public class SoulEntityLootProvider extends EntityLootSubProvider {
                         )
                 )
         );
+        */
     }
 
     @Override

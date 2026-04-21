@@ -39,7 +39,7 @@ public interface IProjectileMomentum {
         }
 
         projectile.setPath(Collections.singletonList(
-                new PathNode("", nextPos, yaw, pitch, projectile.getRoll())
+                new PathNode( nextPos, yaw, pitch, projectile.getRoll())
         ));
 
         setVelocity(vel.scale(getFriction()));
