@@ -136,7 +136,7 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
             assert type != null;
             Servant servant = existingServants.get(uuid);
             if (servant == null) {
-                servant = type.factory().apply(new PathNode(Vec3.ZERO, 0, 0, 0));
+                servant = type.factory().get();
                 servant.setUuid(uuid);
             }
             servant.readBase(buf);

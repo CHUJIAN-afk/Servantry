@@ -3,8 +3,6 @@ package first.servantry.register;
 import first.servantry.Servantry;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.servant.PathNode;
-import first.servantry.common.attachment.ServantData;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -12,6 +10,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class ItemRegister {
@@ -27,12 +26,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
             new IServantWeapon.Builder<>(ServantRegister.TerraPrism)
                     .sound(SoundRegister.UseTerraprism)
-                    .onSummon(servant -> {
-                        Player owner = servant.getOwner();
-                        ServantData data = owner.getData(AttachmentRegister.ServantData);
-                        PathNode node = servant.getInterpolatedIdleState(owner, 1);
-                        servant.setPath(List.of(node));
-                    })
+                    .onSummon(servant -> servant.init(servant.getInterpolatedIdleState(servant.getOwner(), 1)))
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
 /*
@@ -59,15 +53,15 @@ public class ItemRegister {
                     })
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
-
+*/
     public static final DeferredItem<Item> StardustCell = Register.registerItem("stardust_cell_render_item", RenderItem::new);
     public static final DeferredItem<Item> StardustCellStaff = Register.register("stardust_cell_staff", () ->
             new IServantWeapon.Builder<>(ServantRegister.StardustCell)
                     .sound(SoundRegister.UseServantWeapon)
-                    .onSummon(servant -> servant.setPos(servant.getOwner().position().add(0, 3, 0)))
+                    .onSummon(servant -> servant.init(new PathNode(servant.getOwner().position().add(0, 3, 0), 0, 0, 0)))
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
-*/
+
     // 2. 注册套装物品
     public static final DeferredItem<Item> HallowedHelmet = Register.register("hallowed_helmet", () -> new ArmorItem(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET, new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(6)).rarity(Rarity.UNCOMMON)));
 

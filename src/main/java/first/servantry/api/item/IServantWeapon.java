@@ -17,9 +17,9 @@ import java.util.function.Supplier;
 public interface IServantWeapon<T extends Servant> {
 
     static <T extends Servant> void handleSummon(Player player, IServantWeapon<T> weapon) {
-        T servant = weapon.getType().factory().apply(new PathNode(Vec3.ZERO, 0, 0, 0));
-        servant.setOwner(player);
+        T servant = weapon.getType().factory().get();
         ServantData data = player.getData(AttachmentRegister.ServantData);
+        servant.setOwner(player);
         if (data.summon(player, servant)) {
             weapon.summon(servant);
         }
@@ -93,8 +93,8 @@ public interface IServantWeapon<T extends Servant> {
                 @Override
                 public T getDummyServant() {
                     if (dummyServant == null) {
-                        dummyServant = getType().factory().apply(new PathNode(Vec3.ZERO, 0, 0, 0));
-                    }
+                        dummyServant = getType().factory().get();
+                                           }
                     return dummyServant;
                 }
 

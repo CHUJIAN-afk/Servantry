@@ -1,6 +1,14 @@
 package first.servantry.api.ai;
 
-public abstract class ServantGoal {
+import first.servantry.api.servant.Servant;
+
+public abstract class ServantGoal<T extends Servant> {
+
+    protected final T servant;
+
+    public ServantGoal(T servant) {
+        this.servant = servant;
+    }
 
     public abstract boolean canUse();
 

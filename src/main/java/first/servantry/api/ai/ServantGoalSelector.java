@@ -7,15 +7,15 @@ public class ServantGoalSelector {
     private final TreeSet<PrioritizedGoal> availableGoals = new TreeSet<>();
     private PrioritizedGoal currentGoal;
 
-    public ServantGoal getCurrentGoal() {
-        return currentGoal != null ? currentGoal.goal() : null;
+    public ServantGoal<?> getCurrentGoal() {
+        return currentGoal != null ? currentGoal.goal : null;
     }
 
-    public void addGoal(int priority, ServantGoal goal) {
+    public void addGoal(int priority, ServantGoal<?> goal) {
         availableGoals.add(new PrioritizedGoal(priority, goal));
     }
 
-    public void removeGoal(ServantGoal goal) {
+    public void removeGoal(ServantGoal<?> goal) {
         availableGoals.removeIf(p -> p.goal == goal);
         if (currentGoal != null && currentGoal.goal == goal) {
             currentGoal.goal.stop();
@@ -48,7 +48,7 @@ public class ServantGoalSelector {
         }
     }
 
-    private record PrioritizedGoal(int priority, ServantGoal goal) implements Comparable<PrioritizedGoal> {
+    private record PrioritizedGoal(int priority, ServantGoal<?> goal) implements Comparable<PrioritizedGoal> {
 
         @Override
         public int compareTo(PrioritizedGoal o) {

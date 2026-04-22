@@ -4,26 +4,19 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
 import first.servantry.api.client.ServantRenderDispatcher;
 import first.servantry.api.item.IServantWeapon;
-import first.servantry.api.projectile.AdvancedProjectile;
-import first.servantry.api.projectile.IProjectileCollider;
-import first.servantry.api.projectile.IProjectileConeTrail;
 import first.servantry.api.register.Registries;
 import first.servantry.api.register.ServantType;
-import first.servantry.api.servant.PathNode;
-import first.servantry.api.servant.Servant;
-import first.servantry.common.attachment.LevelProjectileData;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.common.particle.StardustScatterParticle;
+import first.servantry.common.renderer.StardustCellRenderer;
 import first.servantry.common.renderer.TerraprismRenderer;
 import first.servantry.register.*;
 import first.servantry.utils.ArmorSetUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -35,7 +28,6 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -45,10 +37,13 @@ import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @EventBusSubscriber(modid = Servantry.MODID, value = Dist.CLIENT)
-public class ClientEvent<T extends Servant> {
+public class ClientEvent {
 
     @SubscribeEvent
     public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
@@ -58,6 +53,7 @@ public class ClientEvent<T extends Servant> {
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
         ServantRenderDispatcher.register(ServantRegister.TerraPrism.get(), new TerraprismRenderer());
+        ServantRenderDispatcher.register(ServantRegister.StardustCell.get(), new StardustCellRenderer());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -70,28 +66,6 @@ public class ClientEvent<T extends Servant> {
             MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();
             for (Player player : clientLevel.players()) {
                 ServantRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
-            }
-            LevelProjectileData data = clientLevel.getData(AttachmentRegister.LevelProjectileData);
-            List<AdvancedProjectile> projectiles = data.getProjectiles();
-            for (AdvancedProjectile projectile : projectiles) {
-                LinkedList<PathNode> historyNodes = projectile.getHistoryNodes();
-                PathNode current = historyNodes.getFirst();
-                PathNode last = historyNodes.size() > 1 ? historyNodes.get(1) : current;
-                PathNode renderNode = last.lerp(current, partialTick);
-                Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-                poseStack.pushPose();
-                poseStack.translate(renderNode.pos().x - cameraPos.x, renderNode.pos().y - cameraPos.y, renderNode.pos().z - cameraPos.z);
-                int packedLight = LevelRenderer.getLightColor(clientLevel, BlockPos.containing(renderNode.pos()));
-                projectile.render(poseStack, bufferSource, partialTick, packedLight, renderNode);
-                if (projectile instanceof IProjectileConeTrail iProjectileConeTrail) {
-                    iProjectileConeTrail.processTrailRender(poseStack, bufferSource, partialTick, projectile, renderNode);
-                }
-                if (projectile instanceof IProjectileCollider iProjectileCollider) {
-                    if (Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes()) {
-                        iProjectileCollider.renderDebugHitbox(poseStack, bufferSource, renderNode.yaw(), renderNode.pitch(), renderNode.roll());
-                    }
-                }
-                poseStack.popPose();
             }
         }
     }

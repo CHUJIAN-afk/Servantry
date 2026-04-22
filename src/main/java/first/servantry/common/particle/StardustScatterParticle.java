@@ -1,7 +1,9 @@
 package first.servantry.common.particle;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +27,7 @@ public class StardustScatterParticle extends TextureSheetParticle {
         // 基础大小与寿命
         this.quadSize = 0.1F + this.random.nextFloat() * 0.05F;
         this.baseScale = this.quadSize;
-        this.lifetime = 15 + this.random.nextInt(10); // 寿命较短，符合爆发感
+        this.lifetime = 5 + this.random.nextInt(25); // 寿命较短，符合爆发感
 
         // 【星尘调色】：青蓝色调，带一点随机偏差增加层次感
         this.rCol = 0.2F + this.random.nextFloat() * 0.2F; // 0.2 ~ 0.4
@@ -40,7 +42,6 @@ public class StardustScatterParticle extends TextureSheetParticle {
     public void tick() {
         super.tick();
         this.setSpriteFromAge(this.spriteSet);
-
         // 【视觉动画】：随时间流逝逐渐平滑缩小，而不是突然消失
         float lifeProgress = (float) this.age / (float) this.lifetime;
         this.quadSize = this.baseScale * (1.0F - (float) Math.pow(lifeProgress, 2.0));
@@ -53,12 +54,12 @@ public class StardustScatterParticle extends TextureSheetParticle {
 
     @Override
     public int getLightColor(float partialTick) {
-        // 全量发光（在黑暗中也能明亮可见）
-        return 15728880;
+        return LightTexture.FULL_BRIGHT;
     }
 
     // 粒子提供者，用于绑定贴图和实例化
     public static class Provider implements ParticleProvider<SimpleParticleType> {
+
         private final SpriteSet sprite;
 
         public Provider(SpriteSet sprite) {
@@ -71,4 +72,5 @@ public class StardustScatterParticle extends TextureSheetParticle {
         }
 
     }
+
 }

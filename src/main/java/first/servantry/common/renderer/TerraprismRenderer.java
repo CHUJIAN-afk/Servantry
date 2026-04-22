@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import first.servantry.api.client.IRibbonTrailRenderer;
-import first.servantry.api.client.ServantRenderer;
+import first.servantry.api.client.IServantRenderer;
 import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.common.attachment.ServantData;
@@ -21,12 +21,12 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-public class TerraprismRenderer extends ServantRenderer<Terraprism> implements IRibbonTrailRenderer {
+public class TerraprismRenderer implements IRibbonTrailRenderer, IServantRenderer<Terraprism> {
 
     @Override
     public PathNode getVisualRenderNode(Servant servant, float partialTick, PathNode rawRenderNode) {
         Terraprism terraprism = (Terraprism) servant;
-        return rawRenderNode.lerp(terraprism.getInterpolatedIdleState(terraprism.getOwner(), partialTick), Mth.lerp(partialTick, terraprism.getIdleBlendO(), terraprism.getIdleBlend()));
+        return rawRenderNode.lerp(terraprism.getInterpolatedIdleState(terraprism.getOwner(), partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend));
     }
 
     @Override
@@ -69,16 +69,69 @@ public class TerraprismRenderer extends ServantRenderer<Terraprism> implements I
 
     @Override
     public int getTrailTimer(Servant servant) {
-        return ((Terraprism) servant).getTrailTimer();
+        return ((Terraprism) servant).trailTimer;
     }
 
+    @Override
+    public int getTrailHistoryLength() {
+        return 5;
+    }
+
+    /**
+     * 获取轨迹颜色：与主色调一致，不使用色彩渐变，使用亮度渐变。
+     * <p>
+     * 颜色计算逻辑：
+     * <ul>
+     *   <li>色相与主剑色调一致，基于仆从顺序和时间偏移</li>
+     *   <li>饱和度固定为 0.75，保持鲜艳</li>
+     *   <li>亮度随进度递减：剑尖处最亮（1.0），尾部较暗（0.4）</li>
+     * </ul>
+     * </p>
+     */
     @Override
     public int getTrailColor(Servant servant, float progress, float timeShift) {
         ServantData data = servant.getOwner().getData(AttachmentRegister.ServantData);
         int order = data.getOrder(servant);
         int total = Math.max(1, data.getServants().size());
-        float hue = (progress * 0.85f + ((float) order / total + timeShift)) % 1.0f;
-        return Mth.hsvToRgb(hue, 0.45f, 0.65f);
+
+        // 色相与主剑保持一致
+        float hue = (((float) order / total) + timeShift) % 1.0f;
+
+        // 固定饱和度，亮度随进度递减（剑尖亮，尾部暗）
+        float saturation = 0.75f;
+        float brightness = Mth.lerp(progress, 1.0f, 0.4f);
+
+        return Mth.hsvToRgb(hue, saturation, brightness);
+    }
+
+    /**
+     * 获取轨迹剑尖处的额外不透明度增强系数。
+     * <p>
+     * 剑尖处（progress 较小）的不透明度更高，使轨迹头部更加醒目。
+     * </p>
+     */
+    @Override
+    public float getTrailTipAlphaBoost(Servant servant, float progress) {
+        // 剑尖处（progress < 0.3）获得额外不透明度增强
+        if (progress < 0.3f) {
+            return Mth.lerp(progress / 0.3f, 2.5f, 1.0f);
+        }
+        return 1.0f;
+    }
+
+    /**
+     * 获取轨迹剑尖处的额外亮度增强系数。
+     * <p>
+     * 剑尖处的亮度额外提升，使轨迹头部更加明亮醒目。
+     * </p>
+     */
+    @Override
+    public float getTrailTipBrightnessBoost(Servant servant, float progress) {
+        // 剑尖处（progress < 0.25）获得额外亮度增强
+        if (progress < 0.25f) {
+            return Mth.lerp(progress / 0.25f, 1.5f, 1.0f);
+        }
+        return 1.0f;
     }
 
     private record TintedVertexConsumer(VertexConsumer base, int r, int g, int b, int a) implements VertexConsumer {

@@ -4,7 +4,6 @@ import first.servantry.Servantry;
 import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.servant.Servant;
-import first.servantry.common.attachment.LevelProjectileData;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.mixin.MobEffectInstanceAccessor;
 import first.servantry.register.ArmorMaterialRegister;
@@ -34,6 +33,7 @@ import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
@@ -41,6 +41,13 @@ import java.util.List;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
+
+    @SubscribeEvent
+    public static void tick(EntityTickEvent.Post event) {
+        if (event.getEntity() instanceof LivingEntity living) {
+            living.getData(AttachmentRegister.InvincibleData).tick();
+        }
+    }
 
     @SubscribeEvent
     public static void servantDamage(ServantIncomingDamageEvent event) {
@@ -89,17 +96,6 @@ public class Event {
             event.addModifier(AttributeRegister.ServantMaxCount, new AttributeModifier(ResourceLocation.fromNamespaceAndPath(Servantry.MODID, "witch_boots_count"), 1, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.FEET);
             event.addModifier(AttributeRegister.ServantDamage, new AttributeModifier(ResourceLocation.fromNamespaceAndPath(Servantry.MODID, "witch_boots_damage"), 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.FEET);
             event.addModifier(Attributes.MOVEMENT_SPEED, new AttributeModifier(ResourceLocation.fromNamespaceAndPath(Servantry.MODID, "witch_boots_speed"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.FEET);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLevelTick(LevelTickEvent.Post event) {
-        Level level = event.getLevel();
-        LevelProjectileData data = level.getData(AttachmentRegister.LevelProjectileData);
-        data.tickProjectiles();
-        if (!level.isClientSide() && data.isChange()) {
-            data.setChange(false);
-            level.syncData(AttachmentRegister.LevelProjectileData);
         }
     }
 
