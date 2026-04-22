@@ -33,7 +33,9 @@ public class InvincibleData {
             target.invulnerableTime = 0;
             target.hurt(damageSource, damage);
             target.invulnerableTime = invulnerableTime;
-            partialInvincibleFrames.put(servant, new AtomicInteger(invincibleTime));
+            if (invincibleTime > 0) {
+                partialInvincibleFrames.put(servant, new AtomicInteger(invincibleTime));
+            }
         }
     }
 

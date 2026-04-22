@@ -2,7 +2,6 @@ package first.servantry.api.servant;
 
 import first.servantry.api.ai.ServantGoalSelector;
 import first.servantry.api.register.ServantType;
-import first.servantry.common.attachment.InvincibleData;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.DamageRegister;
 import net.minecraft.core.Registry;

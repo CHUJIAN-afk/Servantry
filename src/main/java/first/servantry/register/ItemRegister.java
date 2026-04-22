@@ -10,9 +10,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class ItemRegister {
 
     private static final DeferredRegister.Items Register = DeferredRegister.createItems(Servantry.MODID);

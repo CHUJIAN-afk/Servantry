@@ -1,14 +1,12 @@
 package first.servantry.api.item;
 
 import first.servantry.api.register.ServantType;
-import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

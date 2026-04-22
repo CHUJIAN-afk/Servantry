@@ -2,6 +2,7 @@ package first.servantry.register;
 
 import first.servantry.Servantry;
 import first.servantry.common.attachment.InvincibleData;
+import first.servantry.common.attachment.ProjectileData;
 import first.servantry.common.attachment.ServantData;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -21,6 +22,12 @@ public class AttachmentRegister {
 			);
 
 	public static final DeferredHolder<AttachmentType<?>, AttachmentType<InvincibleData>> InvincibleData = Register.register("invincible_data", () -> AttachmentType.builder(InvincibleData::new).build());
+
+	public static final DeferredHolder<AttachmentType<?>, AttachmentType<ProjectileData>> ProjectileData =
+			Register.register("projectile_data", () -> AttachmentType.builder(ProjectileData::new)
+					.sync(new ProjectileData())
+					.build()
+			);
 
 	public static void register(IEventBus eventbus) {
 		Register.register(eventbus);

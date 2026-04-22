@@ -2,7 +2,6 @@ package first.servantry.common.attachment;
 
 import first.servantry.api.register.Registries;
 import first.servantry.api.register.ServantType;
-import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttributeRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;

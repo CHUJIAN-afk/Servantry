@@ -3,8 +3,11 @@ package first.servantry.common.event;
 import first.servantry.Servantry;
 import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.item.IServantWeapon;
+import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
+import first.servantry.common.attachment.ProjectileData;
 import first.servantry.common.attachment.ServantData;
+import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.mixin.MobEffectInstanceAccessor;
 import first.servantry.register.ArmorMaterialRegister;
 import first.servantry.register.AttachmentRegister;
@@ -32,11 +35,12 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @EventBusSubscriber(modid = Servantry.MODID)
@@ -113,9 +117,27 @@ public class Event {
                 servant.tick();
             }
         }
-        if (!player.level().isClientSide() && !servants.isEmpty() || data.isChange()) {
+
+        // 射弹tick（使用副本遍历避免并发修改异常）
+        ProjectileData projectileData = player.getData(AttachmentRegister.ProjectileData);
+        List<Projectile> projectiles = new ArrayList<>(projectileData.getProjectiles());
+        if (!projectiles.isEmpty()) {
+            for (Projectile projectile : projectiles) {
+                projectile.tick(player);
+            }
+        }
+
+        // 清理标记为移除的射弹
+        projectileData.cleanupMarkedProjectiles();
+
+        // 同步数据
+        if (!player.level().isClientSide() && (!servants.isEmpty() || data.isChange())) {
             data.setChange(false);
             player.syncData(AttachmentRegister.ServantData);
+        }
+        if (!player.level().isClientSide() && (!projectileData.getProjectiles().isEmpty() || projectileData.isChanged())) {
+            projectileData.setChanged(false);
+            player.syncData(AttachmentRegister.ProjectileData);
         }
     }
 
@@ -145,6 +167,37 @@ public class Event {
         event.add(EntityType.PLAYER, AttributeRegister.ServantMaxCount);
         event.add(EntityType.PLAYER, AttributeRegister.ServantDamage);
         event.add(EntityType.PLAYER, AttributeRegister.ServantSpeed);
+    }
+
+    /**
+     * 玩家攻击联动事件 - 每个黏贴状态的星细胞有33%概率向被攻击目标发射新射弹。
+     */
+    @SubscribeEvent
+    public static void onPlayerAttack(AttackEntityEvent event) {
+        if (event.getEntity() instanceof Player player && !player.level().isClientSide()) {
+            if (event.getTarget() instanceof LivingEntity target && target.isAlive()) {
+                ProjectileData projectileData = player.getData(AttachmentRegister.ProjectileData);
+                List<Projectile> attachedProjectiles = projectileData.getAttachedProjectiles();
+
+                for (Projectile projectile : attachedProjectiles) {
+                    // 检查是否为星细胞射弹
+                    if (!(projectile instanceof StardustProjectile stardustProjectile)) continue;
+
+                    // 检查冷却
+                    if (stardustProjectile.getExtraShootCooldown() > 0) continue;
+
+                    // 33%概率发射
+                    if (player.getRandom().nextFloat() < 0.33f) {
+                        // 创建新射弹
+                        StardustProjectile newProjectile = new StardustProjectile(player.getUUID(), projectile.getSourceServantUuid(), projectile.getPos(), target);
+                        projectileData.add(newProjectile);
+
+                        // 设置冷却
+                        stardustProjectile.setExtraShootCooldown(14);
+                    }
+                }
+            }
+        }
     }
 
 }

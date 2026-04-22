@@ -2,14 +2,16 @@ package first.servantry.common.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
+import first.servantry.api.client.ProjectileRenderDispatcher;
 import first.servantry.api.client.ServantRenderDispatcher;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.register.Registries;
 import first.servantry.api.register.ServantType;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.common.particle.StardustScatterParticle;
-import first.servantry.common.renderer.StardustCellRenderer;
-import first.servantry.common.renderer.TerraprismRenderer;
+import first.servantry.client.renderer.servant.StardustCellRenderer;
+import first.servantry.client.renderer.projectile.StardustProjectileRenderer;
+import first.servantry.client.renderer.servant.TerraprismRenderer;
 import first.servantry.register.*;
 import first.servantry.utils.ArmorSetUtil;
 import net.minecraft.ChatFormatting;
@@ -54,6 +56,7 @@ public class ClientEvent {
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
         ServantRenderDispatcher.register(ServantRegister.TerraPrism.get(), new TerraprismRenderer());
         ServantRenderDispatcher.register(ServantRegister.StardustCell.get(), new StardustCellRenderer());
+        ProjectileRenderDispatcher.register(ProjectileRegister.StardustProjectile.get(), new StardustProjectileRenderer());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -66,6 +69,7 @@ public class ClientEvent {
             MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();
             for (Player player : clientLevel.players()) {
                 ServantRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
+                ProjectileRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
             }
         }
     }

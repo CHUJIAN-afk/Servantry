@@ -19,6 +19,7 @@ public class Servantry {
         MobEffectRegister.register(eventBus);
         ParticleRegister.register(eventBus);
         PotionRegister.register(eventBus);
+        ProjectileRegister.register(eventBus);
         ServantRegister.register(eventBus);
         SoundRegister.register(eventBus);
     }

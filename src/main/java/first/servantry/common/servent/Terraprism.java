@@ -1,6 +1,5 @@
 package first.servantry.common.servent;
 
-import first.servantry.api.ai.ServantGoal;
 import first.servantry.api.ai.ServantGoalSelector;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.ICollideAttack;
@@ -8,10 +7,8 @@ import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.PlannedPath;
 import first.servantry.api.servant.Servant;
 import first.servantry.common.attachment.InvincibleData;
-import first.servantry.common.attachment.ServantData;
 import first.servantry.common.servent.gaol.TerraprismAttackGoal;
 import first.servantry.common.servent.gaol.TerraprismIdleGoal;
-import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
@@ -22,7 +19,10 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class Terraprism extends Servant implements ICollideAttack {
 
