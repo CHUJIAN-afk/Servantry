@@ -34,7 +34,7 @@ public class TerraprismIdleGoal extends ServantGoal<Terraprism> {
 
     @Override
     public void tick() {
-        servant.setPath(Collections.singletonList(servant.getCurrentPathNode().lerp(servant.getInterpolatedIdleState(servant.getOwner(), 1f), 0.35f)));
+        servant.setPath(Collections.singletonList(servant.getCurrentPathNode().lerp(servant.getInterpolatedIdleState(1f), 0.35f)));
     }
 
 }

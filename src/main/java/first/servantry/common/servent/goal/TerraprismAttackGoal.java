@@ -248,7 +248,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         if (!servant.isExecutingPath() && target != null) {
             loopCount++;
             // 每两次攻击后切换攻击模式
-            if (loopCount >= 2) {
+            if (loopCount >= 2 && target.getRandom().nextBoolean()) {
                 loopCount = 0;
                 lastWasEllipse = !lastWasEllipse;
             }
@@ -406,7 +406,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         List<PathNode> nodes = new ArrayList<>();
 
         // 准备阶段 (5 tick)
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 3; i++) {
             float localT = (float) i / 5;
             float smoothT = localT * localT * (3.0f - 2.0f * localT);
             Vec3 p = servant.calculateBezierPoint(P0, P1, P2, prepPos, localT);
@@ -416,7 +416,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         }
 
         // 攻击阶段 (5 tick)
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 1; i <= 6; i++) {
             float t = ((float) i / 5) * ((float) i / 5);
             Vec3 p = prepPos.lerp(hitPos, t);
             nodes.add(servant.getEulerNode(p, attackDir, planeNormal));
@@ -606,4 +606,5 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
             servant.hitTargets.clear();
         }
     }
+
 }

@@ -13,9 +13,9 @@ public class TrailRenderType extends RenderType {
     /**
      * 获取拖尾渲染类型。
      * <p>
-     * 使用自定义 CompositeState 确保透明度正确渲染：
+     * 使用眼睛发光效果的着色器，光影模组通常对此有良好适配：
      * <ul>
-     *   <li>使用实体半透明着色器</li>
+     *   <li>使用眼睛发光着色器（Eyes）</li>
      *   <li>禁用背面剔除实现双面渲染</li>
      *   <li>启用光照图支持全亮度</li>
      *   <li>透明度混合模式确保正确的 Alpha 混合</li>
@@ -24,7 +24,7 @@ public class TrailRenderType extends RenderType {
      */
     public static RenderType getTrail() {
         CompositeState state = CompositeState.builder()
-                .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+                .setShaderState(RENDERTYPE_EYES_SHADER)
                 .setTextureState(new TextureStateShard(Servantry.rl("textures/trail.png"), false, false))
                 .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                 .setCullState(NO_CULL)
@@ -34,5 +34,4 @@ public class TrailRenderType extends RenderType {
                 .createCompositeState(false);
         return create("ribbon_trail", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, true, state);
     }
-
 }

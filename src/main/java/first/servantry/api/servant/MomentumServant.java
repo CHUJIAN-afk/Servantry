@@ -9,7 +9,7 @@ import net.minecraft.world.phys.Vec3;
  * <p>
  * 子类只需通过调度器方法控制仆从行为，无需关心底层物理实现：
  * <ul>
- *   <li>{@link #lookAt(Vec3)} / {@link #lookAt(LookTarget)} - 控制朝向</li>
+ *   <li>{@link #lookAt(Vec3)} / {@link #lookAt(Vec3)} - 控制朝向</li>
  *   <li>{@link #moveToward(Vec3, double)} / {@link #applyImpulse(Vec3)} - 控制移动</li>
  *   <li>{@link #teleportTo(Vec3)} - 瞬移</li>
  * </ul>

@@ -1,10 +1,9 @@
 package first.servantry.common.servent;
 
 import first.servantry.api.PathNode;
-import first.servantry.api.PlannedPath;
 import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.register.ServantType;
 import first.servantry.api.entity.ICollideAttack;
+import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servent.goal.TerraprismAttackGoal;
@@ -13,7 +12,6 @@ import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -21,7 +19,6 @@ import org.joml.Vector3f;
 
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 public class Terraprism extends Servant implements ICollideAttack {
@@ -82,7 +79,6 @@ public class Terraprism extends Servant implements ICollideAttack {
     @Override
     public void tick() {
         super.tick();
-        Player owner = getOwner();
         if (owner.level().isClientSide()) {
             idleBlendO = idleBlend;
             if (attacking) {
@@ -107,29 +103,7 @@ public class Terraprism extends Servant implements ICollideAttack {
         this.attacking = buf.readBoolean();
     }
 
-    public Vec3 applyTargetTracking(LivingEntity target, Vec3 lastTargetPos) {
-        if (target == null || lastTargetPos == null) return lastTargetPos;
-        Vec3 currentTargetCenter = target.position().add(0, target.getBbHeight() / 2.0, 0);
-        Vec3 offset = currentTargetCenter.subtract(lastTargetPos);
-
-        if (offset.lengthSqr() > 1e-5) {
-            PlannedPath path = getCurrentPath();
-            if (path != null) {
-                List<PathNode> nodes = path.getNodes();
-                int startIdx = path.getCurrentIndex();
-                int qSize = nodes.size() - startIdx;
-                for (int i = 0; i < qSize; i++) {
-                    PathNode node = nodes.get(startIdx + i);
-                    float weight = (float) (i + 1) / qSize;
-                    Vec3 blendedOffset = offset.scale(weight);
-                    nodes.set(startIdx + i, new PathNode(node.pos().add(blendedOffset), node.yaw(), node.pitch(), node.roll()));
-                }
-            }
-        }
-        return currentTargetCenter;
-    }
-
-    public PathNode getInterpolatedIdleState(Player owner, float partialTick) {
+    public PathNode getInterpolatedIdleState(float partialTick) {
         float playerYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
         float rad = (float) Math.toRadians(-playerYaw + 180);
         float backX = (float) Math.sin(rad);

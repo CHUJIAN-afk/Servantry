@@ -26,7 +26,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
             new IServantWeapon.Builder<>(ServantRegister.TerraPrism)
                     .sound(SoundRegister.UseTerraprism)
-                    .onSummon(servant -> servant.init(servant.getInterpolatedIdleState(servant.getOwner(), 1)))
+                    .onSummon(servant -> servant.init(servant.getInterpolatedIdleState(1)))
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
 

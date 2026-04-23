@@ -54,7 +54,7 @@ public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<
                 })
                 .modelScale(1.0f)
                 .modelRotationOffset(0, 90, -45)
-                .visualNodeFunction((terraprism, partialTick, rawNode) -> rawNode.lerp(terraprism.getInterpolatedIdleState(terraprism.getOwner(), partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend)));
+                .visualNodeFunction((terraprism, partialTick, rawNode) -> rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend)));
     }
 
     @Override
