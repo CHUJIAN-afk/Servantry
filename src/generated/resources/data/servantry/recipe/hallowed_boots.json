@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "pattern": [
+    "R R",
+    "I I"
+  ],
+  "result": {
+    "count": 1,
+    "id": "servantry:hallowed_boots"
+  }
+}
