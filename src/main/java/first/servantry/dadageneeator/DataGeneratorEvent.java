@@ -5,6 +5,7 @@ import first.servantry.api.item.IServantWeapon;
 import first.servantry.dadageneeator.provider.SoulEntityLootProvider;
 import first.servantry.dadageneeator.provider.SoulLangProvider;
 import first.servantry.dadageneeator.provider.SoulRecipeProvider;
+import first.servantry.register.ItemRegister;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
@@ -39,7 +40,11 @@ public class DataGeneratorEvent {
         generator.addProvider(event.includeClient(), new ItemModelProvider(packOutput, Servantry.MODID, existingFileHelper) {
             @Override
             protected void registerModels() {
-                //handheldItem(ItemRegister.EnchantedThrowingKnives.get());
+                handheldItem(ItemRegister.EnchantedThrowingKnives.get());
+                basicItem(ItemRegister.HallowedHelmet.get());
+                basicItem(ItemRegister.HallowedChestplate.get());
+                basicItem(ItemRegister.HallowedLeggings.get());
+                basicItem(ItemRegister.HallowedBoots.get());
                 BuiltInRegistries.ITEM.stream()
                         .filter(item -> item instanceof IServantWeapon<?>)
                         .forEach(this::handheldItem);

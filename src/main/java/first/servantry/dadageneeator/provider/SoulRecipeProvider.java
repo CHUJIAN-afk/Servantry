@@ -20,7 +20,7 @@ public class SoulRecipeProvider extends RecipeProvider {
 
     @Override
     protected void buildRecipes(@NotNull RecipeOutput output) {
-        /*
+
         // 1. 星尘细胞法杖: 2 下界之星, 1 木棍
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ItemRegister.StardustCellStaff.get())
                 .pattern("  N")
@@ -40,7 +40,7 @@ public class SoulRecipeProvider extends RecipeProvider {
                 .define('S', Items.STICK)
                 .unlockedBy("has_iron_sword", has(Items.IRON_SWORD)) // 获得铁剑时解锁配方
                 .save(output);
-*/
+
         // ================= 神圣套装合成表 =================
 
         // 3. 神圣兜帽 (头盔: 5个材料)

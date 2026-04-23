@@ -71,24 +71,17 @@ public class StardustCellAttackGoal extends ServantGoal<StardustCell> {
 
     private void shootAtTarget(Player owner, LivingEntity target) {
         Vec3 start = servant.getPos();
-
         // 创建并发射星细胞射弹
-        StardustProjectile projectile = new StardustProjectile(
-                owner.getUUID(),
-                servant.getUuid(),
-                start,
-                target
-        );
-
+        StardustProjectile projectile = new StardustProjectile(owner.getUUID(), servant.getUuid(), start, target);
+        projectile.life = 10;
         owner.getData(AttachmentRegister.ProjectileData).add(projectile);
-
         // 后坐力
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
         spawnShootParticles((ServerLevel) owner.level(), start, direction);
         servant.applyForce(direction.scale(-0.5));
     }
 
-    private void spawnShootParticles(ServerLevel level, Vec3 pos, Vec3 direction) {
+    public static void spawnShootParticles(ServerLevel level, Vec3 pos, Vec3 direction) {
         RandomSource rand = level.getRandom();
         int particleCount = 2 + rand.nextInt(4);
 

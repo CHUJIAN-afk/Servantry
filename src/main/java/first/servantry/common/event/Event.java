@@ -5,9 +5,13 @@ import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
+import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.attachment.ProjectileData;
 import first.servantry.common.attachment.ServantData;
+import first.servantry.common.attachment.TargetCacheData;
 import first.servantry.common.projectile.StardustProjectile;
+import first.servantry.common.servent.StardustCell;
+import first.servantry.common.servent.goal.StardustCellAttackGoal;
 import first.servantry.mixin.MobEffectInstanceAccessor;
 import first.servantry.register.ArmorMaterialRegister;
 import first.servantry.register.AttachmentRegister;
@@ -16,8 +20,10 @@ import first.servantry.register.ItemRegister;
 import first.servantry.utils.ArmorSetUtil;
 import first.servantry.utils.AttributeUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -29,11 +35,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -106,6 +114,12 @@ public class Event {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
+
+        // 更新索敌缓存（仅服务端）
+        if (!player.level().isClientSide()) {
+            player.getData(AttachmentRegister.TargetCacheData).update(player);
+        }
+
         ServantData data = player.getData(AttachmentRegister.ServantData);
         List<Servant> servants = data.getServants();
         while (!servants.isEmpty() && data.getMaxSize(player) < servants.size()) {
@@ -170,30 +184,30 @@ public class Event {
     }
 
     /**
-     * 玩家攻击联动事件 - 每个黏贴状态的星细胞有33%概率向被攻击目标发射新射弹。
+     * 玩家攻击联动事件 - 每个星细胞仆从有33%概率向被攻击目标发射新射弹。
      */
     @SubscribeEvent
-    public static void onPlayerAttack(AttackEntityEvent event) {
-        if (event.getEntity() instanceof Player player && !player.level().isClientSide()) {
-            if (event.getTarget() instanceof LivingEntity target && target.isAlive()) {
+    public static void onPlayerAttack(LivingDamageEvent.Post event) {
+        DamageSource damageSource = event.getSource();
+        if (damageSource instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof StardustCell) {
+            return;
+        }
+        if (damageSource.getEntity() instanceof Player player && !player.level().isClientSide()) {
+            LivingEntity target = event.getEntity();
+            if (target.isAlive()) {
+                ServantData servantData = player.getData(AttachmentRegister.ServantData);
                 ProjectileData projectileData = player.getData(AttachmentRegister.ProjectileData);
-                List<Projectile> attachedProjectiles = projectileData.getAttachedProjectiles();
-
-                for (Projectile projectile : attachedProjectiles) {
-                    // 检查是否为星细胞射弹
-                    if (!(projectile instanceof StardustProjectile stardustProjectile)) continue;
-
-                    // 检查冷却
-                    if (stardustProjectile.getExtraShootCooldown() > 0) continue;
-
-                    // 33%概率发射
-                    if (player.getRandom().nextFloat() < 0.33f) {
-                        // 创建新射弹
-                        StardustProjectile newProjectile = new StardustProjectile(player.getUUID(), projectile.getSourceServantUuid(), projectile.getPos(), target);
+                for (Servant servant : servantData.getServants()) {
+                    if (servant instanceof StardustCell cell && cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
+                        Vec3 startPos = servant.getPos();
+                        StardustProjectile newProjectile = new StardustProjectile(player.getUUID(), servant.getUuid(), startPos, target);
+                        newProjectile.life = 10;
                         projectileData.add(newProjectile);
-
-                        // 设置冷却
-                        stardustProjectile.setExtraShootCooldown(14);
+                        cell.setExtraShootCooldown(14);
+                        // 后坐力
+                        Vec3 direction = target.getBoundingBox().getCenter().subtract(startPos).normalize();
+                        StardustCellAttackGoal.spawnShootParticles((ServerLevel) player.level(), startPos, direction);
+                        cell.applyForce(direction.scale(-0.5));
                     }
                 }
             }

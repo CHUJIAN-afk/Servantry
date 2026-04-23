@@ -36,10 +36,10 @@ public class ServantRenderDispatcher {
                 poseStack.translate(renderNode.pos().x() - cameraPos.x(), renderNode.pos().y() - cameraPos.y(), renderNode.pos().z() - cameraPos.z());
                 int packedLight = LevelRenderer.getLightColor(((LocalPlayer) player).clientLevel, BlockPos.containing(renderNode.pos().x(), renderNode.pos().y(), renderNode.pos().z()));
                 renderer.render(servant, poseStack, bufferSource, partialTick, packedLight, renderNode);
-                if (renderer instanceof IRibbonTrailRenderer ribbonTrailRenderer) {
+                if (renderer instanceof IServantRibbonTrailRenderer ribbonTrailRenderer) {
                     ribbonTrailRenderer.processRibbonTrailRender(poseStack, bufferSource, partialTick, servant, renderNode);
                 }
-                if (renderer instanceof IConeTrailRenderer coneTrailRenderer) {
+                if (renderer instanceof IServantConeTrailRenderer coneTrailRenderer) {
                     coneTrailRenderer.processConeTrailRender(poseStack, bufferSource, partialTick, servant, renderNode);
                 }
                 if (servant instanceof ICollideAttack iCollideAttack) {

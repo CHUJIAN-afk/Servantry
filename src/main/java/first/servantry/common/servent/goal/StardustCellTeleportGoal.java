@@ -21,8 +21,8 @@ import java.util.Collections;
 public class StardustCellTeleportGoal extends ServantGoal<StardustCell> {
 
     private static final int TELEPORT_DURATION = 6;
-    private static final double MIN_TELEPORT_DISTANCE = 28.75;
-    private static final double MAX_TELEPORT_DISTANCE = 53.75;
+    private static final double MIN_TELEPORT_DISTANCE = 16;
+    private static final double MAX_TELEPORT_DISTANCE = 20;
     private static final double PLAYER_TELEPORT_DISTANCE = 128.0;
 
     public StardustCellTeleportGoal(StardustCell servant) {
@@ -47,8 +47,7 @@ public class StardustCellTeleportGoal extends ServantGoal<StardustCell> {
         if (target == null) return false;
 
         double distSqr = target.distanceToSqr(servant.getPos());
-        boolean shouldTeleport = (distSqr >= MIN_TELEPORT_DISTANCE * MIN_TELEPORT_DISTANCE && distSqr <= MAX_TELEPORT_DISTANCE * MAX_TELEPORT_DISTANCE)
-                || distSqr > PLAYER_TELEPORT_DISTANCE * PLAYER_TELEPORT_DISTANCE;
+        boolean shouldTeleport = (distSqr >= MIN_TELEPORT_DISTANCE * MIN_TELEPORT_DISTANCE && distSqr <= MAX_TELEPORT_DISTANCE * MAX_TELEPORT_DISTANCE) || distSqr > PLAYER_TELEPORT_DISTANCE * PLAYER_TELEPORT_DISTANCE;
 
         if (!shouldTeleport) return false;
 

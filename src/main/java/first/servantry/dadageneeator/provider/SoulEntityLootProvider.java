@@ -25,32 +25,19 @@ public class SoulEntityLootProvider extends EntityLootSubProvider {
 
     @Override
     public void generate() {
-        // 1. 生成并覆盖悦灵 (Allay) 的掉落表
         this.add(EntityType.ALLAY, LootTable.lootTable()
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
                         .add(LootItem.lootTableItem(ItemRegister.TerraPrism.get())
-                                .when(LootItemRandomChanceCondition.randomChance(1)) // 1% 几率 (JEI/EMI 完美识别)
-                                .when(LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.ATTACKER, EntityPredicate.Builder.entity().of(EntityType.PLAYER))) // 必须是玩家击杀
+                                .when(LootItemRandomChanceCondition.randomChance(1))
                         )
                 )
         );
-/*
-        // 2. 生成并覆盖蝙蝠 (Bat) 的掉落表
-        this.add(EntityType.BAT, LootTable.lootTable()
-                .withPool(LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1.0F))
-                        .add(LootItem.lootTableItem(ItemRegister.SanguineStaff.get())
-                                .when(LootItemRandomChanceCondition.randomChance(1F)) // 1% 几率
-                        )
-                )
-        );
-        */
     }
 
     @Override
     protected @NotNull Stream<EntityType<?>> getKnownEntityTypes() {
-        return Stream.of(EntityType.ALLAY, EntityType.BAT);
+        return Stream.of(EntityType.ALLAY);
     }
 
 }

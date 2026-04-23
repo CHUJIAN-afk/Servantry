@@ -10,13 +10,6 @@
             {
               "chance": 1.0,
               "condition": "minecraft:random_chance"
-            },
-            {
-              "condition": "minecraft:entity_properties",
-              "entity": "attacker",
-              "predicate": {
-                "type": "minecraft:player"
-              }
             }
           ],
           "name": "servantry:terraprism"

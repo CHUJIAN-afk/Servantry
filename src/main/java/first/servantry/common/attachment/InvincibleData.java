@@ -7,11 +7,12 @@ import net.minecraft.world.entity.LivingEntity;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InvincibleData {
 
-    private final Map<Servant, AtomicInteger> partialInvincibleFrames = new HashMap<>();
+    private final Map<UUID, AtomicInteger> partialInvincibleFrames = new HashMap<>();
     private final AtomicInteger globalInvincibleFrames = new AtomicInteger(0);
 
     public void tick() {
@@ -34,14 +35,19 @@ public class InvincibleData {
             target.hurt(damageSource, damage);
             target.invulnerableTime = invulnerableTime;
             if (invincibleTime > 0) {
-                partialInvincibleFrames.put(servant, new AtomicInteger(invincibleTime));
+                if (type == Type.PARTIAL) {
+                    partialInvincibleFrames.put(servant.getUuid(), new AtomicInteger(invincibleTime));
+                }
+                if (type == Type.Global) {
+                    globalInvincibleFrames.set(invincibleTime);
+                }
             }
         }
     }
 
     public boolean canDamage(Servant servant, Type type) {
         return switch (type) {
-            case PARTIAL -> partialInvincibleFrames.getOrDefault(servant, new AtomicInteger(0)).get() <= 0;
+            case PARTIAL -> partialInvincibleFrames.getOrDefault(servant.getUuid(), new AtomicInteger(0)).get() <= 0;
             case Global -> globalInvincibleFrames.get() <= 0;
             case null -> false;
         };

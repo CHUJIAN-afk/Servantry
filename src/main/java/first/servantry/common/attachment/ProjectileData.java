@@ -1,7 +1,10 @@
 package first.servantry.common.attachment;
 
 import first.servantry.api.projectile.Projectile;
+import first.servantry.api.register.ProjectileType;
+import first.servantry.api.register.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.attachment.AttachmentSyncHandler;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import org.jetbrains.annotations.NotNull;
@@ -139,6 +142,9 @@ public class ProjectileData implements AttachmentSyncHandler<ProjectileData> {
         buf.writeVarInt(data.projectiles.size());
         for (Projectile projectile : data.projectiles) {
             buf.writeUUID(projectile.getUuid());
+            ResourceLocation location = Registries.PROJECTILE_TYPES.getKey(projectile.getType());
+            assert location != null;
+            buf.writeResourceLocation(location);
             projectile.writeBase(buf);
         }
     }
@@ -158,11 +164,12 @@ public class ProjectileData implements AttachmentSyncHandler<ProjectileData> {
 
         for (int i = 0; i < size; i++) {
             UUID uuid = buf.readUUID();
+            ResourceLocation location = buf.readResourceLocation();
             Projectile projectile = existingProjectiles.get(uuid);
             if (projectile == null) {
-                // 创建新射弹实例（需要通过类型注册表）
-                // 这里简化处理，实际应该根据类型创建
-                projectile = new first.servantry.common.projectile.StardustProjectile();
+                ProjectileType<? extends Projectile> projectileType = Registries.PROJECTILE_TYPES.get(location);
+                assert projectileType != null;
+                projectile = projectileType.factory().get();
                 projectile.setUuid(uuid);
             }
             projectile.readBase(buf);

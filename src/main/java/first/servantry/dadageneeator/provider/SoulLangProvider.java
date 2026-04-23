@@ -38,9 +38,6 @@ public class SoulLangProvider extends LanguageProvider {
         entry("item.servantry.blade_staff.tooltip.1").en("Ignores 2.5 points of enemy Defense").zh("忽略敌人 2.5 防御力");
         entry("item.servantry.blade_staff.tooltip.2").en("'Don't let their small size fool you'").zh("“别被它们小小的个头给骗了”");
 
-        entry("item.servantry.sanguine_staff").en("Sanguine Staff").zh("血红法杖");
-        entry("servant.servantry.sanguine_bat").en("Sanguine Bat").zh("血蝙蝠");
-
         entry("item.servantry.stardust_cell_staff").en("Stardust Cell Staff").zh("星尘细胞法杖");
         entry("servant.servantry.stardust_cell").en("Stardust Cell").zh("星尘细胞");
         entry("item.servantry.stardust_cell_staff.tooltip.1").en("'Cultivate the most beautiful cellular infection'").zh("“培养最美丽的细胞感染”");

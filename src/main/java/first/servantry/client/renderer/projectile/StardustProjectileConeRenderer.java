@@ -3,7 +3,7 @@ package first.servantry.client.renderer.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import first.servantry.api.client.IProjectileRenderer;
-import first.servantry.api.client.IProjectileTrailRenderer;
+import first.servantry.api.client.IProjectileConeTrailRenderer;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.PathNode;
 import first.servantry.common.projectile.StardustProjectile;
@@ -17,14 +17,14 @@ import net.minecraft.world.item.ItemDisplayContext;
 /**
  * 星细胞射弹渲染器。
  * <p>
- * 实现 {@link IProjectileRenderer} 和 {@link IProjectileTrailRenderer} 接口，
+ * 实现 {@link IProjectileRenderer} 和 {@link IProjectileConeTrailRenderer} 接口，
  * 渲染缩小版星尘细胞模型（0.25倍）。
  * 飞行状态渲染圆锥拖尾，黏贴状态仅渲染模型。
  * </p>
  */
-public class StardustProjectileRenderer implements IProjectileRenderer<StardustProjectile>, IProjectileTrailRenderer {
+public class StardustProjectileConeRenderer implements IProjectileRenderer<StardustProjectile>, IProjectileConeTrailRenderer {
 
-    // ===================== IProjectileTrailRenderer 实现 =====================
+    // ===================== IProjectileConeTrailRenderer 实现 =====================
 
     @Override
     public int getTrailTimer(Projectile projectile) {

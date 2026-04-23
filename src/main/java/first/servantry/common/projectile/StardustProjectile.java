@@ -25,28 +25,27 @@ import java.util.UUID;
 /**
  * 星细胞射弹 - 由星尘细胞仆从发射的追踪射弹。
  * <p>
- * 继承自 {@link Projectile} 基类，实现追踪目标、命中后黏贴、细胞寄生效果等功能。
+ * 状态流转：FLYING（飞行追踪） -> ATTACHED（黏贴在目标身上） -> DEAD（死亡移除）。
  * </p>
  * <p>
- * 状态流转：FLYING（飞行追踪） -> ATTACHED（黏贴在目标身上） -> DEAD（死亡移除）。
+ * 特性：
+ * <ul>
+ *   <li>追踪目标直到命中</li>
+ *   <li>命中后黏贴在目标碰撞箱内部随机位置</li>
+ *   <li>施加细胞寄生效果（可叠加）</li>
+ *   <li>目标死亡时爆裂粒子消失</li>
+ * </ul>
  * </p>
  */
 public class StardustProjectile extends Projectile {
 
-    // ===================== 特有字段 =====================
-
-    /** 额外发射冷却（用于玩家攻击联动） */
-    private int extraShootCooldown = 0;
+    // ===================== 常量 =====================
 
     /** 细胞寄生效果持续时间（tick） */
     private static final int PARASITISM_DURATION = 100;
 
     /** 细胞寄生效果最大等级 */
     private static final int MAX_PARASITISM_LEVEL = 10;
-
-    /** 命中时的入射方向（用于确定附着位置） */
-    private Vec3 hitDirection = Vec3.ZERO;
-
 
     // ===================== 构造器 =====================
 
@@ -60,94 +59,83 @@ public class StardustProjectile extends Projectile {
         setSourceServantUuid(sourceServantUuid);
     }
 
-    // ===================== 行为实现 =====================
+    // ===================== Tick行为 =====================
 
     @Override
     public void tickBehavior(Player owner) {
         switch (getState()) {
             case FLYING -> tickFlying(owner);
             case ATTACHED -> tickAttached(owner);
-            case DEAD -> { /* 无操作 */ }
+            case DEAD -> { }
         }
 
-        // 远距离检测
+        // 远距离检测：超过最大距离时消失
         if (getPos().distanceToSqr(owner.position()) > getMaxDistance() * getMaxDistance()) {
-            spawnDisappearParticles((ServerLevel) owner.level(), getPos());
+            spawnScatterParticles((ServerLevel) owner.level(), getPos(), 2, 0.1);
             markForRemoval();
-        }
-
-        // 冷却衰减
-        if (extraShootCooldown > 0) {
-            extraShootCooldown--;
         }
     }
 
     /**
-     * 飞行状态逻辑：追踪目标、检测命中。
+     * 飞行状态：追踪目标、检测命中。
      */
     private void tickFlying(Player owner) {
         ServerLevel level = (ServerLevel) owner.level();
+        LivingEntity target = getCachedTarget(level);
 
-        // 更新缓存的目标
-        if (cachedTarget == null && targetUuid != null) {
-            cachedTarget = findEntityByUuid(level, targetUuid);
-        }
-
-        LivingEntity target = cachedTarget;
-
-        // 目标消失处理
+        // 目标消失
         if (target == null || !target.isAlive()) {
-            spawnDisappearParticles(level, getPos());
+            spawnScatterParticles(level, getPos(), 2, 0.1);
             markForRemoval();
             return;
         }
 
-        // 追踪目标
         Vec3 targetCenter = target.getBoundingBox().getCenter();
-        Vec3 toTarget = targetCenter.subtract(getPos());
-        double dist = toTarget.length();
+        double dist = getPos().distanceTo(targetCenter);
 
-        // 检测命中
+        // 命中检测
         if (dist < getHitRadius() + target.getBbWidth() / 2.0) {
             onHit(owner, target);
             return;
         }
 
-        // 计算追踪速度
-        Vec3 trackingDir = toTarget.normalize();
-        double trackingForce = Math.min(dist * 0.1, 0.3);
-        applyForce(trackingDir.scale(trackingForce));
-
-        // 更新朝向
-        if (getVelocity().lengthSqr() > 0.01) {
-            Vec3 velDir = getVelocity().normalize();
-            setDesiredRotation(
-                    (float) Math.toDegrees(Math.atan2(-velDir.x, velDir.z)),
-                    (float) Math.toDegrees(Math.atan2(-velDir.y, Math.sqrt(velDir.x * velDir.x + velDir.z * velDir.z))),
-                    getDesiredRoll()
-            );
+        // 追踪：施加指向目标的力
+        if (life >= 10) {
+            Vec3 trackingDir = targetCenter.subtract(getPos()).normalize();
+            double trackingForce = Math.min(dist * 0.1, 0.3);
+            applyForce(trackingDir.scale(trackingForce));
+            // 更新朝向跟随速度方向
+            Vec3 vel = getVelocity();
+            if (vel.lengthSqr() > 0.01) {
+                Vec3 dir = vel.normalize();
+                setDesiredRotation((float) Math.toDegrees(Math.atan2(-dir.x, dir.z)), (float) Math.toDegrees(Math.atan2(-dir.y, Math.sqrt(dir.x * dir.x + dir.z * dir.z))), getDesiredRoll());
+            }
+            setTrailTimer(getTrailDuration());
         }
-
-        // 拖尾计时器
-        setTrailTimer(getTrailDuration());
     }
 
     /**
-     * 黏贴状态逻辑：跟随目标、检测目标消失。
+     * 黏贴状态：跟随目标、检测目标消失。
+     * <p>
+     * 目标死亡时：如果来源星细胞仆从有其他目标，则产生两个新星细胞向新目标发起攻击。
+     * </p>
      */
     private void tickAttached(Player owner) {
         ServerLevel level = (ServerLevel) owner.level();
+        LivingEntity target = getCachedAttachedTarget(level);
 
-        // 更新缓存的目标
-        if (cachedAttachedTarget == null && attachedTargetUuid != null) {
-            cachedAttachedTarget = findEntityByUuid(level, attachedTargetUuid);
-        }
-
-        LivingEntity target = cachedAttachedTarget;
-
-        // 目标消失处理（死亡或移除）
+        // 目标死亡
         if (target == null || !target.isAlive()) {
-            spawnExplosionParticles(level, getPos());
+            // 尝试找到来源仆从并检查是否有新目标
+            Servant sourceServant = findServantByUuid(owner, getSourceServantUuid());
+            if (sourceServant != null) {
+                level.getEntitiesOfClass(LivingEntity.class, new AABB(getPos(), getPos()).inflate(10)).stream()
+                        .filter(sourceServant::isTarget)
+                        .findAny()
+                        .ifPresent(newTarget -> spawnNewProjectiles(owner, newTarget, sourceServant, level));
+            }
+            // 爆裂粒子消失
+            spawnScatterParticles(level, getPos(), owner.getRandom().nextInt(8, 12), 0.5);
             markForRemoval();
             return;
         }
@@ -157,27 +145,45 @@ public class StardustProjectile extends Projectile {
     }
 
     /**
-     * 命中处理：造成伤害、添加药水效果、切换到黏贴状态。
+     * 产生新星细胞射弹，在同一位置向四周散射不同方向。
+     */
+    private void spawnNewProjectiles(Player owner, LivingEntity newTarget, Servant sourceServant, ServerLevel level) {
+        Vec3 spawnPos = getPos();
+        RandomSource rand = level.getRandom();
+        int count = rand.nextInt(1, 3);
+
+        for (int i = 0; i < count; i++) {
+            // 在同一位置生成射弹，但给予不同的初始速度方向（散射）
+            StardustProjectile newProjectile = new StardustProjectile(owner.getUUID(), sourceServant.getUuid(), spawnPos, newTarget);
+            // 给予随机方向的初始速度，实现散射效果
+            double theta = rand.nextDouble() * Math.PI * 2;
+            double phi = rand.nextDouble() * Math.PI * 0.5; // 主要向上半球散射
+            double speed = 0.15 + rand.nextDouble() * 0.1;
+            Vec3 scatterDir = new Vec3(Math.sin(phi) * Math.cos(theta) * speed, Math.cos(phi) * speed, Math.sin(phi) * Math.sin(theta) * speed);
+            newProjectile.applyForce(scatterDir.scale(2));
+
+            owner.getData(AttachmentRegister.ProjectileData).add(newProjectile);
+        }
+    }
+
+    // ===================== 命中处理 =====================
+
+    /**
+     * 命中时：造成伤害、施加寄生效果、黏贴到目标碰撞箱内随机位置。
      */
     private void onHit(Player owner, LivingEntity target) {
-        // 记录命中方向和角度
-        hitDirection = getVelocity().lengthSqr() > 0.01 ? getVelocity().normalize() : Vec3.ZERO;
+        // 黏贴到目标碰撞箱内随机位置
+        Vec3 attachOffset = randomPositionInBoundingBox(target.getBoundingBox(), target.getRandom());
+        attachTo(target, attachOffset);
 
-        // 计算附着位置（基于命中方向）
-        Vec3 attachedPos = calculateAttachedPosition(target);
-
-        // 切换到黏贴状态
-        attachTo(target, attachedPos);
-
-        // 造成伤害（使用来源仆从的伤害源和伤害值）
+        // 造成伤害
         Servant sourceServant = findServantByUuid(owner, getSourceServantUuid());
         if (sourceServant != null) {
-            ServantDamageSource damageSource = sourceServant.getDamageSource();
-            float damage = sourceServant.getDamage();
-            InvincibleData.servantAttack(target, sourceServant, 0, damageSource, damage, InvincibleData.Type.PARTIAL);
+            InvincibleData.servantAttack(target, sourceServant, 0,
+                    sourceServant.getDamageSource(), sourceServant.getDamage(), InvincibleData.Type.PARTIAL);
         }
 
-        // 添加细胞寄生药水效果
+        // 施加细胞寄生效果（可叠加）
         Holder<MobEffect> effectHolder = MobEffectRegister.CellParasitism;
         MobEffectInstance existing = target.getEffect(effectHolder);
         int newAmplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, MAX_PARASITISM_LEVEL - 1);
@@ -185,116 +191,59 @@ public class StardustProjectile extends Projectile {
     }
 
     /**
-     * 根据命中方向计算在目标身上的附着位置。
+     * 在碰撞箱内生成随机位置偏移。
      */
-    private Vec3 calculateAttachedPosition(LivingEntity target) {
-        AABB box = target.getBoundingBox();
-        double width = box.getXsize();
-        double height = box.getYsize();
-        double depth = box.getZsize();
-
-        // 根据入射方向确定附着面
-        double absX = Math.abs(hitDirection.x);
-        double absY = Math.abs(hitDirection.y);
-        double absZ = Math.abs(hitDirection.z);
-
-        double offsetX, offsetY, offsetZ;
-
-        // 选择入射方向最大的分量作为附着面
-        if (absY >= absX && absY >= absZ) {
-            // 从上方或下方命中
-            offsetX = (target.getRandom().nextDouble() - 0.5) * width * 0.6;
-            offsetY = hitDirection.y > 0 ? height * 0.1 : height * 0.9;
-            offsetZ = (target.getRandom().nextDouble() - 0.5) * depth * 0.6;
-        } else if (absX >= absZ) {
-            // 从左侧或右侧命中
-            offsetX = hitDirection.x > 0 ? width * 0.1 : width * 0.9;
-            offsetY = target.getRandom().nextDouble() * height * 0.8 + height * 0.1;
-            offsetZ = (target.getRandom().nextDouble() - 0.5) * depth * 0.6;
-        } else {
-            // 从前方或后方命中
-            offsetX = (target.getRandom().nextDouble() - 0.5) * width * 0.6;
-            offsetY = target.getRandom().nextDouble() * height * 0.8 + height * 0.1;
-            offsetZ = hitDirection.z > 0 ? depth * 0.1 : depth * 0.9;
-        }
-
-        // 转换为相对于目标位置的偏移
-        return new Vec3(
-                box.minX + offsetX - target.getX(),
-                box.minY + offsetY - target.getY(),
-                box.minZ + offsetZ - target.getZ()
-        );
+    private Vec3 randomPositionInBoundingBox(AABB box, RandomSource rand) {
+        double offsetX = (rand.nextDouble() - 0.5) * box.getXsize() * 0.8;
+        double offsetY = rand.nextDouble() * box.getYsize() * 0.8;
+        double offsetZ = (rand.nextDouble() - 0.5) * box.getZsize() * 0.8;
+        return new Vec3(offsetX, offsetY, offsetZ);
     }
 
     // ===================== 粒子效果 =====================
 
     /**
-     * 爆裂粒子效果（目标死亡时）。
+     * 散射粒子效果。
      */
-    private void spawnExplosionParticles(ServerLevel level, Vec3 pos) {
+    private void spawnScatterParticles(ServerLevel level, Vec3 pos, int count, double speed) {
         RandomSource rand = level.getRandom();
-        int particleCount = 8 + rand.nextInt(6);
-
-        for (int i = 0; i < particleCount; i++) {
-            double theta = rand.nextDouble() * Math.PI * 2.0;
+        for (int i = 0; i < count; i++) {
+            double theta = rand.nextDouble() * Math.PI * 2;
             double phi = rand.nextDouble() * Math.PI;
-            double speed = 0.4 + rand.nextDouble() * 0.5;
-
-            double vx = Math.sin(phi) * Math.cos(theta) * speed;
-            double vy = Math.cos(phi) * speed;
-            double vz = Math.sin(phi) * Math.sin(theta) * speed;
-
-            level.sendParticles(
-                    ParticleRegister.StardustScatter.get(),
-                    pos.x, pos.y, pos.z,
-                    0,
-                    vx, vy, vz,
-                    1.0
-            );
-        }
-    }
-
-    /**
-     * 消失残留粒子效果（追踪过程中消失）。
-     */
-    private void spawnDisappearParticles(ServerLevel level, Vec3 pos) {
-        RandomSource rand = level.getRandom();
-        int particleCount = 2 + rand.nextInt(2);
-
-        for (int i = 0; i < particleCount; i++) {
-            double spreadAngle = rand.nextDouble() * Math.PI * 2.0;
-            double spreadSpeed = 0.05 + rand.nextDouble() * 0.1;
-
-            double vx = Math.cos(spreadAngle) * spreadSpeed;
-            double vy = rand.nextDouble() * 0.05;
-            double vz = Math.sin(spreadAngle) * spreadSpeed;
-
-            level.sendParticles(
-                    ParticleRegister.StardustScatter.get(),
-                    pos.x, pos.y, pos.z,
-                    0,
-                    vx, vy, vz,
-                    1.0
-            );
+            double s = speed + rand.nextDouble() * speed;
+            level.sendParticles(ParticleRegister.StardustScatter.get(), pos.x(), pos.y(), pos.z(), 0, Math.sin(phi) * Math.cos(theta) * s, Math.cos(phi) * s, Math.sin(phi) * Math.sin(theta) * s, 1.0);
         }
     }
 
     // ===================== 辅助方法 =====================
 
-    private LivingEntity findEntityByUuid(ServerLevel level, UUID uuid) {
-        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, AABB.INFINITE)) {
-            if (entity.getUUID().equals(uuid)) {
-                return entity;
+    private LivingEntity getCachedTarget(ServerLevel level) {
+        if (cachedTarget == null && targetUuid != null) {
+            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, AABB.INFINITE)) {
+                if (entity.getUUID().equals(targetUuid)) {
+                    cachedTarget = entity;
+                    break;
+                }
             }
         }
-        return null;
+        return cachedTarget;
+    }
+
+    private LivingEntity getCachedAttachedTarget(ServerLevel level) {
+        if (cachedAttachedTarget == null && attachedTargetUuid != null) {
+            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, AABB.INFINITE)) {
+                if (entity.getUUID().equals(attachedTargetUuid)) {
+                    cachedAttachedTarget = entity;
+                    break;
+                }
+            }
+        }
+        return cachedAttachedTarget;
     }
 
     private Servant findServantByUuid(Player owner, UUID servantUuid) {
         for (Servant servant : owner.getData(AttachmentRegister.ServantData).getServants()) {
-            if (servant.getUuid().equals(servantUuid)) {
-                return servant;
-            }
+            if (servant.getUuid().equals(servantUuid)) return servant;
         }
         return null;
     }
@@ -302,34 +251,18 @@ public class StardustProjectile extends Projectile {
     // ===================== 网络同步 =====================
 
     @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(extraShootCooldown);
-    }
+    public void writeAdditional(RegistryFriendlyByteBuf buf) { }
 
     @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        extraShootCooldown = buf.readInt();
-    }
+    public void readAdditional(RegistryFriendlyByteBuf buf) { }
 
     // ===================== 属性实现 =====================
 
     @Override
-    public float getDamage() {
-        return 6f;
-    }
+    public float getDamage() { return 6f; }
 
     @Override
     public ProjectileType<? extends Projectile> getType() {
         return ProjectileRegister.StardustProjectile.get();
-    }
-
-    // ===================== 访问器 =====================
-
-    public int getExtraShootCooldown() {
-        return extraShootCooldown;
-    }
-
-    public void setExtraShootCooldown(int cooldown) {
-        this.extraShootCooldown = cooldown;
     }
 }

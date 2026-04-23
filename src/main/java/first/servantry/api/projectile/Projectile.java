@@ -42,8 +42,12 @@ public abstract class Projectile {
 
     // ===================== 基础标识字段 =====================
 
-    /** 射弹的唯一标识符，用于网络同步和持久化 */
+    /**
+     * 射弹的唯一标识符，用于网络同步和持久化
+     */
     private UUID uuid;
+
+    public int life = 0;
 
     /** 拥有该射弹的玩家UUID */
     private UUID ownerUuid;
@@ -275,12 +279,14 @@ public abstract class Projectile {
      */
     public void tick(Player owner) {
         this.owner = owner;
-
         if (!owner.level().isClientSide()) {
             // 服务端逻辑
             tickBehavior(owner);
             tickPhysics();
             updateHistoryNodes();
+            if (++life >= 400) {
+                markForRemoval();
+            }
         } else {
             // 客户端逻辑：直接使用网络同步来的目标节点
             this.currentPathNode = clientTargetNode;
@@ -405,10 +411,7 @@ public abstract class Projectile {
     public void updateAttachedPosition() {
         if (cachedAttachedTarget != null && cachedAttachedTarget.isAlive()) {
             Vec3 targetPos = cachedAttachedTarget.position();
-            setPath(Collections.singletonList(new PathNode(
-                    targetPos.add(attachedOffset),
-                    desiredYaw, desiredPitch, desiredRoll + getSpinSpeed()
-            )));
+            setPath(Collections.singletonList(new PathNode(targetPos.add(attachedOffset), desiredYaw, desiredPitch, desiredRoll + getSpinSpeed())));
         }
     }
 

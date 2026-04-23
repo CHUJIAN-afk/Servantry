@@ -60,7 +60,7 @@ public class ProjectileRenderDispatcher {
             renderer.render(projectile, poseStack, bufferSource, partialTick, packedLight, renderNode);
 
             // 如果渲染器实现了拖尾渲染接口，处理拖尾渲染
-            if (renderer instanceof IProjectileTrailRenderer trailRenderer) {
+            if (renderer instanceof IProjectileConeTrailRenderer trailRenderer) {
                 trailRenderer.processTrailRender(poseStack, bufferSource, partialTick, projectile, renderNode);
             }
 

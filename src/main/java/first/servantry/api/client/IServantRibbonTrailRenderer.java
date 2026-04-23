@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public interface IRibbonTrailRenderer {
+public interface IServantRibbonTrailRenderer {
 
     class TrailNode {
         public final Vector3f pos = new Vector3f();
@@ -39,6 +39,18 @@ public interface IRibbonTrailRenderer {
             super(name, fmt, mode, bufSize, affectsCrumbling, sort, setup, clear);
         }
 
+        /**
+         * 获取拖尾渲染类型。
+         * <p>
+         * 使用自定义 CompositeState 确保透明度正确渲染：
+         * <ul>
+         *   <li>使用实体半透明着色器</li>
+         *   <li>禁用背面剔除实现双面渲染</li>
+         *   <li>启用光照图支持全亮度</li>
+         *   <li>透明度混合模式确保正确的 Alpha 混合</li>
+         * </ul>
+         * </p>
+         */
         public static RenderType getTrail() {
             CompositeState state = CompositeState.builder()
                     .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
@@ -49,7 +61,7 @@ public interface IRibbonTrailRenderer {
                     .setOverlayState(OVERLAY)
                     .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(false);
-            return create("servantry_trail", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, true, state);
+            return create("ribbon_trail", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, true, state);
         }
     }
 

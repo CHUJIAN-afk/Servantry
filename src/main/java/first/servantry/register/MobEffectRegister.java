@@ -22,7 +22,7 @@ public class MobEffectRegister {
         return mobEffect;
     });
 
-    public static final DeferredHolder<MobEffect, MobEffect> CellParasitism = Register.register("cell_parasitism", () -> new MobEffect(MobEffectCategory.BENEFICIAL, 5578058) {
+    public static final DeferredHolder<MobEffect, MobEffect> CellParasitism = Register.register("cell_parasitism", () -> new MobEffect(MobEffectCategory.BENEFICIAL, 0x8AE0FF) {
 
         @Override
         public boolean applyEffectTick(@NotNull LivingEntity entity, int amplifier) {

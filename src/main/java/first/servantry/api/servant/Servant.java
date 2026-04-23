@@ -2,6 +2,7 @@ package first.servantry.api.servant;
 
 import first.servantry.api.ai.ServantGoalSelector;
 import first.servantry.api.register.ServantType;
+import first.servantry.common.attachment.TargetCacheData;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.DamageRegister;
 import net.minecraft.core.Registry;
@@ -243,15 +244,19 @@ public abstract class Servant {
 
     /**
      * 在所有者周围搜索一个有效目标。
-     * 默认搜索半径为 16 格，返回第一个满足 {@link #isTarget(LivingEntity)} 的实体。
+     * 使用 TargetCacheData 缓存优化，避免重复计算距离。
      *
      * @return 找到的目标实体，若没有则返回 null
      */
     public LivingEntity searchTarget() {
         Player owner = getOwner();
-        return owner.level().getEntitiesOfClass(LivingEntity.class, owner.getBoundingBox().inflate(32)).stream()
+        TargetCacheData cache = owner.getData(AttachmentRegister.TargetCacheData);
+        // 使用缓存获取候选目标（64格内，不要求视线）
+        List<LivingEntity> candidates = cache.getTargets(this, getTargetDistance() * getTargetDistance(), 4096.0, requireLineOfSight());
+        // 过滤有效目标并按评分排序
+        return candidates.stream()
                 .filter(this::isTarget)
-                .sorted(Comparator.comparingDouble(target -> {
+                .min(Comparator.comparingDouble(target -> {
                     double score = target.distanceToSqr(getPos());
                     if (target.distanceToSqr(owner) < 36.0) {
                         score -= 10000.0;
@@ -262,8 +267,23 @@ public abstract class Servant {
                     score += (target.hashCode() * 31 + hashCode() * 17) % 5 * 40;
                     return score;
                 }))
-                .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * 获取仆从搜索目标的最大距离（默认64格）
+     * @return 最大距离（平方）
+     */
+    public int getTargetDistance() {
+        return 64;
+    }
+
+    /**
+     * 搜索目标时是否要求目标可见（默认true）
+     * @return 是否要求目标可见
+     */
+    public boolean requireLineOfSight() {
+        return true;
     }
 
     /**

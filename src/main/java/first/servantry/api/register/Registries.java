@@ -21,13 +21,11 @@ public class Registries {
 
     /** 仆从类型注册表键 */
     private static final ResourceKey<Registry<ServantType<? extends Servant>>> SERVANT_TYPE_KEY = ResourceKey.createRegistryKey(Servantry.rl("servant_types"));
-
     /** 仆从类型注册表 */
     public static final Registry<ServantType<? extends Servant>> SERVANT_TYPES = new RegistryBuilder<>(SERVANT_TYPE_KEY).sync(true).create();
 
     /** 射弹类型注册表键 */
     private static final ResourceKey<Registry<ProjectileType<? extends Projectile>>> PROJECTILE_TYPE_KEY = ResourceKey.createRegistryKey(Servantry.rl("projectile_types"));
-
     /** 射弹类型注册表 */
     public static final Registry<ProjectileType<? extends Projectile>> PROJECTILE_TYPES = new RegistryBuilder<>(PROJECTILE_TYPE_KEY).sync(true).create();
 

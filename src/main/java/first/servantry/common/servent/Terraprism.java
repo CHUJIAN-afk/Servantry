@@ -7,8 +7,8 @@ import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.PlannedPath;
 import first.servantry.api.servant.Servant;
 import first.servantry.common.attachment.InvincibleData;
-import first.servantry.common.servent.gaol.TerraprismAttackGoal;
-import first.servantry.common.servent.gaol.TerraprismIdleGoal;
+import first.servantry.common.servent.goal.TerraprismAttackGoal;
+import first.servantry.common.servent.goal.TerraprismIdleGoal;
 import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
@@ -67,6 +67,16 @@ public class Terraprism extends Servant implements ICollideAttack {
                 }
             }
         }
+    }
+
+    @Override
+    public int getTargetDistance() {
+        return 32;
+    }
+
+    @Override
+    public boolean requireLineOfSight() {
+        return !attacking;
     }
 
     @Override

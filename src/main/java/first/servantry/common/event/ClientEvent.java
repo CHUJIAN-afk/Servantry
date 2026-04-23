@@ -7,11 +7,12 @@ import first.servantry.api.client.ServantRenderDispatcher;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.register.Registries;
 import first.servantry.api.register.ServantType;
+import first.servantry.client.renderer.projectile.StardustProjectileConeRenderer;
+import first.servantry.client.renderer.servant.EnchantedThrowingKnivesRendererServant;
+import first.servantry.client.renderer.servant.StardustCellRendererServant;
+import first.servantry.client.renderer.servant.TerraprismRendererServant;
 import first.servantry.common.attachment.ServantData;
 import first.servantry.common.particle.StardustScatterParticle;
-import first.servantry.client.renderer.servant.StardustCellRenderer;
-import first.servantry.client.renderer.projectile.StardustProjectileRenderer;
-import first.servantry.client.renderer.servant.TerraprismRenderer;
 import first.servantry.register.*;
 import first.servantry.utils.ArmorSetUtil;
 import net.minecraft.ChatFormatting;
@@ -54,9 +55,10 @@ public class ClientEvent {
 
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
-        ServantRenderDispatcher.register(ServantRegister.TerraPrism.get(), new TerraprismRenderer());
-        ServantRenderDispatcher.register(ServantRegister.StardustCell.get(), new StardustCellRenderer());
-        ProjectileRenderDispatcher.register(ProjectileRegister.StardustProjectile.get(), new StardustProjectileRenderer());
+        ServantRenderDispatcher.register(ServantRegister.TerraPrism.get(), new TerraprismRendererServant());
+        ServantRenderDispatcher.register(ServantRegister.StardustCell.get(), new StardustCellRendererServant());
+        ServantRenderDispatcher.register(ServantRegister.EnchantedThrowingKnives.get(), new EnchantedThrowingKnivesRendererServant());
+        ProjectileRenderDispatcher.register(ProjectileRegister.StardustProjectile.get(), new StardustProjectileConeRenderer());
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

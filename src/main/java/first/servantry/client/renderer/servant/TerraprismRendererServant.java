@@ -3,7 +3,7 @@ package first.servantry.client.renderer.servant;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import first.servantry.api.client.IRibbonTrailRenderer;
+import first.servantry.api.client.IServantRibbonTrailRenderer;
 import first.servantry.api.client.IServantRenderer;
 import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.Servant;
@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-public class TerraprismRenderer implements IRibbonTrailRenderer, IServantRenderer<Terraprism> {
+public class TerraprismRendererServant implements IServantRibbonTrailRenderer, IServantRenderer<Terraprism> {
 
     @Override
     public PathNode getVisualRenderNode(Servant servant, float partialTick, PathNode rawRenderNode) {
@@ -74,7 +74,7 @@ public class TerraprismRenderer implements IRibbonTrailRenderer, IServantRendere
 
     @Override
     public int getTrailHistoryLength() {
-        return 5;
+        return 3;
     }
 
     /**

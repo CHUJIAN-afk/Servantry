@@ -2,7 +2,7 @@ package first.servantry.client.renderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import first.servantry.api.client.IConeTrailRenderer;
+import first.servantry.api.client.IServantConeTrailRenderer;
 import first.servantry.api.client.IServantRenderer;
 import first.servantry.api.servant.PathNode;
 import first.servantry.api.servant.Servant;
@@ -18,16 +18,16 @@ import net.minecraft.world.phys.Vec3;
 /**
  * 星尘细胞渲染器，同时实现物品模型渲染和圆锥拖尾特效。
  * <p>
- * 该渲染器通过实现 {@link IConeTrailRenderer} 将拖尾逻辑与仆从实体解耦，
+ * 该渲染器通过实现 {@link IServantConeTrailRenderer} 将拖尾逻辑与仆从实体解耦，
  * 拖尾的颜色、半径、淡出曲线等参数在此统一配置。
  * </p>
  * <p>
  * 渲染顺序：先绘制拖尾（若计时器有效），再绘制仆从的本体模型（使用物品渲染）。
  * </p>
  */
-public class StardustCellRenderer implements IConeTrailRenderer, IServantRenderer<StardustCell> {
+public class StardustCellRendererServant implements IServantConeTrailRenderer, IServantRenderer<StardustCell> {
 
-    // ===================== IConeTrailRenderer 实现 =====================
+    // ===================== IServantConeTrailRenderer 实现 =====================
     @Override
     public int getTrailTimer(Servant servant) {
         return ((StardustCell) servant).trailTimer;
@@ -84,23 +84,14 @@ public class StardustCellRenderer implements IConeTrailRenderer, IServantRendere
      * @param renderNode   原始渲染节点（未经客户端动画插值）
      */
     @Override
-    public void render(StardustCell servant, PoseStack poseStack, MultiBufferSource bufferSource,
-                       float partialTick, int packedLight, PathNode renderNode) {
-
-        // 1. 先渲染拖尾（若计时器有效）
-        // processConeTrailRender 内部会检查计时器，无效时自动跳过
-        processConeTrailRender(poseStack, bufferSource, partialTick, servant, renderNode);
-
-        // 2. 渲染仆从模型（物品形式）
+    public void render(StardustCell servant, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode) {
+        // 渲染仆从模型
         PathNode visualNode = getVisualRenderNode(servant, partialTick, renderNode);
         poseStack.pushPose();
-
         // 应用视觉节点相对于原始节点的偏移（插值导致的位置微调）
         Vec3 offset = visualNode.pos().subtract(renderNode.pos());
         poseStack.translate(offset.x, offset.y, offset.z);
-
         renderModel(servant, poseStack, bufferSource, visualNode);
-
         poseStack.popPose();
     }
 

@@ -29,6 +29,5 @@ public interface IProjectileRenderer<T extends Projectile> {
      * @param packedLight   光照值
      * @param renderNode    渲染节点（位置和旋转）
      */
-    void render(T projectile, PoseStack poseStack, MultiBufferSource bufferSource,
-                float partialTick, int packedLight, PathNode renderNode);
+    void render(T projectile, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode);
 }

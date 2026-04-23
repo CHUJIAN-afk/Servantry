@@ -1,4 +1,4 @@
-package first.servantry.common.servent.gaol;
+package first.servantry.common.servent.goal;
 
 import first.servantry.api.ai.ServantGoal;
 import first.servantry.common.servent.Terraprism;
