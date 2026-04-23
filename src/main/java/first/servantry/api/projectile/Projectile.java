@@ -174,6 +174,7 @@ public abstract class Projectile extends AttachmentEntity {
         if (trailTimer > 0) {
             trailTimer--;
         }
+        super.tick();
     }
 
     // ===================== 可重写配置 =====================

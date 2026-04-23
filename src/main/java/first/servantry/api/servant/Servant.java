@@ -101,7 +101,6 @@ public abstract class Servant extends AttachmentEntity {
 
     @Override
     public void tick() {
-        super.tick();
         if (!owner.level().isClientSide()) {
             // 服务端：执行AI逻辑
             setTargetChange(false);
@@ -115,6 +114,7 @@ public abstract class Servant extends AttachmentEntity {
             // 客户端：使用同步数据更新位置
             currentPathNode = clientTargetNode;
         }
+        super.tick();
     }
 
     // ===================== 目标搜索 =====================
