@@ -1,12 +1,12 @@
 package first.servantry.common.servent;
 
-import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.api.register.ServantType;
-import first.servantry.api.servant.ICollideAttack;
 import first.servantry.api.PathNode;
 import first.servantry.api.PlannedPath;
-import first.servantry.api.servant.Servant;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.register.ServantType;
+import first.servantry.api.entity.ICollideAttack;
+import first.servantry.api.servant.Servant;
+import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servent.goal.TerraprismAttackGoal;
 import first.servantry.common.servent.goal.TerraprismIdleGoal;
 import first.servantry.register.ServantRegister;
@@ -59,7 +59,7 @@ public class Terraprism extends Servant implements ICollideAttack {
     }
 
     @Override
-    public void collisionAttack(Set<LivingEntity> hitTargets) {
+    public void onCollisionAttack(Set<LivingEntity> hitTargets) {
         if (isExecutingPath()) {
             for (LivingEntity target : hitTargets) {
                 if (this.hitTargets.add(target)) {
@@ -197,7 +197,7 @@ public class Terraprism extends Servant implements ICollideAttack {
     }
 
     @Override
-    public ServantType<? extends Servant> getType() {
+    public ServantType<? extends Servant> getServantType() {
         return ServantRegister.TerraPrism.get();
     }
 

@@ -1,10 +1,10 @@
 package first.servantry.common.servent.goal;
 
-import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.api.PathNode;
 import first.servantry.api.PlannedPath;
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.servant.Servant;
-import first.servantry.api.common.attachment.ServantData;
+import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servent.Terraprism;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.util.Mth;
@@ -81,7 +81,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
      * </p>
      */
     public boolean canTransitionToAttack(Player owner) {
-        ServantData data = owner.getData(AttachmentRegister.ServantData);
+        EntityData data = owner.getData(AttachmentRegister.EntityData);
         int maxOrder = -1;
         Servant chosen = null;
         for (Servant s : data.getServants()) {

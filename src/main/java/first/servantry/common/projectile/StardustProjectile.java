@@ -1,9 +1,9 @@
 package first.servantry.common.projectile;
 
+import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ProjectileType;
 import first.servantry.api.servant.Servant;
-import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.MobEffectRegister;
 import first.servantry.register.ParticleRegister;
@@ -161,7 +161,7 @@ public class StardustProjectile extends Projectile {
             Vec3 scatterDir = new Vec3(Math.sin(phi) * Math.cos(theta) * speed, Math.cos(phi) * speed, Math.sin(phi) * Math.sin(theta) * speed);
             newProjectile.applyForce(scatterDir.scale(2));
 
-            owner.getData(AttachmentRegister.ProjectileData).add(newProjectile);
+            owner.getData(AttachmentRegister.EntityData).addProjectile(newProjectile);
         }
     }
 
@@ -241,7 +241,7 @@ public class StardustProjectile extends Projectile {
     }
 
     private Servant findServantByUuid(Player owner, UUID servantUuid) {
-        for (Servant servant : owner.getData(AttachmentRegister.ServantData).getServants()) {
+        for (Servant servant : owner.getData(AttachmentRegister.EntityData).getServants()) {
             if (servant.getUuid().equals(servantUuid)) return servant;
         }
         return null;
@@ -261,7 +261,7 @@ public class StardustProjectile extends Projectile {
     public float getDamage() { return 6f; }
 
     @Override
-    public ProjectileType<? extends Projectile> getType() {
+    public ProjectileType<? extends Projectile> getProjectileType() {
         return ProjectileRegister.StardustProjectile.get();
     }
 }

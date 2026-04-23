@@ -1,8 +1,8 @@
 package first.servantry.common.servent;
 
-import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.MomentumServant;
+import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servent.goal.StardustCellAttackGoal;
 import first.servantry.common.servent.goal.StardustCellIdleGoal;
 import first.servantry.common.servent.goal.StardustCellTeleportGoal;
@@ -59,13 +59,11 @@ public class StardustCell extends MomentumServant {
     @Override
     public void writeAdditional(RegistryFriendlyByteBuf buf) {
         buf.writeInt(trailTimer);
-        buf.writeInt(extraShootCooldown);
     }
 
     @Override
     public void readAdditional(RegistryFriendlyByteBuf buf) {
         trailTimer = buf.readInt();
-        extraShootCooldown = buf.readInt();
     }
 
     @Override
@@ -77,7 +75,7 @@ public class StardustCell extends MomentumServant {
     public void tick() {
         super.tick();
         if (!getOwner().level().isClientSide()) {
-            // 服务端：冷却衰减
+            // 冷却衰减
             if (shootCooldown > 0) shootCooldown--;
             if (extraShootCooldown > 0) extraShootCooldown--;
             if (trailTimer > 0) trailTimer--;
@@ -127,7 +125,7 @@ public class StardustCell extends MomentumServant {
     public float getKnockback() { return 0.2f; }
 
     @Override
-    public ServantType<? extends MomentumServant> getType() { return ServantRegister.StardustCell.get(); }
+    public ServantType<? extends MomentumServant> getServantType() { return ServantRegister.StardustCell.get(); }
 
     // ===================== 访问器 =====================
 

@@ -1,9 +1,9 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.PathNode;
-import first.servantry.api.common.attachment.ServantData;
+import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.item.IServantWeapon;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
@@ -37,7 +37,7 @@ public class ItemRegister {
                     .sound(SoundRegister.UseServantWeapon)
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();
-                        ServantData data = owner.getData(AttachmentRegister.ServantData);
+                        EntityData data = owner.getData(AttachmentRegister.EntityData);
                         PathNode idle = servant.getInterpolatedIdleState(owner, data.getOrder(servant), Math.max(1, data.getSameSize(servant)), 1.0f);
                         Vec3 center = owner.getBoundingBox().getCenter();
                         servant.init(new PathNode(new Vec3(center.x(), idle.pos().y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));

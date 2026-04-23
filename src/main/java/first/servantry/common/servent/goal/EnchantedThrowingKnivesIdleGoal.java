@@ -1,8 +1,8 @@
 package first.servantry.common.servent.goal;
 
-import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.api.PathNode;
-import first.servantry.api.common.attachment.ServantData;
+import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servent.EnchantedThrowingKnives;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.util.Mth;
@@ -55,7 +55,7 @@ public class EnchantedThrowingKnivesIdleGoal extends ServantGoal<EnchantedThrowi
         Player owner = servant.getOwner();
         if (owner == null) return;
 
-        ServantData data = owner.getData(AttachmentRegister.ServantData);
+        EntityData data = owner.getData(AttachmentRegister.EntityData);
         PathNode idleNode = servant.getInterpolatedIdleState(owner, data.getOrder(servant), Math.max(1, data.getSameSize(servant)), 1.0f);
 
         // 平滑过渡到空闲位置

@@ -2,11 +2,10 @@ package first.servantry.client.renderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
-import first.servantry.api.client.servant.AbstractServantRenderer;
-import first.servantry.api.client.servant.ServantRenderConfig;
-import first.servantry.api.common.attachment.ServantData;
+import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
+import first.servantry.api.client.render.RenderContext;
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.common.servent.EnchantedThrowingKnives;
-import first.servantry.common.servent.Terraprism;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ItemRegister;
 import net.minecraft.client.Minecraft;
@@ -23,13 +22,14 @@ import net.minecraft.world.phys.Vec3;
  * 使用丝带拖尾，渲染飞刀本体和拖尾轨迹。
  * </p>
  */
-public class EnchantedThrowingKnivesRendererServant extends AbstractServantRenderer<EnchantedThrowingKnives> {
+public class EnchantedThrowingKnivesRendererServant extends AbstractAttachmentEntityRenderer<EnchantedThrowingKnives> {
 
     @Override
-    protected ServantRenderConfig<EnchantedThrowingKnives> createConfig(EnchantedThrowingKnives servant) {
-        return ServantRenderConfig.<EnchantedThrowingKnives>ribbon(servant.trailTimer, 0x88CCFF)
+    protected RenderContext<EnchantedThrowingKnives> createContext(EnchantedThrowingKnives servant) {
+        int trailTimer = servant.attacking ? servant.trailTimer : 0;
+        return RenderContext.<EnchantedThrowingKnives>ribbon(trailTimer, 0x88CCFF)
                 .trailHistoryLength(3)
-                .trailStartIndex(Math.max(0, 10 - servant.trailTimer))
+                .trailStartIndex(Math.max(0, 10 - trailTimer))
                 .trailColorFunction((s, progress, timeShift) -> {
                     // 淡蓝色基调 (136, 204, 255)
                     int r = 136;
@@ -62,7 +62,7 @@ public class EnchantedThrowingKnivesRendererServant extends AbstractServantRende
                     float blend = Mth.lerp(partialTick, knives.idleBlendO, knives.idleBlend);
                     var owner = knives.getOwner();
                     if (blend > 0f && owner != null) {
-                        ServantData data = owner.getData(AttachmentRegister.ServantData);
+                        EntityData data = owner.getData(AttachmentRegister.EntityData);
                         PathNode idealNode = knives.getInterpolatedIdleState(owner, data.getOrder(knives), Math.max(1, data.getSameSize(knives)), partialTick);
                         Vec3 pos = rawNode.pos().lerp(idealNode.pos(), blend);
                         float yaw = Mth.rotLerp(blend, rawNode.yaw(), idealNode.yaw());
@@ -75,7 +75,7 @@ public class EnchantedThrowingKnivesRendererServant extends AbstractServantRende
     }
 
     @Override
-    protected void renderModelItem(EnchantedThrowingKnives servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, ServantRenderConfig<EnchantedThrowingKnives> config) {
+    protected void renderEntity(EnchantedThrowingKnives servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EnchantedThrowingKnives> config) {
         Minecraft.getInstance().getItemRenderer().renderStatic(
                 ItemRegister.EnchantedThrowingKnives.get().getDefaultInstance(),
                 ItemDisplayContext.FIXED,

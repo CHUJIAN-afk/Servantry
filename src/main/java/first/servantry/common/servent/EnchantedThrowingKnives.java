@@ -1,11 +1,11 @@
 package first.servantry.common.servent;
 
-import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.api.register.ServantType;
-import first.servantry.api.servant.ICollideAttack;
 import first.servantry.api.PathNode;
-import first.servantry.api.servant.Servant;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.register.ServantType;
+import first.servantry.api.entity.ICollideAttack;
+import first.servantry.api.servant.Servant;
+import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servent.goal.EnchantedThrowingKnivesAttackGoal;
 import first.servantry.common.servent.goal.EnchantedThrowingKnivesIdleGoal;
 import first.servantry.register.ServantRegister;
@@ -81,7 +81,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack {
     // ===================== 碰撞攻击 =====================
 
     @Override
-    public void collisionAttack(Set<LivingEntity> targets) {
+    public void onCollisionAttack(Set<LivingEntity> targets) {
         if (isExecutingPath()) {
             for (LivingEntity target : targets) {
                 InvincibleData.servantAttack(target, this, 10, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
@@ -168,7 +168,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack {
     // ===================== 注册类型 =====================
 
     @Override
-    public ServantType<? extends Servant> getType() {
+    public ServantType<? extends Servant> getServantType() {
         return ServantRegister.EnchantedThrowingKnives.get();
     }
 }

@@ -2,9 +2,8 @@ package first.servantry.api.core;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
-import first.servantry.api.client.ProjectileRenderDispatcher;
-import first.servantry.api.client.ServantRenderDispatcher;
-import first.servantry.api.common.attachment.ServantData;
+import first.servantry.api.client.render.EntityRenderDispatcher;
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.register.ServantryRegistries;
@@ -57,8 +56,7 @@ public class ClientEvent {
             float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
             MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();
             for (Player player : clientLevel.players()) {
-                ServantRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
-                ProjectileRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
+                EntityRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
             }
         }
     }
@@ -77,7 +75,7 @@ public class ClientEvent {
 
             if (location != null) {
                 String key = "servant." + location.getNamespace() + "." + location.getPath();
-                ServantData data = player.getData(AttachmentRegister.ServantData);
+                EntityData data = player.getData(AttachmentRegister.EntityData);
                 float damage = iServantWeapon.getDamage();
                 float knockback = iServantWeapon.getKnockback();
 
@@ -103,7 +101,7 @@ public class ClientEvent {
                 // 4. 栏位消耗 (例如: "仆从栏位: 3 / 5")
                 toolTip.add(Component.translatable("item.servantry.tooltip.slots",
                         Component.literal(String.valueOf(data.getServants().size())).withStyle(ChatFormatting.BLUE),
-                        Component.literal(String.valueOf(data.getMaxSize(player))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
+                        Component.literal(String.valueOf(data.getMaxServantSize(player))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
 
                 // 5. 移除操作提示 (深灰色，避免喧宾夺主)
                 toolTip.add(Component.translatable("item.servantry.tooltip.remove_all").withStyle(ChatFormatting.GRAY));
@@ -137,4 +135,5 @@ public class ClientEvent {
             ArmorSetUtil.addSetBonusTooltip(player, hallowedArmorMaterial, toolTip);
         }
     }
+
 }

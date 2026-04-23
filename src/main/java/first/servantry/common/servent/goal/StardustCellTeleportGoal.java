@@ -1,7 +1,7 @@
 package first.servantry.common.servent.goal;
 
-import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.api.PathNode;
+import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servent.StardustCell;
 import first.servantry.register.AttachmentRegister;
@@ -95,7 +95,7 @@ public class StardustCellTeleportGoal extends ServantGoal<StardustCell> {
                         servant.getPos(),
                         target
                 );
-                owner.getData(AttachmentRegister.ProjectileData).add(projectile);
+                owner.getData(AttachmentRegister.EntityData).addProjectile(projectile);
             }
             servant.setTeleportTimer(0);
         }

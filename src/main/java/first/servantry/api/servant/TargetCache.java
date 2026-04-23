@@ -19,9 +19,6 @@ public class TargetCache {
     /** 缓存的实体列表 */
     private final List<LivingEntity> entities = new ArrayList<>();
 
-    /** 缓存的最大搜索半径 */
-    private static final double CACHE_RADIUS = 32;
-
     /**
      * 更新缓存。每tick调用一次。
      *
@@ -29,11 +26,8 @@ public class TargetCache {
      */
     public void update(Player player) {
         entities.clear();
-        AABB searchBox = player.getBoundingBox().inflate(CACHE_RADIUS);
-        List<LivingEntity> result = player.level().getEntitiesOfClass(
-                LivingEntity.class, searchBox,
-                e -> e.isAlive() && e != player
-        );
+        AABB searchBox = player.getBoundingBox().inflate(32);
+        List<LivingEntity> result = player.level().getEntitiesOfClass(LivingEntity.class, searchBox, e -> e.isAlive() && e != player);
         entities.addAll(result);
     }
 

@@ -1,8 +1,8 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import first.servantry.api.register.ServantryRegistries;
 import first.servantry.api.register.ServantType;
+import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.servent.EnchantedThrowingKnives;
 import first.servantry.common.servent.StardustCell;
 import first.servantry.common.servent.Terraprism;

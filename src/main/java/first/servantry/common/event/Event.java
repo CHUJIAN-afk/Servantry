@@ -1,13 +1,10 @@
 package first.servantry.common.event;
 
 import first.servantry.Servantry;
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.event.ServantIncomingDamageEvent;
-import first.servantry.api.item.IServantWeapon;
-import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.api.common.attachment.ProjectileData;
-import first.servantry.api.common.attachment.ServantData;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servent.StardustCell;
 import first.servantry.common.servent.goal.StardustCellAttackGoal;
@@ -20,34 +17,21 @@ import first.servantry.utils.ArmorSetUtil;
 import first.servantry.utils.AttributeUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
-import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
@@ -114,14 +98,13 @@ public class Event {
         if (damageSource.getEntity() instanceof Player player && !player.level().isClientSide()) {
             LivingEntity target = event.getEntity();
             if (target.isAlive()) {
-                ServantData servantData = player.getData(AttachmentRegister.ServantData);
-                ProjectileData projectileData = player.getData(AttachmentRegister.ProjectileData);
-                for (Servant servant : servantData.getServants()) {
+                EntityData entityData = player.getData(AttachmentRegister.EntityData);
+                for (Servant servant : entityData.getServants()) {
                     if (servant instanceof StardustCell cell && cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
                         Vec3 startPos = servant.getPos();
                         StardustProjectile newProjectile = new StardustProjectile(player.getUUID(), servant.getUuid(), startPos, target);
                         newProjectile.life = 10;
-                        projectileData.add(newProjectile);
+                        entityData.addProjectile(newProjectile);
                         cell.setExtraShootCooldown(14);
                         // 后坐力
                         Vec3 direction = target.getBoundingBox().getCenter().subtract(startPos).normalize();

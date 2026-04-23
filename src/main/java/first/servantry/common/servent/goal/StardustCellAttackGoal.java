@@ -41,7 +41,7 @@ public class StardustCellAttackGoal extends ServantGoal<StardustCell> {
         if (target == null || !target.isAlive()) return;
 
         Player owner = servant.getOwner();
-        int order = owner.getData(AttachmentRegister.ServantData).getOrder(servant);
+        int order = owner.getData(AttachmentRegister.EntityData).getOrder(servant);
         Vec3 anchor = servant.getHaloAnchorPos(owner, target, order);
 
         Vec3 toAnchor = anchor.subtract(servant.getPos());
@@ -74,7 +74,7 @@ public class StardustCellAttackGoal extends ServantGoal<StardustCell> {
         // 创建并发射星细胞射弹
         StardustProjectile projectile = new StardustProjectile(owner.getUUID(), servant.getUuid(), start, target);
         projectile.life = 10;
-        owner.getData(AttachmentRegister.ProjectileData).add(projectile);
+        owner.getData(AttachmentRegister.EntityData).addProjectile(projectile);
         // 后坐力
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
         spawnShootParticles((ServerLevel) owner.level(), start, direction);
