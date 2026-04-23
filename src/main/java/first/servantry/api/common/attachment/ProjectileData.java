@@ -1,8 +1,8 @@
-package first.servantry.common.attachment;
+package first.servantry.api.common.attachment;
 
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ProjectileType;
-import first.servantry.api.register.Registries;
+import first.servantry.api.register.ServantryRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.attachment.AttachmentSyncHandler;
@@ -142,7 +142,7 @@ public class ProjectileData implements AttachmentSyncHandler<ProjectileData> {
         buf.writeVarInt(data.projectiles.size());
         for (Projectile projectile : data.projectiles) {
             buf.writeUUID(projectile.getUuid());
-            ResourceLocation location = Registries.PROJECTILE_TYPES.getKey(projectile.getType());
+            ResourceLocation location = ServantryRegistries.PROJECTILE_TYPES.getKey(projectile.getType());
             assert location != null;
             buf.writeResourceLocation(location);
             projectile.writeBase(buf);
@@ -167,7 +167,7 @@ public class ProjectileData implements AttachmentSyncHandler<ProjectileData> {
             ResourceLocation location = buf.readResourceLocation();
             Projectile projectile = existingProjectiles.get(uuid);
             if (projectile == null) {
-                ProjectileType<? extends Projectile> projectileType = Registries.PROJECTILE_TYPES.get(location);
+                ProjectileType<? extends Projectile> projectileType = ServantryRegistries.PROJECTILE_TYPES.get(location);
                 assert projectileType != null;
                 projectile = projectileType.factory().get();
                 projectile.setUuid(uuid);

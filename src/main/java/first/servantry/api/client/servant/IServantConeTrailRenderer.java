@@ -1,15 +1,12 @@
-package first.servantry.api.client;
+package first.servantry.api.client.servant;
 
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import first.servantry.Servantry;
-import first.servantry.api.projectile.Projectile;
-import first.servantry.api.servant.PathNode;
+import first.servantry.api.client.renderType.TrailRenderType;
+import first.servantry.api.PathNode;
+import first.servantry.api.servant.Servant;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.Vec3;
@@ -20,14 +17,11 @@ import org.joml.Vector3f;
 import java.util.*;
 
 /**
- * 射弹圆锥形拖尾渲染接口。
+ * 圆锥形拖尾渲染接口。
  * <p>
- * 该接口为射弹实体提供一种末端细、前端粗的拖尾效果，拖尾沿运动轨迹生成，
+ * 该接口为仆从实体提供一种末端细、前端粗的拖尾效果，拖尾沿运动轨迹生成，
  * 并通过 Catmull-Rom 样条插值和球面线性插值实现平滑的路径与旋转过渡。
  * 拖尾颜色、半径和透明度随进度渐变，末端自然消散。
- * </p>
- * <p>
- * 与 {@link IServantConeTrailRenderer} 功能相同，但专为射弹设计，不依赖仆从类型。
  * </p>
  * <p>
  * 渲染流程：
@@ -40,12 +34,12 @@ import java.util.*;
  * </ol>
  * </p>
  */
-public interface IProjectileConeTrailRenderer {
+public interface IServantConeTrailRenderer {
 
     /**
      * 单个平滑后的拖尾节点，包含世界坐标和旋转四元数。
      */
-    record TrailNode(Vec3 pos, Quaternionf rot) {
+    record ConeTrailNode(Vec3 pos, Quaternionf rot) {
     }
 
     // ===================== 核心控制方法 =====================
@@ -54,17 +48,17 @@ public interface IProjectileConeTrailRenderer {
      * 获取拖尾计时器的当前值。
      * <p>
      * 计时器大于 0 时拖尾可见，小于等于 0 时跳过所有渲染计算。
+     * 实现类通常根据仆从的状态（如冲刺、技能）递增计时器，并随时间衰减。
      * </p>
      *
-     * @param projectile 射弹实体
      * @return 拖尾计时器值（非负数）
      */
-    int getTrailTimer(Projectile projectile);
+    int getTrailTimer(Servant servant);
 
     /**
      * 获取拖尾渲染时使用的历史节点数量。
      * <p>
-     * 该值决定了参与样条插值的原始轨迹节点个数。默认返回 4。
+     * 该值决定了参与样条插值的原始轨迹节点个数。默认返回 4，表示使用最近 4 个历史位置。
      * </p>
      *
      * @return 历史节点缓存长度
@@ -104,12 +98,12 @@ public interface IProjectileConeTrailRenderer {
      * 默认直接返回原始节点。子类可重写以实现更平滑的视觉位置。
      * </p>
      *
-     * @param projectile     射弹实体
-     * @param partialTick    当前帧插值进度（0~1）
-     * @param rawRenderNode  原始渲染节点
+     * @param servant       仆从实体
+     * @param partialTick   当前帧插值进度（0~1）
+     * @param rawRenderNode 原始渲染节点
      * @return 实际用于定位拖尾头部的节点
      */
-    default PathNode getVisualRenderNode(Projectile projectile, float partialTick, PathNode rawRenderNode) {
+    default PathNode getVisualRenderNode(Servant servant, float partialTick, PathNode rawRenderNode) {
         return rawRenderNode;
     }
 
@@ -133,13 +127,14 @@ public interface IProjectileConeTrailRenderer {
      * @return 淡出因子（0~1）
      */
     default float getTrailFadeOut(float progress) {
+        // 使用幂次为 1.5 的衰减曲线，末端快速变细消失
         return (float) Math.pow(Math.max(0.0f, 1.0f - progress), 1.5);
     }
 
     /**
      * 获取圆锥横截面的多边形边数。
      * <p>
-     * 边数越多，圆柱体越圆滑，但顶点数量成倍增加。默认 6 边形。
+     * 边数越多，圆柱体越圆滑，但顶点数量成倍增加。默认 6 边形，平衡性能与效果。
      * </p>
      *
      * @return 多边形边数（至少为 3）
@@ -168,6 +163,7 @@ public interface IProjectileConeTrailRenderer {
      * 预计算正/余弦值的缓存表，用于加速圆形截面的顶点计算。
      * <p>
      * 避免每帧重复调用 Math.cos 和 Math.sin，尤其当分辨率固定时。
+     * 每个实例持有自己的缓存，以应对不同分辨率。
      * </p>
      */
     final class CircleVertexCache {
@@ -211,19 +207,19 @@ public interface IProjectileConeTrailRenderer {
      * @param poseStack     矩阵栈，用于变换坐标系
      * @param bufferSource  渲染缓冲源
      * @param partialTick   当前帧插值进度
-     * @param projectile    射弹实体
+     * @param servant       仆从实体
      * @param rawRenderNode 原始渲染节点
      */
-    default void processTrailRender(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, Projectile projectile, PathNode rawRenderNode) {
-        int timer = getTrailTimer(projectile);
+    default void processConeTrailRender(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, Servant servant, PathNode rawRenderNode) {
+        int timer = getTrailTimer(servant);
         if (timer <= 0) return;
 
-        LinkedList<PathNode> history = projectile.getHistoryNodes();
+        LinkedList<PathNode> history = servant.getHistoryNodes();
         int actualLength = Math.min(history.size(), getTrailHistoryLength());
         if (actualLength < 3) return;
 
         // 1. 准备节点数组，并将最新位置用视觉节点覆盖
-        PathNode visualNode = getVisualRenderNode(projectile, partialTick, rawRenderNode);
+        PathNode visualNode = getVisualRenderNode(servant, partialTick, rawRenderNode);
         Vec3 visualRenderPos = visualNode.pos();
 
         PathNode[] renderNodesArray = new PathNode[actualLength];
@@ -240,7 +236,7 @@ public interface IProjectileConeTrailRenderer {
         // 2. Catmull-Rom 插值生成平滑节点序列
         int segments = getTrailSegmentsPerNode();
         int estimatedNodes = (endIndex - startIndex) * segments + 1;
-        List<TrailNode> smoothNodes = new ArrayList<>(estimatedNodes);
+        List<ConeTrailNode> smoothNodes = new ArrayList<>(estimatedNodes);
         Quaternionf tempQ = new Quaternionf();
 
         for (int i = startIndex; i < endIndex; i++) {
@@ -249,14 +245,8 @@ public interface IProjectileConeTrailRenderer {
             PathNode p2 = renderNodesArray[i + 1];
             PathNode p3 = renderNodesArray[Math.min(i + 2, endIndex)];
 
-            Quaternionf q1 = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-p1.yaw()))
-                    .rotateX((float) Math.toRadians(p1.pitch()))
-                    .rotateZ((float) Math.toRadians(p1.roll()));
-            Quaternionf q2 = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-p2.yaw()))
-                    .rotateX((float) Math.toRadians(p2.pitch()))
-                    .rotateZ((float) Math.toRadians(p2.roll()));
+            Quaternionf q1 = new Quaternionf().rotateY((float) Math.toRadians(-p1.yaw())).rotateX((float) Math.toRadians(p1.pitch())).rotateZ((float) Math.toRadians(p1.roll()));
+            Quaternionf q2 = new Quaternionf().rotateY((float) Math.toRadians(-p2.yaw())).rotateX((float) Math.toRadians(p2.pitch())).rotateZ((float) Math.toRadians(p2.roll()));
 
             for (int j = 0; j < segments; j++) {
                 float t = (float) j / segments;
@@ -269,40 +259,33 @@ public interface IProjectileConeTrailRenderer {
                 float f2 = -1.5f * t3 + 2.0f * t2 + 0.5f * t;
                 float f3 = 0.5f * t3 - 0.5f * t2;
 
-                Vec3 pos = new Vec3(
-                        p0.pos().x * f0 + p1.pos().x * f1 + p2.pos().x * f2 + p3.pos().x * f3,
-                        p0.pos().y * f0 + p1.pos().y * f1 + p2.pos().y * f2 + p3.pos().y * f3,
-                        p0.pos().z * f0 + p1.pos().z * f1 + p2.pos().z * f2 + p3.pos().z * f3
-                );
+                Vec3 pos = new Vec3(p0.pos().x * f0 + p1.pos().x * f1 + p2.pos().x * f2 + p3.pos().x * f3, p0.pos().y * f0 + p1.pos().y * f1 + p2.pos().y * f2 + p3.pos().y * f3, p0.pos().z * f0 + p1.pos().z * f1 + p2.pos().z * f2 + p3.pos().z * f3);
 
                 tempQ.set(q1).slerp(q2, t);
-                smoothNodes.add(new TrailNode(pos, new Quaternionf(tempQ)));
+                smoothNodes.add(new ConeTrailNode(pos, new Quaternionf(tempQ)));
             }
         }
 
         // 添加末尾节点
         PathNode lastNode = renderNodesArray[endIndex];
-        Quaternionf qLast = new Quaternionf()
-                .rotateY((float) Math.toRadians(-lastNode.yaw()))
-                .rotateX((float) Math.toRadians(lastNode.pitch()))
-                .rotateZ((float) Math.toRadians(lastNode.roll()));
-        smoothNodes.add(new TrailNode(lastNode.pos(), qLast));
+        Quaternionf qLast = new Quaternionf().rotateY((float) Math.toRadians(-lastNode.yaw())).rotateX((float) Math.toRadians(lastNode.pitch())).rotateZ((float) Math.toRadians(lastNode.roll()));
+        smoothNodes.add(new ConeTrailNode(lastNode.pos(), qLast));
 
         // 3. 开始绘制
         poseStack.pushPose();
         Vec3 offset = visualRenderPos.subtract(rawRenderNode.pos());
         poseStack.translate(offset.x, offset.y, offset.z);
 
-        VertexConsumer consumer = bufferSource.getBuffer(ProjectileTrailRenderType.getTrail());
+        VertexConsumer consumer = bufferSource.getBuffer(TrailRenderType.getTrail());
         Matrix4f pose = poseStack.last().pose();
         int resolution = getTrailResolution();
         float maxRadius = getTrailMaxRadius();
         Vec3 renderPos = visualNode.pos();
 
-        // 获取或创建圆形顶点缓存
+        // 获取或创建圆形顶点缓存（每个分辨率一个实例，懒加载）
         CircleVertexCache cache = getOrCreateCircleCache(resolution);
 
-        // 临时复用变量
+        // 临时复用变量，减少对象创建
         Vector3f cV1 = new Vector3f();
         Vector3f cV2 = new Vector3f();
         Vector3f pV1 = new Vector3f();
@@ -311,8 +294,8 @@ public interface IProjectileConeTrailRenderer {
         int nodeCount = smoothNodes.size();
         if (nodeCount > 1) {
             for (int i = 0; i < nodeCount - 1; i++) {
-                TrailNode curr = smoothNodes.get(i);
-                TrailNode prev = smoothNodes.get(i + 1);
+                ConeTrailNode curr = smoothNodes.get(i);
+                ConeTrailNode prev = smoothNodes.get(i + 1);
 
                 float currProgress = (float) i / (nodeCount - 1);
                 float prevProgress = (float) (i + 1) / (nodeCount - 1);
@@ -349,30 +332,25 @@ public interface IProjectileConeTrailRenderer {
                     float cos2 = cache.cos(j + 1);
                     float sin2 = cache.sin(j + 1);
 
+                    // 当前节点截面顶点
                     cV1.set(cos1 * currRadius, sin1 * currRadius, 0).rotate(curr.rot);
                     cV2.set(cos2 * currRadius, sin2 * currRadius, 0).rotate(curr.rot);
+                    // 前一个节点截面顶点
                     pV1.set(cos1 * prevRadius, sin1 * prevRadius, 0).rotate(prev.rot);
                     pV2.set(cos2 * prevRadius, sin2 * prevRadius, 0).rotate(prev.rot);
 
-                    consumer.addVertex(pose, (float) cRel.x + cV1.x(), (float) cRel.y + cV1.y(), (float) cRel.z + cV1.z())
-                            .setColor(cColorVal).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY)
-                            .setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-                    consumer.addVertex(pose, (float) cRel.x + cV2.x(), (float) cRel.y + cV2.y(), (float) cRel.z + cV2.z())
-                            .setColor(cColorVal).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY)
-                            .setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-                    consumer.addVertex(pose, (float) pRel.x + pV2.x(), (float) pRel.y + pV2.y(), (float) pRel.z + pV2.z())
-                            .setColor(pColorVal).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY)
-                            .setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-                    consumer.addVertex(pose, (float) pRel.x + pV1.x(), (float) pRel.y + pV1.y(), (float) pRel.z + pV1.z())
-                            .setColor(pColorVal).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY)
-                            .setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    // 四边形顶点顺序：当前1 -> 当前2 -> 前一2 -> 前一1
+                    consumer.addVertex(pose, (float) cRel.x + cV1.x(), (float) cRel.y + cV1.y(), (float) cRel.z + cV1.z()).setColor(cColorVal).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    consumer.addVertex(pose, (float) cRel.x + cV2.x(), (float) cRel.y + cV2.y(), (float) cRel.z + cV2.z()).setColor(cColorVal).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    consumer.addVertex(pose, (float) pRel.x + pV2.x(), (float) pRel.y + pV2.y(), (float) pRel.z + pV2.z()).setColor(pColorVal).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    consumer.addVertex(pose, (float) pRel.x + pV1.x(), (float) pRel.y + pV1.y(), (float) pRel.z + pV1.z()).setColor(pColorVal).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
                 }
             }
         }
 
-        // 4. 绘制头部半球
+        // 4. 绘制头部半球（封闭前端）
         if (!smoothNodes.isEmpty()) {
-            TrailNode first = smoothNodes.get(0);
+            ConeTrailNode first = smoothNodes.get(0);
             Vec3 headRel = first.pos.subtract(renderPos);
             float headRadius = getTrailMaxRadius();
             int headColorRGB = getTrailColorRGB(0f);
@@ -381,11 +359,13 @@ public interface IProjectileConeTrailRenderer {
             int hb = headColorRGB & 0xFF;
             int headColorVal = FastColor.ARGB32.color(200, hr, hg, hb);
 
+            // 使用球坐标系生成半球网格（纬度 rings，经度 sectors）
             int rings = 8;
             int sectors = 8;
             float deltaPhi = (float) Math.PI / rings;
             float deltaTheta = (float) (2.0 * Math.PI / sectors);
 
+            // 预计算球面顶点位置（复用临时 Vector3f）
             Vector3f v1 = new Vector3f();
             Vector3f v2 = new Vector3f();
             Vector3f v3 = new Vector3f();
@@ -407,19 +387,16 @@ public interface IProjectileConeTrailRenderer {
                     float cosTheta2 = (float) Math.cos(theta2);
                     float sinTheta2 = (float) Math.sin(theta2);
 
+                    // 计算四个顶点（球面坐标 -> 直角坐标）
                     setSphereVertex(v1, headRel, headRadius, sinPhi1, cosPhi1, cosTheta1, sinTheta1);
                     setSphereVertex(v2, headRel, headRadius, sinPhi1, cosPhi1, cosTheta2, sinTheta2);
                     setSphereVertex(v3, headRel, headRadius, sinPhi2, cosPhi2, cosTheta2, sinTheta2);
                     setSphereVertex(v4, headRel, headRadius, sinPhi2, cosPhi2, cosTheta1, sinTheta1);
 
-                    consumer.addVertex(pose, v1.x(), v1.y(), v1.z()).setColor(headColorVal).setUv(0, 0)
-                            .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-                    consumer.addVertex(pose, v2.x(), v2.y(), v2.z()).setColor(headColorVal).setUv(1, 0)
-                            .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-                    consumer.addVertex(pose, v3.x(), v3.y(), v3.z()).setColor(headColorVal).setUv(1, 1)
-                            .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-                    consumer.addVertex(pose, v4.x(), v4.y(), v4.z()).setColor(headColorVal).setUv(0, 1)
-                            .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    consumer.addVertex(pose, v1.x(), v1.y(), v1.z()).setColor(headColorVal).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    consumer.addVertex(pose, v2.x(), v2.y(), v2.z()).setColor(headColorVal).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    consumer.addVertex(pose, v3.x(), v3.y(), v3.z()).setColor(headColorVal).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                    consumer.addVertex(pose, v4.x(), v4.y(), v4.z()).setColor(headColorVal).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
                 }
             }
         }
@@ -427,20 +404,32 @@ public interface IProjectileConeTrailRenderer {
         poseStack.popPose();
     }
 
-    // ===================== 缓存与辅助 =====================
-
-    /** 圆形顶点缓存映射 */
-    Map<Integer, CircleVertexCache> CACHE_MAP = new java.util.HashMap<>();
-
     /**
      * 获取或创建指定分辨率的圆形顶点缓存。
+     * <p>
+     * 使用一个简单的静态 Map 缓存不同分辨率的 CircleVertexCache 实例，
+     * 避免每帧重建正余弦表。
+     * </p>
+     *
+     * @param resolution 多边形边数
+     * @return 对应的缓存实例
      */
+    Map<Integer, CircleVertexCache> CACHE_MAP = new java.util.HashMap<>();
+
     private CircleVertexCache getOrCreateCircleCache(int resolution) {
         return CACHE_MAP.computeIfAbsent(resolution, CircleVertexCache::new);
     }
 
     /**
-     * 辅助方法：将球面坐标转换为直角坐标。
+     * 辅助方法：将球面坐标转换为直角坐标并存储到目标 Vector3f 中。
+     *
+     * @param out       输出向量
+     * @param center    球心相对坐标
+     * @param radius    半径
+     * @param sinPhi    sin(phi)
+     * @param cosPhi    cos(phi)
+     * @param cosTheta  cos(theta)
+     * @param sinTheta  sin(theta)
      */
     private void setSphereVertex(Vector3f out, Vec3 center, float radius, float sinPhi, float cosPhi, float cosTheta, float sinTheta) {
         out.x = (float) center.x + radius * sinPhi * cosTheta;
@@ -448,37 +437,4 @@ public interface IProjectileConeTrailRenderer {
         out.z = (float) center.z + radius * sinPhi * sinTheta;
     }
 
-    // ===================== 渲染类型定义 =====================
-
-    /**
-     * 射弹圆锥拖尾专用渲染类型。
-     * <p>
-     * 使用实体半透明着色器、自定义纹理、双面渲染、无剔除、全亮度光照。
-     * </p>
-     */
-    class ProjectileTrailRenderType extends RenderType {
-
-        private ProjectileTrailRenderType(String name, VertexFormat fmt, VertexFormat.Mode mode, int bufSize, boolean affectsCrumbling, boolean sort, Runnable setup, Runnable clear) {
-            super(name, fmt, mode, bufSize, affectsCrumbling, sort, setup, clear);
-        }
-
-        /**
-         * 获取拖尾渲染类型。
-         *
-         * @return 渲染类型实例
-         */
-        public static RenderType getTrail() {
-            CompositeState state = CompositeState.builder()
-                    .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-                    .setTextureState(new TextureStateShard(Servantry.rl("textures/trail.png"), false, false))
-                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                    .setCullState(NO_CULL)
-                    .setLightmapState(LIGHTMAP)
-                    .setOverlayState(OVERLAY)
-                    .setWriteMaskState(COLOR_WRITE)
-                    .createCompositeState(false);
-            return create("projectile_trail", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS,
-                    256, false, true, state);
-        }
-    }
 }

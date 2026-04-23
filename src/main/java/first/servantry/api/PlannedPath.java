@@ -1,4 +1,4 @@
-package first.servantry.api.servant;
+package first.servantry.api;
 
 import java.util.List;
 
@@ -47,4 +47,5 @@ public class PlannedPath {
     public boolean isFinished() {
         return currentIndex >= nodes.size();
     }
+
 }

@@ -1,6 +1,6 @@
 package first.servantry.common.servent.goal;
 
-import first.servantry.api.ai.ServantGoal;
+import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servent.Terraprism;
 
 import java.util.Collections;

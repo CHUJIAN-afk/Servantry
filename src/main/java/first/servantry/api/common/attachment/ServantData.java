@@ -1,6 +1,6 @@
-package first.servantry.common.attachment;
+package first.servantry.api.common.attachment;
 
-import first.servantry.api.register.Registries;
+import first.servantry.api.register.ServantryRegistries;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttributeRegister;
@@ -111,7 +111,7 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
     public void write(RegistryFriendlyByteBuf buf, ServantData data, boolean isSelf) {
         buf.writeVarInt(data.servants.size());
         for (Servant servant : data.servants) {
-            ResourceLocation location = Registries.SERVANT_TYPES.getKey(servant.getType());
+            ResourceLocation location = ServantryRegistries.SERVANT_TYPES.getKey(servant.getType());
             assert location != null;
             buf.writeResourceLocation(location);
             buf.writeUUID(servant.getUuid());
@@ -131,7 +131,7 @@ public class ServantData implements AttachmentSyncHandler<ServantData> {
         for (int i = 0; i < size; i++) {
             ResourceLocation typeId = buf.readResourceLocation();
             UUID uuid = buf.readUUID();
-            ServantType<?> type = Registries.SERVANT_TYPES.get(typeId);
+            ServantType<?> type = ServantryRegistries.SERVANT_TYPES.get(typeId);
             assert type != null;
             Servant servant = existingServants.get(uuid);
             if (servant == null) {

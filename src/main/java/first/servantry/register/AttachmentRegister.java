@@ -1,10 +1,10 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import first.servantry.common.attachment.InvincibleData;
-import first.servantry.common.attachment.ProjectileData;
-import first.servantry.common.attachment.ServantData;
-import first.servantry.common.attachment.TargetCacheData;
+import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.attachment.ProjectileData;
+import first.servantry.api.common.attachment.ServantData;
+import first.servantry.api.servant.TargetCache;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -30,8 +30,8 @@ public class AttachmentRegister {
 					.build()
 			);
 
-	public static final DeferredHolder<AttachmentType<?>, AttachmentType<TargetCacheData>> TargetCacheData =
-			Register.register("target_cache_data", () -> AttachmentType.builder(TargetCacheData::new).build());
+	public static final DeferredHolder<AttachmentType<?>, AttachmentType<TargetCache>> TargetCache =
+			Register.register("target_cache", () -> AttachmentType.builder(TargetCache::new).build());
 
 	public static void register(IEventBus eventbus) {
 		Register.register(eventbus);

@@ -17,7 +17,7 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
  * </p>
  */
 @EventBusSubscriber(modid = Servantry.MODID)
-public class Registries {
+public class ServantryRegistries {
 
     /** 仆从类型注册表键 */
     private static final ResourceKey<Registry<ServantType<? extends Servant>>> SERVANT_TYPE_KEY = ResourceKey.createRegistryKey(Servantry.rl("servant_types"));

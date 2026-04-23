@@ -2,7 +2,7 @@ package first.servantry.register;
 
 import first.servantry.Servantry;
 import first.servantry.api.register.ProjectileType;
-import first.servantry.api.register.Registries;
+import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.projectile.StardustProjectile;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -17,7 +17,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class ProjectileRegister {
 
     /** 射弹类型注册表 */
-    public static final DeferredRegister<ProjectileType<?>> Register = DeferredRegister.create(Registries.PROJECTILE_TYPES, Servantry.MODID);
+    public static final DeferredRegister<ProjectileType<?>> Register = DeferredRegister.create(ServantryRegistries.PROJECTILE_TYPES, Servantry.MODID);
 
     /** 星细胞射弹类型 */
     public static final DeferredHolder<ProjectileType<?>, ProjectileType<StardustProjectile>> StardustProjectile =

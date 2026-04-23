@@ -1,7 +1,7 @@
-package first.servantry.api.client;
+package first.servantry.api.client.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.servant.PathNode;
+import first.servantry.api.PathNode;
 import first.servantry.api.servant.Servant;
 import net.minecraft.client.renderer.MultiBufferSource;
 

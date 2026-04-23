@@ -2,7 +2,7 @@ package first.servantry.api.item;
 
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
-import first.servantry.common.attachment.ServantData;
+import first.servantry.api.common.attachment.ServantData;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;

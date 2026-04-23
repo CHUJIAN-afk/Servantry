@@ -1,12 +1,12 @@
 package first.servantry.common.servent;
 
-import first.servantry.api.ai.ServantGoalSelector;
+import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.ICollideAttack;
-import first.servantry.api.servant.PathNode;
-import first.servantry.api.servant.PlannedPath;
+import first.servantry.api.PathNode;
+import first.servantry.api.PlannedPath;
 import first.servantry.api.servant.Servant;
-import first.servantry.common.attachment.InvincibleData;
+import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.common.servent.goal.TerraprismAttackGoal;
 import first.servantry.common.servent.goal.TerraprismIdleGoal;
 import first.servantry.register.ServantRegister;
@@ -71,7 +71,7 @@ public class Terraprism extends Servant implements ICollideAttack {
 
     @Override
     public int getTargetDistance() {
-        return 32;
+        return 18;
     }
 
     @Override

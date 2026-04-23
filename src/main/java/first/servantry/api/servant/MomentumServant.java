@@ -1,9 +1,8 @@
 package first.servantry.api.servant;
 
+import first.servantry.api.PathNode;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.Collections;
 
 /**
  * 基于动量物理的仆从抽象基类，继承自 {@link Servant}。

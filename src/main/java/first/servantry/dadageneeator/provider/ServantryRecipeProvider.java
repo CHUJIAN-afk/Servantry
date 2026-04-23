@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SoulRecipeProvider extends RecipeProvider {
+public class ServantryRecipeProvider extends RecipeProvider {
 
-    public SoulRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+    public ServantryRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries);
     }
 

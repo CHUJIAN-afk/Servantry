@@ -1,4 +1,4 @@
-package first.servantry.api.ai;
+package first.servantry.api.servant.ai;
 
 import java.util.TreeSet;
 

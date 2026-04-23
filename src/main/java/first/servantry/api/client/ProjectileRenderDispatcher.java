@@ -1,9 +1,11 @@
 package first.servantry.api.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.projectile.IProjectileConeTrailRenderer;
+import first.servantry.api.client.projectile.IProjectileRenderer;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ProjectileType;
-import first.servantry.api.servant.PathNode;
+import first.servantry.api.PathNode;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -42,29 +44,18 @@ public class ProjectileRenderDispatcher {
     public static void render(Player player, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick) {
         List<Projectile> projectiles = player.getData(AttachmentRegister.ProjectileData).getProjectiles();
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-
         for (Projectile projectile : projectiles) {
-            IProjectileRenderer<Projectile> renderer = getRenderer(projectile);
-            if (renderer == null) continue;
-
-            poseStack.pushPose();
-            PathNode renderNode = projectile.getRenderNode(partialTick);
-            poseStack.translate(
-                    renderNode.pos().x() - cameraPos.x,
-                    renderNode.pos().y() - cameraPos.y,
-                    renderNode.pos().z() - cameraPos.z
-            );
-
-            int packedLight = LevelRenderer.getLightColor(player.level(), BlockPos.containing(renderNode.pos().x(), renderNode.pos().y(), renderNode.pos().z()));
-
-            renderer.render(projectile, poseStack, bufferSource, partialTick, packedLight, renderNode);
-
-            // 如果渲染器实现了拖尾渲染接口，处理拖尾渲染
-            if (renderer instanceof IProjectileConeTrailRenderer trailRenderer) {
-                trailRenderer.processTrailRender(poseStack, bufferSource, partialTick, projectile, renderNode);
+            if (getRenderer(projectile) instanceof IProjectileRenderer<Projectile> renderer) {
+                poseStack.pushPose();
+                PathNode renderNode = projectile.getRenderNode(partialTick);
+                poseStack.translate(renderNode.pos().x() - cameraPos.x, renderNode.pos().y() - cameraPos.y, renderNode.pos().z() - cameraPos.z);
+                int packedLight = LevelRenderer.getLightColor(player.level(), BlockPos.containing(renderNode.pos().x(), renderNode.pos().y(), renderNode.pos().z()));
+                renderer.render(projectile, poseStack, bufferSource, partialTick, packedLight, renderNode);
+                if (renderer instanceof IProjectileConeTrailRenderer trailRenderer) {
+                    trailRenderer.processTrailRender(poseStack, bufferSource, partialTick, projectile, renderNode);
+                }
+                poseStack.popPose();
             }
-
-            poseStack.popPose();
         }
     }
 

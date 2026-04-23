@@ -1,6 +1,6 @@
 package first.servantry.common.servent.goal;
 
-import first.servantry.api.ai.ServantGoal;
+import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servent.StardustCell;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;

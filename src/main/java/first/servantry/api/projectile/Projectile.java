@@ -1,8 +1,8 @@
 package first.servantry.api.projectile;
 
 import first.servantry.api.register.ProjectileType;
-import first.servantry.api.servant.PathNode;
-import first.servantry.api.servant.PlannedPath;
+import first.servantry.api.PathNode;
+import first.servantry.api.PlannedPath;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;

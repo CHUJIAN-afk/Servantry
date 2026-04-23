@@ -4,11 +4,11 @@ import first.servantry.register.AttributeRegister;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
-public class SoulLangProvider extends LanguageProvider {
+public class ServantryLangProvider extends LanguageProvider {
 
     private final String locale;
 
-    public SoulLangProvider(PackOutput output, String modid, String locale) {
+    public ServantryLangProvider(PackOutput output, String modid, String locale) {
         super(output, modid, locale);
         this.locale = locale;
     }
@@ -77,14 +77,14 @@ public class SoulLangProvider extends LanguageProvider {
 
         public LangEntry en(String enDesc) {
             if ("en_us".equals(locale)) {
-                SoulLangProvider.this.add(key, enDesc);
+                ServantryLangProvider.this.add(key, enDesc);
             }
             return this;
         }
 
         public LangEntry zh(String zhDesc) {
             if ("zh_cn".equals(locale)) {
-                SoulLangProvider.this.add(key, zhDesc);
+                ServantryLangProvider.this.add(key, zhDesc);
             }
             return this;
         }

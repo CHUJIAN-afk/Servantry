@@ -1,11 +1,11 @@
 package first.servantry.common.servent;
 
-import first.servantry.api.ai.ServantGoalSelector;
+import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.ICollideAttack;
-import first.servantry.api.servant.PathNode;
+import first.servantry.api.PathNode;
 import first.servantry.api.servant.Servant;
-import first.servantry.common.attachment.InvincibleData;
+import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.common.servent.goal.EnchantedThrowingKnivesAttackGoal;
 import first.servantry.common.servent.goal.EnchantedThrowingKnivesIdleGoal;
 import first.servantry.register.ServantRegister;

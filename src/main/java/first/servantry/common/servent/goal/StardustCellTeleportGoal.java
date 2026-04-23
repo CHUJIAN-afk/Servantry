@@ -1,7 +1,7 @@
 package first.servantry.common.servent.goal;
 
-import first.servantry.api.ai.ServantGoal;
-import first.servantry.api.servant.PathNode;
+import first.servantry.api.servant.ai.ServantGoal;
+import first.servantry.api.PathNode;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servent.StardustCell;
 import first.servantry.register.AttachmentRegister;

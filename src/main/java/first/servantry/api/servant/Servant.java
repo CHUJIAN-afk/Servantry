@@ -1,8 +1,9 @@
 package first.servantry.api.servant;
 
-import first.servantry.api.ai.ServantGoalSelector;
+import first.servantry.api.PathNode;
+import first.servantry.api.PlannedPath;
+import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.api.register.ServantType;
-import first.servantry.common.attachment.TargetCacheData;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.DamageRegister;
 import net.minecraft.core.Registry;
@@ -244,30 +245,18 @@ public abstract class Servant {
 
     /**
      * 在所有者周围搜索一个有效目标。
-     * 使用 TargetCacheData 缓存优化，避免重复计算距离。
+     * 使用 TargetSelector 进行高性能目标筛选。
      *
      * @return 找到的目标实体，若没有则返回 null
      */
     public LivingEntity searchTarget() {
-        Player owner = getOwner();
-        TargetCacheData cache = owner.getData(AttachmentRegister.TargetCacheData);
-        // 使用缓存获取候选目标（64格内，不要求视线）
-        List<LivingEntity> candidates = cache.getTargets(this, getTargetDistance() * getTargetDistance(), 4096.0, requireLineOfSight());
-        // 过滤有效目标并按评分排序
-        return candidates.stream()
+        return TargetSelector.create(this)
+                .maxDistance(getTargetDistance())
+                .requireLineOfSight(requireLineOfSight())
                 .filter(this::isTarget)
-                .min(Comparator.comparingDouble(target -> {
-                    double score = target.distanceToSqr(getPos());
-                    if (target.distanceToSqr(owner) < 36.0) {
-                        score -= 10000.0;
-                    }
-                    if (target == getTarget()) {
-                        score -= 1000.0;
-                    }
-                    score += (target.hashCode() * 31 + hashCode() * 17) % 5 * 40;
-                    return score;
-                }))
-                .orElse(null);
+                .preferCloseTo(getPos())
+                .preferCurrentTarget(getTarget())
+                .find();
     }
 
     /**

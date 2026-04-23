@@ -1,6 +1,6 @@
 package first.servantry.common.servent;
 
-import first.servantry.api.ai.ServantGoalSelector;
+import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.common.servent.goal.StardustCellAttackGoal;

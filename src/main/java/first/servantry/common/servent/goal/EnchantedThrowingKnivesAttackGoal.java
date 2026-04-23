@@ -1,19 +1,17 @@
 package first.servantry.common.servent.goal;
 
-import first.servantry.api.ai.ServantGoal;
-import first.servantry.api.servant.PathNode;
-import first.servantry.api.servant.PlannedPath;
-import first.servantry.common.attachment.ServantData;
+import first.servantry.api.servant.ai.ServantGoal;
+import first.servantry.api.PathNode;
+import first.servantry.api.PlannedPath;
+import first.servantry.api.common.attachment.ServantData;
 import first.servantry.common.servent.EnchantedThrowingKnives;
 import first.servantry.register.AttachmentRegister;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

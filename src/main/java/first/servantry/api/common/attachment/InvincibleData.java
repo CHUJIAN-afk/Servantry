@@ -1,4 +1,4 @@
-package first.servantry.common.attachment;
+package first.servantry.api.common.attachment;
 
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttachmentRegister;
