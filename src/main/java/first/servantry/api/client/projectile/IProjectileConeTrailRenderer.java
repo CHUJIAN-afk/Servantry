@@ -3,7 +3,6 @@ package first.servantry.api.client.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import first.servantry.api.client.renderType.TrailRenderType;
-import first.servantry.api.client.servant.IServantConeTrailRenderer;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.PathNode;
 import net.minecraft.client.renderer.LightTexture;
@@ -25,7 +24,6 @@ import java.util.*;
  * 拖尾颜色、半径和透明度随进度渐变，末端自然消散。
  * </p>
  * <p>
- * 与 {@link IServantConeTrailRenderer} 功能相同，但专为射弹设计，不依赖仆从类型。
  * </p>
  * <p>
  * 渲染流程：
