@@ -27,6 +27,8 @@ public class StardustProjectileConeRenderer extends AbstractAttachmentEntityRend
                 .trailSegmentsPerNode(3)
                 .trailResolution(8)
                 .trailFadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))
+                // 使用无光照着色器，光影兼容性更好
+                .trailShaderType(RenderContext.ShaderType.UNLIT)
                 .modelScale(0.25f);
     }
 

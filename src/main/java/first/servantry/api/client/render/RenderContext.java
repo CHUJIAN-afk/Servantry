@@ -2,6 +2,9 @@ package first.servantry.api.client.render;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
+import net.minecraft.client.renderer.RenderType;
+
+import java.util.function.Function;
 
 /**
  * 渲染上下文，封装附件实体渲染所需的所有参数和配置。
@@ -66,6 +69,34 @@ public class RenderContext<T extends AttachmentEntity> {
      * </p>
      */
     public TrailType trailType = TrailType.NONE;
+
+    /**
+     * 拖尾着色器类型，默认 {@link ShaderType#STANDARD}。
+     * <p>
+     * 控制拖尾使用的着色器和混合模式，影响光影模组兼容性：
+     * <ul>
+     *   <li>{@link ShaderType#STANDARD} - 标准透明，适合大多数情况</li>
+     *   <li>{@link ShaderType#UNLIT} - 无光照透明，光影兼容性更好</li>
+     *   <li>{@link ShaderType#ADDITIVE} - 加法混合，适合发光效果</li>
+     * </ul>
+     * </p>
+     */
+    public ShaderType trailShaderType = ShaderType.STANDARD;
+
+    /**
+     * 拖尾着色器类型枚举。
+     * <p>
+     * 提供不同的渲染方案以兼容原版和光影模组环境。
+     * </p>
+     */
+    public enum ShaderType {
+        /** 标准透明着色器，使用标准透明度混合 */
+        STANDARD,
+        /** 无光照透明着色器，禁用深度写入，光影兼容性更好 */
+        UNLIT,
+        /** 加法混合着色器，颜色叠加效果，适合发光拖尾 */
+        ADDITIVE
+    }
 
     // ===================== 拖尾基础参数 =====================
 
@@ -406,6 +437,25 @@ public class RenderContext<T extends AttachmentEntity> {
      */
     public RenderContext<T> trailType(TrailType type) {
         this.trailType = type;
+        return this;
+    }
+
+    /**
+     * 设置拖尾着色器类型。
+     * <p>
+     * 不同着色器类型对光影模组的兼容性不同：
+     * <ul>
+     *   <li>STANDARD - 标准透明，适合大多数情况</li>
+     *   <li>UNLIT - 无光照透明，光影兼容性更好</li>
+     *   <li>ADDITIVE - 加法混合，适合发光效果</li>
+     * </ul>
+     * </p>
+     *
+     * @param type 着色器类型
+     * @return this，用于链式调用
+     */
+    public RenderContext<T> trailShaderType(ShaderType type) {
+        this.trailShaderType = type;
         return this;
     }
 

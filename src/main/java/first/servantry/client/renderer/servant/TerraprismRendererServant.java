@@ -31,6 +31,7 @@ public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<
         return RenderContext.<Terraprism>ribbon(timer, 0xFFFFFF)
                 .trailHistoryLength(4)
                 .trailStartIndex(Math.max(0, 10 - timer))
+                .trailShaderType(RenderContext.ShaderType.ADDITIVE)
                 .trailColorFunction((terraprism, progress, timeShift) -> {
                     EntityData data = terraprism.getOwner().getData(AttachmentRegister.EntityData);
                     int order = data.getOrder(terraprism);

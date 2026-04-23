@@ -8,6 +8,7 @@ import first.servantry.api.client.renderType.TrailRenderType;
 import first.servantry.api.entity.AttachmentEntity;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Player;
@@ -123,6 +124,20 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
     // ===================== 拖尾渲染 =====================
 
     /**
+     * 根据配置获取拖尾渲染类型。
+     *
+     * @param config 渲染配置
+     * @return 对应的渲染类型
+     */
+    protected RenderType getTrailRenderType(RenderContext<T> config) {
+        return switch (config.trailShaderType) {
+            case UNLIT -> TrailRenderType.getTrailUnlit();
+            case ADDITIVE -> TrailRenderType.getTrailAdditive();
+            default -> TrailRenderType.getTrail();
+        };
+    }
+
+    /**
      * 渲染拖尾，根据配置的拖尾类型分发到具体渲染方法。
      */
     protected void renderTrail(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderContext<T> config) {
@@ -155,8 +170,8 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         List<InterpolatedNode> smoothNodes = buildSmoothNodes(entity, visualNode, config);
         if (smoothNodes.size() < 2) return;
 
-        // 获取渲染资源
-        VertexConsumer consumer = bufferSource.getBuffer(TrailRenderType.getTrail());
+        // 根据配置选择渲染类型
+        VertexConsumer consumer = bufferSource.getBuffer(getTrailRenderType(config));
         Matrix4f pose = poseStack.last().pose();
         CircleVertexCache cache = CIRCLE_CACHE.computeIfAbsent(config.trailResolution, CircleVertexCache::new);
 
@@ -244,8 +259,8 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         List<InterpolatedNode> smoothNodes = buildSmoothNodes(entity, visualNode, config);
         if (smoothNodes.size() < 2) return;
 
-        // 获取渲染资源
-        VertexConsumer consumer = bufferSource.getBuffer(TrailRenderType.getTrail());
+        // 根据配置选择渲染类型
+        VertexConsumer consumer = bufferSource.getBuffer(getTrailRenderType(config));
         Matrix4f pose = poseStack.last().pose();
         PoseStack.Pose last = poseStack.last();
 

@@ -30,6 +30,7 @@ public class EnchantedThrowingKnivesRendererServant extends AbstractAttachmentEn
         return RenderContext.<EnchantedThrowingKnives>ribbon(trailTimer, 0x88CCFF)
                 .trailHistoryLength(3)
                 .trailStartIndex(Math.max(0, 10 - trailTimer))
+                .trailShaderType(RenderContext.ShaderType.ADDITIVE)
                 .trailColorFunction((s, progress, timeShift) -> {
                     // 淡蓝色基调 (136, 204, 255)
                     int r = 136;
