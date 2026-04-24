@@ -2,6 +2,7 @@ package first.servantry.common.servent;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
@@ -21,7 +22,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-public class Terraprism extends Servant implements ICollideAttack {
+public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
     public boolean idle = true;
     public boolean attacking = false;
@@ -64,6 +65,11 @@ public class Terraprism extends Servant implements ICollideAttack {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean isValidCollisionTarget(Terraprism entity, LivingEntity target) {
+        return isTarget(target);
     }
 
     @Override

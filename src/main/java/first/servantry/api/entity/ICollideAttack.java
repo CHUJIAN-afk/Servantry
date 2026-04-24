@@ -47,7 +47,7 @@ import java.util.*;
  *
  * @see AttachmentEntity
  */
-public interface ICollideAttack {
+public interface ICollideAttack<T extends AttachmentEntity> {
 
     // ===================== 核心抽象方法 =====================
 
@@ -99,7 +99,7 @@ public interface ICollideAttack {
      * @param target 待检测的目标
      * @return true 表示目标有效，应参与碰撞检测
      */
-    default boolean isValidCollisionTarget(AttachmentEntity entity, LivingEntity target) {
+    default boolean isValidCollisionTarget(T entity, LivingEntity target) {
         return target.isAlive() && target != entity.getOwner();
     }
 
@@ -122,7 +122,7 @@ public interface ICollideAttack {
      *
      * @param entity 执行碰撞检测的附件实体实例
      */
-    default void processCollision(AttachmentEntity entity) {
+    default void processCollision(T entity) {
         AABB localBox = getHitbox();
         if (localBox == null) return;
 
@@ -215,16 +215,14 @@ public interface ICollideAttack {
         // ========== 阶段三：精确 OBB-AABB 相交检测 ==========
         for (LivingEntity target : potentialTargets) {
             // 检查目标有效性
-            if (!isValidCollisionTarget(entity, target)) {
-                continue;
-            }
-
-            // 对每个 OBB 进行相交检测
-            AABB targetBox = target.getBoundingBox();
-            for (OBB obb : sweepOBBs) {
-                if (obb.intersects(targetBox)) {
-                    hitTargets.add(target);
-                    break; // 命中即可跳出内层循环
+            if (isValidCollisionTarget(entity, target)) {
+                // 对每个 OBB 进行相交检测
+                AABB targetBox = target.getBoundingBox();
+                for (OBB obb : sweepOBBs) {
+                    if (obb.intersects(targetBox)) {
+                        hitTargets.add(target);
+                        break; // 命中即可跳出内层循环
+                    }
                 }
             }
         }

@@ -30,7 +30,7 @@ import java.util.Set;
  * </ul>
  * </p>
  */
-public class EnchantedThrowingKnives extends Servant implements ICollideAttack {
+public class EnchantedThrowingKnives extends Servant implements ICollideAttack<EnchantedThrowingKnives> {
 
     // ===================== 渲染状态 =====================
 
@@ -87,6 +87,11 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack {
                 InvincibleData.servantAttack(target, this, 10, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
             }
         }
+    }
+
+    @Override
+    public boolean isValidCollisionTarget(EnchantedThrowingKnives entity, LivingEntity target) {
+        return isTarget(target);
     }
 
     // ===================== Tick 更新 =====================
