@@ -43,7 +43,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
     @Override
     public float getDamage() {
-        return 9;
+        return 9F;
     }
 
     @Override

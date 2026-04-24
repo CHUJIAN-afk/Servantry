@@ -129,7 +129,7 @@ public abstract class Servant extends AttachmentEntity {
                 .maxDistance(getTargetDistance())
                 .requireLineOfSight(requireLineOfSight())
                 .filter(this::isTarget)
-                .preferCloseTo(getPos())
+                .preferCloseTo(owner.getBoundingBox().getCenter())
                 .preferCurrentTarget(getTarget())
                 .find();
     }
@@ -171,7 +171,8 @@ public abstract class Servant extends AttachmentEntity {
             boolean isEnemy = target instanceof Enemy;
             boolean targetingOwner = target instanceof Targeting t && t.getTarget() == owner;
             boolean hurtOwner = owner.getLastHurtByMob() == target;
-            return isEnemy || targetingOwner || hurtOwner;
+            boolean hurtTarget = target.getLastHurtByMob() == owner;
+            return isEnemy || targetingOwner || hurtOwner || hurtTarget;
         }
         return false;
     }

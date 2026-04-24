@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
  * 泰拉棱镜渲染器。
  * <p>
  * 使用丝带拖尾，渲染带色调渐变的棱镜模型。
- * </p>
  */
 public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<Terraprism> {
 
@@ -30,15 +29,17 @@ public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<
         int timer = servant.attacking ? servant.trailTimer : 0;
         return RenderContext.<Terraprism>ribbon(timer, 0xFFFFFF)
                 .trailHistoryLength(4)
-                .trailStartIndex(Math.max(0, 10 - timer))
-                .trailShaderType(RenderContext.ShaderType.ADDITIVE)
+                .trailSegmentsPerNode(4)
+                .ribbonWidth(0.75f)
+                .ribbonDiamondSize(0.15f)
+                .trailShaderType(RenderContext.ShaderType.UNLIT)
                 .trailColorFunction((terraprism, progress, timeShift) -> {
                     EntityData data = terraprism.getOwner().getData(AttachmentRegister.EntityData);
                     int order = data.getOrder(terraprism);
                     int total = Math.max(1, data.getSameSize(terraprism));
                     float hue = (((float) order / total) + timeShift) % 1.0f;
                     float saturation = 0.55f;
-                    float brightness = Mth.lerp(progress, 1.0f, 0.4f);
+                    float brightness = Mth.lerp(progress, 1f, 0.4f);
                     return Mth.hsvToRgb(hue, saturation, brightness);
                 })
                 .trailTipAlphaBoost((s, progress) -> {
@@ -55,7 +56,9 @@ public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<
                 })
                 .modelScale(1.0f)
                 .modelRotationOffset(0, 90, -45)
-                .visualNodeFunction((terraprism, partialTick, rawNode) -> rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend)));
+                .visualNodeFunction((terraprism, partialTick, rawNode) ->
+                        rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick),
+                                Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend)));
     }
 
     @Override

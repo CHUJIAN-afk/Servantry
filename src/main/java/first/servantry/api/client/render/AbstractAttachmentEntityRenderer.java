@@ -22,14 +22,126 @@ import java.util.*;
 /**
  * 附件实体渲染器抽象基类。
  * <p>
- * 提供完整的拖尾渲染和本体渲染框架，子类只需实现：
- * <ul>
- *   <li>{@link #createContext(AttachmentEntity)} - 创建渲染配置</li>
- *   <li>{@link #renderEntity(T, PoseStack, MultiBufferSource, PathNode, RenderContext)} - 渲染实体本体</li>
- * </ul>
+ * 提供完整的拖尾渲染和本体渲染框架，子类只需实现两个核心方法：
  * </p>
+ * <pre>{@code
+ * public class MyRenderer extends AbstractAttachmentEntityRenderer<MyEntity> {
+ *
+ *     @Override
+ *     protected RenderContext<MyEntity> createContext(MyEntity entity) {
+ *         // 返回渲染配置
+ *         return RenderContext.cone(entity.getTrailTimer(), 0xFF0000, 0.2f);
+ *     }
+ *
+ *     @Override
+ *     protected void renderEntity(MyEntity entity, PoseStack poseStack,
+ *                                 MultiBufferSource bufferSource,
+ *                                 PathNode visualNode, RenderContext<MyEntity> config) {
+ *         // 渲染实体模型
+ *         Minecraft.getInstance().getItemRenderer().renderStatic(...);
+ *     }
+ * }
+ * }</pre>
+ *
+ * <h2>渲染流程</h2>
+ * <pre>{@code
+ * ┌─────────────────────────────────────────────────────────────────────────┐
+ * │                          渲染流程图                                      │
+ * ├─────────────────────────────────────────────────────────────────────────┤
+ * │                                                                         │
+ * │   render() 入口                                                         │
+ * │       │                                                                 │
+ * │       ▼                                                                 │
+ * │   ┌───────────────┐                                                     │
+ * │   │ createContext │ ← 子类实现，返回渲染配置                             │
+ * │   └───────┬───────┘                                                     │
+ * │           │                                                             │
+ * │           ▼                                                             │
+ * │   ┌───────────────────┐                                                 │
+ * │   │ 计算视觉节点       │ ← 应用 visualNodeFunction 插值                  │
+ * │   └───────┬───────────┘                                                 │
+ * │           │                                                             │
+ * │           ▼                                                             │
+ * │   ┌───────────────────┐                                                 │
+ * │   │ 渲染拖尾          │ ← 根据 trailType 分发到圆锥/丝带渲染              │
+ * │   │ (在模型后面)      │                                                   │
+ * │   └───────┬───────────┘                                                 │
+ * │           │                                                             │
+ * │           ▼                                                             │
+ * │   ┌───────────────────┐                                                 │
+ * │   │ 应用变换          │ ← yaw/pitch/roll + 偏移 + 缩放                   │
+ * │   └───────┬───────────┘                                                 │
+ * │           │                                                             │
+ * │           ▼                                                             │
+ * │   ┌───────────────────┐                                                 │
+ * │   │ renderEntity      │ ← 子类实现，渲染具体模型                         │
+ * │   └───────────────────┘                                                 │
+ * │                                                                         │
+ * └─────────────────────────────────────────────────────────────────────────┘
+ * }</pre>
+ *
+ * <h2>拖尾渲染原理</h2>
+ *
+ * <h3>历史节点收集</h3>
+ * <pre>{@code
+ * 实体每帧记录当前位置和旋转，形成历史节点队列：
+ *
+ *   历史队列（最新在前）：
+ *   [当前帧] ← [帧-1] ← [帧-2] ← [帧-3] ← ...
+ *      ↑
+ *   visualNode (当前渲染位置)
+ *
+ *   trailHistoryLength 决定取多少个历史节点
+ * }</pre>
+ *
+ * <h3>Catmull-Rom 插值</h3>
+ * <pre>{@code
+ * 原始节点之间通过 Catmull-Rom 样条插值生成平滑曲线：
+ *
+ *   原始节点:    *--------*--------*--------*
+ *                P0       P1       P2       P3
+ *
+ *   插值后:      *-*-*-*-*-*-*-*-*-*-*-*-*
+ *                ↑ trailSegmentsPerNode 控制插值密度
+ * }</pre>
+ *
+ * <h3>圆锥拖尾渲染</h3>
+ * <pre>{@code
+ * 每个节点绘制一个正多边形截面，半径随进度递减：
+ *
+ *   节点0 (progress=0)   节点1            节点2            节点3 (progress=1)
+ *       ╭──╮              ╭─╮              ╭╮               *
+ *      ╱    ╲            ╱   ╲            ╱ ╲              (半径≈0)
+ *     │      │          │     │          │   │
+ *      ╲    ╱            ╲   ╱            ╲ ╱
+ *       ╰──╯              ╰─╯              ╰╯
+ *
+ *   相邻截面之间用四边形面片连接，形成锥形管道
+ * }</pre>
+ *
+ * <h3>丝带拖尾渲染</h3>
+ * <pre>{@code
+ * 每个节点绘制一个三角形截面，尖端朝前：
+ *
+ *   节点0 (大)         节点1            节点2            节点3 (小)
+ *        *                 *               *               *
+ *       /|\               /|\             /|\              |
+ *      / | \             / | \           / | \             |
+ *     *--+--*           *--+--*         *--+--*            *
+ *
+ *   相邻三角形之间连接形成三角带，正反两面都渲染
+ * }</pre>
+ *
+ * <h2>性能优化</h2>
+ * <ul>
+ *   <li>圆形顶点缓存：预计算 cos/sin 值，避免重复计算</li>
+ *   <li>向量复用：在循环中复用 Vector3f 对象</li>
+ *   <li>按需渲染：trailTimer <= 0 时跳过拖尾渲染</li>
+ * </ul>
  *
  * @param <T> 附件实体类型
+ * @see RenderContext
+ * @see IAttachmentEntityRenderer
  */
 public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntity> implements IAttachmentEntityRenderer<T> {
 
@@ -93,11 +205,11 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         poseStack.pushPose();
         poseStack.translate(offset.x, offset.y, offset.z);
 
+
         // 3. 先渲染拖尾（在模型后面，避免遮挡）
         if (config.trailType != RenderContext.TrailType.NONE && config.trailTimer > 0) {
             renderTrail(entity, poseStack, bufferSource, partialTick, visualNode, config);
         }
-
         // 4. 渲染本体模型
         poseStack.pushPose();
 
@@ -247,10 +359,35 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
      * 特点：
      * <ul>
      *   <li>使用 Catmull-Rom 样条插值实现平滑曲线</li>
-     *   <li>每个节点处绘制一个菱形截面（尖端向前）</li>
-     *   <li>四个方向的面片形成十字交叉效果</li>
+     *   <li>每个节点处绘制一个三角形截面（尖端向前）</li>
+     *   <li>三角形正反两面都渲染，确保任意视角可见</li>
      *   <li>支持颜色渐变、亮度增强和透明度控制</li>
      * </ul>
+     * </p>
+     *
+     * <h3>几何结构</h3>
+     * <pre>{@code
+     *      三角形截面（俯视图）：
+     *
+     *           tip (尖端，朝前)
+     *            *
+     *           /|\
+     *          / | \
+     *         /  |  \
+     *        /   |   \
+     *       *----+----*
+     *     left  center right (基部)
+     *
+     *      参数说明：
+     *      - ribbonWidth: 三角形的高（tip 到基线的距离，Z方向）
+     *      - ribbonDiamondSize: 基线长度（left 到 right 的距离）
+     * }</pre>
+     *
+     * <h3>渲染效果</h3>
+     * <p>
+     * 三角形从头部（进度 0）到尾部（进度 1）逐渐缩小并淡出，
+     * 形成剑刃拖尾效果。尖端透明度较高，基部透明度较低，
+     * 使拖尾看起来像剑刃的光芒。
      * </p>
      */
     private void renderRibbonTrail(T entity, PoseStack poseStack, MultiBufferSource bufferSource,
@@ -284,19 +421,22 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
             float currScale = Math.max(0.0f, 1.0f - currProgress);
             float prevScale = Math.max(0.0f, 1.0f - prevProgress);
 
-            // 计算当前节点的菱形截面顶点
-            Vector3f currTip = new Vector3f(0, 0, 0.6f).rotate(curr.rot);
-            Vector3f currRight = new Vector3f(0.3f * currScale, 0, -0.2f).rotate(curr.rot);
-            Vector3f currLeft = new Vector3f(-0.3f * currScale, 0, -0.2f).rotate(curr.rot);
-            Vector3f currTop = new Vector3f(0, 0.15f * currScale, -0.2f).rotate(curr.rot);
-            Vector3f currBottom = new Vector3f(0, -0.15f * currScale, -0.2f).rotate(curr.rot);
+            // 使用配置参数计算三角形截面
+            // ribbonWidth: 三角形的高（从尖端到基部的距离，Z方向）
+            // ribbonDiamondSize: 三角形的底边长度（左右方向的宽度）
+            float height = config.ribbonWidth;
+            float baseWidth = config.ribbonDiamondSize;
 
-            // 计算前一个节点的菱形截面顶点
-            Vector3f prevTip = new Vector3f(0, 0, 0.6f).rotate(prev.rot);
-            Vector3f prevRight = new Vector3f(0.3f * prevScale, 0, -0.2f).rotate(prev.rot);
-            Vector3f prevLeft = new Vector3f(-0.3f * prevScale, 0, -0.2f).rotate(prev.rot);
-            Vector3f prevTop = new Vector3f(0, 0.15f * prevScale, -0.2f).rotate(prev.rot);
-            Vector3f prevBottom = new Vector3f(0, -0.15f * prevScale, -0.2f).rotate(prev.rot);
+            // 计算当前节点的三角形顶点
+            // 尖端在Z正方向（前方），基部在Z负方向（后方）
+            Vector3f currTip = new Vector3f(0, 0, height).rotate(curr.rot);
+            Vector3f currLeft = new Vector3f(-baseWidth * 0.5f * currScale, 0, 0).rotate(curr.rot);
+            Vector3f currRight = new Vector3f(baseWidth * 0.5f * currScale, 0, 0).rotate(curr.rot);
+
+            // 计算前一个节点的三角形顶点
+            Vector3f prevTip = new Vector3f(0, 0, height).rotate(prev.rot);
+            Vector3f prevLeft = new Vector3f(-baseWidth * 0.5f * prevScale, 0, 0).rotate(prev.rot);
+            Vector3f prevRight = new Vector3f(baseWidth * 0.5f * prevScale, 0, 0).rotate(prev.rot);
 
             // 获取颜色和增强参数
             int currColorRGB = config.trailColorFunction.getColor(entity, currProgress, timeShift);
@@ -329,11 +469,11 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
             Vec3 currRel = curr.pos.subtract(renderPos);
             Vec3 prevRel = prev.pos.subtract(renderPos);
 
-            // 绘制四个方向的面片（形成十字交叉效果）
-            emitRibbonFace(consumer, pose, last, currRel, prevRel, currTip, prevTip, currRight, prevRight, currTipColor, prevTipColor, currBaseColor, prevBaseColor);
-            emitRibbonFace(consumer, pose, last, currRel, prevRel, currTip, prevTip, currLeft, prevLeft, currTipColor, prevTipColor, currBaseColor, prevBaseColor);
-            emitRibbonFace(consumer, pose, last, currRel, prevRel, currTip, prevTip, currTop, prevTop, currTipColor, prevTipColor, currBaseColor, prevBaseColor);
-            emitRibbonFace(consumer, pose, last, currRel, prevRel, currTip, prevTip, currBottom, prevBottom, currTipColor, prevTipColor, currBaseColor, prevBaseColor);
+            // 绘制三角形截面（正反两面）
+            // 将两个相邻的三角形连接成一个三角带
+            emitTriangleStrip(consumer, pose, last, currRel, prevRel,
+                    currTip, prevTip, currLeft, prevLeft, currRight, prevRight,
+                    currTipColor, prevTipColor, currBaseColor, prevBaseColor);
         }
     }
 
@@ -451,33 +591,91 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
     }
 
     /**
-     * 发射一个丝带面片（正反两面）。
+     * 发射一个三角形带（正反两面）。
+     * <p>
+     * 将两个相邻节点的三角形截面连接成一个三角带，形成丝带拖尾效果。
+     * </p>
+     *
+     * <h3>几何结构</h3>
+     * <pre>{@code
+     *      curr节点              prev节点
+     *      (进度 i)             (进度 i+1)
+     *
+     *        tip *                 tip *
+     *           /|\                   /|\
+     *          / | \                 / | \
+     *         /  |  \               /  |  \
+     *   left *----+----* right  left *----+----* right
+     *
+     *      连接方式：
+     *      - 三角形1: curr.tip -> curr.left -> prev.left -> prev.tip
+     *      - 三角形2: curr.tip -> prev.tip -> prev.right -> curr.right
+     * }</pre>
+     *
+     * @param consumer       顶点消费者
+     * @param pose           变换矩阵
+     * @param last           PoseStack 状态
+     * @param currRel        当前节点相对位置
+     * @param prevRel        前一节点相对位置
+     * @param currTip        当前节点尖端顶点
+     * @param prevTip        前一节点尖端顶点
+     * @param currLeft       当前节点左侧顶点
+     * @param prevLeft       前一节点左侧顶点
+     * @param currRight      当前节点右侧顶点
+     * @param prevRight      前一节点右侧顶点
+     * @param currTipColor   当前尖端颜色
+     * @param prevTipColor   前一尖端颜色
+     * @param currBaseColor  当前基部颜色
+     * @param prevBaseColor  前一基部颜色
      */
-    private void emitRibbonFace(VertexConsumer consumer, Matrix4f pose, PoseStack.Pose last,
-                                Vec3 currRel, Vec3 prevRel,
-                                Vector3f currTip, Vector3f prevTip,
-                                Vector3f currBase, Vector3f prevBase,
-                                int currTipColor, int prevTipColor,
-                                int currBaseColor, int prevBaseColor) {
+    private void emitTriangleStrip(VertexConsumer consumer, Matrix4f pose, PoseStack.Pose last,
+                                   Vec3 currRel, Vec3 prevRel,
+                                   Vector3f currTip, Vector3f prevTip,
+                                   Vector3f currLeft, Vector3f prevLeft,
+                                   Vector3f currRight, Vector3f prevRight,
+                                   int currTipColor, int prevTipColor,
+                                   int currBaseColor, int prevBaseColor) {
+        // === 左侧三角形（tip -> left） ===
         // 正面
-        consumer.addVertex(pose, (float) currRel.x + currBase.x, (float) currRel.y + currBase.y, (float) currRel.z + currBase.z)
+        consumer.addVertex(pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z)
+                .setColor(currTipColor).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+        consumer.addVertex(pose, (float) currRel.x + currLeft.x, (float) currRel.y + currLeft.y, (float) currRel.z + currLeft.z)
                 .setColor(currBaseColor).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+        consumer.addVertex(pose, (float) prevRel.x + prevLeft.x, (float) prevRel.y + prevLeft.y, (float) prevRel.z + prevLeft.z)
+                .setColor(prevBaseColor).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+        consumer.addVertex(pose, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z)
+                .setColor(prevTipColor).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+
+        // 反面
+        consumer.addVertex(pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z)
+                .setColor(currTipColor).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+        consumer.addVertex(pose, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z)
+                .setColor(prevTipColor).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+        consumer.addVertex(pose, (float) prevRel.x + prevLeft.x, (float) prevRel.y + prevLeft.y, (float) prevRel.z + prevLeft.z)
+                .setColor(prevBaseColor).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+        consumer.addVertex(pose, (float) currRel.x + currLeft.x, (float) currRel.y + currLeft.y, (float) currRel.z + currLeft.z)
+                .setColor(currBaseColor).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+
+        // === 右侧三角形（tip -> right） ===
+        // 正面
         consumer.addVertex(pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z)
                 .setColor(currTipColor).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
         consumer.addVertex(pose, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z)
                 .setColor(prevTipColor).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
-        consumer.addVertex(pose, (float) prevRel.x + prevBase.x, (float) prevRel.y + prevBase.y, (float) prevRel.z + prevBase.z)
+        consumer.addVertex(pose, (float) prevRel.x + prevRight.x, (float) prevRel.y + prevRight.y, (float) prevRel.z + prevRight.z)
                 .setColor(prevBaseColor).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+        consumer.addVertex(pose, (float) currRel.x + currRight.x, (float) currRel.y + currRight.y, (float) currRel.z + currRight.z)
+                .setColor(currBaseColor).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
 
         // 反面
-        consumer.addVertex(pose, (float) currRel.x + currBase.x, (float) currRel.y + currBase.y, (float) currRel.z + currBase.z)
+        consumer.addVertex(pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z)
+                .setColor(currTipColor).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+        consumer.addVertex(pose, (float) currRel.x + currRight.x, (float) currRel.y + currRight.y, (float) currRel.z + currRight.z)
                 .setColor(currBaseColor).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
-        consumer.addVertex(pose, (float) prevRel.x + prevBase.x, (float) prevRel.y + prevBase.y, (float) prevRel.z + prevBase.z)
+        consumer.addVertex(pose, (float) prevRel.x + prevRight.x, (float) prevRel.y + prevRight.y, (float) prevRel.z + prevRight.z)
                 .setColor(prevBaseColor).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
         consumer.addVertex(pose, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z)
                 .setColor(prevTipColor).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
-        consumer.addVertex(pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z)
-                .setColor(currTipColor).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
     }
 
     // ===================== 数学辅助方法 =====================

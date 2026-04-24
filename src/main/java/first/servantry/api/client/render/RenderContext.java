@@ -4,8 +4,6 @@ import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
 import net.minecraft.client.renderer.RenderType;
 
-import java.util.function.Function;
-
 /**
  * 渲染上下文，封装附件实体渲染所需的所有参数和配置。
  * <p>
@@ -14,30 +12,149 @@ import java.util.function.Function;
  * 即可获得完整的拖尾和本体渲染效果。
  * </p>
  *
- * <h3>配置分类</h3>
+ * <h2>配置分类</h2>
  * <ul>
  *   <li><b>拖尾类型</b>：无拖尾、圆锥拖尾、丝带拖尾</li>
  *   <li><b>拖尾参数</b>：计时器、历史长度、插值分段、颜色、淡出曲线等</li>
  *   <li><b>本体参数</b>：缩放比例、旋转偏移、视觉节点插值</li>
  * </ul>
  *
- * <h3>使用示例</h3>
+ * <h2>拖尾类型选择指南</h2>
  * <pre>{@code
- * // 创建圆锥拖尾配置
- * RenderContext<MyEntity> context = RenderContext.<MyEntity>cone(timer, 0xFF0000, 0.2f)
- *     .trailHistoryLength(6)
- *     .trailResolution(12)
- *     .modelScale(0.5f);
- *
- * // 创建丝带拖尾配置
- * RenderContext<MyEntity> context = RenderContext.<MyEntity>ribbon(timer, 0x88CCFF)
- *     .trailColorFunction((e, progress, time) -> computeColor(progress))
- *     .modelRotationOffset(0, 90, 0);
+ * ┌─────────────────────────────────────────────────────────────────────┐
+ * │                        拖尾类型选择决策树                            │
+ * ├─────────────────────────────────────────────────────────────────────┤
+ * │                                                                     │
+ * │   实体形状是什么？                                                   │
+ * │   ├── 球状/圆形/无明显方向 ──→ 圆锥拖尾 (CONE)                       │
+ * │   │   例如：能量球、魔法弹、火焰球                                    │
+ * │   │                                                                 │
+ * │   ├── 剑状/扁平/有明显方向 ──→ 丝带拖尾 (RIBBON)                     │
+ * │   │   例如：剑刃、刀锋、棱镜                                         │
+ * │   │                                                                 │
+ * │   └── 不需要拖尾 ──→ 无拖尾 (NONE)                                   │
+ * │                                                                     │
+ * └─────────────────────────────────────────────────────────────────────┘
  * }</pre>
+ *
+ * <h2>轨迹效果示例</h2>
+ *
+ * <h3>圆锥拖尾效果</h3>
+ * <pre>{@code
+ *     侧视图：                    俯视图：
+ *
+ *         ╭──────╮                  ☆ ── 正多边形截面
+ *        ╱        ╲                 ╲
+ *       ╱          ╲                 ╲
+ *      │            │                 ☆
+ *      │            │                ╱
+ *       ╲          ╲                ╱
+ *        ╲          ╲              ☆
+ *         ╰──────────╯
+ *
+ *     头部(大) → 尾部(小)         半径随进度递减
+ * }</pre>
+ *
+ * <h3>丝带拖尾效果</h3>
+ * <pre>{@code
+ *     侧视图（单个三角形截面）：       俯视图（轨迹展开）：
+ *
+ *            * 尖端                      * ── 尖端（朝前）
+ *           /|                          /|
+ *          / |                         / |
+ *         /  |                        /  |
+ *        *---+---* 基部              *---+---* ── 基部
+ *       left right                  left   right
+ *
+ *     参数说明：
+ *     - ribbonWidth: 三角形的高（尖端到基部的距离）
+ *     - ribbonDiamondSize: 基部宽度（left 到 right 的距离）
+ *
+ *     轨迹效果：
+ *     ═════════════════════════════════════════════════════════
+ *     头部 ═══════════════════════════════════════════════ 尾部
+ *     (大)                                              (小/淡出)
+ *     ═════════════════════════════════════════════════════════
+ * }</pre>
+ *
+ * <h2>完整使用示例</h2>
+ *
+ * <h3>示例1：能量球（圆锥拖尾）</h3>
+ * <pre>{@code
+ * @Override
+ * protected RenderContext<EnergyBall> createContext(EnergyBall entity) {
+ *     return RenderContext.<EnergyBall>cone(entity.getTrailTimer(), 0xFF6600, 0.3f)
+ *         .trailHistoryLength(6)           // 6个历史节点
+ *         .trailSegmentsPerNode(4)         // 每节点4段插值
+ *         .trailResolution(8)              // 8边形截面
+ *         .trailShaderType(ShaderType.ADDITIVE)  // 加法混合发光
+ *         .trailColorFunction((e, progress, time) -> {
+ *             // 从橙色渐变到黄色
+ *             int r = 255;
+ *             int g = (int) (102 + progress * 153);  // 102 → 255
+ *             int b = 0;
+ *             return (r << 16) | (g << 8) | b;
+ *         })
+ *         .trailFadeOut(p -> (1 - p) * (1 - p))  // 二次淡出
+ *         .modelScale(0.8f);
+ * }
+ * }</pre>
+ *
+ * <h3>示例2：剑刃（丝带拖尾）</h3>
+ * <pre>{@code
+ * @Override
+ * protected RenderContext<SwordEntity> createContext(SwordEntity entity) {
+ *     return RenderContext.<SwordEntity>ribbon(entity.getTrailTimer(), 0x88CCFF)
+ *         .trailHistoryLength(8)           // 更长的轨迹
+ *         .ribbonWidth(0.5f)               // 三角形高度
+ *         .ribbonDiamondSize(0.25f)        // 基部宽度
+ *         .trailShaderType(ShaderType.UNLIT)  // 光影兼容
+ *         .trailColorFunction((e, progress, time) -> {
+ *             // 从亮蓝渐变到暗蓝
+ *             float brightness = 1.0f - progress * 0.6f;
+ *             int r = (int) (0x88 * brightness);
+ *             int g = (int) (0xCC * brightness);
+ *             int b = (int) (0xFF * brightness);
+ *             return (r << 16) | (g << 8) | b;
+ *         })
+ *         .trailTipAlphaBoost((e, p) -> p < 0.2f ? 2.0f : 1.0f)  // 尖端更亮
+ *         .trailTipBrightnessBoost((e, p) -> p < 0.15f ? 1.3f : 1.0f)
+ *         .modelRotationOffset(0, 90, 0)   // 调整模型朝向
+ *         .modelScale(1.0f);
+ * }
+ * }</pre>
+ *
+ * <h3>示例3：动态缩短的拖尾</h3>
+ * <pre>{@code
+ * // 当 trailTimer 从 10 递减到 0 时，拖尾从尾部逐渐消失
+ * @Override
+ * protected RenderContext<MyEntity> createContext(MyEntity entity) {
+ *     int timer = entity.getTrailTimer();  // 假设从 10 递减
+ *     return RenderContext.<MyEntity>cone(timer, 0xFF0000, 0.2f)
+ *         .trailHistoryLength(10)           // 最大历史长度
+ *         .trailStartIndex(10 - timer)      // 动态起始索引
+ *         // 当 timer=10: startIndex=0, 显示完整拖尾
+ *         // 当 timer=5:  startIndex=5, 显示后半段
+ *         // 当 timer=0:  startIndex=10, 不显示
+ *         ;
+ * }
+ * }</pre>
+ *
+ * <h2>参数调优建议</h2>
+ * <table border="1">
+ *   <tr><th>参数</th><th>范围</th><th>效果</th></tr>
+ *   <tr><td>trailHistoryLength</td><td>3-12</td><td>越大轨迹越长，但开销越大</td></tr>
+ *   <tr><td>trailSegmentsPerNode</td><td>2-8</td><td>越大曲线越平滑，顶点越多</td></tr>
+ *   <tr><td>trailResolution (圆锥)</td><td>4-16</td><td>截面边数，越多越圆</td></tr>
+ *   <tr><td>trailMaxRadius (圆锥)</td><td>0.1-1.0</td><td>头部最大半径</td></tr>
+ *   <tr><td>ribbonWidth (丝带)</td><td>0.05-1.0</td><td>三角形高度（尖锐程度）</td></tr>
+ *   <tr><td>ribbonDiamondSize (丝带)</td><td>0.1-1.0</td><td>三角形宽度</td></tr>
+ * </table>
  *
  * @param <T> 附件实体类型
  * @see AttachmentEntity
  * @see IAttachmentEntityRenderer
+ * @see AbstractAttachmentEntityRenderer
  */
 public class RenderContext<T extends AttachmentEntity> {
 
@@ -45,18 +162,47 @@ public class RenderContext<T extends AttachmentEntity> {
 
     /**
      * 拖尾渲染类型。
-     * <ul>
-     *   <li>{@link #NONE} - 无拖尾，仅渲染实体本体</li>
-     *   <li>{@link #CONE} - 圆锥拖尾，末端细前端粗，适合球状或圆形实体</li>
-     *   <li>{@link #RIBBON} - 丝带拖尾，菱形截面四向展开，适合剑状或扁平实体</li>
-     * </ul>
+     * <p>
+     * 选择指南：
+     * </p>
+     * <pre>{@code
+     * ┌─────────────┬────────────────────────────────────────────┐
+     * │ 类型        │ 适用场景                                     │
+     * ├─────────────┼────────────────────────────────────────────┤
+     * │ NONE        │ 不需要拖尾效果                               │
+     * │ CONE        │ 球状、圆形、能量弹、魔法球                    │
+     * │ RIBBON      │ 剑状、刀锋、扁平物体、有明显方向性的实体       │
+     * └─────────────┴────────────────────────────────────────────┘
+     * }</pre>
      */
     public enum TrailType {
-        /** 无拖尾效果 */
+        /** 无拖尾效果，仅渲染实体本体 */
         NONE,
-        /** 圆锥拖尾：每个节点绘制正多边形截面，半径随进度递减形成锥形 */
+        /**
+         * 圆锥拖尾：每个节点绘制正多边形截面，半径随进度递减形成锥形。
+         * <pre>{@code
+         *     效果示意：
+         *         ╭──╮
+         *        ╱    ╲
+         *       │      │
+         *        ╲    ╱
+         *         ╰──╯
+         *     头→尾
+         * }</pre>
+         */
         CONE,
-        /** 丝带拖尾：每个节点绘制菱形截面，四个方向的面片形成十字交叉效果 */
+        /**
+         * 丝带拖尾：每个节点绘制三角形截面，尖端朝前。
+         * <pre>{@code
+         *     效果示意：
+         *            *
+         *           /|\
+         *          / | \
+         *         *--+--*
+         *        左 尖端 右
+         *     尖端指向运动方向
+         * }</pre>
+         */
         RIBBON
     }
 
@@ -73,21 +219,22 @@ public class RenderContext<T extends AttachmentEntity> {
     /**
      * 拖尾着色器类型，默认 {@link ShaderType#STANDARD}。
      * <p>
-     * 控制拖尾使用的着色器和混合模式，影响光影模组兼容性：
-     * <ul>
-     *   <li>{@link ShaderType#STANDARD} - 标准透明，适合大多数情况</li>
-     *   <li>{@link ShaderType#UNLIT} - 无光照透明，光影兼容性更好</li>
-     *   <li>{@link ShaderType#ADDITIVE} - 加法混合，适合发光效果</li>
-     * </ul>
+     * 控制拖尾使用的着色器和混合模式，影响光影模组兼容性。
      * </p>
+     * <pre>{@code
+     * ┌───────────┬─────────────────────────────────────────────┐
+     * │ 类型      │ 特点                                        │
+     * ├───────────┼─────────────────────────────────────────────┤
+     * │ STANDARD  │ 标准透明，适合大多数情况                     │
+     * │ UNLIT     │ 无光照透明，光影兼容性更好，适合发光物体      │
+     * │ ADDITIVE  │ 加法混合，颜色叠加，适合火焰、能量效果        │
+     * └───────────┴─────────────────────────────────────────────┘
+     * }</pre>
      */
     public ShaderType trailShaderType = ShaderType.STANDARD;
 
     /**
      * 拖尾着色器类型枚举。
-     * <p>
-     * 提供不同的渲染方案以兼容原版和光影模组环境。
-     * </p>
      */
     public enum ShaderType {
         /** 标准透明着色器，使用标准透明度混合 */
@@ -106,16 +253,34 @@ public class RenderContext<T extends AttachmentEntity> {
      * 控制拖尾的显示时长。当值 > 0 时才会渲染拖尾。
      * 通常与实体内部的 trailTimer 字段同步，实现攻击时显示拖尾、静止时隐藏的效果。
      * </p>
+     * <pre>{@code
+     * // 典型用法：
+     * // 在实体 tick() 中：
+     * if (attacking) {
+     *     trailTimer = 15;  // 攻击时设置拖尾时长
+     * } else {
+     *     trailTimer--;     // 非攻击时递减
+     * }
+     * }</pre>
      */
     public int trailTimer = 0;
 
     /**
      * 历史节点数量，默认 4。
      * <p>
-     * 从历史记录中取出的节点数量，影响拖尾长度。
-     * 数值越大，拖尾越长，但渲染开销也越大。
-     * 建议范围：3-8。
+     * 从历史记录中取出的节点数量，直接影响拖尾的视觉长度。
      * </p>
+     * <pre>{@code
+     * 历史节点数量与轨迹长度关系：
+     *
+     * historyLength=4:    *--*--*--*--*    (短轨迹)
+     * historyLength=8:    *--*--*--*--*--*--*--*--*    (长轨迹)
+     *
+     * 注意：
+     * - 数值越大，拖尾越长，但渲染开销也越大
+     * - 建议根据实体移动速度调整：快速移动用较大值，慢速用较小值
+     * - 建议范围：3-12
+     * }</pre>
      */
     public int trailHistoryLength = 4;
 
@@ -123,9 +288,16 @@ public class RenderContext<T extends AttachmentEntity> {
      * 每节点插值分段数，默认 4。
      * <p>
      * Catmull-Rom 样条插值时，每两个原始节点之间插入的分段数。
-     * 数值越大，曲线越平滑，但顶点数也越多。
-     * 建议范围：2-6。
      * </p>
+     * <pre>{@code
+     * 插值效果对比：
+     *
+     * segmentsPerNode=2:  *---*---*---*    (折线感明显)
+     * segmentsPerNode=4:  *-*-*-*-*-*-*    (较平滑)
+     * segmentsPerNode=8:  ~~~~~~~~~~~~     (非常平滑)
+     *
+     * 建议范围：2-8
+     * }</pre>
      */
     public int trailSegmentsPerNode = 4;
 
@@ -133,9 +305,27 @@ public class RenderContext<T extends AttachmentEntity> {
      * 拖尾起始索引，默认 0。
      * <p>
      * 从历史节点的哪个位置开始渲染。用于实现拖尾动态缩短效果。
-     * 例如，当 trailTimer 从 10 递减到 0 时，可设置 trailStartIndex = 10 - trailTimer，
-     * 使拖尾从尾部开始逐渐消失。
      * </p>
+     * <pre>{@code
+     * 动态缩短示例：
+     *
+     * 假设 historyLength=10, timer 从 10 递减到 0
+     *
+     * timer=10, startIndex=0:
+     *   ═════════════════════════════════════
+     *   |完整轨迹显示|
+     *
+     * timer=5, startIndex=5:
+     *   ═════════════════════════════════════
+     *           |后半段显示|
+     *
+     * timer=0, startIndex=10:
+     *   ═════════════════════════════════════
+     *                                   (不显示)
+     *
+     * 实现代码：
+     * .trailStartIndex(maxTimer - currentTimer)
+     * }</pre>
      */
     public int trailStartIndex = 0;
 
@@ -145,8 +335,20 @@ public class RenderContext<T extends AttachmentEntity> {
      * 圆锥拖尾最大半径，默认 0.2。
      * <p>
      * 拖尾头部（进度 0）的截面半径。尾部半径由淡出函数计算。
-     * 建议根据实体大小调整，通常为实体半径的 0.5-1.5 倍。
      * </p>
+     * <pre>{@code
+     * 半径效果：
+     *
+     * radius=0.1:    ╭╮    (细小)
+     *                ││
+     *                ╰╯
+     *
+     * radius=0.3:    ╭──╮  (粗大)
+     *               │    │
+     *                ╰──╯
+     *
+     * 建议根据实体大小调整，通常为实体半径的 0.5-1.5 倍
+     * }</pre>
      */
     public float trailMaxRadius = 0.2f;
 
@@ -154,8 +356,16 @@ public class RenderContext<T extends AttachmentEntity> {
      * 圆锥截面正多边形边数，默认 6。
      * <p>
      * 每个节点处绘制的正多边形边数。边数越多，截面越接近圆形。
-     * 建议范围：4-16。边数过多会显著增加顶点数。
      * </p>
+     * <pre>{@code
+     * 边数效果：
+     *
+     * resolution=4:   ◇    (菱形)
+     * resolution=6:   ⬡    (六边形)
+     * resolution=8:   ⯃    (八边形，接近圆)
+     *
+     * 建议范围：4-16。边数过多会显著增加顶点数。
+     * }</pre>
      */
     public int trailResolution = 6;
 
@@ -177,10 +387,28 @@ public class RenderContext<T extends AttachmentEntity> {
      * <ul>
      *   <li>entity - 当前渲染的实体实例</li>
      *   <li>progress - 进度值，0 表示拖尾头部（靠近实体），1 表示尾部</li>
-     *   <li>timeShift - 时间偏移量，用于实现动态颜色变化效果</li>
+     *   <li>timeShift - 时间偏移量，用于实现动态颜色变化效果（如彩虹渐变）</li>
      * </ul>
      * 返回值：RGB 颜色值 (0xRRGGBB)。
      * </p>
+     * <pre>{@code
+     * // 示例1：从头到尾渐变（红→黄）
+     * .trailColorFunction((e, progress, time) -> {
+     *     int r = 255;
+     *     int g = (int) (progress * 255);
+     *     int b = 0;
+     *     return (r << 16) | (g << 8) | b;
+     * })
+     *
+     * // 示例2：彩虹渐变（使用 timeShift）
+     * .trailColorFunction((e, progress, time) -> {
+     *     float hue = (time + progress * 0.3f) % 1.0f;
+     *     return Mth.hsvToRgb(hue, 0.8f, 1.0f);
+     * })
+     *
+     * // 示例3：固定颜色
+     * .trailColorFunction((e, progress, time) -> 0x00FF00)
+     * }</pre>
      */
     public ColorFunction<T> trailColorFunction = (entity, progress, timeShift) -> trailColorRGB;
 
@@ -192,19 +420,93 @@ public class RenderContext<T extends AttachmentEntity> {
      * 参数 progress：0 表示头部，1 表示尾部。
      * 返回值：缩放因子 [0, 1]，1 表示完全不透明，0 表示完全透明。
      * </p>
-     * <p>
-     * 默认实现：{@code (1 - progress)^1.5}，产生平滑的淡出效果。
-     * 其他常用选项：
-     * <ul>
-     *   <li>线性淡出：{@code progress -> 1 - progress}</li>
-     *   <li>二次淡出：{@code progress -> (1 - progress)^2}</li>
-     *   <li>先快后慢：{@code progress -> sqrt(1 - progress)}</li>
-     * </ul>
-     * </p>
+     * <pre>{@code
+     * 常用淡出曲线对比：
+     *
+     * progress:  0.0   0.25   0.5   0.75   1.0
+     *
+     * 线性:      1.0 ─────────────────────── 0.0
+     *            (1 - progress)
+     *
+     * 二次:      1.0 ────────╮
+     *                        ╰───────────── 0.0
+     *            ((1 - progress)²)
+     *
+     * 1.5次:     1.0 ──────╮
+     *                      ╰────────────── 0.0
+     *            ((1 - progress)^1.5)  [默认]
+     *
+     * 先快后慢:  1.0 ─╮
+     *                 ╰────────────────── 0.0
+     *            (sqrt(1 - progress))
+     *
+     * 代码示例：
+     * .trailFadeOut(p -> (1 - p) * (1 - p))           // 二次淡出
+     * .trailFadeOut(p -> (float) Math.sqrt(1 - p))    // 先快后慢
+     * .trailFadeOut(p -> 1 - p)                       // 线性淡出
+     * }</pre>
      */
     public FadeFunction trailFadeOut = progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 1.5);
 
     // ===================== 丝带拖尾专属参数 =====================
+
+    /**
+     * 丝带宽度（三角形的高），默认 0.15。
+     * <p>
+     * 控制丝带三角形从尖端到基部的距离（Z方向）。
+     * </p>
+     * <pre>{@code
+     * 三角形截面结构：
+     *
+     *            * 尖端
+     *           /|\
+     *          / | \  ribbonWidth (高)
+     *         /  |  \
+     *        *---+---*
+     *       左  基部  右
+     *
+     * width=0.1:    *      (短小尖锐)
+     *              /|
+     *             *-*
+     *
+     * width=0.5:    *      (长而尖锐)
+     *              /|
+     *             / |
+     *            *--*
+     *
+     * 建议范围：0.05-1.0
+     * }</pre>
+     */
+    public float ribbonWidth = 0.15f;
+
+    /**
+     * 丝带棱形大小（三角形底边长度），默认 0.3。
+     * <p>
+     * 控制丝带三角形底边的宽度（左右方向）。
+     * </p>
+     * <pre>{@code
+     * 三角形截面结构：
+     *
+     *            *
+     *           /|\
+     *          / | \
+     *         *--+--*
+     *         ←─→
+     *    ribbonDiamondSize (底边长度)
+     *
+     * diamondSize=0.1:    *    (窄)
+     *                    /|\
+     *                   *-*-*
+     *
+     * diamondSize=0.5:    *    (宽)
+     *                    /|\
+     *                   / | \
+     *                  *--+--*
+     *
+     * 建议范围：0.1-1.0
+     * }</pre>
+     */
+    public float ribbonDiamondSize = 0.3f;
 
     /**
      * 丝带尖端透明度增强函数。
@@ -212,9 +514,23 @@ public class RenderContext<T extends AttachmentEntity> {
      * 用于增强丝带拖尾尖端的可见度，使其更加突出。
      * 返回值：透明度乘数，1.0 表示不增强，>1 表示增强。
      * </p>
-     * <p>
-     * 典型用法：在 progress < 0.3 时返回较高的值，使尖端更亮。
-     * </p>
+     * <pre>{@code
+     * // 示例：尖端前30%增强2倍透明度
+     * .trailTipAlphaBoost((e, progress) -> {
+     *     if (progress < 0.3f) {
+     *         return 2.0f;  // 尖端区域增强
+     *     }
+     *     return 1.0f;      // 其他区域不增强
+     * })
+     *
+     * // 渐变增强
+     * .trailTipAlphaBoost((e, progress) -> {
+     *     if (progress < 0.2f) {
+     *         return Mth.lerp(progress / 0.2f, 3.0f, 1.0f);
+     *     }
+     *     return 1.0f;
+     * })
+     * }</pre>
      */
     public AlphaBoostFunction<T> trailTipAlphaBoost = (entity, progress) -> 1.0f;
 
@@ -224,6 +540,15 @@ public class RenderContext<T extends AttachmentEntity> {
      * 用于增强丝带拖尾尖端的颜色亮度。
      * 返回值：亮度乘数，1.0 表示不增强，>1 表示增强。
      * </p>
+     * <pre>{@code
+     * // 示例：尖端前25%增强1.5倍亮度
+     * .trailTipBrightnessBoost((e, progress) -> {
+     *     if (progress < 0.25f) {
+     *         return 1.5f;
+     *     }
+     *     return 1.0f;
+     * })
+     * }</pre>
      * <p>
      * 注意：过高的亮度可能导致颜色溢出（超过 255），会被自动截断。
      * </p>
@@ -264,12 +589,22 @@ public class RenderContext<T extends AttachmentEntity> {
      * 视觉节点插值函数。
      * <p>
      * 用于在渲染时对实体的位置和朝向进行额外处理。
-     * 典型用途：
-     * <ul>
-     *   <li>平滑过渡：在攻击状态和待机状态之间平滑插值</li>
-     *   <li>自定义旋转：覆盖实体的默认旋转计算</li>
-     * </ul>
      * </p>
+     * <pre>{@code
+     * 典型用途：
+     *
+     * 1. 攻击/待机状态平滑过渡：
+     *    .visualNodeFunction((entity, partialTick, rawNode) -> {
+     *        float blend = entity.getBlendFactor(partialTick);
+     *        PathNode idleNode = entity.getIdleNode(partialTick);
+     *        return rawNode.lerp(idleNode, blend);
+     *    })
+     *
+     * 2. 自定义旋转：
+     *    .visualNodeFunction((entity, partialTick, rawNode) -> {
+     *        return new PathNode(rawNode.pos(), rawNode.yaw() + 45, rawNode.pitch(), rawNode.roll());
+     *    })
+     * }</pre>
      * <p>
      * 默认实现：直接返回原始节点，不进行任何处理。
      * </p>
@@ -381,12 +716,18 @@ public class RenderContext<T extends AttachmentEntity> {
      * 创建圆锥拖尾渲染上下文。
      * <p>
      * 圆锥拖尾特点：
-     * <ul>
-     *   <li>每个节点绘制正多边形截面</li>
-     *   <li>截面半径从头部到尾部递减，形成锥形</li>
-     *   <li>适合球状、圆形或无明显方向性的实体</li>
-     * </ul>
      * </p>
+     * <pre>{@code
+     *     侧视图：
+     *         ╭──╮
+     *        ╱    ╲
+     *       │      │
+     *        ╲    ╱
+     *         ╰──╯
+     *     头→尾
+     *
+     * 适合：球状、圆形、能量弹、魔法球
+     * }</pre>
      *
      * @param timer    拖尾计时器值，>0 时显示拖尾
      * @param colorRGB 基础颜色 (0xRRGGBB)
@@ -407,12 +748,17 @@ public class RenderContext<T extends AttachmentEntity> {
      * 创建丝带拖尾渲染上下文。
      * <p>
      * 丝带拖尾特点：
-     * <ul>
-     *   <li>每个节点绘制菱形截面，尖端朝前</li>
-     *   <li>四个方向的面片形成十字交叉效果</li>
-     *   <li>适合剑状、扁平或有明显方向性的实体</li>
-     * </ul>
      * </p>
+     * <pre>{@code
+     *     三角形截面：
+     *            * 尖端（朝前）
+     *           /|\
+     *          / | \
+     *         *--+--*
+     *        左  基部  右
+     *
+     * 适合：剑状、刀锋、扁平物体、有明显方向性的实体
+     * }</pre>
      *
      * @param timer    拖尾计时器值，>0 时显示拖尾
      * @param colorRGB 基础颜色 (0xRRGGBB)
@@ -442,14 +788,6 @@ public class RenderContext<T extends AttachmentEntity> {
 
     /**
      * 设置拖尾着色器类型。
-     * <p>
-     * 不同着色器类型对光影模组的兼容性不同：
-     * <ul>
-     *   <li>STANDARD - 标准透明，适合大多数情况</li>
-     *   <li>UNLIT - 无光照透明，光影兼容性更好</li>
-     *   <li>ADDITIVE - 加法混合，适合发光效果</li>
-     * </ul>
-     * </p>
      *
      * @param type 着色器类型
      * @return this，用于链式调用
@@ -555,6 +893,28 @@ public class RenderContext<T extends AttachmentEntity> {
      */
     public RenderContext<T> trailFadeOut(FadeFunction function) {
         this.trailFadeOut = function;
+        return this;
+    }
+
+    /**
+     * 设置丝带宽度（三角形高度）。
+     *
+     * @param width 宽度值
+     * @return this，用于链式调用
+     */
+    public RenderContext<T> ribbonWidth(float width) {
+        this.ribbonWidth = width;
+        return this;
+    }
+
+    /**
+     * 设置丝带棱形大小（三角形底边长度）。
+     *
+     * @param size 棱形大小值
+     * @return this，用于链式调用
+     */
+    public RenderContext<T> ribbonDiamondSize(float size) {
+        this.ribbonDiamondSize = size;
         return this;
     }
 

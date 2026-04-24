@@ -101,12 +101,13 @@ public abstract class AttachmentEntity {
      * </ul>
      * </p>
      */
+    @SuppressWarnings("unchecked")
     public void tick() {
         // 更新历史轨迹
         updateHistoryNodes();
         // 碰撞攻击检测
-        if (this instanceof ICollideAttack collideAttack) {
-            collideAttack.processCollision(this);
+        if (this instanceof ICollideAttack<?> collideAttack) {
+            ((ICollideAttack<AttachmentEntity>) collideAttack).processCollision(this);
         }
     }
 

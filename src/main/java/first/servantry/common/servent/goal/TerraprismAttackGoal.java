@@ -55,9 +55,6 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
     /** 上一次记录的目标位置，用于位置修正计算 */
     private Vec3 lastTargetPos;
 
-    /** 连续攻击循环计数器 */
-    private int loopCount;
-
     /** 准备阶段的目标位置 */
     private Vec3 prepPos;
 
@@ -118,7 +115,6 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         phase = Phase.PREP;
         prepPos = servant.getPos().add(0, 2, 0);
         prepTick = 0;
-        loopCount = 0;
         lastTargetPos = null;
     }
 
@@ -137,7 +133,6 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
         // 目标切换检测：在非准备和非连锁阶段时触发连锁攻击
         if (servant.isTargetChange() && phase != Phase.PREP && phase != Phase.CHAIN && target != null) {
-            loopCount = 0;
             transitionToChain(target);
             return;
         }
@@ -234,7 +229,6 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
      */
     private void transitionToContinuous(LivingEntity target) {
         phase = Phase.CONTINUOUS;
-        loopCount = 0;
         planSlashAttack(target);
     }
 
@@ -246,10 +240,8 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         applyDamageControl(14);
 
         if (!servant.isExecutingPath() && target != null) {
-            loopCount++;
-            // 每两次攻击后切换攻击模式
-            if (loopCount >= 2 && target.getRandom().nextBoolean()) {
-                loopCount = 0;
+            float chance = lastWasEllipse ? 0.25f : 0.75f;
+            if (target.getRandom().nextFloat() < chance) {
                 lastWasEllipse = !lastWasEllipse;
             }
             planSlashAttack(target);
@@ -293,7 +285,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
         // 生成随机椭圆参数
         float randAngle = owner.getRandom().nextFloat() * Mth.TWO_PI;
-        float randRadius = 3.0f + owner.getRandom().nextFloat() * 2.0f;
+        float randRadius = (float) target.getBoundingBox().getSize() * 2 + owner.getRandom().nextFloat() * 2.0f;
         float randY = 0.5f + owner.getRandom().nextFloat() * 2.5f;
         Vec3 farPoint = T.add(Math.cos(randAngle) * randRadius, randY, Math.sin(randAngle) * randRadius);
 
@@ -359,11 +351,11 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
      * <p>
      * 路径分为三部分：
      * <ul>
-     *   <li>准备阶段 (5 tick)：贝塞尔曲线移动到攻击准备位置</li>
-     *   <li>攻击阶段 (5 tick)：直线加速冲向目标</li>
-     *   <li>撤退阶段 (4 tick)：平滑过渡到下一个攻击方向</li>
+     *   <li>准备阶段 (4 tick)：贝塞尔曲线移动到攻击准备位置</li>
+     *   <li>攻击阶段 (4 tick)：直线加速冲向目标</li>
+     *   <li>撤退阶段 (8 tick)：平滑过渡到下一个攻击方向</li>
      * </ul>
-     * 总计 14 tick 的攻击周期。
+     * 总计 16 tick 的攻击周期。
      * </p>
      */
     private void planHourglassSlash(LivingEntity target) {
@@ -381,7 +373,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         // 计算关键位置
         double dist = Math.max(7.0, startPos.distanceTo(T));
         Vec3 prepPos = T.subtract(attackDir.scale(dist));
-        Vec3 hitPos = T.add(attackDir.scale(6));
+        Vec3 hitPos = T.add(attackDir);
 
         // 计算下一个攻击方向（旋转 80 度）
         Vector3f v = new Vector3f((float) attackDir.x, (float) attackDir.y, (float) attackDir.z);
@@ -397,6 +389,10 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         Vec3 planeNormal = attackDir.cross(new Vec3(0, 1, 0)).normalize();
         if (planeNormal.lengthSqr() < 1e-4) planeNormal = new Vec3(1, 0, 0);
 
+        int prepTicks = 3;
+        int attackTicks = 5;
+        int retreatTicks = 6;
+
         // 贝塞尔准备阶段控制点
         double R = startPos.distanceTo(prepPos) * 0.4;
         Vec3 P0 = startPos;
@@ -405,9 +401,9 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
         List<PathNode> nodes = new ArrayList<>();
 
-        // 准备阶段 (5 tick)
-        for (int i = 1; i <= 3; i++) {
-            float localT = (float) i / 5;
+        // 准备阶段 (4 tick)
+        for (int i = 1; i <= prepTicks; i++) {
+            float localT = (float) i / prepTicks;
             float smoothT = localT * localT * (3.0f - 2.0f * localT);
             Vec3 p = servant.calculateBezierPoint(P0, P1, P2, prepPos, localT);
             Vec3 tipDir = servant.slerpVector(currentTip, attackDir, smoothT);
@@ -415,18 +411,18 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
             nodes.add(servant.getEulerNode(p, tipDir, bNormal));
         }
 
-        // 攻击阶段 (5 tick)
-        for (int i = 1; i <= 6; i++) {
-            float t = ((float) i / 5) * ((float) i / 5);
+        // 攻击阶段 (4 tick)
+        for (int i = 1; i <= attackTicks; i++) {
+            float t = ((float) i / attackTicks) * ((float) i / attackTicks);
             Vec3 p = prepPos.lerp(hitPos, t);
             nodes.add(servant.getEulerNode(p, attackDir, planeNormal));
         }
 
-        // 撤退阶段 (4 tick)
+        // 撤退阶段 (8 tick)
         Vec3 nextPlaneNormal = nextAttackDir.cross(new Vec3(0, 1, 0)).normalize();
         if (nextPlaneNormal.lengthSqr() < 1e-4) nextPlaneNormal = new Vec3(1, 0, 0);
-        for (int i = 1; i <= 5; i++) {
-            float t = (float) i / 4;
+        for (int i = 1; i <= retreatTicks; i++) {
+            float t = (float) i / retreatTicks;
             float easeOut = t * (2.0f - t);
             Vec3 p = hitPos.lerp(nextPrepPos, easeOut);
             Vec3 tipDir = servant.slerpVector(attackDir, nextAttackDir, easeOut);
@@ -461,7 +457,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         if (target == null) return;
         lastTargetPos = target.position().add(0, target.getBbHeight() / 2.0, 0);
         double thrustAngleThreshold = 0.9;
-        int thrustAttackTicks = 7;
+        int thrustAttackTicks = 14;
         int sweepAttackTicks = 14;
         double curvePullOutward = 0.35;
 
@@ -549,7 +545,6 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         applyDamageControl(servant.getCurrentPath().getNodes().size());
 
         if (!servant.isExecutingPath() && target != null) {
-            loopCount = 0;
             transitionToContinuous(target);
         }
     }
