@@ -1,11 +1,11 @@
-package first.servantry.common.servent;
+package first.servantry.common.servant;
 
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.common.servent.goal.StardustCellAttackGoal;
-import first.servantry.common.servent.goal.StardustCellIdleGoal;
-import first.servantry.common.servent.goal.StardustCellTeleportGoal;
+import first.servantry.common.servant.goal.StardustCellAttackGoal;
+import first.servantry.common.servant.goal.StardustCellIdleGoal;
+import first.servantry.common.servant.goal.StardustCellTeleportGoal;
 import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;

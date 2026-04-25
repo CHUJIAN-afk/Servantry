@@ -1,10 +1,10 @@
-package first.servantry.common.servent.goal;
+package first.servantry.common.servant.goal;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.PlannedPath;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.servent.EnchantedThrowingKnives;
+import first.servantry.common.servant.EnchantedThrowingKnives;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;

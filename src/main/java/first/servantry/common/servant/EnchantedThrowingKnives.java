@@ -1,4 +1,4 @@
-package first.servantry.common.servent;
+package first.servantry.common.servant;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
@@ -6,8 +6,8 @@ import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.common.servent.goal.EnchantedThrowingKnivesAttackGoal;
-import first.servantry.common.servent.goal.EnchantedThrowingKnivesIdleGoal;
+import first.servantry.common.servant.goal.EnchantedThrowingKnivesAttackGoal;
+import first.servantry.common.servant.goal.EnchantedThrowingKnivesIdleGoal;
 import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;

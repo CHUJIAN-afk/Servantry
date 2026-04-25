@@ -5,6 +5,7 @@ import first.servantry.api.client.render.EntityRenderDispatcher;
 import first.servantry.client.renderer.projectile.StardustProjectileConeRenderer;
 import first.servantry.client.renderer.servant.EnchantedThrowingKnivesRendererServant;
 import first.servantry.client.renderer.servant.StardustCellRendererServant;
+import first.servantry.client.renderer.servant.StardustDragonRenderer;
 import first.servantry.client.renderer.servant.TerraprismRendererServant;
 import first.servantry.common.particle.StardustScatterParticle;
 import first.servantry.register.ParticleRegister;
@@ -29,6 +30,7 @@ public class ClientEvent {
         EntityRenderDispatcher.register(ServantRegister.TerraPrism.get(), new TerraprismRendererServant());
         EntityRenderDispatcher.register(ServantRegister.StardustCell.get(), new StardustCellRendererServant());
         EntityRenderDispatcher.register(ServantRegister.EnchantedThrowingKnives.get(), new EnchantedThrowingKnivesRendererServant());
+        EntityRenderDispatcher.register(ServantRegister.StardustDragon.get(), new StardustDragonRenderer());
         EntityRenderDispatcher.register(ProjectileRegister.StardustProjectile.get(), new StardustProjectileConeRenderer());
     }
 

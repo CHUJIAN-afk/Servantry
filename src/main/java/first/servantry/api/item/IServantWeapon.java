@@ -1,5 +1,6 @@
 package first.servantry.api.item;
 
+import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
@@ -7,8 +8,11 @@ import first.servantry.register.AttachmentRegister;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -18,25 +22,6 @@ import java.util.function.Supplier;
  * 实现此接口的物品将获得召唤/移除仆从的能力。
  * 通常与 {@link Builder} 配合使用，通过构建器模式创建武器物品。
  * </p>
- *
- * <h3>使用示例</h3>
- * <pre>{@code
- * // 使用 Builder 创建武器物品
- * public static final Item MY_WEAPON = new IServantWeapon.Builder<>(() -> ServantRegister.MyServant.get())
- *     .sound(() -> SoundEvents.EVOKER_CAST_SPELL)
- *     .onSummon(servant -> {
- *         servant.init(new PathNode(player.position(), 0, 0, 0));
- *     })
- *     .buildItem(new Item.Properties().stacksTo(1));
- *
- * // 手动实现接口
- * public class MyWeaponItem extends Item implements IServantWeapon<MyServant> {
- *     public MyWeaponItem(Properties properties) { super(properties); }
- *
- *     @Override public ServantType<MyServant> getType() { return ServantRegister.MyServant.get(); }
- *     @Override public MyServant getDummyServant() { return new MyServant(); }
- * }
- * }</pre>
  *
  * @param <T> 仆从类型
  * @see Servant
@@ -48,137 +33,41 @@ public interface IServantWeapon<T extends Servant> {
 
     /**
      * 处理仆从召唤逻辑。
-     * <p>
-     * 执行流程：
-     * <ol>
-     *   <li>通过类型工厂创建仆从实例</li>
-     *   <li>设置所有者为当前玩家</li>
-     *   <li>尝试将仆从添加到玩家的附件数据中</li>
-     *   <li>若添加成功，调用武器的 {@link #summon(Servant)} 回调</li>
-     * </ol>
-     * </p>
-     * <p>
-     * 召唤可能失败的情况：
-     * <ul>
-     *   <li>已达到该类型仆从的数量上限</li>
-     *   <li>已达到总仆从数量上限</li>
-     * </ul>
-     * </p>
      *
      * @param player 召唤仆从的玩家
-     * @param weapon 仆从武器实例
-     * @param <T>    仆从类型
      */
-    static <T extends Servant> void handleSummon(Player player, IServantWeapon<T> weapon) {
-        // 创建仆从实例
-        T servant = weapon.getType().factory().get();
-
-        // 设置所有者
+    default void handleSummon(Player player) {
+        T servant = this.getType().factory().get();
         EntityData data = player.getData(AttachmentRegister.EntityData);
         servant.setOwner(player);
-
-        // 尝试召唤，成功后执行初始化回调
         if (data.summonServant(player, servant)) {
-            weapon.summon(servant);
+            this.summon(servant);
         }
     }
 
     // ===================== 核心抽象方法 =====================
 
-    /**
-     * 获取武器对应的仆从类型。
-     * <p>
-     * 返回的类型用于：
-     * <ul>
-     *   <li>创建仆从实例</li>
-     *   <li>识别和移除特定类型的仆从</li>
-     *   <li>查询该类型仆从的数量</li>
-     * </ul>
-     * </p>
-     *
-     * @return 仆从类型
-     */
     ServantType<T> getType();
 
-    /**
-     * 获取用于读取静态面板数据的占位仆从实例。
-     * <p>
-     * 该实例不参与实际游戏逻辑，仅用于：
-     * <ul>
-     *   <li>在物品提示框中显示伤害、击退等属性</li>
-     *   <li>提供默认的属性值计算</li>
-     * </ul>
-     * </p>
-     * <p>
-     * 实现建议：使用懒加载缓存占位实例，避免重复创建。
-     * </p>
-     *
-     * @return 占位仆从实例
-     */
     T getDummyServant();
 
     // ===================== 默认实现方法 =====================
 
-    /**
-     * 获取武器面板显示的伤害值。
-     * <p>
-     * 默认实现从占位仆从读取真实伤害值。
-     * 子类可重写以提供自定义计算（如基于玩家属性的动态伤害）。
-     * </p>
-     *
-     * @return 伤害值
-     */
     default float getDamage() {
         return getDummyServant().getDamage();
     }
 
-    /**
-     * 获取武器面板显示的击退值。
-     * <p>
-     * 默认实现从占位仆从读取真实击退值。
-     * 子类可重写以提供自定义计算。
-     * </p>
-     *
-     * @return 击退系数
-     */
     default float getKnockback() {
         return getDummyServant().getKnockback();
     }
 
-    /**
-     * 召唤仆从时的初始化回调。
-     * <p>
-     * 在仆从成功添加到玩家附件数据后调用。
-     * 子类可重写以执行自定义初始化逻辑，如：
-     * <ul>
-     *   <li>设置仆从初始位置</li>
-     *   <li>配置仆从状态</li>
-     *   <li>播放特效</li>
-     * </ul>
-     * </p>
-     *
-     * @param servant 新召唤的仆从实例
-     */
-    default void summon(T servant) {}
+    default void summon(T servant) {
+    }
 
-    /**
-     * 获取召唤时播放的音效。
-     *
-     * @return 音效事件，默认为 null（不播放音效）
-     */
     default SoundEvent getSoundEvent() {
         return null;
     }
 
-    /**
-     * 移除玩家拥有的该类型仆从。
-     * <p>
-     * 默认实现从玩家附件数据中移除一个该类型的仆从。
-     * 子类可重写以添加额外逻辑（如返还资源）。
-     * </p>
-     *
-     * @param player 玩家
-     */
     default void remove(Player player) {
         player.getData(AttachmentRegister.EntityData).removeServant(getType());
     }
@@ -188,136 +77,275 @@ public interface IServantWeapon<T extends Servant> {
     /**
      * 仆从武器构建器，用于快速创建武器物品。
      * <p>
-     * 通过构建器模式配置武器属性，无需手动创建 Item 子类。
-     * 构建器内部会创建一个匿名 Item 子类实现 IServantWeapon 接口。
+     * 支持两种模式：
+     * <ul>
+     *   <li>普通模式：每次召唤创建一个仆从</li>
+     *   <li>多体节模式：首次召唤创建多个体节，重复召唤增加体节</li>
+     * </ul>
      * </p>
-     *
-     * <h3>使用示例</h3>
-     * <pre>{@code
-     * public static final Item MY_WEAPON = new IServantWeapon.Builder<>(() -> ServantRegister.MyServant.get())
-     *     .sound(() -> SoundEvents.EVOKER_CAST_SPELL)
-     *     .onSummon(servant -> servant.init(new PathNode(player.position(), 0, 0, 0)))
-     *     .onRemove(player -> player.give(new ItemStack(Items.DIAMOND)))
-     *     .buildItem(new Item.Properties().stacksTo(1));
-     * }</pre>
      *
      * @param <T> 仆从类型
      */
     class Builder<T extends Servant> {
 
-        /** 仆从类型供应器 */
         private final Supplier<ServantType<T>> typeSupplier;
-
-        /** 召唤音效供应器 */
         private Supplier<SoundEvent> soundEventSupplier = () -> null;
-
-        /** 召唤回调 */
         private Consumer<T> onSummon = servant -> {};
-
-        /** 移除回调（可选） */
         private Consumer<Player> onRemove = null;
 
-        /**
-         * 创建构建器。
-         *
-         * @param typeSupplier 仆从类型供应器，通常使用注册表的 get() 方法引用
-         */
+        // 多体节模式配置
+        private boolean multiSegmentMode = false;
+        private int initialSegments = 1;
+        private int slotCostPerSegment = 1;
+        private double segmentDistance = 0.8;
+        private BiConsumer<Player, T> onSegmentInit = null;
+
         public Builder(@NotNull Supplier<ServantType<T>> typeSupplier) {
             this.typeSupplier = typeSupplier;
         }
 
-        /**
-         * 设置召唤音效。
-         *
-         * @param soundEventSupplier 音效供应器
-         * @return this，用于链式调用
-         */
         public Builder<T> sound(Supplier<SoundEvent> soundEventSupplier) {
             this.soundEventSupplier = soundEventSupplier;
             return this;
         }
 
-        /**
-         * 设置召唤回调。
-         * <p>
-         * 回调在仆从成功添加到玩家附件数据后执行。
-         * </p>
-         *
-         * @param action 召唤回调
-         * @return this，用于链式调用
-         */
         public Builder<T> onSummon(Consumer<T> action) {
             this.onSummon = action;
             return this;
         }
 
-        /**
-         * 设置移除回调。
-         * <p>
-         * 回调在移除仆从时执行，可用于返还资源等。
-         * 若不设置，将使用默认的移除逻辑。
-         * </p>
-         *
-         * @param action 移除回调
-         * @return this，用于链式调用
-         */
         public Builder<T> onRemove(Consumer<Player> action) {
             this.onRemove = action;
             return this;
         }
 
         /**
-         * 构建武器物品。
+         * 启用多体节模式。
+         * <p>
+         * 首次召唤创建多个体节，重复召唤增加体节。
+         * 需要仆从类实现 {@link ISegmentServant} 接口。
+         * </p>
          *
-         * @param properties 物品属性
-         * @return 配置好的武器物品实例
+         * @param initialSegments 首次召唤的体节数量
+         * @param segmentDistance 体节之间的固定距离
+         * @param slotCostPerSegment 每个体节占用的栏位数
+         * @return this，用于链式调用
          */
+        public Builder<T> multiSegment(int initialSegments, double segmentDistance, int slotCostPerSegment) {
+            this.multiSegmentMode = true;
+            this.initialSegments = initialSegments;
+            this.segmentDistance = segmentDistance;
+            this.slotCostPerSegment = slotCostPerSegment;
+            return this;
+        }
+
+        /**
+         * 设置体节初始化回调（多体节模式专用）。
+         *
+         * @param action 回调，参数为玩家和体节实例
+         * @return this，用于链式调用
+         */
+        public Builder<T> onSegmentInit(BiConsumer<Player, T> action) {
+            this.onSegmentInit = action;
+            return this;
+        }
+
         public Item buildItem(Item.Properties properties) {
-            // 匿名类实现 IServantWeapon 接口
-            class BuiltServantWeaponItem extends Item implements IServantWeapon<T> {
+            if (multiSegmentMode) {
+                return new MultiSegmentServantWeaponItem(properties);
+            } else {
+                return new SimpleServantWeaponItem(properties);
+            }
+        }
 
-                /** 缓存的占位仆从实例 */
-                private T dummyServant = null;
+        // ===================== 简单模式武器 =====================
 
-                public BuiltServantWeaponItem(Properties p) {
-                    super(p);
+        private class SimpleServantWeaponItem extends Item implements IServantWeapon<T> {
+            private T dummyServant = null;
+
+            public SimpleServantWeaponItem(Properties p) {
+                super(p);
+            }
+
+            @Override
+            public ServantType<T> getType() {
+                return typeSupplier.get();
+            }
+
+            @Override
+            public SoundEvent getSoundEvent() {
+                return soundEventSupplier.get();
+            }
+
+            @Override
+            public T getDummyServant() {
+                if (dummyServant == null) {
+                    dummyServant = getType().factory().get();
                 }
+                return dummyServant;
+            }
 
-                @Override
-                public ServantType<T> getType() {
-                    return typeSupplier.get();
+            @Override
+            public void summon(T servant) {
+                onSummon.accept(servant);
+            }
+
+            @Override
+            public void remove(Player player) {
+                if (onRemove != null) {
+                    onRemove.accept(player);
+                } else {
+                    IServantWeapon.super.remove(player);
                 }
+            }
+        }
 
-                @Override
-                public SoundEvent getSoundEvent() {
-                    return soundEventSupplier.get();
+        // ===================== 多体节模式武器 =====================
+
+        private class MultiSegmentServantWeaponItem extends Item implements IServantWeapon<T> {
+            private T dummyServant = null;
+
+            public MultiSegmentServantWeaponItem(Properties p) {
+                super(p);
+            }
+
+            @Override
+            public ServantType<T> getType() {
+                return typeSupplier.get();
+            }
+
+            @Override
+            public SoundEvent getSoundEvent() {
+                return soundEventSupplier.get();
+            }
+
+            @Override
+            public T getDummyServant() {
+                if (dummyServant == null) {
+                    dummyServant = getType().factory().get();
                 }
+                return dummyServant;
+            }
 
-                @Override
-                public T getDummyServant() {
-                    // 懒加载缓存
-                    if (dummyServant == null) {
-                        dummyServant = getType().factory().get();
+            @Override
+            public void handleSummon(Player player) {
+                EntityData data = player.getData(AttachmentRegister.EntityData);
+                ServantType<T> type = getType();
+
+                // 查找现有的体节
+                List<T> existing = data.getEntities().stream()
+                        .filter(e -> type.equals(e.getType()))
+                        .map(e -> (T) e)
+                        .sorted((a, b) -> Integer.compare(getSegmentIndex(a), getSegmentIndex(b)))
+                        .toList();
+
+                if (existing.isEmpty()) {
+                    // 首次召唤：创建多个体节
+                    int requiredSlots = initialSegments * slotCostPerSegment;
+                    int availableSlots = data.getMaxServantSize(player) - data.getUsedSlots();
+
+                    if (availableSlots < requiredSlots) {
+                        return; // 栏位不足
                     }
-                    return dummyServant;
-                }
 
-                @Override
-                public void summon(T servant) {
-                    onSummon.accept(servant);
-                }
+                    // 创建头部
+                    T head = type.factory().get();
+                    head.setOwner(player);
+                    setSegmentIndex(head, 0);
+                    setTotalSegments(head, initialSegments);
 
-                @Override
-                public void remove(Player player) {
-                    if (onRemove != null) {
-                        onRemove.accept(player);
+                    if (!data.summonServant(player, head)) return;
+
+                    // 初始化头部位置
+                    if (onSegmentInit != null) {
+                        onSegmentInit.accept(player, head);
                     } else {
-                        IServantWeapon.super.remove(player);
+                        onSummon.accept(head);
+                    }
+
+                    // 创建后续体节
+                    Vec3 headPos = head.getPos();
+                    for (int i = 1; i < initialSegments; i++) {
+                        T segment = type.factory().get();
+                        segment.setOwner(player);
+                        setSegmentIndex(segment, i);
+                        setTotalSegments(segment, initialSegments);
+
+                        if (!data.summonServant(player, segment)) break;
+
+                        // 在头部后方按固定距离排列
+                        Vec3 spawnPos = headPos.subtract(0, 0, i * segmentDistance);
+                        segment.init(new PathNode(spawnPos, 0, 0, 0));
+                    }
+                } else {
+                    // 增加体节
+                    int requiredSlots = slotCostPerSegment;
+                    int availableSlots = data.getMaxServantSize(player) - data.getUsedSlots();
+
+                    if (availableSlots < requiredSlots) {
+                        return; // 栏位不足
+                    }
+
+                    T last = existing.getLast();
+                    T newSegment = type.factory().get();
+                    newSegment.setOwner(player);
+                    setSegmentIndex(newSegment, getSegmentIndex(last) + 1);
+
+                    if (data.summonServant(player, newSegment)) {
+                        newSegment.init(last.getCurrentPathNode());
                     }
                 }
             }
 
-            return new BuiltServantWeaponItem(properties);
+            @Override
+            public void summon(T servant) {
+                onSummon.accept(servant);
+            }
+
+            @Override
+            public void remove(Player player) {
+                EntityData data = player.getData(AttachmentRegister.EntityData);
+                ServantType<T> type = getType();
+
+                List<T> existing = data.getEntities().stream()
+                        .filter(e -> type.equals(e.getType()))
+                        .map(e -> (T) e)
+                        .sorted((a, b) -> Integer.compare(getSegmentIndex(b), getSegmentIndex(a)))
+                        .toList();
+
+                if (!existing.isEmpty()) {
+                    data.removeServant(type);
+                }
+            }
+
+            private int getSegmentIndex(T servant) {
+                if (servant instanceof ISegmentServant seg) {
+                    return seg.getSegmentIndex();
+                }
+                return 0;
+            }
+
+            private void setSegmentIndex(T servant, int index) {
+                if (servant instanceof ISegmentServant seg) {
+                    seg.setSegmentIndex(index);
+                }
+            }
+
+            private void setTotalSegments(T servant, int total) {
+                if (servant instanceof ISegmentServant seg) {
+                    seg.setTotalSegments(total);
+                }
+            }
         }
+    }
+
+    /**
+     * 多体节仆从接口，用于多体节模式。
+     */
+    interface ISegmentServant {
+        int getSegmentIndex();
+        void setSegmentIndex(int index);
+        int getTotalSegments();
+        void setTotalSegments(int total);
     }
 }

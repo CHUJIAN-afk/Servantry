@@ -4,6 +4,9 @@ import first.servantry.Servantry;
 import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.item.IServantWeapon;
+import first.servantry.api.register.ServantType;
+import first.servantry.common.servant.StardustDragon;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
@@ -12,6 +15,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.List;
 
 public class ItemRegister {
 
@@ -44,7 +49,11 @@ public class ItemRegister {
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
 
-    // 2. 注册套装物品
+    public static final DeferredItem<Item> StardustDragonStaff = Register.register("stardust_dragon_staff", () ->
+            new StardustDragonWeaponItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
+    );
+
+    // 套装物品
     public static final DeferredItem<Item> HallowedHelmet = Register.register("hallowed_helmet", () -> new ArmorItem(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET, new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(6)).rarity(Rarity.UNCOMMON)));
 
     public static final DeferredItem<Item> HallowedChestplate = Register.register("hallowed_chestplate", () -> new ArmorItem(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.CHESTPLATE, new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(6)).rarity(Rarity.UNCOMMON)));
@@ -55,6 +64,85 @@ public class ItemRegister {
 
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
+    }
+
+    /** 星尘龙武器 - 处理多体节召唤 */
+    private static class StardustDragonWeaponItem extends Item implements IServantWeapon<StardustDragon> {
+
+        public StardustDragonWeaponItem(Properties props) {
+            super(props);
+        }
+
+        @Override
+        public ServantType<StardustDragon> getType() {
+            return ServantRegister.StardustDragon.get();
+        }
+
+        @Override
+        public StardustDragon getDummyServant() {
+            return getType().factory().get();
+        }
+
+        @Override
+        public SoundEvent getSoundEvent() {
+            return SoundRegister.UseServantWeapon.get();
+        }
+
+        @Override
+        public void handleSummon(Player player) {
+            EntityData data = player.getData(AttachmentRegister.EntityData);
+            ServantType<StardustDragon> type = getType();
+
+            // 查找现有体节
+            List<StardustDragon> existing = data.getEntities().stream()
+                    .filter(e -> e instanceof StardustDragon)
+                    .map(e -> (StardustDragon) e)
+                    .toList();
+
+            if (existing.isEmpty()) {
+                // 首次召唤：创建3个体节
+                if (data.getUsedSlots() + 3 > data.getMaxServantSize(player)) return;
+
+                Vec3 spawnPos = player.position().add(0, 3, 0);
+
+                for (int i = 0; i < 3; i++) {
+                    StardustDragon segment = type.factory().get();
+                    segment.setOwner(player);
+                    segment.setSegmentIndex(i);
+                    segment.setTotalSegments(3);
+                    if (data.summonServant(player, segment)) {
+                        segment.init(new PathNode(spawnPos.subtract(0, 0, i * 0.4), 0, 0, 0));
+                    }
+                }
+            } else {
+                // 增加体节
+                if (data.getUsedSlots() + 1 > data.getMaxServantSize(player)) return;
+
+                int maxIndex = existing.stream()
+                        .mapToInt(StardustDragon::getSegmentIndex)
+                        .max()
+                        .orElse(0);
+
+                StardustDragon newSegment = type.factory().get();
+                newSegment.setOwner(player);
+                newSegment.setSegmentIndex(maxIndex + 1);
+
+                if (data.summonServant(player, newSegment)) {
+                    Vec3 lastPos = existing.stream()
+                            .filter(e -> e.getSegmentIndex() == maxIndex)
+                            .findFirst()
+                            .map(StardustDragon::getPos)
+                            .orElse(player.position().add(0, 3, 0));
+                    newSegment.init(new PathNode(lastPos, 0, 0, 0));
+                }
+            }
+        }
+
+        @Override
+        public void remove(Player player) {
+            player.getData(AttachmentRegister.EntityData).removeServant(getType());
+        }
+
     }
 
 }

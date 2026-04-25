@@ -2,7 +2,7 @@ package first.servantry.mixin;
 
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.common.servent.EnchantedThrowingKnives;
+import first.servantry.common.servant.EnchantedThrowingKnives;
 import first.servantry.register.ArmorMaterialRegister;
 import first.servantry.utils.ArmorSetUtil;
 import net.minecraft.world.damagesource.CombatRules;

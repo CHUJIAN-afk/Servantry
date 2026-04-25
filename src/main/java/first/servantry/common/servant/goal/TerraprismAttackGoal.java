@@ -1,11 +1,11 @@
-package first.servantry.common.servent.goal;
+package first.servantry.common.servant.goal;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.PlannedPath;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.servent.Terraprism;
+import first.servantry.common.servant.Terraprism;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;

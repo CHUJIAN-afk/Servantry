@@ -1,9 +1,9 @@
-package first.servantry.common.servent.goal;
+package first.servantry.common.servant.goal;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.projectile.StardustProjectile;
-import first.servantry.common.servent.StardustCell;
+import first.servantry.common.servant.StardustCell;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;

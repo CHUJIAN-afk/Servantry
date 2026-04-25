@@ -20,6 +20,8 @@
   "item.servantry.hallowed_leggings": "神圣护胫",
   "item.servantry.stardust_cell_staff": "星尘细胞法杖",
   "item.servantry.stardust_cell_staff.tooltip.1": "“培养最美丽的细胞感染”",
+  "item.servantry.stardust_dragon_staff": "星尘之龙法杖",
+  "item.servantry.stardust_dragon_staff.tooltip.1": "“有了一条巨龙后，谁还需要一群仆从呢？”",
   "item.servantry.terraprism": "泰拉棱镜",
   "item.servantry.terraprism.tooltip.1": "召唤一柄光棱剑，施展近乎完美的攻击",
   "item.servantry.terraprism.tooltip.2": "——曾被冠以“大地棱彩”美名的无暇之剑",
@@ -32,6 +34,7 @@
   "modid.servantry": "仆从学",
   "servant.servantry.enchanted_throwing_knives": "附魔飞刀",
   "servant.servantry.stardust_cell": "星尘细胞",
+  "servant.servantry.stardust_dragon": "星尘之龙",
   "servant.servantry.terraprism": "泰拉棱镜",
   "servantry:attribute.name.servantry.servant_damage": "仆从伤害",
   "servantry:attribute.name.servantry.servant_max_count": "仆从栏"

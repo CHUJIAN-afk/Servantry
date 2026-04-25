@@ -6,6 +6,7 @@ import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
+import first.servantry.register.ItemRegister;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -63,7 +64,7 @@ public class Event {
         Level level = player.level();
         if (!level.isClientSide() && event.getHand() == InteractionHand.MAIN_HAND && itemStack.getItem() instanceof IServantWeapon<?> iServantWeapon) {
             if (!player.isShiftKeyDown()) {
-                IServantWeapon.handleSummon(player, iServantWeapon);
+                iServantWeapon.handleSummon(player);
             } else {
                 EntityData data = player.getData(AttachmentRegister.EntityData);
                 data.removeServant(iServantWeapon.getType());

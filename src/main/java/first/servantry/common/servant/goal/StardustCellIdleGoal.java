@@ -1,7 +1,7 @@
-package first.servantry.common.servent.goal;
+package first.servantry.common.servant.goal;
 
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.servent.StardustCell;
+import first.servantry.common.servant.StardustCell;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 

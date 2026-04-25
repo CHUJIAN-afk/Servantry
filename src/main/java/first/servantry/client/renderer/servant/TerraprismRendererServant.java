@@ -7,7 +7,7 @@ import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.common.attachment.EntityData;
-import first.servantry.common.servent.Terraprism;
+import first.servantry.common.servant.Terraprism;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
