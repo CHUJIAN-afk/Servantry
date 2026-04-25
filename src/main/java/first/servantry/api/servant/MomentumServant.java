@@ -76,12 +76,12 @@ public abstract class MomentumServant extends Servant {
 
     @Override
     public void tick() {
-        super.tick();
         if (!owner.level().isClientSide()) {
             // 应用物理更新
             tickPhysics();
             tickOrientation();
         }
+        super.tick();
     }
 
     // ===================== 物理更新（私有实现） =====================

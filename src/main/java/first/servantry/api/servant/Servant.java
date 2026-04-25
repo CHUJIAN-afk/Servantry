@@ -92,6 +92,18 @@ public abstract class Servant extends AttachmentEntity {
      */
     public abstract ServantType<? extends Servant> getServantType();
 
+    /**
+     * 获取仆从占用的栏位数。
+     * <p>
+     * 默认返回 1，大型召唤物可重写此方法返回更大的值。
+     * </p>
+     *
+     * @return 占用栏位数
+     */
+    public int getSlotCost() {
+        return 1;
+    }
+
     // ===================== AttachmentEntity 实现 =====================
 
     @Override

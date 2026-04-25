@@ -81,6 +81,18 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     // ===================== 仆从管理 =====================
 
     /**
+     * 获取当前已占用的仆从栏位数。
+     *
+     * @return 已占用栏位数
+     */
+    public int getUsedSlots() {
+        return entities.stream()
+                .filter(e -> e instanceof Servant)
+                .mapToInt(e -> ((Servant) e).getSlotCost())
+                .sum();
+    }
+
+    /**
      * 召唤仆从。
      *
      * @param player  玩家
@@ -88,7 +100,9 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      * @return 是否成功
      */
     public boolean summonServant(Player player, Servant servant) {
-        if (getMaxServantSize(player) > getServants().size()) {
+        int maxSlots = getMaxServantSize(player);
+        int usedSlots = getUsedSlots();
+        if (maxSlots >= usedSlots + servant.getSlotCost()) {
             if (ticking) {
                 pendingAdd.add(servant);
             } else {

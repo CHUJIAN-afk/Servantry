@@ -47,7 +47,6 @@ public class DataGeneratorEvent {
         generator.addProvider(event.includeClient(), new ItemModelProvider(packOutput, Servantry.MODID, existingFileHelper) {
             @Override
             protected void registerModels() {
-                handheldItem(ItemRegister.EnchantedThrowingKnives.get());
                 basicItem(ItemRegister.HallowedHelmet.get());
                 basicItem(ItemRegister.HallowedChestplate.get());
                 basicItem(ItemRegister.HallowedLeggings.get());

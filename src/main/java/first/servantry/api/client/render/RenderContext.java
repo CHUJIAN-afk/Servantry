@@ -2,7 +2,6 @@ package first.servantry.api.client.render;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
-import net.minecraft.client.renderer.RenderType;
 
 /**
  * 渲染上下文，封装附件实体渲染所需的所有参数和配置。
@@ -567,6 +566,25 @@ public class RenderContext<T extends AttachmentEntity> {
     public float modelScale = 1.0f;
 
     /**
+     * 本体模型 X 轴平移偏移，默认 0。
+     * <p>
+     * 用于修正模型旋转中心与视觉中心不一致的问题。
+     * 当模型绕外部点旋转时，通过此偏移将其移回正确位置。
+     * </p>
+     */
+    public float modelTranslateX = 0f;
+
+    /**
+     * 本体模型 Y 轴平移偏移，默认 0。
+     */
+    public float modelTranslateY = 0f;
+
+    /**
+     * 本体模型 Z 轴平移偏移，默认 0。
+     */
+    public float modelTranslateZ = 0f;
+
+    /**
      * 本体模型 Yaw 轴旋转偏移（度），默认 0。
      * <p>
      * 在应用实体自身旋转后，额外添加的偏移角度。
@@ -948,6 +966,24 @@ public class RenderContext<T extends AttachmentEntity> {
      */
     public RenderContext<T> modelScale(float scale) {
         this.modelScale = scale;
+        return this;
+    }
+
+    /**
+     * 设置本体模型平移偏移。
+     * <p>
+     * 用于修正模型旋转中心与视觉中心不一致的问题。
+     * </p>
+     *
+     * @param x X 轴偏移
+     * @param y Y 轴偏移
+     * @param z Z 轴偏移
+     * @return this，用于链式调用
+     */
+    public RenderContext<T> modelTranslateOffset(float x, float y, float z) {
+        this.modelTranslateX = x;
+        this.modelTranslateY = y;
+        this.modelTranslateZ = z;
         return this;
     }
 

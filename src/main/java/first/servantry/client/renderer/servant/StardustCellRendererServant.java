@@ -3,14 +3,12 @@ package first.servantry.client.renderer.servant;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
+import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.common.servent.StardustCell;
-import first.servantry.register.ItemRegister;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.client.renderer.Sheets;
 
 /**
  * 星尘细胞渲染器。
@@ -26,6 +24,7 @@ public class StardustCellRendererServant extends AbstractAttachmentEntityRendere
                 .trailResolution(12)
                 .trailFadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))
                 .trailShaderType(RenderContext.ShaderType.UNLIT)
+                .modelTranslateOffset(-0.25f, -0.25f, -0.25f)
                 .modelScale(0.5f)
                 .visualNodeFunction((cell, partialTick, rawNode) -> {
                     float y = cell.getRenderYaw(partialTick);
@@ -37,16 +36,7 @@ public class StardustCellRendererServant extends AbstractAttachmentEntityRendere
 
     @Override
     protected void renderEntity(StardustCell servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> config) {
-        Minecraft.getInstance().getItemRenderer().renderStatic(
-                ItemRegister.StardustCell.get().getDefaultInstance(),
-                ItemDisplayContext.FIXED,
-                LightTexture.FULL_BRIGHT,
-                OverlayTexture.NO_OVERLAY,
-                poseStack,
-                bufferSource,
-                servant.getOwner().level(),
-                0
-        );
+        ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource, Sheets.translucentItemSheet());
     }
 
 }

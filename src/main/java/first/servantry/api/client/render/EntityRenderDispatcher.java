@@ -42,30 +42,32 @@ public class EntityRenderDispatcher {
     public static void render(Player player, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick) {
         List<AttachmentEntity> entities = player.getData(AttachmentRegister.EntityData).getEntities();
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-
+        boolean showHitboxes = Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes();
         for (AttachmentEntity entity : entities) {
-            IAttachmentEntityRenderer<AttachmentEntity> renderer = getRenderer(entity);
-            if (renderer == null) continue;
-
             entity.setOwner(player);
             poseStack.pushPose();
             PathNode renderNode = entity.getRenderNode(partialTick);
             poseStack.translate(renderNode.pos().x() - cameraPos.x, renderNode.pos().y() - cameraPos.y, renderNode.pos().z() - cameraPos.z);
+            // 渲染实体模型
+            IAttachmentEntityRenderer<AttachmentEntity> renderer = getRenderer(entity);
+            if (renderer != null) {
+                int packedLight = LevelRenderer.getLightColor(player.level(), BlockPos.containing(renderNode.pos().x(), renderNode.pos().y(), renderNode.pos().z()));
+                renderer.render(entity, poseStack, bufferSource, partialTick, packedLight, renderNode);
+            }
+            // 调试渲染
+            if (showHitboxes) {
+                // 渲染实体位置点（黄色小方块）
+                VertexConsumer debugConsumer = bufferSource.getBuffer(RenderType.lines());
+                LevelRenderer.renderLineBox(poseStack, debugConsumer, -0.002, -0.002, -0.002, 0.002, 0.002, 0.002, 1.0F, 1.0F, 0.0F, 1.0F);
 
-            int packedLight = LevelRenderer.getLightColor(player.level(), BlockPos.containing(renderNode.pos().x(), renderNode.pos().y(), renderNode.pos().z()));
-
-            renderer.render(entity, poseStack, bufferSource, partialTick, packedLight, renderNode);
-
-            // 碰撞箱调试渲染
-            if (entity instanceof ICollideAttack iCollideAttack) {
-                if (Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes()) {
+                // 渲染碰撞箱
+                if (entity instanceof ICollideAttack<?> iCollideAttack) {
                     poseStack.pushPose();
                     poseStack.mulPose(Axis.YN.rotationDegrees(renderNode.yaw()));
                     poseStack.mulPose(Axis.XP.rotationDegrees(renderNode.pitch()));
                     poseStack.translate(0, 0, 0.5);
                     poseStack.mulPose(Axis.ZP.rotationDegrees(renderNode.roll()));
-                    VertexConsumer consumer = bufferSource.getBuffer(RenderType.lines());
-                    LevelRenderer.renderLineBox(poseStack, consumer, iCollideAttack.getHitbox(), 1.0F, 0.0F, 0.0F, 1.0F);
+                    LevelRenderer.renderLineBox(poseStack, debugConsumer, iCollideAttack.getHitbox(), 1.0F, 0.0F, 0.0F, 1.0F);
                     poseStack.popPose();
                 }
             }

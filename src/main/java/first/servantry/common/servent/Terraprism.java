@@ -2,7 +2,6 @@ package first.servantry.common.servent;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;

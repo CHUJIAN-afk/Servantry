@@ -223,6 +223,9 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         poseStack.mulPose(Axis.XP.rotationDegrees(config.modelPitchOffset));
         poseStack.mulPose(Axis.ZP.rotationDegrees(config.modelRollOffset));
 
+        // 应用平移偏移（修正模型旋转中心）
+        poseStack.translate(config.modelTranslateX, config.modelTranslateY, config.modelTranslateZ);
+
         // 应用缩放
         poseStack.scale(config.modelScale, config.modelScale, config.modelScale);
 

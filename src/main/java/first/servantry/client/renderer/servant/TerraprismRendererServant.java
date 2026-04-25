@@ -4,17 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
+import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.common.servent.Terraprism;
 import first.servantry.register.AttachmentRegister;
-import first.servantry.register.ItemRegister;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemDisplayContext;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -54,11 +51,9 @@ public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<
                     }
                     return 1.0f;
                 })
-                .modelScale(1.0f)
-                .modelRotationOffset(0, 90, -45)
-                .visualNodeFunction((terraprism, partialTick, rawNode) ->
-                        rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick),
-                                Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend)));
+                .modelTranslateOffset(-0.5f, -0.5f, -0.5f)
+                .modelRotationOffset(0, 90, 45)
+                .visualNodeFunction((terraprism, partialTick, rawNode) -> rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend)));
     }
 
     @Override
@@ -71,24 +66,9 @@ public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<
 
         float hueShift = ((float) order / total + (owner.tickCount) * 0.015f) % 1.0f;
         float breathFactor = 0.5f + 0.5f * Mth.sin(hueShift * Mth.TWO_PI);
-        float currentScale = 1.0f + 0.10f * breathFactor;
-
-        poseStack.scale(currentScale, currentScale, currentScale);
-
         int mColorRGB = Mth.hsvToRgb(hueShift, 0.75f - 0.35f * breathFactor, 1.0f);
         int mr = (mColorRGB >> 16) & 0xFF, mg = (mColorRGB >> 8) & 0xFF, mb = mColorRGB & 0xFF;
-
-        Minecraft.getInstance().getItemRenderer().renderStatic(
-                ItemRegister.TerraPrism.get().getDefaultInstance(),
-                ItemDisplayContext.FIXED,
-                LightTexture.FULL_BRIGHT,
-                OverlayTexture.NO_OVERLAY,
-                poseStack,
-                type -> new TintedVertexConsumer(bufferSource.getBuffer(type), mr, mg, mb, 255),
-                owner.level(),
-                0
-        );
-
+        ModelRenderer.renderModel(ModelRegister.TERRAPRISM, poseStack,  type -> new TintedVertexConsumer(bufferSource.getBuffer(type), mr, mg, mb, 255));
     }
 
     private record TintedVertexConsumer(VertexConsumer base, int r, int g, int b, int a) implements VertexConsumer {

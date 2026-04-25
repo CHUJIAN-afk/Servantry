@@ -3,17 +3,14 @@ package first.servantry.client.renderer.servant;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
+import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.common.servent.EnchantedThrowingKnives;
 import first.servantry.register.AttachmentRegister;
-import first.servantry.register.ItemRegister;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
+import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -29,6 +26,8 @@ public class EnchantedThrowingKnivesRendererServant extends AbstractAttachmentEn
         int trailTimer = servant.attacking ? servant.trailTimer : 0;
         return RenderContext.<EnchantedThrowingKnives>ribbon(trailTimer, 0x88CCFF)
                 .trailHistoryLength(3)
+                .ribbonDiamondSize(0.25f)
+                .ribbonWidth(0.225f)
                 .trailStartIndex(Math.max(0, 10 - trailTimer))
                 .trailShaderType(RenderContext.ShaderType.ADDITIVE)
                 .trailColorFunction((s, progress, timeShift) -> {
@@ -57,7 +56,8 @@ public class EnchantedThrowingKnivesRendererServant extends AbstractAttachmentEn
                     }
                     return 1.0f;
                 })
-                .modelScale(0.8f)
+                .modelTranslateOffset(-0.25f, -0.25f, -0.25f)
+                .modelScale(0.5f)
                 .modelRotationOffset(0, 90, 0)
                 .visualNodeFunction((knives, partialTick, rawNode) -> {
                     float blend = Mth.lerp(partialTick, knives.idleBlendO, knives.idleBlend);
@@ -77,16 +77,7 @@ public class EnchantedThrowingKnivesRendererServant extends AbstractAttachmentEn
 
     @Override
     protected void renderEntity(EnchantedThrowingKnives servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EnchantedThrowingKnives> config) {
-        Minecraft.getInstance().getItemRenderer().renderStatic(
-                ItemRegister.EnchantedThrowingKnives.get().getDefaultInstance(),
-                ItemDisplayContext.FIXED,
-                LightTexture.FULL_BRIGHT,
-                OverlayTexture.NO_OVERLAY,
-                poseStack,
-                bufferSource,
-                servant.getOwner().level(),
-                0
-        );
+        ModelRenderer.renderModel(ModelRegister.ENCHANTED_THROWING_KNIVES, poseStack, bufferSource);
     }
 
 }

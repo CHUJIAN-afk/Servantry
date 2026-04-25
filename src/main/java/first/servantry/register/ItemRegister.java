@@ -17,20 +17,12 @@ public class ItemRegister {
 
     private static final DeferredRegister.Items Register = DeferredRegister.createItems(Servantry.MODID);
 
-    public static class RenderItem extends Item {
-        public RenderItem(Properties properties) {
-            super(properties);
-        }
-    }
-
     public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
             new IServantWeapon.Builder<>(ServantRegister.TerraPrism)
                     .sound(SoundRegister.UseTerraprism)
                     .onSummon(servant -> servant.init(servant.getInterpolatedIdleState(1)))
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
-
-    public static final DeferredItem<Item> EnchantedThrowingKnives = Register.registerItem("enchanted_throwing_knives_render_item", RenderItem::new);
 
     public static final DeferredItem<Item> BladeStaff = Register.register("blade_staff", () ->
             new IServantWeapon.Builder<>(ServantRegister.EnchantedThrowingKnives)
@@ -45,7 +37,6 @@ public class ItemRegister {
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
 
-    public static final DeferredItem<Item> StardustCell = Register.registerItem("stardust_cell_render_item", RenderItem::new);
     public static final DeferredItem<Item> StardustCellStaff = Register.register("stardust_cell_staff", () ->
             new IServantWeapon.Builder<>(ServantRegister.StardustCell)
                     .sound(SoundRegister.UseServantWeapon)
