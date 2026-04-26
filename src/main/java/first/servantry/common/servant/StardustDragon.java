@@ -33,6 +33,8 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     private int segmentIndex = 0;
     /** 总体节数 */
     private int totalSegments = 3;
+    /** 螺旋相位 */
+    private float spiralPhase = 0;
 
     public StardustDragon() {
         setDrag(0.92f);
@@ -93,44 +95,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
      */
     @Override
     public void applyForce(Vec3 force) {
-        double forceLength = force.length();
-        if (forceLength < 0.001) {
-            super.applyForce(force);
-            return;
-        }
-
-        // 限制最大推力
-        double maxForce = 0.5;
-        if (forceLength > maxForce) {
-            force = force.normalize().scale(maxForce);
-            forceLength = maxForce;
-        }
-
-        Vec3 velocity = getVelocity();
-        double speed = velocity.length();
-
-        // 静止时直接施加
-        if (speed < 0.01) {
-            super.applyForce(force);
-            return;
-        }
-        Vec3 forceDir = force.normalize();
-
-        super.applyForce(forceDir.scale(forceLength).scale(0.5));
-    }
-
-    private Vec3 slerp(Vec3 from, Vec3 to, double t) {
-        double dot = Mth.clamp(from.dot(to), -1.0, 1.0);
-        double theta = Math.acos(dot);
-
-        // 角度太小，直接线性插值避免除零
-        if (theta < 0.01) {
-            return from.lerp(to, t);
-        }
-
-        double sin = Math.sin(theta);
-        return from.scale(Math.sin((1 - t) * theta) / sin)
-                .add(to.scale(Math.sin(t * theta) / sin));
+        super.applyForce(force);
     }
 
     private void updateTotalSegments() {
@@ -230,6 +195,63 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     public double getSegmentDistance() {
         return 0.5;
+    }
+
+    /**
+     * 螺旋游动向目标位置。
+     *
+     * @param targetPos    目标位置
+     * @param acceleration 加速度大小
+     */
+    public void spiralToward(Vec3 targetPos, double acceleration) {
+        Vec3 currentPos = getPos();
+        Vec3 toTarget = targetPos.subtract(currentPos);
+        double distance = toTarget.length();
+
+        if (distance < 1) return;
+
+        // 更新螺旋相位
+        double speed = getVelocity().length();
+        spiralPhase += 0.2f * (float) speed;
+
+        // 计算到目标的方向
+        Vec3 forward = toTarget.normalize();
+
+        // 计算右方向和上方向（构建局部坐标系）
+        Vec3 worldUp = new Vec3(0, 1, 0);
+        Vec3 right = forward.cross(worldUp);
+        if (right.lengthSqr() < 0.001) {
+            right = new Vec3(1, 0, 0);
+        } else {
+            right = right.normalize();
+        }
+        Vec3 up = right.cross(forward).normalize();
+
+        // 螺旋偏移：左右和上下同时变化，相位差90度形成螺旋
+        double spiralAmplitude = Math.min(0.4, distance * 0.08);
+        double horizontalOffset = Math.cos(spiralPhase) * spiralAmplitude;
+        double verticalOffset = Math.sin(spiralPhase) * spiralAmplitude;
+
+        // 合成移动方向
+        Vec3 moveDir = forward
+                .add(right.scale(horizontalOffset))
+                .add(up.scale(verticalOffset))
+                .normalize();
+
+        // 施加推力
+        applyForce(moveDir.scale(acceleration));
+
+        // 计算翻滚角：根据螺旋运动
+        float roll = (float) (-Math.sin(spiralPhase) * spiralAmplitude * 90);
+
+        // 更新朝向
+        if (speed > 0.01) {
+            Vec3 motionDir = getVelocity().normalize();
+            float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
+            float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
+
+            setDesiredRotation(targetYaw, targetPitch, roll);
+        }
     }
 
 }

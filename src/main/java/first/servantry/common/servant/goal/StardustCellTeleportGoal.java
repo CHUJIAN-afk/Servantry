@@ -5,6 +5,8 @@ import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.register.AttachmentRegister;
+import first.servantry.register.ParticleRegister;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;

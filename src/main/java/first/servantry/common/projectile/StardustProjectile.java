@@ -1,5 +1,6 @@
 package first.servantry.common.projectile;
 
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ProjectileType;
@@ -127,7 +128,7 @@ public class StardustProjectile extends Projectile {
         if (target == null || !target.isAlive()) {
             // 尝试找到来源仆从并检查是否有新目标
             Servant sourceServant = findServantByUuid(owner, getSourceServantUuid());
-            if (sourceServant != null) {
+            if (sourceServant != null && owner.getData(AttachmentRegister.EntityData).getProjectiles().size() < 500) {
                 level.getEntitiesOfClass(LivingEntity.class, new AABB(getPos(), getPos()).inflate(10)).stream()
                         .filter(sourceServant::isTarget)
                         .findAny()
@@ -150,7 +151,6 @@ public class StardustProjectile extends Projectile {
         Vec3 spawnPos = getPos();
         RandomSource rand = level.getRandom();
         int count = rand.nextInt(1, 3);
-
         for (int i = 0; i < count; i++) {
             // 在同一位置生成射弹，但给予不同的初始速度方向（散射）
             StardustProjectile newProjectile = new StardustProjectile(owner.getUUID(), sourceServant.getUuid(), spawnPos, newTarget);
@@ -160,8 +160,8 @@ public class StardustProjectile extends Projectile {
             double speed = 0.15 + rand.nextDouble() * 0.1;
             Vec3 scatterDir = new Vec3(Math.sin(phi) * Math.cos(theta) * speed, Math.cos(phi) * speed, Math.sin(phi) * Math.sin(theta) * speed);
             newProjectile.applyForce(scatterDir.scale(2));
-
-            owner.getData(AttachmentRegister.EntityData).addProjectile(newProjectile);
+            EntityData data = owner.getData(AttachmentRegister.EntityData);
+            data.addProjectile(newProjectile);
         }
     }
 
