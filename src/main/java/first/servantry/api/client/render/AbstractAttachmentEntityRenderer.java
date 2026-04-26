@@ -6,10 +6,8 @@ import com.mojang.math.Axis;
 import first.servantry.api.PathNode;
 import first.servantry.api.client.renderType.TrailRenderType;
 import first.servantry.api.entity.AttachmentEntity;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -292,7 +290,9 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
 
         // 计算时间偏移（用于动态颜色效果）
         Player owner = entity.getOwner();
-        float timeShift = owner != null ? (owner.tickCount + partialTick) * 0.015f : 0f;
+        float timeShiftFloat = owner != null ? (owner.tickCount + partialTick) * 0.015f : 0f;
+        // 将时间偏移编码为字节 (0-255)
+        int timeShift = Math.clamp((int)(timeShiftFloat * 255) % 256, 0, 255);
 
         int nodeCount = smoothNodes.size();
         Vec3 renderPos = visualNode.pos();
@@ -307,18 +307,21 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
             InterpolatedNode prev = smoothNodes.get(i + 1);
 
             // 计算进度（0 = 头部，1 = 尾部）
-            float currProgress = (float) i / (nodeCount - 1);
-            float prevProgress = (float) (i + 1) / (nodeCount - 1);
+            float currProgressFloat = (float) i / (nodeCount - 1);
+            float prevProgressFloat = (float) (i + 1) / (nodeCount - 1);
+            // 将进度编码为字节 (0-255)
+            int currProgress = Math.clamp((int)(currProgressFloat * 255), 0, 255);
+            int prevProgress = Math.clamp((int)(prevProgressFloat * 255), 0, 255);
 
             // 计算淡出系数和半径
-            float currFade = config.trailFadeOut.getFade(currProgress);
-            float prevFade = config.trailFadeOut.getFade(prevProgress);
+            float currFade = config.trailFadeOut.getFade(currProgressFloat);
+            float prevFade = config.trailFadeOut.getFade(prevProgressFloat);
             float currRadius = config.trailMaxRadius * currFade;
             float prevRadius = config.trailMaxRadius * prevFade;
 
             // 获取颜色
-            int currColor = config.trailColorFunction.getColor(entity, currProgress, timeShift);
-            int prevColor = config.trailColorFunction.getColor(entity, prevProgress, timeShift);
+            int currColor = config.trailColorFunction.getColor(entity, currProgressFloat, timeShiftFloat);
+            int prevColor = config.trailColorFunction.getColor(entity, prevProgressFloat, timeShiftFloat);
 
             // 计算最终颜色（带透明度）
             int currAlpha = Math.round(currFade * 200);
@@ -349,7 +352,7 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
                         (float) currRel.x + currV2.x, (float) currRel.y + currV2.y, (float) currRel.z + currV2.z,
                         (float) prevRel.x + prevV2.x, (float) prevRel.y + prevV2.y, (float) prevRel.z + prevV2.z,
                         (float) prevRel.x + prevV1.x, (float) prevRel.y + prevV1.y, (float) prevRel.z + prevV1.z,
-                        currARGB, prevARGB);
+                        currARGB, prevARGB, currProgress, timeShift);
             }
         }
     }
@@ -402,11 +405,12 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         // 根据配置选择渲染类型
         VertexConsumer consumer = bufferSource.getBuffer(getTrailRenderType(config));
         Matrix4f pose = poseStack.last().pose();
-        PoseStack.Pose last = poseStack.last();
 
         // 计算时间偏移
         Player owner = entity.getOwner();
-        float timeShift = owner != null ? (owner.tickCount + partialTick) * 0.015f : 0f;
+        float timeShiftFloat = owner != null ? (owner.tickCount + partialTick) * 0.015f : 0f;
+        // 将时间偏移编码为字节 (0-255)
+        int timeShift = Math.clamp((int)(timeShiftFloat * 255) % 256, 0, 255);
 
         int nodeCount = smoothNodes.size();
         Vec3 renderPos = visualNode.pos();
@@ -417,12 +421,15 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
             InterpolatedNode prev = smoothNodes.get(i + 1);
 
             // 计算进度
-            float currProgress = (float) i / (nodeCount - 1);
-            float prevProgress = (float) (i + 1) / (nodeCount - 1);
+            float currProgressFloat = (float) i / (nodeCount - 1);
+            float prevProgressFloat = (float) (i + 1) / (nodeCount - 1);
+            // 将进度编码为字节 (0-255)
+            int currProgress = Math.clamp((int)(currProgressFloat * 255), 0, 255);
+            int prevProgress = Math.clamp((int)(prevProgressFloat * 255), 0, 255);
 
             // 计算缩放（从头到尾递减）
-            float currScale = Math.max(0.0f, 1.0f - currProgress);
-            float prevScale = Math.max(0.0f, 1.0f - prevProgress);
+            float currScale = Math.max(0.0f, 1.0f - currProgressFloat);
+            float prevScale = Math.max(0.0f, 1.0f - prevProgressFloat);
 
             // 使用配置参数计算三角形截面
             // ribbonWidth: 三角形的高（从尖端到基部的距离，Z方向）
@@ -442,12 +449,12 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
             Vector3f prevRight = new Vector3f(baseWidth * 0.5f * prevScale, 0, 0).rotate(prev.rot);
 
             // 获取颜色和增强参数
-            int currColorRGB = config.trailColorFunction.getColor(entity, currProgress, timeShift);
-            int prevColorRGB = config.trailColorFunction.getColor(entity, prevProgress, timeShift);
-            float currAlphaBoost = config.trailTipAlphaBoost.getBoost(entity, currProgress);
-            float currBrightBoost = config.trailTipBrightnessBoost.getBoost(entity, currProgress);
-            float prevAlphaBoost = config.trailTipAlphaBoost.getBoost(entity, prevProgress);
-            float prevBrightBoost = config.trailTipBrightnessBoost.getBoost(entity, prevProgress);
+            int currColorRGB = config.trailColorFunction.getColor(entity, currProgressFloat, timeShiftFloat);
+            int prevColorRGB = config.trailColorFunction.getColor(entity, prevProgressFloat, timeShiftFloat);
+            float currAlphaBoost = config.trailTipAlphaBoost.getBoost(entity, currProgressFloat);
+            float currBrightBoost = config.trailTipBrightnessBoost.getBoost(entity, currProgressFloat);
+            float prevAlphaBoost = config.trailTipAlphaBoost.getBoost(entity, prevProgressFloat);
+            float prevBrightBoost = config.trailTipBrightnessBoost.getBoost(entity, prevProgressFloat);
 
             // 计算最终颜色
             int currR = Math.min(255, Math.round(((currColorRGB >> 16) & 0xFF) * currBrightBoost));
@@ -459,9 +466,9 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
 
             // 计算透明度（尖端较亮，基部较暗）
             int currTipAlpha = Math.min(255, Math.round(currScale * 0.1f * 255 * currAlphaBoost));
-            int currBaseAlpha = Math.min(255, Math.round(Math.max(0f, 1.0f - currProgress * 2.5f) * 0.04f * 255 * currAlphaBoost));
+            int currBaseAlpha = Math.min(255, Math.round(Math.max(0f, 1.0f - currProgressFloat * 2.5f) * 0.04f * 255 * currAlphaBoost));
             int prevTipAlpha = Math.min(255, Math.round(prevScale * 0.1f * 255 * prevAlphaBoost));
-            int prevBaseAlpha = Math.min(255, Math.round(Math.max(0f, 1.0f - prevProgress * 2.5f) * 0.04f * 255 * prevAlphaBoost));
+            int prevBaseAlpha = Math.min(255, Math.round(Math.max(0f, 1.0f - prevProgressFloat * 2.5f) * 0.04f * 255 * prevAlphaBoost));
 
             int currTipColor = FastColor.ARGB32.color(currTipAlpha, currR, currG, currB);
             int currBaseColor = FastColor.ARGB32.color(currBaseAlpha, currR, currG, currB);
@@ -474,9 +481,10 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
 
             // 绘制三角形截面（正反两面）
             // 将两个相邻的三角形连接成一个三角带
-            emitTriangleStrip(consumer, pose, last, currRel, prevRel,
+            emitTriangleStrip(consumer, pose, currRel, prevRel,
                     currTip, prevTip, currLeft, prevLeft, currRight, prevRight,
-                    currTipColor, prevTipColor, currBaseColor, prevBaseColor);
+                    currTipColor, prevTipColor, currBaseColor, prevBaseColor,
+                    currProgress, prevProgress, timeShift);
         }
     }
 
@@ -576,27 +584,36 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
 
     /**
      * 发射一个四边形面片（用于圆锥拖尾）。
+     * <p>
+     * 使用自定义着色器顶点格式：
+     * - UV0: 纹理坐标
+     * - UV1: 进度值和时间偏移（编码为字节）
+     * - UV2: 未使用
+     * - Normal: 法线
+     * </p>
+     *
+     * @param progress   进度值 (0-255 映射到 0.0-1.0)
+     * @param timeShift  时间偏移 (0-255 映射到 0.0-1.0)
      */
     private void emitQuad(VertexConsumer consumer, Matrix4f pose,
                           float x1, float y1, float z1,
                           float x2, float y2, float z2,
                           float x3, float y3, float z3,
                           float x4, float y4, float z4,
-                          int color1, int color2) {
-        consumer.addVertex(pose, x1, y1, z1).setColor(color1).setUv(0, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-        consumer.addVertex(pose, x2, y2, z2).setColor(color1).setUv(1, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-        consumer.addVertex(pose, x3, y3, z3).setColor(color2).setUv(1, 1)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-        consumer.addVertex(pose, x4, y4, z4).setColor(color2).setUv(0, 1)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+                          int color1, int color2,
+                          int progress, int timeShift) {
+        // UV1: (progress, timeShift) 编码为字节
+        consumer.addVertex(pose, x1, y1, z1).setColor(color1).setUv(0, 0).setUv1(progress, timeShift).setUv2(0, 0).setNormal(1, 0, 0);
+        consumer.addVertex(pose, x2, y2, z2).setColor(color1).setUv(1, 0).setUv1(progress, timeShift).setUv2(0, 0).setNormal(1, 0, 0);
+        consumer.addVertex(pose, x3, y3, z3).setColor(color2).setUv(1, 1).setUv1(progress, timeShift).setUv2(0, 0).setNormal(1, 0, 0);
+        consumer.addVertex(pose, x4, y4, z4).setColor(color2).setUv(0, 1).setUv1(progress, timeShift).setUv2(0, 0).setNormal(1, 0, 0);
     }
 
     /**
      * 发射一个三角形带（正反两面）。
      * <p>
      * 将两个相邻节点的三角形截面连接成一个三角带，形成丝带拖尾效果。
+     * 使用自定义着色器顶点格式。
      * </p>
      *
      * <h3>几何结构</h3>
@@ -617,7 +634,6 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
      *
      * @param consumer       顶点消费者
      * @param pose           变换矩阵
-     * @param last           PoseStack 状态
      * @param currRel        当前节点相对位置
      * @param prevRel        前一节点相对位置
      * @param currTip        当前节点尖端顶点
@@ -630,55 +646,59 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
      * @param prevTipColor   前一尖端颜色
      * @param currBaseColor  当前基部颜色
      * @param prevBaseColor  前一基部颜色
+     * @param currProgress   当前进度值 (0-255)
+     * @param prevProgress   前一进度值 (0-255)
+     * @param timeShift      时间偏移 (0-255)
      */
-    private void emitTriangleStrip(VertexConsumer consumer, Matrix4f pose, PoseStack.Pose last,
+    private void emitTriangleStrip(VertexConsumer consumer, Matrix4f pose,
                                    Vec3 currRel, Vec3 prevRel,
                                    Vector3f currTip, Vector3f prevTip,
                                    Vector3f currLeft, Vector3f prevLeft,
                                    Vector3f currRight, Vector3f prevRight,
                                    int currTipColor, int prevTipColor,
-                                   int currBaseColor, int prevBaseColor) {
+                                   int currBaseColor, int prevBaseColor,
+                                   int currProgress, int prevProgress, int timeShift) {
         // === 左侧三角形（tip -> left） ===
         // 正面
         consumer.addVertex(pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z)
-                .setColor(currTipColor).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+                .setColor(currTipColor).setUv(0, 1).setUv1(currProgress, timeShift).setUv2(0, 0).setNormal(0, 1, 0);
         consumer.addVertex(pose, (float) currRel.x + currLeft.x, (float) currRel.y + currLeft.y, (float) currRel.z + currLeft.z)
-                .setColor(currBaseColor).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+                .setColor(currBaseColor).setUv(0, 0).setUv1(currProgress, timeShift).setUv2(0, 0).setNormal(0, 1, 0);
         consumer.addVertex(pose, (float) prevRel.x + prevLeft.x, (float) prevRel.y + prevLeft.y, (float) prevRel.z + prevLeft.z)
-                .setColor(prevBaseColor).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+                .setColor(prevBaseColor).setUv(1, 0).setUv1(prevProgress, timeShift).setUv2(0, 0).setNormal(0, 1, 0);
         consumer.addVertex(pose, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z)
-                .setColor(prevTipColor).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+                .setColor(prevTipColor).setUv(1, 1).setUv1(prevProgress, timeShift).setUv2(0, 0).setNormal(0, 1, 0);
 
         // 反面
         consumer.addVertex(pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z)
-                .setColor(currTipColor).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+                .setColor(currTipColor).setUv(0, 1).setUv1(currProgress, timeShift).setUv2(0, 0).setNormal(0, -1, 0);
         consumer.addVertex(pose, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z)
-                .setColor(prevTipColor).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+                .setColor(prevTipColor).setUv(1, 1).setUv1(prevProgress, timeShift).setUv2(0, 0).setNormal(0, -1, 0);
         consumer.addVertex(pose, (float) prevRel.x + prevLeft.x, (float) prevRel.y + prevLeft.y, (float) prevRel.z + prevLeft.z)
-                .setColor(prevBaseColor).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+                .setColor(prevBaseColor).setUv(1, 0).setUv1(prevProgress, timeShift).setUv2(0, 0).setNormal(0, -1, 0);
         consumer.addVertex(pose, (float) currRel.x + currLeft.x, (float) currRel.y + currLeft.y, (float) currRel.z + currLeft.z)
-                .setColor(currBaseColor).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+                .setColor(currBaseColor).setUv(0, 0).setUv1(currProgress, timeShift).setUv2(0, 0).setNormal(0, -1, 0);
 
         // === 右侧三角形（tip -> right） ===
         // 正面
         consumer.addVertex(pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z)
-                .setColor(currTipColor).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+                .setColor(currTipColor).setUv(0, 1).setUv1(currProgress, timeShift).setUv2(0, 0).setNormal(0, 1, 0);
         consumer.addVertex(pose, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z)
-                .setColor(prevTipColor).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+                .setColor(prevTipColor).setUv(1, 1).setUv1(prevProgress, timeShift).setUv2(0, 0).setNormal(0, 1, 0);
         consumer.addVertex(pose, (float) prevRel.x + prevRight.x, (float) prevRel.y + prevRight.y, (float) prevRel.z + prevRight.z)
-                .setColor(prevBaseColor).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+                .setColor(prevBaseColor).setUv(1, 0).setUv1(prevProgress, timeShift).setUv2(0, 0).setNormal(0, 1, 0);
         consumer.addVertex(pose, (float) currRel.x + currRight.x, (float) currRel.y + currRight.y, (float) currRel.z + currRight.z)
-                .setColor(currBaseColor).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, 1, 0);
+                .setColor(currBaseColor).setUv(0, 0).setUv1(currProgress, timeShift).setUv2(0, 0).setNormal(0, 1, 0);
 
         // 反面
         consumer.addVertex(pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z)
-                .setColor(currTipColor).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+                .setColor(currTipColor).setUv(0, 1).setUv1(currProgress, timeShift).setUv2(0, 0).setNormal(0, -1, 0);
         consumer.addVertex(pose, (float) currRel.x + currRight.x, (float) currRel.y + currRight.y, (float) currRel.z + currRight.z)
-                .setColor(currBaseColor).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+                .setColor(currBaseColor).setUv(0, 0).setUv1(currProgress, timeShift).setUv2(0, 0).setNormal(0, -1, 0);
         consumer.addVertex(pose, (float) prevRel.x + prevRight.x, (float) prevRel.y + prevRight.y, (float) prevRel.z + prevRight.z)
-                .setColor(prevBaseColor).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+                .setColor(prevBaseColor).setUv(1, 0).setUv1(prevProgress, timeShift).setUv2(0, 0).setNormal(0, -1, 0);
         consumer.addVertex(pose, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z)
-                .setColor(prevTipColor).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(last, 0, -1, 0);
+                .setColor(prevTipColor).setUv(1, 1).setUv1(prevProgress, timeShift).setUv2(0, 0).setNormal(0, -1, 0);
     }
 
     // ===================== 数学辅助方法 =====================

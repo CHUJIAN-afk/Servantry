@@ -2,7 +2,6 @@ package first.servantry.api.client.renderType;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import first.servantry.Servantry;
 import net.minecraft.client.renderer.RenderStateShard;
@@ -10,15 +9,22 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * 拖尾渲染类型。
+ * 轨迹渲染类型。
  * <p>
- * 提供多种渲染方案以兼容原版和光影模组环境：
- * <ul>
- *   <li>{@link #getTrail()} - 标准透明拖尾（推荐）</li>
- *   <li>{@link #getTrailUnlit()} - 无光照透明拖尾，光影兼容性更好</li>
- *   <li>{@link #getTrailAdditive()} - 加法混合拖尾，适合发光效果</li>
- * </ul>
+ * 使用自定义着色器实现自发光轨迹效果，完美兼容光影模组（Iris/Oculus）。
+ * 所有轨迹都是自发光效果，不受世界光照影响。
  * </p>
+ *
+ * <h3>渲染类型选择指南</h3>
+ * <pre>{@code
+ * ┌─────────────────┬────────────────────────────────────────────┐
+ * │ 类型            │ 适用场景                                     │
+ * ├─────────────────┼────────────────────────────────────────────┤
+ * │ getTrail()      │ 标准透明轨迹，适合大多数情况                  │
+ * │ getTrailUnlit() │ 无光照轨迹，光影兼容性最佳                    │
+ * │ getTrailAdditive() │ 加法混合轨迹，适合能量/魔法效果            │
+ * └─────────────────┴────────────────────────────────────────────┘
+ * }</pre>
  */
 public class TrailRenderType extends RenderType {
     private TrailRenderType(String name, VertexFormat fmt, VertexFormat.Mode mode, int bufSize, boolean affectsCrumbling, boolean sort, Runnable setup, Runnable clear) {
@@ -27,113 +33,126 @@ public class TrailRenderType extends RenderType {
 
     private static final ResourceLocation TRAIL_TEXTURE = Servantry.rl("textures/trail.png");
 
-    // 缓存渲染类型实例
-    private static final RenderType TRAIL = createTrail();
-    private static final RenderType TRAIL_UNLIT = createTrailUnlit();
-    private static final RenderType TRAIL_ADDITIVE = createTrailAdditive();
+    // ===================== 着色器状态分片 =====================
+
+    /** 标准轨迹着色器状态 */
+    private static final ShaderStateShard TRAIL_SHADER = new ShaderStateShard(
+            () -> TrailShaders.trailShader
+    );
+
+    /** 加法混合轨迹着色器状态 */
+    private static final ShaderStateShard TRAIL_ADDITIVE_SHADER = new ShaderStateShard(
+            () -> TrailShaders.trailAdditiveShader
+    );
+
+    /** 无光照轨迹着色器状态 */
+    private static final ShaderStateShard TRAIL_UNLIT_SHADER = new ShaderStateShard(
+            () -> TrailShaders.trailUnlitShader
+    );
+
+    // ===================== 透明度状态分片 =====================
+
+    /** 加法透明度状态 */
+    private static final TransparencyStateShard ADDITIVE_TRANSPARENCY = new TransparencyStateShard(
+            "trail_additive_transparency",
+            () -> {
+                RenderSystem.enableBlend();
+                RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+            },
+            () -> {
+                RenderSystem.disableBlend();
+                RenderSystem.defaultBlendFunc();
+            }
+    );
+
+    // ===================== 公共 API =====================
 
     /**
-     * 获取标准透明拖尾渲染类型。
+     * 获取标准透明轨迹渲染类型。
      * <p>
-     * 使用标准实体透明着色器，特点：
+     * 特点：
      * <ul>
      *   <li>标准透明度混合</li>
-     *   <li>禁用背面剔除实现双面渲染</li>
-     *   <li>启用光照图支持全亮度</li>
-     *   <li>启用深度排序</li>
+     *   <li>自发光效果，不受世界光照影响</li>
+     *   <li>光影模组兼容性良好</li>
      * </ul>
-     * 适用于大多数情况，光影兼容性良好。
      * </p>
      */
     public static RenderType getTrail() {
-        return TRAIL;
+        return Internal.TRAIL;
     }
 
     /**
-     * 获取无光照透明拖尾渲染类型。
+     * 获取无光照轨迹渲染类型。
      * <p>
-     * 使用自定义无光照着色器，特点：
+     * 特点：
      * <ul>
-     *   <li>禁用漫反射光照，全亮度四边形显示正确</li>
-     *   <li>标准透明度混合</li>
+     *   <li>自发光效果，不受世界光照影响</li>
      *   <li>光影模组兼容性最佳</li>
+     *   <li>不写入深度缓冲</li>
      * </ul>
-     * 推荐在光影环境下使用。
      * </p>
      */
     public static RenderType getTrailUnlit() {
-        return TRAIL_UNLIT;
+        return Internal.TRAIL_UNLIT;
     }
 
     /**
-     * 获取加法混合拖尾渲染类型。
+     * 获取加法混合轨迹渲染类型。
      * <p>
-     * 使用加法透明度混合，特点：
+     * 特点：
      * <ul>
-     *   <li>颜色叠加效果，适合发光拖尾</li>
-     *   <li>不写入深度缓冲，避免深度冲突</li>
-     *   <li>光影模组通常对加法混合有良好支持</li>
+     *   <li>颜色叠加效果，适合能量武器、魔法效果</li>
+     *   <li>自发光效果，不受世界光照影响</li>
+     *   <li>不写入深度缓冲</li>
      * </ul>
-     * 适合能量武器、魔法效果等发光拖尾。
      * </p>
      */
     public static RenderType getTrailAdditive() {
-        return TRAIL_ADDITIVE;
+        return Internal.TRAIL_ADDITIVE;
     }
 
-    // ===================== 内部创建方法 =====================
+    // ===================== 内部实现 =====================
 
-    private static RenderType createTrail() {
-        CompositeState state = CompositeState.builder()
-                .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-                .setTextureState(new TextureStateShard(TRAIL_TEXTURE, false, false))
-                .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                .setCullState(NO_CULL)
-                .setLightmapState(LIGHTMAP)
-                .setOverlayState(OVERLAY)
-                .createCompositeState(false);
-        return create("servantry_trail", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, true, state);
-    }
+    /**
+     * 延迟初始化的渲染类型实例。
+     * 由于着色器在资源加载后才可用，需要延迟创建渲染类型。
+     */
+    private static class Internal {
+        static final RenderType TRAIL = createTrail();
+        static final RenderType TRAIL_UNLIT = createTrailUnlit();
+        static final RenderType TRAIL_ADDITIVE = createTrailAdditive();
 
-    private static RenderType createTrailUnlit() {
-        // 无光照着色器状态 - 使用实体透明着色器但禁用漫反射
-        // 注意：这里使用 RENDERTYPE_ENTITY_TRANSLUCENT_SHADER，但通过 FULL_BRIGHT 光照实现无光照效果
-        CompositeState state = CompositeState.builder()
-                .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-                .setTextureState(new TextureStateShard(TRAIL_TEXTURE, false, false))
-                .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                .setCullState(NO_CULL)
-                .setLightmapState(LIGHTMAP)
-                .setOverlayState(OVERLAY)
-                // 禁用深度写入，避免透明物体遮挡问题
-                .setWriteMaskState(COLOR_WRITE)
-                .createCompositeState(false);
-        return create("servantry_trail_unlit", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, true, state);
-    }
+        private static RenderType createTrail() {
+            CompositeState state = CompositeState.builder()
+                    .setShaderState(TRAIL_SHADER)
+                    .setTextureState(new TextureStateShard(TRAIL_TEXTURE, false, false))
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setCullState(NO_CULL)
+                    .createCompositeState(false);
+            return create("servantry_trail", TrailShaders.TRAIL_FORMAT, VertexFormat.Mode.QUADS, 256, false, true, state);
+        }
 
-    private static RenderType createTrailAdditive() {
-        // 加法透明度状态
-        RenderStateShard.TransparencyStateShard ADDITIVE_TRANSPARENCY = new RenderStateShard.TransparencyStateShard(
-                "additive_transparency",
-                () -> {
-                    RenderSystem.enableBlend();
-                    RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-                },
-                () -> {
-                    RenderSystem.disableBlend();
-                    RenderSystem.defaultBlendFunc();
-                }
-        );
+        private static RenderType createTrailUnlit() {
+            CompositeState state = CompositeState.builder()
+                    .setShaderState(TRAIL_UNLIT_SHADER)
+                    .setTextureState(new TextureStateShard(TRAIL_TEXTURE, false, false))
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setCullState(NO_CULL)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false);
+            return create("servantry_trail_unlit", TrailShaders.TRAIL_FORMAT, VertexFormat.Mode.QUADS, 256, false, true, state);
+        }
 
-        CompositeState state = CompositeState.builder()
-                .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-                .setTextureState(new TextureStateShard(TRAIL_TEXTURE, false, false))
-                .setTransparencyState(ADDITIVE_TRANSPARENCY)
-                .setCullState(NO_CULL)
-                .setLightmapState(LIGHTMAP)
-                .setOverlayState(OVERLAY)
-                .setWriteMaskState(COLOR_WRITE)
-                .createCompositeState(false);
-        return create("servantry_trail_additive", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, true, state);
+        private static RenderType createTrailAdditive() {
+            CompositeState state = CompositeState.builder()
+                    .setShaderState(TRAIL_ADDITIVE_SHADER)
+                    .setTextureState(new TextureStateShard(TRAIL_TEXTURE, false, false))
+                    .setTransparencyState(ADDITIVE_TRANSPARENCY)
+                    .setCullState(NO_CULL)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false);
+            return create("servantry_trail_additive", TrailShaders.TRAIL_FORMAT, VertexFormat.Mode.QUADS, 256, false, true, state);
+        }
     }
 }

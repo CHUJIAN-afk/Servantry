@@ -2,6 +2,7 @@ package first.servantry.common.event;
 
 import first.servantry.Servantry;
 import first.servantry.api.client.render.EntityRenderDispatcher;
+import first.servantry.api.client.renderType.TrailShaders;
 import first.servantry.client.renderer.projectile.StardustProjectileConeRenderer;
 import first.servantry.client.renderer.servant.EnchantedThrowingKnivesRendererServant;
 import first.servantry.client.renderer.servant.StardustCellRendererServant;
@@ -16,6 +17,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 
 @EventBusSubscriber(modid = Servantry.MODID, value = Dist.CLIENT)
 public class ClientEvent {
@@ -32,6 +34,15 @@ public class ClientEvent {
         EntityRenderDispatcher.register(ServantRegister.EnchantedThrowingKnives.get(), new EnchantedThrowingKnivesRendererServant());
         EntityRenderDispatcher.register(ServantRegister.StardustDragon.get(), new StardustDragonRenderer());
         EntityRenderDispatcher.register(ProjectileRegister.StardustProjectile.get(), new StardustProjectileConeRenderer());
+    }
+
+    @SubscribeEvent
+    public static void registerShaders(RegisterShadersEvent event) {
+        try {
+            TrailShaders.register(event);
+        } catch (Exception e) {
+            Servantry.LOGGER.error("Failed to register trail shaders", e);
+        }
     }
 
 }
