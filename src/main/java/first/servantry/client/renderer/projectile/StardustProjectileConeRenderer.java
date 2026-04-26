@@ -21,13 +21,14 @@ public class StardustProjectileConeRenderer extends AbstractAttachmentEntityRend
     @Override
     protected RenderContext<StardustProjectile> createContext(StardustProjectile projectile) {
         return RenderContext.<StardustProjectile>cone(projectile.getTrailTimer(), 0x8AE0FF, 0.15f)
-                .trailHistoryLength(6)
-                .trailSegmentsPerNode(3)
-                .trailResolution(8)
+                .trailHistoryLength(5)
+                .trailMaxRadius(0.125f)
+                .trailSegmentsPerNode(16)
+                .trailResolution(4)
                 .trailFadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))
-                .trailShaderType(RenderContext.ShaderType.UNLIT)
-                .modelTranslateOffset(-0.125f, -0.125f, -0.125f)
-                .modelScale(0.25f);
+                .modelTranslateOffset(-0.1f, -0.1f, -0.1f)
+                .modelRotationOffset(0, 0, 45)
+                .modelScale(0.2f);
     }
 
     @Override

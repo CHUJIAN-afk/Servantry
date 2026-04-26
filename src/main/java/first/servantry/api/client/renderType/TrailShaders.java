@@ -20,12 +20,6 @@ public class TrailShaders {
     /** 标准透明轨迹着色器 */
     public static ShaderInstance trailShader;
 
-    /** 加法混合轨迹着色器 */
-    public static ShaderInstance trailAdditiveShader;
-
-    /** 无光照轨迹着色器（光影兼容性最佳） */
-    public static ShaderInstance trailUnlitShader;
-
     /** 轨迹顶点格式：Position + Color + UV0 + UV1 + UV2 + Normal */
     public static final VertexFormat TRAIL_FORMAT = VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
@@ -51,26 +45,6 @@ public class TrailShaders {
                         TRAIL_FORMAT
                 ),
                 shader -> trailShader = shader
-        );
-
-        // 加法混合轨迹着色器
-        event.registerShader(
-                new ShaderInstance(
-                        event.getResourceProvider(),
-                        ResourceLocation.parse("servantry:trail_additive"),
-                        TRAIL_FORMAT
-                ),
-                shader -> trailAdditiveShader = shader
-        );
-
-        // 无光照轨迹着色器
-        event.registerShader(
-                new ShaderInstance(
-                        event.getResourceProvider(),
-                        ResourceLocation.parse("servantry:trail_unlit"),
-                        TRAIL_FORMAT
-                ),
-                shader -> trailUnlitShader = shader
         );
     }
 }

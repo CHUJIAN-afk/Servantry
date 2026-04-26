@@ -86,7 +86,6 @@ import first.servantry.api.entity.AttachmentEntity;
  *         .trailHistoryLength(6)           // 6个历史节点
  *         .trailSegmentsPerNode(4)         // 每节点4段插值
  *         .trailResolution(8)              // 8边形截面
- *         .trailShaderType(ShaderType.ADDITIVE)  // 加法混合发光
  *         .trailColorFunction((e, progress, time) -> {
  *             // 从橙色渐变到黄色
  *             int r = 255;
@@ -107,7 +106,6 @@ import first.servantry.api.entity.AttachmentEntity;
  *         .trailHistoryLength(8)           // 更长的轨迹
  *         .ribbonWidth(0.5f)               // 三角形高度
  *         .ribbonDiamondSize(0.25f)        // 基部宽度
- *         .trailShaderType(ShaderType.UNLIT)  // 光影兼容
  *         .trailColorFunction((e, progress, time) -> {
  *             // 从亮蓝渐变到暗蓝
  *             float brightness = 1.0f - progress * 0.6f;
@@ -230,19 +228,6 @@ public class RenderContext<T extends AttachmentEntity> {
      * └───────────┴─────────────────────────────────────────────┘
      * }</pre>
      */
-    public ShaderType trailShaderType = ShaderType.STANDARD;
-
-    /**
-     * 拖尾着色器类型枚举。
-     */
-    public enum ShaderType {
-        /** 标准透明着色器，使用标准透明度混合 */
-        STANDARD,
-        /** 无光照透明着色器，禁用深度写入，光影兼容性更好 */
-        UNLIT,
-        /** 加法混合着色器，颜色叠加效果，适合发光拖尾 */
-        ADDITIVE
-    }
 
     // ===================== 拖尾基础参数 =====================
 
@@ -298,7 +283,7 @@ public class RenderContext<T extends AttachmentEntity> {
      * 建议范围：2-8
      * }</pre>
      */
-    public int trailSegmentsPerNode = 4;
+    public int trailSegmentsPerNode = 8;
 
     /**
      * 拖尾起始索引，默认 0。
@@ -801,17 +786,6 @@ public class RenderContext<T extends AttachmentEntity> {
      */
     public RenderContext<T> trailType(TrailType type) {
         this.trailType = type;
-        return this;
-    }
-
-    /**
-     * 设置拖尾着色器类型。
-     *
-     * @param type 着色器类型
-     * @return this，用于链式调用
-     */
-    public RenderContext<T> trailShaderType(ShaderType type) {
-        this.trailShaderType = type;
         return this;
     }
 

@@ -162,7 +162,7 @@ public abstract class Projectile extends AttachmentEntity {
             tickPhysics();
 
             // 生命周期检查
-            if (++life >= 400) {
+            if (++life >= 200) {
                 markForRemoval();
             }
         } else {

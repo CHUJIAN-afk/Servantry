@@ -28,7 +28,6 @@ public class StardustCellRendererServant extends AbstractAttachmentEntityRendere
         return RenderContext.<StardustCell>cone(servant.trailTimer, 0x8AE0FF, 0.2f)
                 .trailResolution(12)
                 .trailFadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))
-                .trailShaderType(RenderContext.ShaderType.UNLIT)
                 .modelTranslateOffset(-0.25f, -0.25f, -0.25f)
                 .modelScale(0.5f)
                 .visualNodeFunction((cell, partialTick, rawNode) -> {
