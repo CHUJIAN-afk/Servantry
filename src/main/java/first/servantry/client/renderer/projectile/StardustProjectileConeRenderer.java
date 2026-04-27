@@ -20,9 +20,9 @@ public class StardustProjectileConeRenderer extends AbstractAttachmentEntityRend
 
     @Override
     protected RenderContext<StardustProjectile> createContext(StardustProjectile projectile) {
-        return RenderContext.<StardustProjectile>cone(projectile.getTrailTimer(), 0x8AE0FF, 0.15f)
+        return RenderContext.<StardustProjectile>cone(projectile.getTrailTimer(), 0x8AE0FF, 0.125f)
                 .trailHistoryLength(5)
-                .trailMaxRadius(0.125f)
+                .trailMaxRadius(0.105f)
                 .trailSegmentsPerNode(16)
                 .trailResolution(4)
                 .trailFadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))

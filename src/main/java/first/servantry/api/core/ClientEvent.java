@@ -46,9 +46,7 @@ public class ClientEvent {
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         Minecraft minecraft = Minecraft.getInstance();
         ClientLevel clientLevel = minecraft.level;
-        // 使用 AFTER_TRANSLUCENT_BLOCKS 阶段，确保轨迹不会被天空遮挡
-        // 此阶段在半透明方块之后、天气效果之前渲染
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS && clientLevel != null) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER && clientLevel != null) {
             PoseStack poseStack = event.getPoseStack();
             float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
             MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();

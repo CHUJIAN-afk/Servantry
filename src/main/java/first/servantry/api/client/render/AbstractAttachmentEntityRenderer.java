@@ -419,7 +419,7 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         }
 
         // 渲染头部半球
-        InterpolatedNode headNode = smoothNodes.get(0);
+        InterpolatedNode headNode = smoothNodes.getFirst();
         float headFade = config.trailFadeOut.getFade(0);
         float headRadius = config.trailMaxRadius * headFade;
         int headColor = config.trailColorFunction.getColor(entity, 0, timeShift);
