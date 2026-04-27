@@ -3,10 +3,10 @@ package first.servantry.api.core;
 import first.servantry.Servantry;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.item.IServantWeapon;
+import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
-import first.servantry.register.ItemRegister;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -18,6 +18,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
+import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -26,6 +27,17 @@ import java.util.List;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void levelChange(EntityTravelToDimensionEvent event) {
+        if (!event.isCanceled() && event.getEntity() instanceof Player player && !player.level().isClientSide()) {
+            EntityData data = player.getData(AttachmentRegister.EntityData);
+            List<Projectile> projectiles = data.getProjectiles();
+            for (Projectile projectile : projectiles) {
+                data.removeProjectile(projectile);
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void tick(EntityTickEvent.Post event) {
@@ -66,9 +78,7 @@ public class Event {
             if (!player.isShiftKeyDown()) {
                 iServantWeapon.handleSummon(player);
             } else {
-                EntityData data = player.getData(AttachmentRegister.EntityData);
-                data.removeServant(iServantWeapon.getType());
-                data.setChanged(true);
+                iServantWeapon.remove(player);
             }
             player.swing(InteractionHand.MAIN_HAND, true);
             SoundEvent soundEvent = iServantWeapon.getSoundEvent();

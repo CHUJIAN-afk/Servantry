@@ -8,10 +8,8 @@ import first.servantry.api.client.render.RenderContext;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.register.ModelRegister;
 import first.servantry.register.ParticleRegister;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 

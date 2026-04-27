@@ -6,7 +6,6 @@ import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.common.servant.goal.StardustCellAttackGoal;
 import first.servantry.common.servant.goal.StardustDragonAttackGoal;
 import first.servantry.common.servant.goal.StardustDragonFollowGoal;
 import first.servantry.common.servant.goal.StardustDragonIdleGoal;
@@ -15,7 +14,6 @@ import first.servantry.register.ParticleRegister;
 import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -26,6 +24,10 @@ import java.util.Set;
 
 /**
  * 星尘龙 - 多体节龙形仆从。
+ * <p>
+ * 由多个体节组成的长条形仆从，头部控制移动方向，尾部跟随。
+ * 首次召唤创建多个体节，重复召唤可增加体节数量。
+ * </p>
  */
 public class StardustDragon extends MomentumServant implements ICollideAttack<StardustDragon> {
 

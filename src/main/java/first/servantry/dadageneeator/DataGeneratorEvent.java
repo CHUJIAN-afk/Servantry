@@ -56,7 +56,7 @@ public class DataGeneratorEvent {
                         .forEach(this::handheldItem);
             }
         });
-        // 战利品掉落表 (使用完美兼容的原版 LootTable 接口)
+        // 战利品掉落表
         generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Collections.emptySet(), List.of(new LootTableProvider.SubProviderEntry(provider -> new EntityLootSubProvider(FeatureFlags.REGISTRY.allFlags(), provider) {
             @Override
             public void generate() {

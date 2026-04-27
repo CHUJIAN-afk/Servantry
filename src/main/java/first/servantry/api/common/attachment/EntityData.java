@@ -120,20 +120,21 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      * @param type 仆从类型
      */
     public void removeServant(ServantType<?> type) {
-        Servant target = null;
+        List<Servant> targets = new ArrayList<>();
         for (AttachmentEntity entity : entities) {
             if (entity instanceof Servant servant && servant.getServantType() == type) {
-                target = servant;
-                break;
+                targets.add(servant);
             }
         }
-        if (target != null) {
-            if (ticking) {
-                pendingRemove.add(target);
-            } else {
-                entities.remove(target);
-            }
+        if (!targets.isEmpty()) {
             changed = true;
+            for (Servant target : targets) {
+                if (ticking) {
+                    pendingRemove.add(target);
+                } else {
+                    entities.remove(target);
+                }
+            }
         }
     }
 
