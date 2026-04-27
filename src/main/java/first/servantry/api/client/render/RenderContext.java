@@ -189,6 +189,19 @@ public class RenderContext<T extends AttachmentEntity> {
          */
         CONE,
         /**
+         * 水滴拖尾：圆锥头部加上半球顶部，形成水滴形状。
+         * <pre>{@code
+         *     效果示意：
+         *           ╭─╮  ← 半球顶部
+         *          ╱   ╲
+         *         │     │
+         *          ╲   ╱
+         *           ╰─╯  ← 圆锥尾部
+         *     头→尾
+         * }</pre>
+         */
+        DROPLET,
+        /**
          * 丝带拖尾：每个节点绘制三角形截面，尖端朝前。
          * <pre>{@code
          *     效果示意：
@@ -212,22 +225,6 @@ public class RenderContext<T extends AttachmentEntity> {
      * </p>
      */
     public TrailType trailType = TrailType.NONE;
-
-    /**
-     * 拖尾着色器类型，默认 {@link ShaderType#STANDARD}。
-     * <p>
-     * 控制拖尾使用的着色器和混合模式，影响光影模组兼容性。
-     * </p>
-     * <pre>{@code
-     * ┌───────────┬─────────────────────────────────────────────┐
-     * │ 类型      │ 特点                                        │
-     * ├───────────┼─────────────────────────────────────────────┤
-     * │ STANDARD  │ 标准透明，适合大多数情况                     │
-     * │ UNLIT     │ 无光照透明，光影兼容性更好，适合发光物体      │
-     * │ ADDITIVE  │ 加法混合，颜色叠加，适合火焰、能量效果        │
-     * └───────────┴─────────────────────────────────────────────┘
-     * }</pre>
-     */
 
     // ===================== 拖尾基础参数 =====================
 
@@ -741,6 +738,24 @@ public class RenderContext<T extends AttachmentEntity> {
     public static <T extends AttachmentEntity> RenderContext<T> cone(int timer, int colorRGB, float radius) {
         RenderContext<T> context = new RenderContext<>();
         context.trailType = TrailType.CONE;
+        context.trailTimer = timer;
+        context.trailColorRGB = colorRGB;
+        context.trailMaxRadius = radius;
+        return context;
+    }
+
+    /**
+     * 创建水滴拖尾渲染上下文（圆锥 + 头部半球）。
+     *
+     * @param timer    拖尾计时器值，>0 时显示拖尾
+     * @param colorRGB 基础颜色 (0xRRGGBB)
+     * @param radius   头部最大半径
+     * @param <T>      实体类型
+     * @return 新建的渲染上下文
+     */
+    public static <T extends AttachmentEntity> RenderContext<T> droplet(int timer, int colorRGB, float radius) {
+        RenderContext<T> context = new RenderContext<>();
+        context.trailType = TrailType.DROPLET;
         context.trailTimer = timer;
         context.trailColorRGB = colorRGB;
         context.trailMaxRadius = radius;

@@ -92,6 +92,7 @@ public interface IServantWeapon<T extends Servant> {
         private Supplier<SoundEvent> soundEventSupplier = () -> null;
         private Consumer<T> onSummon = servant -> {};
         private Consumer<Player> onRemove = null;
+        private int maxCount = Integer.MAX_VALUE;
 
         // 多体节模式配置
         private boolean multiSegmentMode = false;
@@ -116,6 +117,11 @@ public interface IServantWeapon<T extends Servant> {
 
         public Builder<T> onRemove(Consumer<Player> action) {
             this.onRemove = action;
+            return this;
+        }
+
+        public Builder<T> maxCount(int max) {
+            this.maxCount = max;
             return this;
         }
 
@@ -183,6 +189,27 @@ public interface IServantWeapon<T extends Servant> {
                     dummyServant = getType().factory().get();
                 }
                 return dummyServant;
+            }
+
+            @Override
+            public void handleSummon(Player player) {
+                EntityData data = player.getData(AttachmentRegister.EntityData);
+                ServantType<T> type = getType();
+
+                // 检查当前数量
+                long currentCount = data.getEntities().stream()
+                        .filter(e -> type.equals(e.getType()))
+                        .count();
+
+                if (currentCount >= maxCount) {
+                    return; // 已达到最大数量
+                }
+
+                T servant = type.factory().get();
+                servant.setOwner(player);
+                if (data.summonServant(player, servant)) {
+                    this.summon(servant);
+                }
             }
 
             @Override

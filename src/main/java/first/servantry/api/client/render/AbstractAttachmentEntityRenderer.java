@@ -257,6 +257,7 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
     protected void renderTrail(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderContext<T> config) {
         switch (config.trailType) {
             case CONE -> renderConeTrail(entity, poseStack, bufferSource, partialTick, visualNode, config);
+            case DROPLET -> renderDropletTrail(entity, poseStack, bufferSource, partialTick, visualNode, config);
             case RIBBON -> renderRibbonTrail(entity, poseStack, bufferSource, partialTick, visualNode, config);
             default -> {}
         }
@@ -349,6 +350,108 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
                         (float) prevRel.x + prevV2.x, (float) prevRel.y + prevV2.y, (float) prevRel.z + prevV2.z,
                         (float) prevRel.x + prevV1.x, (float) prevRel.y + prevV1.y, (float) prevRel.z + prevV1.z,
                         currARGB, prevARGB);
+            }
+        }
+    }
+
+    // ===================== 水滴拖尾渲染 =====================
+
+    /**
+     * 渲染水滴形拖尾（圆锥 + 头部半球）。
+     */
+    private void renderDropletTrail(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderContext<T> config) {
+        List<InterpolatedNode> smoothNodes = buildSmoothNodes(entity, visualNode, config);
+        if (smoothNodes.size() < 2) return;
+
+        VertexConsumer consumer = bufferSource.getBuffer(getTrailRenderType(config));
+        Matrix4f pose = poseStack.last().pose();
+        CircleVertexCache cache = CIRCLE_CACHE.computeIfAbsent(config.trailResolution, CircleVertexCache::new);
+
+        Player owner = entity.getOwner();
+        float timeShift = owner != null ? (owner.tickCount + partialTick) * 0.015f : 0f;
+
+        int nodeCount = smoothNodes.size();
+        Vec3 renderPos = visualNode.pos();
+
+        // 渲染圆锥部分（与renderConeTrail相同）
+        Vector3f currV1 = new Vector3f(), currV2 = new Vector3f();
+        Vector3f prevV1 = new Vector3f(), prevV2 = new Vector3f();
+
+        for (int i = 0; i < nodeCount - 1; i++) {
+            InterpolatedNode curr = smoothNodes.get(i);
+            InterpolatedNode prev = smoothNodes.get(i + 1);
+
+            float currProgress = (float) i / (nodeCount - 1);
+            float prevProgress = (float) (i + 1) / (nodeCount - 1);
+
+            float currFade = config.trailFadeOut.getFade(currProgress);
+            float prevFade = config.trailFadeOut.getFade(prevProgress);
+            float currRadius = config.trailMaxRadius * currFade;
+            float prevRadius = config.trailMaxRadius * prevFade;
+
+            int currColor = config.trailColorFunction.getColor(entity, currProgress, timeShift);
+            int prevColor = config.trailColorFunction.getColor(entity, prevProgress, timeShift);
+
+            int currAlpha = Math.round(currFade * 200);
+            int prevAlpha = Math.round(prevFade * 200);
+            int currARGB = FastColor.ARGB32.color(currAlpha, (currColor >> 16) & 0xFF, (currColor >> 8) & 0xFF, currColor & 0xFF);
+            int prevARGB = FastColor.ARGB32.color(prevAlpha, (prevColor >> 16) & 0xFF, (prevColor >> 8) & 0xFF, prevColor & 0xFF);
+
+            Vec3 currRel = curr.pos.subtract(renderPos);
+            Vec3 prevRel = prev.pos.subtract(renderPos);
+
+            for (int j = 0; j < config.trailResolution; j++) {
+                float cos1 = cache.cos(j), sin1 = cache.sin(j);
+                float cos2 = cache.cos(j + 1), sin2 = cache.sin(j + 1);
+
+                currV1.set(cos1 * currRadius, sin1 * currRadius, 0).rotate(curr.rot);
+                currV2.set(cos2 * currRadius, sin2 * currRadius, 0).rotate(curr.rot);
+                prevV1.set(cos1 * prevRadius, sin1 * prevRadius, 0).rotate(prev.rot);
+                prevV2.set(cos2 * prevRadius, sin2 * prevRadius, 0).rotate(prev.rot);
+
+                emitQuad(consumer, pose,
+                        (float) currRel.x + currV1.x, (float) currRel.y + currV1.y, (float) currRel.z + currV1.z,
+                        (float) currRel.x + currV2.x, (float) currRel.y + currV2.y, (float) currRel.z + currV2.z,
+                        (float) prevRel.x + prevV2.x, (float) prevRel.y + prevV2.y, (float) prevRel.z + prevV2.z,
+                        (float) prevRel.x + prevV1.x, (float) prevRel.y + prevV1.y, (float) prevRel.z + prevV1.z,
+                        currARGB, prevARGB);
+            }
+        }
+
+        // 渲染头部半球
+        InterpolatedNode headNode = smoothNodes.get(0);
+        float headFade = config.trailFadeOut.getFade(0);
+        float headRadius = config.trailMaxRadius * headFade;
+        int headColor = config.trailColorFunction.getColor(entity, 0, timeShift);
+        int headAlpha = Math.round(headFade * 200);
+        int headARGB = FastColor.ARGB32.color(headAlpha, (headColor >> 16) & 0xFF, (headColor >> 8) & 0xFF, headColor & 0xFF);
+
+        Vec3 headRel = headNode.pos.subtract(renderPos);
+        int hemisphereSegments = Math.max(2, config.trailResolution / 2);
+
+        for (int lat = 0; lat < hemisphereSegments; lat++) {
+            float latAngle1 = (float) (Math.PI / 2 * lat / hemisphereSegments);
+            float latAngle2 = (float) (Math.PI / 2 * (lat + 1) / hemisphereSegments);
+            float r1 = (float) Math.cos(latAngle1) * headRadius;
+            float r2 = (float) Math.cos(latAngle2) * headRadius;
+            float h1 = (float) Math.sin(latAngle1) * headRadius;
+            float h2 = (float) Math.sin(latAngle2) * headRadius;
+
+            for (int lon = 0; lon < config.trailResolution; lon++) {
+                float cos1 = cache.cos(lon), sin1 = cache.sin(lon);
+                float cos2 = cache.cos(lon + 1), sin2 = cache.sin(lon + 1);
+
+                Vector3f v1 = new Vector3f(cos1 * r1, sin1 * r1, h1).rotate(headNode.rot);
+                Vector3f v2 = new Vector3f(cos2 * r1, sin2 * r1, h1).rotate(headNode.rot);
+                Vector3f v3 = new Vector3f(cos2 * r2, sin2 * r2, h2).rotate(headNode.rot);
+                Vector3f v4 = new Vector3f(cos1 * r2, sin1 * r2, h2).rotate(headNode.rot);
+
+                emitQuad(consumer, pose,
+                        (float) headRel.x + v1.x, (float) headRel.y + v1.y, (float) headRel.z + v1.z,
+                        (float) headRel.x + v2.x, (float) headRel.y + v2.y, (float) headRel.z + v2.z,
+                        (float) headRel.x + v3.x, (float) headRel.y + v3.y, (float) headRel.z + v3.z,
+                        (float) headRel.x + v4.x, (float) headRel.y + v4.y, (float) headRel.z + v4.z,
+                        headARGB, headARGB);
             }
         }
     }

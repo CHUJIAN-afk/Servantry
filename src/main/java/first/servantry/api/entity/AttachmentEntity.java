@@ -134,7 +134,8 @@ public abstract class AttachmentEntity {
      *
      * @param buf 数据包缓冲区
      */
-    public abstract void writeAdditional(RegistryFriendlyByteBuf buf);
+    public void writeAdditional(RegistryFriendlyByteBuf buf) {
+    }
 
     /**
      * 读取实体特有的附加同步数据。
@@ -145,7 +146,8 @@ public abstract class AttachmentEntity {
      *
      * @param buf 数据包缓冲区
      */
-    public abstract void readAdditional(RegistryFriendlyByteBuf buf);
+    public void readAdditional(RegistryFriendlyByteBuf buf) {
+    }
 
     // ===================== 路径管理 =====================
 
