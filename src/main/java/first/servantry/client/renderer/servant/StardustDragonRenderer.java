@@ -3,12 +3,15 @@ package first.servantry.client.renderer.servant;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
+import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.common.servant.StardustDragon;
+import first.servantry.register.ModelRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -29,32 +32,29 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
 
     @Override
     protected RenderContext<StardustDragon> createContext(StardustDragon dragon) {
-        return RenderContext.<StardustDragon>none().modelScale(0.5f);
+        int total = dragon.getTotalSegments();
+        int index = dragon.getSegmentIndex();
+        return RenderContext.<StardustDragon>none()
+                .modelTranslateOffset(-0.5f, -0.425f, index == total - 1 ? -0.1f : -0.5f)
+                .modelRotationOffset(180, 0, 0);
     }
 
     @Override
     protected void renderEntity(StardustDragon dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustDragon> config) {
         int total = dragon.getTotalSegments();
         int index = dragon.getSegmentIndex();
-        ItemStack renderItem;
+        ModelResourceLocation model;
         // 多体节渲染逻辑
         if (index == 0) {
-            renderItem = Items.DRAGON_HEAD.getDefaultInstance();
+            model = ModelRegister.STARDUST_DRAGON_HEAD;
         } else if (index == total - 1) {
-            renderItem = Items.GOLD_BLOCK.getDefaultInstance();
+            model = ModelRegister.STARDUST_DRAGON_BODY3;
+        } else if (index % 2 == 0) {
+            model = ModelRegister.STARDUST_DRAGON_BODY1;
         } else {
-            renderItem = Items.DIAMOND_BLOCK.getDefaultInstance();
+            model = ModelRegister.STARDUST_DRAGON_BODY2;
         }
-        Minecraft.getInstance().getItemRenderer().renderStatic(
-                renderItem,
-                ItemDisplayContext.NONE,
-                LightTexture.FULL_BRIGHT,
-                OverlayTexture.NO_OVERLAY,
-                poseStack,
-                bufferSource,
-                dragon.getOwner().level(),
-                0
-        );
+        ModelRenderer.renderModel(model, poseStack, bufferSource);
     }
 
 }

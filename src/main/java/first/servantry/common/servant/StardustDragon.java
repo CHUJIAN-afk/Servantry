@@ -196,7 +196,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     }
 
     public double getSegmentDistance() {
-        return 0.5;
+        return 0.65;
     }
 
     /**

@@ -26,11 +26,28 @@ public final class ModelRegister {
     /** 泰拉棱镜模型 */
     public static final ModelResourceLocation TERRAPRISM = standalone("servant/terraprism");
 
+    /** 星尘龙头部模型 */
+    public static final ModelResourceLocation STARDUST_DRAGON_HEAD = standalone("servant/stardust_dragon_head");
+
+    /** 星尘龙身体1模型 */
+    public static final ModelResourceLocation STARDUST_DRAGON_BODY1 = standalone("servant/stardust_dragon_body1");
+
+    /** 星尘龙身体2模型 */
+    public static final ModelResourceLocation STARDUST_DRAGON_BODY2 = standalone("servant/stardust_dragon_body2");
+
+    /** 星尘龙尾部模型 */
+    public static final ModelResourceLocation STARDUST_DRAGON_BODY3 = standalone("servant/stardust_dragon_body3");
+
+
     @SubscribeEvent
     public static void registerAdditional(ModelEvent.RegisterAdditional event) {
         event.register(ENCHANTED_THROWING_KNIVES);
         event.register(STARDUST_CELL);
         event.register(TERRAPRISM);
+        event.register(STARDUST_DRAGON_HEAD);
+        event.register(STARDUST_DRAGON_BODY1);
+        event.register(STARDUST_DRAGON_BODY2);
+        event.register(STARDUST_DRAGON_BODY3);
     }
 
     private static ModelResourceLocation standalone(String path) {

@@ -74,6 +74,8 @@ public abstract class AttachmentEntity {
     /** 标记客户端是否已完成首次位置同步 */
     protected boolean clientInitialized = false;
 
+    protected boolean remove = false;
+
     // ===================== 构造方法 =====================
 
     /**
@@ -197,6 +199,14 @@ public abstract class AttachmentEntity {
         if (!nodes.isEmpty()) {
             this.currentPathNode = nodes.getLast();
         }
+    }
+
+    public boolean isRemove() {
+        return remove;
+    }
+
+    public void setRemove() {
+        this.remove = true;
     }
 
     /**
