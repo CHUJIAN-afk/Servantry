@@ -68,7 +68,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
     @Override
     public boolean canUse() {
-        return servant.getTarget() != null && canTransitionToAttack(servant.getOwner());
+        return servant.getTarget() != null && servant.getOwner().getRandom().nextDouble() < 0.25;
     }
 
     /**

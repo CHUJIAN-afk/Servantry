@@ -73,7 +73,6 @@ public class StardustCell extends MomentumServant {
 
     @Override
     public void tick() {
-        super.tick();
         if (!getOwner().level().isClientSide()) {
             // 冷却衰减
             if (shootCooldown > 0) shootCooldown--;
@@ -88,6 +87,7 @@ public class StardustCell extends MomentumServant {
             renderPitch += 2f;
             renderRoll += 2f;
         }
+        super.tick();
     }
 
     /**

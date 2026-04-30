@@ -83,7 +83,6 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
     @Override
     public void tick() {
-        super.tick();
         if (owner.level().isClientSide()) {
             idleBlendO = idleBlend;
             if (attacking) {
@@ -94,6 +93,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
                 idleBlend = Math.min(1.0f, idleBlend + 0.1f);
             }
         }
+        super.tick();
     }
 
     @Override

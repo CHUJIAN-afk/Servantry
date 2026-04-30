@@ -98,7 +98,6 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
 
     @Override
     public void tick() {
-        super.tick();
         if (getOwner().level().isClientSide()) {
             // 拖尾计时器更新
             if (attacking) {
@@ -114,6 +113,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
                 idleBlend = Math.max(0.0f, idleBlend - 0.25f);
             }
         }
+        super.tick();
     }
 
     @Override

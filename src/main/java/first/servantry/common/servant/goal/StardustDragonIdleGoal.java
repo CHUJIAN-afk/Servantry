@@ -29,8 +29,10 @@ public class StardustDragonIdleGoal extends ServantGoal<StardustDragon> {
     @Override
     public void tick() {
         Player owner = servant.getOwner();
-        if (owner == null) return;
-
+        if (owner.distanceToSqr(servant.getPos()) > 128 * 128) {
+            servant.teleportTo(owner.getBoundingBox().getCenter());
+            wanderTarget = Vec3.ZERO;
+        }
         // 选择新目标
         if (wanderTarget.equals(Vec3.ZERO) || servant.getPos().distanceToSqr(wanderTarget) < 1 || owner.getRandom().nextDouble() < 0.01) {
 
@@ -46,6 +48,6 @@ public class StardustDragonIdleGoal extends ServantGoal<StardustDragon> {
         }
 
         // 螺旋游动向目标
-        servant.spiralToward(wanderTarget, 0.1);
+        servant.spiralToward(wanderTarget, (wanderTarget.distanceToSqr(servant.getPos()) + 20) * 0.0005);
     }
 }

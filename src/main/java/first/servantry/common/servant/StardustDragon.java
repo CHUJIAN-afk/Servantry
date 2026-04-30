@@ -71,7 +71,6 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
                 );
             }
         }
-        super.tick();
 
         // 限制最大速度
         double maxSpeed = 1.0;
@@ -80,6 +79,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         if (speed > maxSpeed) {
             setVelocity(vel.normalize().scale(maxSpeed));
         }
+        super.tick();
     }
 
     private StardustDragon getHead() {
@@ -132,7 +132,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     @Override
     public AABB getHitbox() {
-        return new AABB(-0.25, -0.25, -0.75, 0.25, 0.25, -0.25);
+        return new AABB(-0.25, -0.25, -0.84, 0.25, 0.25, -0.19);
     }
 
     @Override

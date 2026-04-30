@@ -8,6 +8,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ModelEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 仆从模型注册。
  * <p>
@@ -15,43 +18,54 @@ import net.neoforged.neoforge.client.event.ModelEvent;
  * </p>
  */
 @EventBusSubscriber(modid = Servantry.MODID, value = Dist.CLIENT)
-public final class ModelRegister {
+public class ModelRegister {
 
-    /** 附魔飞刀模型 */
-    public static final ModelResourceLocation ENCHANTED_THROWING_KNIVES = standalone("servant/enchanted_throwing_knives");
+    private static final List<ModelResourceLocation> MODELS = new ArrayList<>();
 
-    /** 星尘细胞模型 */
-    public static final ModelResourceLocation STARDUST_CELL = standalone("servant/stardust_cell");
+    /**
+     * 附魔飞刀模型
+     */
+    public static final ModelResourceLocation ENCHANTED_THROWING_KNIVES = standalone("servant/enchanted_throwing_knives"),
 
-    /** 泰拉棱镜模型 */
-    public static final ModelResourceLocation TERRAPRISM = standalone("servant/terraprism");
+    /**
+     * 星尘细胞模型
+     */
+    STARDUST_CELL = standalone("servant/stardust_cell"),
 
-    /** 星尘龙头部模型 */
-    public static final ModelResourceLocation STARDUST_DRAGON_HEAD = standalone("servant/stardust_dragon_head");
+    /**
+     * 泰拉棱镜模型
+     */
+    TERRAPRISM = standalone("servant/terraprism"),
 
-    /** 星尘龙身体1模型 */
-    public static final ModelResourceLocation STARDUST_DRAGON_BODY1 = standalone("servant/stardust_dragon_body1");
+    /**
+     * 星尘龙头部模型
+     */
+    STARDUST_DRAGON_HEAD = standalone("servant/stardust_dragon_head"),
 
-    /** 星尘龙身体2模型 */
-    public static final ModelResourceLocation STARDUST_DRAGON_BODY2 = standalone("servant/stardust_dragon_body2");
+    /**
+     * 星尘龙身体1模型
+     */
+    STARDUST_DRAGON_BODY1 = standalone("servant/stardust_dragon_body1"),
 
-    /** 星尘龙尾部模型 */
-    public static final ModelResourceLocation STARDUST_DRAGON_BODY3 = standalone("servant/stardust_dragon_body3");
+    /**
+     * 星尘龙身体2模型
+     */
+    STARDUST_DRAGON_BODY2 = standalone("servant/stardust_dragon_body2"),
 
+    /**
+     * 星尘龙尾部模型
+     */
+    STARDUST_DRAGON_BODY3 = standalone("servant/stardust_dragon_body3");
 
     @SubscribeEvent
     public static void registerAdditional(ModelEvent.RegisterAdditional event) {
-        event.register(ENCHANTED_THROWING_KNIVES);
-        event.register(STARDUST_CELL);
-        event.register(TERRAPRISM);
-        event.register(STARDUST_DRAGON_HEAD);
-        event.register(STARDUST_DRAGON_BODY1);
-        event.register(STARDUST_DRAGON_BODY2);
-        event.register(STARDUST_DRAGON_BODY3);
+        MODELS.forEach(event::register);
     }
 
     private static ModelResourceLocation standalone(String path) {
-        return ModelResourceLocation.standalone(ResourceLocation.parse(Servantry.MODID + ":" + path));
+        ModelResourceLocation location = ModelResourceLocation.standalone(Servantry.rl(path));
+        MODELS.add(location);
+        return location;
     }
 
 }
