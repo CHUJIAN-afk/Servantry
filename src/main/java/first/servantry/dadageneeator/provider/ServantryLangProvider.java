@@ -66,6 +66,9 @@ public class ServantryLangProvider extends LanguageProvider {
         entry("item.minecraft.splash_potion.effect.obsession").en("Splash Potion of Obsession").zh("喷溅型着魔药水");
         entry("item.minecraft.lingering_potion.effect.obsession").en("Lingering Potion of Obsession").zh("滞留型着魔药水");
         entry("item.minecraft.tipped_arrow.effect.obsession").en("Arrow of Obsession").zh("着魔之箭");
+
+        // JEI 描述
+        entry("jei.servantry.description.terraprism").en("Allays have a 1% chance to drop this").zh("悦灵有 1% 概率掉落");
     }
 
     private LangEntry entry(String key) {

@@ -1,4 +1,4 @@
-package first.servantry.client.renderer.servant;
+package first.servantry.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
@@ -7,14 +7,8 @@ import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.common.servant.StardustDragon;
 import first.servantry.register.ModelRegister;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 
 /**
  * 星尘龙渲染器。

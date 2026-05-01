@@ -21,7 +21,7 @@ public class ServantryRecipeProvider extends RecipeProvider {
     @Override
     protected void buildRecipes(@NotNull RecipeOutput output) {
 
-        // 1. 星尘细胞法杖: 2 下界之星, 1 木棍
+        // 1. 星尘细胞法杖
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ItemRegister.StardustCellStaff.get())
                 .pattern("  N")
                 .pattern(" N ")
@@ -29,6 +29,17 @@ public class ServantryRecipeProvider extends RecipeProvider {
                 .define('N', Items.NETHER_STAR)
                 .define('S', Items.STICK)
                 .unlockedBy("has_nether_star", has(Items.NETHER_STAR)) // 获得下界之星时解锁配方
+                .save(output);
+
+        // 1. 星尘之龙法杖:
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ItemRegister.StardustDragonStaff.get())
+                .pattern("  D")
+                .pattern(" N ")
+                .pattern("S  ")
+                .define('D', Items.DRAGON_HEAD)
+                .define('N', Items.NETHER_STAR)
+                .define('S', Items.STICK)
+                .unlockedBy("has_nether_star", has(Items.DRAGON_HEAD)) // 获得下界之星时解锁配方
                 .save(output);
 
         // 2. 刃杖: 1 铁剑, 1 木棍

@@ -1,4 +1,4 @@
-package first.servantry.client.renderer.projectile;
+package first.servantry.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;

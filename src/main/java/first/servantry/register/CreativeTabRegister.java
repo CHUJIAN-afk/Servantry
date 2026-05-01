@@ -21,7 +21,6 @@ public class CreativeTabRegister {
                 builder.icon(ItemRegister.TerraPrism.get()::getDefaultInstance);
                 builder.displayItems((parameters, output) -> BuiltInRegistries.ITEM.stream()
                         .filter(item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Servantry.MODID))
-                        .filter(item -> item != ItemRegister.StardustDragonStaff.get())
                         .forEach(output::accept));
                 return builder.build();
             });

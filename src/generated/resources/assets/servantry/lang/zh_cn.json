@@ -32,6 +32,7 @@
   "item.servantry.tooltip.set_bonus_title": "套装效果:",
   "item.servantry.tooltip.slots": "仆从栏位: %s / %s",
   "item.servantry.tooltip.summon": "召唤 %s 为你而战",
+  "jei.servantry.description.terraprism": "悦灵有 1% 概率掉落",
   "modid.servantry": "仆从学",
   "servant.servantry.enchanted_throwing_knives": "附魔飞刀",
   "servant.servantry.stardust_cell": "星尘细胞",
