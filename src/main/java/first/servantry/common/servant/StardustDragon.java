@@ -34,7 +34,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     /** 当前体节索引 */
     private int segmentIndex = 0;
     /** 总体节数 */
-    private int totalSegments = 3;
+    private int totalSegments = 1;
     /** 螺旋相位 */
     private float spiralPhase = 0;
 
@@ -140,6 +140,14 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         for (LivingEntity target : targets) {
             InvincibleData.servantAttack(target, getHead(), 2, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
         }
+    }
+
+    @Override
+    public int getSlotCost() {
+        if (getSegmentIndex() == getTotalSegments() - 1 || getSegmentIndex() == 0) {
+            return 0;
+        }
+        return super.getSlotCost();
     }
 
     @Override

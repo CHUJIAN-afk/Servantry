@@ -119,9 +119,9 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         double localZ = 0.5 + order * 0.12;
         double floatSpeed = 0.08 + order * 0.01;
         double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;
-        double px = owner.xo + (owner.getX() - owner.xo) * partialTick;
-        double py = owner.yo + (owner.getY() - owner.yo) * partialTick;
-        double pz = owner.zo + (owner.getZ() - owner.zo) * partialTick;
+        double px = Mth.lerp(partialTick, owner.xo, owner.getX());
+        double py = Mth.lerp(partialTick, owner.yo, owner.getY());
+        double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
         Vec3 playerPos = new Vec3(px, py, pz);
         Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
         return new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
