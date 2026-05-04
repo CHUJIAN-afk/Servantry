@@ -25,11 +25,22 @@ import java.util.Map;
  * <p>
  * 在客户端渲染事件中调用，遍历玩家的所有附件实体并调用对应的渲染器进行渲染。
  * </p>
+ * <h2>第一人称透明度调整</h2>
+ * <p>
+ * 当玩家处于第一人称视角时，附件实体可能会遮挡玩家视野。为解决此问题，
+ * 根据附件实体与玩家眼睛的距离动态调整透明度。
+ * </p>
  */
 public class EntityRenderDispatcher {
 
     /** 渲染器映射表，按实体类型存储对应的渲染器 */
     private static final Map<EntityType<?>, IAttachmentEntityRenderer<?>> renderers = new HashMap<>();
+
+    /** 第一人称视角下，完全透明的距离阈值（方块） */
+    private static final float FIRST_PERSON_MIN_DISTANCE = 0.5f;
+
+    /** 第一人称视角下，完全不透明的距离阈值（方块） */
+    private static final float FIRST_PERSON_MAX_DISTANCE = 4f;
 
     /**
      * 渲染玩家的所有附件实体。
@@ -43,6 +54,14 @@ public class EntityRenderDispatcher {
         List<AttachmentEntity> entities = player.getData(AttachmentRegister.EntityData).getEntities();
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         boolean showHitboxes = Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes();
+
+        // 检测是否为第一人称视角且正在渲染当前玩家
+        boolean isFirstPerson = isFirstPersonCamera(player);
+        Vec3 eyePos = isFirstPerson ? player.getEyePosition(partialTick) : null;
+
+        // 创建透明缓冲源包装器
+        AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);
+
         for (AttachmentEntity entity : entities) {
             entity.setOwner(player);
             poseStack.pushPose();
@@ -52,9 +71,21 @@ public class EntityRenderDispatcher {
             IAttachmentEntityRenderer<AttachmentEntity> renderer = getRenderer(entity);
             if (renderer != null) {
                 int packedLight = LevelRenderer.getLightColor(player.level(), BlockPos.containing(renderNode.pos().x(), renderNode.pos().y(), renderNode.pos().z()));
-                renderer.render(entity, poseStack, bufferSource, partialTick, packedLight, renderNode);
+                // 计算第一人称视角下的透明度
+                float alpha = 1.0f;
+                if (isFirstPerson) {
+                    PathNode visualNode = renderNode;
+                    if (renderer instanceof AbstractAttachmentEntityRenderer<AttachmentEntity> entityAbstractAttachmentEntityRenderer) {
+                        visualNode = entityAbstractAttachmentEntityRenderer.createContext(entity).visualNodeFunction.getVisualNode(entity, partialTick, renderNode);
+                    }
+                    alpha = Math.max(0.105f, calculateFirstPersonAlpha(visualNode.pos(), eyePos));
+                }
+                // 设置透明度
+                alphaBufferSource.setAlpha(alpha);
+                renderer.render(entity, poseStack, alphaBufferSource, partialTick, packedLight, renderNode);
             }
-            // 调试渲染
+
+            // 调试渲染（使用原始缓冲源，不受透明度影响）
             if (showHitboxes) {
                 // 渲染实体位置点（黄色小方块）
                 VertexConsumer debugConsumer = bufferSource.getBuffer(RenderType.lines());
@@ -74,6 +105,48 @@ public class EntityRenderDispatcher {
 
             poseStack.popPose();
         }
+    }
+
+    /**
+     * 检测当前是否为第一人称视角且正在渲染当前玩家。
+     *
+     * @param player 正在渲染的玩家
+     * @return 如果是第一人称视角且是当前玩家返回 true
+     */
+    private static boolean isFirstPersonCamera(Player player) {
+        Minecraft minecraft = Minecraft.getInstance();
+        // 检查是否是当前客户端玩家
+        if (minecraft.player != player) {
+            return false;
+        }
+        // 检查视角类型（0 = 第一人称，1 = 第三人称背面，2 = 第三人称正面）
+        return minecraft.options.getCameraType().isFirstPerson();
+    }
+
+    /**
+     * 计算第一人称视角下的透明度。
+     * <p>
+     * 根据附件实体与玩家眼睛的距离，动态计算透明度：
+     * <ul>
+     *   <li>距离 <= minDistance: 完全透明 (alpha = 0)</li>
+     *   <li>距离 >= maxDistance: 完全不透明 (alpha = 1)</li>
+     *   <li>介于两者之间: 线性插值</li>
+     * </ul>
+     * </p>
+     *
+     * @param entityPos 附件实体的渲染位置
+     * @param eyePos    玩家眼睛位置
+     * @return 透明度值 [0, 1]
+     */
+    private static float calculateFirstPersonAlpha(Vec3 entityPos, Vec3 eyePos) {
+        double distance = entityPos.distanceTo(eyePos);
+        if (distance <= FIRST_PERSON_MIN_DISTANCE) {
+            return 0.0f;
+        }
+        if (distance >= FIRST_PERSON_MAX_DISTANCE) {
+            return 1.0f;
+        }
+        return (float) ((distance - FIRST_PERSON_MIN_DISTANCE) / (FIRST_PERSON_MAX_DISTANCE - FIRST_PERSON_MIN_DISTANCE));
     }
 
     /**
