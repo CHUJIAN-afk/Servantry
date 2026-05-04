@@ -62,7 +62,7 @@ public class DataGeneratorEvent {
             public void generate() {
                 this.add(EntityType.ALLAY, LootTable.lootTable()
                         .withPool(LootPool.lootPool()
-                                .setRolls(ConstantValue.exactly(1.0F))
+                                .setRolls(ConstantValue.exactly(0.01F))
                                 .add(LootItem.lootTableItem(ItemRegister.TerraPrism.get())
                                         .when(LootItemRandomChanceCondition.randomChance(1))
                                 )
