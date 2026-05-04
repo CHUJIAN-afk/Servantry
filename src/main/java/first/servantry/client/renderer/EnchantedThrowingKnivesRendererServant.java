@@ -11,6 +11,7 @@ import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -60,15 +61,9 @@ public class EnchantedThrowingKnivesRendererServant extends AbstractAttachmentEn
                 .modelRotationOffset(0, 90, 0)
                 .visualNodeFunction((knives, partialTick, rawNode) -> {
                     float blend = Mth.lerp(partialTick, knives.idleBlendO, knives.idleBlend);
-                    var owner = knives.getOwner();
-                    if (blend > 0f && owner != null) {
-                        EntityData data = owner.getData(AttachmentRegister.EntityData);
-                        PathNode idealNode = knives.getInterpolatedIdleState(owner, data.getOrder(knives), Math.max(1, data.getSameSize(knives)), partialTick);
-                        Vec3 pos = rawNode.pos().lerp(idealNode.pos(), blend);
-                        float yaw = Mth.rotLerp(blend, rawNode.yaw(), idealNode.yaw());
-                        float pitch = Mth.rotLerp(blend, rawNode.pitch(), idealNode.pitch());
-                        float roll = Mth.rotLerp(blend, rawNode.roll(), idealNode.roll());
-                        return new PathNode(pos, yaw, pitch, roll);
+                    if (blend > 0f) {
+                        Player owner = knives.getOwner();
+                        return rawNode.lerp(knives.getInterpolatedIdleState(owner, knives.getOrder(), Math.max(1, owner.getData(AttachmentRegister.EntityData).getSameSize(knives)), partialTick), partialTick);
                     }
                     return rawNode;
                 });

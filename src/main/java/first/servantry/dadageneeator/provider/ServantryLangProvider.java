@@ -44,8 +44,7 @@ public class ServantryLangProvider extends LanguageProvider {
 
         entry("item.servantry.stardust_dragon_staff").en("Stardust Dragon Staff").zh("星尘之龙法杖");
         entry("servant.servantry.stardust_dragon").en("Stardust Dragon").zh("星尘之龙");
-        entry("item.servantry.stardust_dragon_staff.tooltip.1").en("Requires at least 3 servant slots").zh("至少需要3仆从栏");
-        entry("item.servantry.stardust_dragon_staff.tooltip.2").en("'When you have a dragon, who needs a swarm?'").zh("“有了一条巨龙后，谁还需要一群仆从呢？”");
+        entry("item.servantry.stardust_dragon_staff.tooltip.1").en("'When you have a dragon, who needs a swarm?'").zh("“有了一条巨龙后，谁还需要一群仆从呢？”");
 
         entry(AttributeRegister.ServantMaxCount.value().getDescriptionId()).en("Max Servants").zh("仆从栏");
         entry(AttributeRegister.ServantDamage.value().getDescriptionId()).en("Servant Damage").zh("仆从伤害");
