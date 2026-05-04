@@ -36,12 +36,6 @@ public class EntityRenderDispatcher {
     /** 渲染器映射表，按实体类型存储对应的渲染器 */
     private static final Map<EntityType<?>, IAttachmentEntityRenderer<?>> renderers = new HashMap<>();
 
-    /** 第一人称视角下，完全透明的距离阈值（方块） */
-    private static final float FIRST_PERSON_MIN_DISTANCE = 0.5f;
-
-    /** 第一人称视角下，完全不透明的距离阈值（方块） */
-    private static final float FIRST_PERSON_MAX_DISTANCE = 4f;
-
     /**
      * 渲染玩家的所有附件实体。
      *
@@ -55,10 +49,6 @@ public class EntityRenderDispatcher {
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         boolean showHitboxes = Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes();
 
-        // 检测是否为第一人称视角且正在渲染当前玩家
-        boolean isFirstPerson = isFirstPersonCamera(player);
-        Vec3 eyePos = isFirstPerson ? player.getEyePosition(partialTick) : null;
-
         // 创建透明缓冲源包装器
         AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);
 
@@ -71,27 +61,15 @@ public class EntityRenderDispatcher {
             IAttachmentEntityRenderer<AttachmentEntity> renderer = getRenderer(entity);
             if (renderer != null) {
                 int packedLight = LevelRenderer.getLightColor(player.level(), BlockPos.containing(renderNode.pos().x(), renderNode.pos().y(), renderNode.pos().z()));
-                // 计算第一人称视角下的透明度
-                float alpha = 1.0f;
-                if (isFirstPerson) {
-                    PathNode visualNode = renderNode;
-                    if (renderer instanceof AbstractAttachmentEntityRenderer<AttachmentEntity> entityAbstractAttachmentEntityRenderer) {
-                        visualNode = entityAbstractAttachmentEntityRenderer.createContext(entity).visualNodeFunction.getVisualNode(entity, partialTick, renderNode);
-                    }
-                    alpha = Math.max(0.105f, calculateFirstPersonAlpha(visualNode.pos(), eyePos));
-                }
-                // 设置透明度
-                alphaBufferSource.setAlpha(alpha);
+                // 计算并设置第一人称视角下的透明度
+                alphaBufferSource.setAlpha(calculateFirstPersonAlpha(entity, renderer, renderNode, player, partialTick));
                 renderer.render(entity, poseStack, alphaBufferSource, partialTick, packedLight, renderNode);
             }
-
             // 调试渲染（使用原始缓冲源，不受透明度影响）
             if (showHitboxes) {
-                // 渲染实体位置点（黄色小方块）
                 VertexConsumer debugConsumer = bufferSource.getBuffer(RenderType.lines());
                 LevelRenderer.renderLineBox(poseStack, debugConsumer, -0.002, -0.002, -0.002, 0.002, 0.002, 0.002, 1.0F, 1.0F, 0.0F, 1.0F);
 
-                // 渲染碰撞箱
                 if (entity instanceof ICollideAttack<?> iCollideAttack) {
                     poseStack.pushPose();
                     poseStack.mulPose(Axis.YN.rotationDegrees(renderNode.yaw()));
@@ -108,45 +86,60 @@ public class EntityRenderDispatcher {
     }
 
     /**
-     * 检测当前是否为第一人称视角且正在渲染当前玩家。
-     *
-     * @param player 正在渲染的玩家
-     * @return 如果是第一人称视角且是当前玩家返回 true
-     */
-    private static boolean isFirstPersonCamera(Player player) {
-        Minecraft minecraft = Minecraft.getInstance();
-        // 检查是否是当前客户端玩家
-        if (minecraft.player != player) {
-            return false;
-        }
-        // 检查视角类型（0 = 第一人称，1 = 第三人称背面，2 = 第三人称正面）
-        return minecraft.options.getCameraType().isFirstPerson();
-    }
-
-    /**
      * 计算第一人称视角下的透明度。
      * <p>
-     * 根据附件实体与玩家眼睛的距离，动态计算透明度：
+     * 如果不是第一人称视角或不是当前玩家，返回 1.0。
+     * 否则根据附件实体与玩家眼睛的距离计算透明度：
      * <ul>
-     *   <li>距离 <= minDistance: 完全透明 (alpha = 0)</li>
-     *   <li>距离 >= maxDistance: 完全不透明 (alpha = 1)</li>
+     *   <li>距离 <= 0.5 方块: 最低透明度 0.105</li>
+     *   <li>距离 >= 4.0 方块: 完全不透明 (alpha = 1)</li>
      *   <li>介于两者之间: 线性插值</li>
      * </ul>
      * </p>
      *
-     * @param entityPos 附件实体的渲染位置
-     * @param eyePos    玩家眼睛位置
-     * @return 透明度值 [0, 1]
+     * @param entity     附件实体
+     * @param renderer   渲染器
+     * @param renderNode 渲染节点
+     * @param player     玩家
+     * @param partialTick 部分 tick
+     * @return 透明度值 [0.105, 1]
      */
-    private static float calculateFirstPersonAlpha(Vec3 entityPos, Vec3 eyePos) {
-        double distance = entityPos.distanceTo(eyePos);
-        if (distance <= FIRST_PERSON_MIN_DISTANCE) {
-            return 0.0f;
-        }
-        if (distance >= FIRST_PERSON_MAX_DISTANCE) {
+    private static float calculateFirstPersonAlpha(AttachmentEntity entity, IAttachmentEntityRenderer<AttachmentEntity> renderer, PathNode renderNode, Player player, float partialTick) {
+        Minecraft minecraft = Minecraft.getInstance();
+
+        // 检查是否为第一人称视角且是当前玩家
+        if (minecraft.player != player || !minecraft.options.getCameraType().isFirstPerson()) {
             return 1.0f;
         }
-        return (float) ((distance - FIRST_PERSON_MIN_DISTANCE) / (FIRST_PERSON_MAX_DISTANCE - FIRST_PERSON_MIN_DISTANCE));
+
+        // 获取视觉节点位置
+        Vec3 entityPos = renderNode.pos();
+        if (renderer instanceof AbstractAttachmentEntityRenderer<AttachmentEntity> abstractRenderer) {
+            var config = abstractRenderer.createContext(entity);
+            if (config != null) {
+                entityPos = config.visualNodeFunction.getVisualNode(entity, partialTick, renderNode).pos();
+            }
+        }
+
+        // 计算距离和透明度
+        Vec3 eyePos = player.getEyePosition(partialTick);
+        double distance = entityPos.distanceTo(eyePos);
+
+        // 距离阈值：0.5 方块内最低透明度，4.0 方块外完全不透明
+        final float minDistance = 0.5f;
+        final float maxDistance = 4.0f;
+        final float minAlpha = 0.105f;
+
+        if (distance <= minDistance) {
+            return minAlpha;
+        }
+        if (distance >= maxDistance) {
+            return 1.0f;
+        }
+
+        // 线性插值，但确保不低于最低透明度
+        float alpha = (float) ((distance - minDistance) / (maxDistance - minDistance));
+        return Math.max(minAlpha, alpha);
     }
 
     /**

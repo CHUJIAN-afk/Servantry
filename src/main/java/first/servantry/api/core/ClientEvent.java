@@ -48,7 +48,8 @@ public class ClientEvent {
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         Minecraft minecraft = Minecraft.getInstance();
         ClientLevel clientLevel = minecraft.level;
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_WEATHER && clientLevel != null) {
+        // 使用 AFTER_TRANSLUCENT_BLOCKS 阶段，确保透明物体正确排序
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS && clientLevel != null) {
             PoseStack poseStack = event.getPoseStack();
             float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
             MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();

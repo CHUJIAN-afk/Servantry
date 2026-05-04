@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 带透明度调整的 MultiBufferSource 包装器。
@@ -37,7 +38,7 @@ public class AlphaBufferSource implements MultiBufferSource {
     }
 
     @Override
-    public VertexConsumer getBuffer(RenderType renderType) {
+    public @NotNull VertexConsumer getBuffer(@NotNull RenderType renderType) {
         VertexConsumer innerConsumer = inner.getBuffer(renderType);
         if (alpha >= 1.0f) {
             return innerConsumer;
@@ -49,48 +50,50 @@ public class AlphaBufferSource implements MultiBufferSource {
     /**
          * 带透明度调整的 VertexConsumer 包装器。
          */
-        private record AlphaVertexConsumer(VertexConsumer inner, float alpha) implements VertexConsumer {
+    private record AlphaVertexConsumer(VertexConsumer inner, float alpha) implements VertexConsumer {
 
         @Override
-            public VertexConsumer addVertex(float x, float y, float z) {
-                inner.addVertex(x, y, z);
-                return this;
-            }
-
-            @Override
-            public VertexConsumer setColor(int r, int g, int b, int a) {
-                // 应用透明度
-                return inner.setColor(r, g, b, (int) (a * alpha));
-            }
-
-            @Override
-            public VertexConsumer setUv(float u, float v) {
-                inner.setUv(u, v);
-                return this;
-            }
-
-            @Override
-            public VertexConsumer setUv1(int u, int v) {
-                inner.setUv1(u, v);
-                return this;
-            }
-
-            @Override
-            public VertexConsumer setUv2(int u, int v) {
-                inner.setUv2(u, v);
-                return this;
-            }
-
-            @Override
-            public VertexConsumer setNormal(float x, float y, float z) {
-                inner.setNormal(x, y, z);
-                return this;
-            }
-
-            @Override
-            public VertexConsumer misc(VertexFormatElement element, int... rawData) {
-                inner.misc(element, rawData);
-                return this;
-            }
+        public @NotNull VertexConsumer addVertex(float x, float y, float z) {
+            inner.addVertex(x, y, z);
+            return this;
         }
+
+        @Override
+        public @NotNull VertexConsumer setColor(int r, int g, int b, int a) {
+            // 应用透明度
+            return inner.setColor(r, g, b, (int) (a * alpha));
+        }
+
+        @Override
+        public @NotNull VertexConsumer setUv(float u, float v) {
+            inner.setUv(u, v);
+            return this;
+        }
+
+        @Override
+        public @NotNull VertexConsumer setUv1(int u, int v) {
+            inner.setUv1(u, v);
+            return this;
+        }
+
+        @Override
+        public @NotNull VertexConsumer setUv2(int u, int v) {
+            inner.setUv2(u, v);
+            return this;
+        }
+
+        @Override
+        public @NotNull VertexConsumer setNormal(float x, float y, float z) {
+            inner.setNormal(x, y, z);
+            return this;
+        }
+
+        @Override
+        public @NotNull VertexConsumer misc(@NotNull VertexFormatElement element, int @NotNull ... rawData) {
+            inner.misc(element, rawData);
+            return this;
+        }
+
+    }
+
 }
