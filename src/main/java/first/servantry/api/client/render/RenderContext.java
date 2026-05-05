@@ -611,6 +611,45 @@ public class RenderContext<T extends AttachmentEntity> {
      */
     public VisualNodeFunction<T> visualNodeFunction = (entity, partialTick, rawNode) -> rawNode;
 
+    /**
+     * 混合比计算函数，用于动态模糊效果。
+     * <p>
+     * 默认返回 1.0，表示无动态模糊效果。
+     * </p>
+     * <pre>{@code
+     * 使用示例：
+     * // 基于速度的动态模糊
+     * .blendRatio((entity, partialTick) -> {
+     *     double speed = entity.getVelocity().length();
+     *     return Math.max(0.3f, 1.0f - speed * 0.1f);
+     * })
+     *
+     * // 固定混合比
+     * .blendRatio((entity, partialTick) -> 0.7f)
+     * }</pre>
+     */
+    public BlendRatioFunction<T> blendRatioFunction = (entity, partialTick) -> 0.0f;
+
+    /**
+     * 动态模糊历史帧数量，默认 3。
+     * <p>
+     * 当 blendRatio < 1.0 时，渲染多少个历史帧来形成动态模糊效果。
+     * 数值越大，拖影越长，但渲染开销也越大。
+     * </p>
+     */
+    public int motionBlurFrames = 0;
+
+    /**
+     * 动态模糊基础透明度，默认 0.3。
+     * <p>
+     * 历史帧的透明度按此值递减：
+     * - 第1帧：alpha * 1.0
+     * - 第2帧：alpha * 0.7
+     * - 第3帧：alpha * 0.4
+     * </p>
+     */
+    public float motionBlurAlpha = 0.3f;
+
     // ===================== 函数式接口定义 =====================
 
     /**
@@ -695,6 +734,31 @@ public class RenderContext<T extends AttachmentEntity> {
          * @return 处理后的视觉节点
          */
         PathNode getVisualNode(T entity, float partialTick, PathNode rawNode);
+    }
+
+    /**
+     * 混合比计算函数。
+     * <p>
+     * 用于计算动态模糊效果的混合比例。返回值表示当前帧与历史帧的混合比例：
+     * <ul>
+     *   <li>返回 1.0：完全显示当前帧（无动态模糊）</li>
+     *   <li>返回 0.0：完全显示历史帧</li>
+     *   <li>返回 0.5：当前帧与历史帧各占 50%</li>
+     * </ul>
+     * </p>
+     *
+     * @param <T> 实体类型
+     */
+    @FunctionalInterface
+    public interface BlendRatioFunction<T extends AttachmentEntity> {
+        /**
+         * 计算混合比例。
+         *
+         * @param entity      当前渲染的实体
+         * @param partialTick 部分刻时间 [0, 1)
+         * @return 混合比例 [0, 1]
+         */
+        float getBlendRatio(T entity, float partialTick);
     }
 
     // ===================== 静态工厂方法 =====================
@@ -999,6 +1063,42 @@ public class RenderContext<T extends AttachmentEntity> {
      */
     public RenderContext<T> visualNodeFunction(VisualNodeFunction<T> function) {
         this.visualNodeFunction = function;
+        return this;
+    }
+
+    /**
+     * 设置混合比计算函数。
+     * <p>
+     * 用于动态模糊效果，返回值表示当前帧与历史帧的混合比例。
+     * </p>
+     *
+     * @param function 混合比计算函数
+     * @return this，用于链式调用
+     */
+    public RenderContext<T> blendRatio(BlendRatioFunction<T> function) {
+        this.blendRatioFunction = function;
+        return this;
+    }
+
+    /**
+     * 设置动态模糊历史帧数量。
+     *
+     * @param frames 历史帧数量
+     * @return this，用于链式调用
+     */
+    public RenderContext<T> motionBlurFrames(int frames) {
+        this.motionBlurFrames = frames;
+        return this;
+    }
+
+    /**
+     * 设置动态模糊基础透明度。
+     *
+     * @param alpha 基础透明度 [0, 1]
+     * @return this，用于链式调用
+     */
+    public RenderContext<T> motionBlurAlpha(float alpha) {
+        this.motionBlurAlpha = alpha;
         return this;
     }
 }

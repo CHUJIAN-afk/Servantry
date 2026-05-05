@@ -1,5 +1,6 @@
 package first.servantry.api.client.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -16,6 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.lwjgl.opengl.GL11;
 
 import java.util.*;
 
@@ -187,8 +189,10 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
      * <ol>
      *   <li>创建渲染配置</li>
      *   <li>计算视觉节点（支持位置插值）</li>
+     *   <li>渲染动态模糊历史帧（在轨迹和本体之下）</li>
      *   <li>渲染拖尾（在模型后面）</li>
      *   <li>渲染本体模型</li>
+     *   <li>缓存当前渲染帧</li>
      * </ol>
      * </p>
      */
@@ -205,18 +209,116 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         poseStack.pushPose();
         poseStack.translate(offset.x, offset.y, offset.z);
 
+        // 3. 计算混合比，决定是否启用动态模糊
+        float blendRatio = config.blendRatioFunction.getBlendRatio(entity, partialTick);
+        boolean enableMotionBlur = blendRatio > 0 && config.motionBlurFrames > 0;
 
-        // 3. 先渲染拖尾（在模型后面，避免遮挡）
+        // 4. 渲染动态模糊历史帧（在轨迹和本体之下，避免遮挡）
+        if (enableMotionBlur) {
+            renderMotionBlurFrames(entity, poseStack, bufferSource, visualNode, config, blendRatio);
+        }
+
+        // 5. 渲染拖尾（在模型后面）
         if (config.trailType != RenderContext.TrailType.NONE && config.trailTimer > 0) {
             renderTrail(entity, poseStack, bufferSource, partialTick, visualNode, config);
         }
-        // 4. 渲染本体模型
+
+        // 6. 渲染本体模型（当前帧，完整透明度）
+        renderEntityModel(entity, poseStack, bufferSource, visualNode, config, 1.0f);
+
+        // 7. 缓存当前渲染帧（用于下一帧的动态模糊）
+        if (enableMotionBlur) {
+            entity.cacheRenderFrame(visualNode, config.motionBlurFrames);
+        }
+
+        poseStack.popPose();
+    }
+
+    /**
+     * 渲染动态模糊历史帧。
+     * <p>
+     * 使用渲染帧缓存中的历史渲染节点，渲染多层拖影，
+     * 形成跟随实体移动的动态模糊效果。
+     * </p>
+     * <p>
+     * blendRatio 控制缓存帧的采样间隔：
+     * <ul>
+     *   <li>blendRatio = 1.0：不渲染残影</li>
+     *   <li>blendRatio = 0.5：每隔一帧取一个缓存帧</li>
+     *   <li>blendRatio = 0.0：使用所有缓存帧</li>
+     * </ul>
+     * </p>
+     * <p>
+     * 使用 GL_GREATER 深度测试确保残影始终渲染在本体之下。
+     * </p>
+     *
+     * @param entity      附件实体
+     * @param poseStack   变换矩阵栈
+     * @param bufferSource 顶点缓冲源
+     * @param visualNode  当前视觉节点
+     * @param config      渲染配置
+     * @param blendRatio  混合比 [0, 1]，控制帧间隔
+     */
+    private void renderMotionBlurFrames(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> config, float blendRatio) {
+        LinkedList<PathNode> cache = entity.getRenderFrameCache();
+        if (cache.isEmpty()) return;
+        // blendRatio 控制帧间隔：值越小，间隔越小，残影越密集
+        // interval = 1 表示连续帧，interval = 2 表示每隔一帧
+        int interval = Math.max(1, Math.round(blendRatio * 3));
+        int frames = Math.min(config.motionBlurFrames, (cache.size() + interval - 1) / interval);
+        if (frames <= 0) return;
+
+        float baseAlpha = config.motionBlurAlpha;
+        Vec3 currentPos = visualNode.pos();
+
+        // 按间隔采样缓存帧
+        for (int i = 0; i < frames; i++) {
+            int cacheIndex = i * interval;
+            if (cacheIndex >= cache.size()) break;
+
+            PathNode cachedNode = cache.get(cacheIndex);
+            if (cachedNode == null) break;
+
+            // 计算此帧的透明度：越远的帧越透明
+            float progress = (float) i / frames;
+            float frameAlpha = baseAlpha * (1.0f - progress);
+
+            // 计算缓存位置相对于当前位置的偏移
+            Vec3 cachedPos = cachedNode.pos();
+            Vec3 relOffset = cachedPos.subtract(currentPos);
+
+            poseStack.pushPose();
+            // 应用位置偏移（缓存位置相对于当前位置）
+            poseStack.translate(relOffset.x, relOffset.y, relOffset.z);
+
+            // 渲染拖影模型（使用缓存帧的旋转）
+            renderEntityModelWithRotation(entity, poseStack, bufferSource, cachedNode, config, frameAlpha);
+
+            poseStack.popPose();
+        }
+    }
+
+    /**
+     * 渲染实体模型（仅应用旋转和缩放，支持透明度控制）。
+     * <p>
+     * 用于动态模糊拖影渲染，位置已通过 poseStack.translate 设置。
+     * </p>
+     *
+     * @param entity      附件实体
+     * @param poseStack   变换矩阵栈
+     * @param bufferSource 顶点缓冲源
+     * @param node        渲染节点（提供旋转信息）
+     * @param config      渲染配置
+     * @param alpha       透明度 [0, 1]
+     */
+    private void renderEntityModelWithRotation(T entity, PoseStack poseStack, MultiBufferSource bufferSource,
+                                               PathNode node, RenderContext<T> config, float alpha) {
         poseStack.pushPose();
 
-        // 应用旋转：先应用实体的朝向
-        poseStack.mulPose(Axis.YN.rotationDegrees(visualNode.yaw()));
-        poseStack.mulPose(Axis.XP.rotationDegrees(visualNode.pitch()));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(visualNode.roll()));
+        // 应用旋转：使用节点的朝向
+        poseStack.mulPose(Axis.YN.rotationDegrees(node.yaw()));
+        poseStack.mulPose(Axis.XP.rotationDegrees(node.pitch()));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(node.roll()));
 
         // 应用配置中的旋转偏移
         poseStack.mulPose(Axis.YN.rotationDegrees(config.modelYawOffset));
@@ -229,10 +331,61 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         // 应用缩放
         poseStack.scale(config.modelScale, config.modelScale, config.modelScale);
 
+        // 如果需要透明度调整，使用 AlphaBufferSource 包装
+        MultiBufferSource actualBufferSource = bufferSource;
+        if (alpha < 1.0f) {
+            AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);
+            alphaBufferSource.setAlpha(alpha);
+            actualBufferSource = alphaBufferSource;
+        }
+
         // 调用子类实现的具体渲染
-        renderEntity(entity, poseStack, bufferSource, visualNode, config);
+        renderEntity(entity, poseStack, actualBufferSource, node, config);
 
         poseStack.popPose();
+    }
+
+    /**
+     * 渲染实体模型（支持透明度控制）。
+     *
+     * @param entity      附件实体
+     * @param poseStack   变换矩阵栈
+     * @param bufferSource 顶点缓冲源
+     * @param node        渲染节点
+     * @param config      渲染配置
+     * @param alpha       透明度 [0, 1]
+     */
+    private void renderEntityModel(T entity, PoseStack poseStack, MultiBufferSource bufferSource,
+                                   PathNode node, RenderContext<T> config, float alpha) {
+        poseStack.pushPose();
+
+        // 应用旋转：先应用实体的朝向
+        poseStack.mulPose(Axis.YN.rotationDegrees(node.yaw()));
+        poseStack.mulPose(Axis.XP.rotationDegrees(node.pitch()));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(node.roll()));
+
+        // 应用配置中的旋转偏移
+        poseStack.mulPose(Axis.YN.rotationDegrees(config.modelYawOffset));
+        poseStack.mulPose(Axis.XP.rotationDegrees(config.modelPitchOffset));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(config.modelRollOffset));
+
+        // 应用平移偏移（修正模型旋转中心）
+        poseStack.translate(config.modelTranslateX, config.modelTranslateY, config.modelTranslateZ);
+
+        // 应用缩放
+        poseStack.scale(config.modelScale, config.modelScale, config.modelScale);
+
+        // 如果需要透明度调整，使用 AlphaBufferSource 包装
+        MultiBufferSource actualBufferSource = bufferSource;
+        if (alpha < 1.0f) {
+            AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);
+            alphaBufferSource.setAlpha(alpha);
+            actualBufferSource = alphaBufferSource;
+        }
+
+        // 调用子类实现的具体渲染
+        renderEntity(entity, poseStack, actualBufferSource, node, config);
+
         poseStack.popPose();
     }
 

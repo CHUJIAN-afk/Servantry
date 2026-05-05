@@ -51,7 +51,11 @@ public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<
                 })
                 .modelTranslateOffset(-0.5f, -0.5f, -0.5f)
                 .modelRotationOffset(0, 90, 45)
-                .visualNodeFunction((terraprism, partialTick, rawNode) -> rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend)));
+                .visualNodeFunction((terraprism, partialTick, rawNode) -> rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend)))
+                // 动态模糊效果：攻击时启用
+                .blendRatio((terraprism, partialTick) -> terraprism.attacking ? 2 : 0f)
+                .motionBlurFrames(2)
+                .motionBlurAlpha(0.3f);
     }
 
     @Override

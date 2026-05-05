@@ -132,6 +132,12 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     @Override
     public AABB getHitbox() {
+        if (getSegmentIndex() == getTotalSegments() - 1){
+            return new AABB(-0.25, -0.25, -1.84, 0.25, 0.25, -0.19);
+        }
+        if (getSegmentIndex() == 0) {
+            return new AABB(-0.25, -0.25, -0.84, 0.25, 0.25, 0.1);
+        }
         return new AABB(-0.25, -0.25, -0.84, 0.25, 0.25, -0.19);
     }
 

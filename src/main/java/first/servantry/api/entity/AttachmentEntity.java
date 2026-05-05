@@ -76,6 +76,14 @@ public abstract class AttachmentEntity {
 
     protected boolean remove = false;
 
+    /**
+     * 渲染帧缓存，用于动态模糊效果。
+     * <p>
+     * 每次渲染完成后缓存最终的渲染节点，动态模糊渲染时使用历史缓存帧。
+     * </p>
+     */
+    protected final LinkedList<PathNode> renderFrameCache = new LinkedList<>();
+
     // ===================== 构造方法 =====================
 
     /**
@@ -259,6 +267,30 @@ public abstract class AttachmentEntity {
         this.historyNodes.addFirst(this.currentPathNode);
         if (this.historyNodes.size() > getHistoryNodesSize()) {
             this.historyNodes.removeLast();
+        }
+    }
+
+    // ===================== 渲染帧缓存 =====================
+
+    /**
+     * 获取渲染帧缓存队列。
+     *
+     * @return 渲染帧缓存队列
+     */
+    public LinkedList<PathNode> getRenderFrameCache() {
+        return renderFrameCache;
+    }
+
+    /**
+     * 缓存渲染帧，用于动态模糊效果。
+     *
+     * @param node 渲染节点
+     * @param maxFrames 最大缓存帧数
+     */
+    public void cacheRenderFrame(PathNode node, int maxFrames) {
+        renderFrameCache.addFirst(node);
+        if (renderFrameCache.size() > maxFrames) {
+            renderFrameCache.removeLast();
         }
     }
 
