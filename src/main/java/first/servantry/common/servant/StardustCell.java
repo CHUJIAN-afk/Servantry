@@ -125,7 +125,7 @@ public class StardustCell extends MomentumServant {
     public float getKnockback() { return 0.2f; }
 
     @Override
-    public ServantType<? extends MomentumServant> getServantType() { return ServantRegister.StardustCell.get(); }
+    public ServantType<? extends MomentumServant> getType() { return ServantRegister.StardustCell.get(); }
 
     // ===================== 访问器 =====================
 

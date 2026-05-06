@@ -5,14 +5,10 @@ import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
-import first.servantry.api.common.attachment.EntityData;
 import first.servantry.common.servant.EnchantedThrowingKnives;
-import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 
 /**
  * 附魔飞刀渲染器。
@@ -59,14 +55,7 @@ public class EnchantedThrowingKnivesRendererServant extends AbstractAttachmentEn
                 .modelTranslateOffset(-0.25f, -0.25f, -0.25f)
                 .modelScale(0.5f)
                 .modelRotationOffset(0, 90, 0)
-                .visualNodeFunction((knives, partialTick, rawNode) -> {
-                    float blend = Mth.lerp(partialTick, knives.idleBlendO, knives.idleBlend);
-                    if (blend > 0f) {
-                        Player owner = knives.getOwner();
-                        return rawNode.lerp(knives.getInterpolatedIdleState(owner, knives.getOrder(), Math.max(1, owner.getData(AttachmentRegister.EntityData).getSameSize(knives)), partialTick), blend);
-                    }
-                    return rawNode;
-                });
+                .visualNodeFunction((knives, partialTick, rawNode) -> rawNode.lerp(knives.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, knives.idleBlendO, knives.idleBlend)));
     }
 
     @Override

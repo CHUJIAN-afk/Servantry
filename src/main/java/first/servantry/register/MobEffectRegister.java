@@ -1,6 +1,7 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
+import first.servantry.api.common.attachment.InvincibleData;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -26,10 +27,14 @@ public class MobEffectRegister {
 
         @Override
         public boolean applyEffectTick(@NotNull LivingEntity entity, int amplifier) {
-            int invulnerableTime = entity.invulnerableTime;
-            entity.invulnerableTime = 0;
-            entity.hurt(DamageRegister.getDamageSource(DamageRegister.Servant, entity.level()), 2.0f * (amplifier + 1));
-            entity.invulnerableTime = invulnerableTime;
+            entity.getData(AttachmentRegister.InvincibleData).attack(
+                    entity,
+                    null,
+                    0,
+                    DamageRegister.getDamageSource(DamageRegister.Servant, entity.level()),
+                    2.0f * (amplifier + 1),
+                    InvincibleData.Type.Global
+            );
             return true;
         }
 

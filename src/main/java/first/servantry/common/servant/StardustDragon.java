@@ -190,7 +190,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     public float getKnockback() { return 0.5f; }
 
     @Override
-    public ServantType<? extends MomentumServant> getServantType() {
+    public ServantType<? extends MomentumServant> getType() {
         return ServantRegister.StardustDragon.get();
     }
 

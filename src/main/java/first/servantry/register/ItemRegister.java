@@ -35,8 +35,7 @@ public class ItemRegister {
                     .sound(SoundRegister.UseServantWeapon)
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();
-                        EntityData data = owner.getData(AttachmentRegister.EntityData);
-                        PathNode idle = servant.getInterpolatedIdleState(owner, data.getOrder(servant), Math.max(1, data.getSameSize(servant)), 1.0f);
+                        PathNode idle = servant.getInterpolatedIdleState(1.0f);
                         Vec3 center = owner.getBoundingBox().getCenter();
                         servant.init(new PathNode(new Vec3(center.x(), idle.pos().y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
                     })

@@ -8,6 +8,7 @@ import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.EnchantedThrowingKnivesAttackGoal;
 import first.servantry.common.servant.goal.EnchantedThrowingKnivesIdleGoal;
+import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
@@ -146,13 +147,13 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
      * 飞刀围绕玩家旋转悬浮，位置由玩家位置、顺序索引和总数决定。
      * </p>
      *
-     * @param owner       玩家所有者
-     * @param order       当前飞刀在同类仆从中的顺序
-     * @param total       同类仆从总数
      * @param partialTick 部分 tick 插值进度
      * @return 插值后的空闲状态节点
      */
-    public PathNode getInterpolatedIdleState(Player owner, int order, int total, float partialTick) {
+    public PathNode getInterpolatedIdleState(float partialTick) {
+        Player owner = getOwner();
+        int total = Math.max(1, owner.getData(AttachmentRegister.EntityData).getSameSize(this));
+        int order = getOrder();
         float angle = (owner.tickCount + partialTick) * 0.05f + (order * Mth.TWO_PI / total);
         float radius = 1.2f + (total > 4 ? (total - 4) * 0.025f : 0f);
 
@@ -173,7 +174,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
     // ===================== 注册类型 =====================
 
     @Override
-    public ServantType<? extends Servant> getServantType() {
+    public ServantType<? extends Servant> getType() {
         return ServantRegister.EnchantedThrowingKnives.get();
     }
 }

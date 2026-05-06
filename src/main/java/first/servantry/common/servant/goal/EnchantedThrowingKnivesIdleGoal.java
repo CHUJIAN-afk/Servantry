@@ -1,13 +1,7 @@
 package first.servantry.common.servant.goal;
 
-import first.servantry.api.PathNode;
-import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.EnchantedThrowingKnives;
-import first.servantry.register.AttachmentRegister;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.Collections;
 
@@ -36,34 +30,13 @@ public class EnchantedThrowingKnivesIdleGoal extends ServantGoal<EnchantedThrowi
     }
 
     @Override
-    public boolean isInterruptable() {
-        return true;
-    }
-
-    @Override
     public void start() {
         servant.attacking = false;
     }
 
     @Override
-    public void stop() {
-        // 切换到攻击状态时调用
-    }
-
-    @Override
     public void tick() {
-        Player owner = servant.getOwner();
-        if (owner == null) return;
-
-        EntityData data = owner.getData(AttachmentRegister.EntityData);
-        PathNode idleNode = servant.getInterpolatedIdleState(owner, data.getOrder(servant), Math.max(1, data.getSameSize(servant)), 1.0f);
-
-        // 平滑过渡到空闲位置
-        Vec3 nextPos = servant.getPos().lerp(idleNode.pos(), 0.25f);
-        float nextYaw = Mth.rotLerp(0.25f, servant.getYaw(), idleNode.yaw());
-        float nextPitch = Mth.rotLerp(0.25f, servant.getPitch(), idleNode.pitch());
-        float nextRoll = Mth.rotLerp(0.25f, servant.getRoll(), idleNode.roll());
-
-        servant.setPath(Collections.singletonList(new PathNode(nextPos, nextYaw, nextPitch, nextRoll)));
+        servant.setPath(Collections.singletonList(servant.getCurrentPathNode().lerp(servant.getInterpolatedIdleState(1.0f), 0.25f)));
     }
+
 }

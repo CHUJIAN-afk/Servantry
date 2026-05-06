@@ -2,7 +2,6 @@ package first.servantry.api.servant;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.EntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.ai.ServantGoalSelector;
@@ -35,7 +34,7 @@ import net.minecraft.world.phys.Vec3;
  * <ul>
  *   <li>{@link #registerGoals(ServantGoalSelector)} - 注册AI目标</li>
  *   <li>{@link #getDamage()} / {@link #getKnockback()} - 攻击属性</li>
- *   <li>{@link #getServantType()} - 返回注册类型</li>
+ *   <li>{@link #getType()} - 返回注册类型</li>
  *   <li>{@link #writeAdditional(RegistryFriendlyByteBuf)} / {@link #readAdditional(RegistryFriendlyByteBuf)} - 自定义数据同步</li>
  * </ul>
  *
@@ -90,7 +89,7 @@ public abstract class Servant extends AttachmentEntity {
      *
      * @return 仆从类型
      */
-    public abstract ServantType<? extends Servant> getServantType();
+    public abstract ServantType<? extends Servant> getType();
 
     /**
      * 获取仆从占用的栏位数。
@@ -105,11 +104,6 @@ public abstract class Servant extends AttachmentEntity {
     }
 
     // ===================== AttachmentEntity 实现 =====================
-
-    @Override
-    public EntityType<? extends AttachmentEntity> getType() {
-        return getServantType();
-    }
 
     @Override
     public void tick() {

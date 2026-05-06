@@ -33,7 +33,7 @@ public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<
                     int order = data.getOrder(terraprism);
                     int total = Math.max(1, data.getSameSize(terraprism));
                     float hue = (((float) order / total) + timeShift) % 1.0f;
-                    float saturation = 0.55f;
+                    float saturation = 0.95f;
                     float brightness = Mth.lerp(progress, 1f, 0.4f);
                     return Mth.hsvToRgb(hue, saturation, brightness);
                 })
@@ -51,11 +51,7 @@ public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<
                 })
                 .modelTranslateOffset(-0.5f, -0.5f, -0.5f)
                 .modelRotationOffset(0, 90, 45)
-                .visualNodeFunction((terraprism, partialTick, rawNode) -> rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend)))
-                // 动态模糊效果：攻击时启用
-                .blendRatio((terraprism, partialTick) -> terraprism.attacking ? 2 : 0f)
-                .motionBlurFrames(2)
-                .motionBlurAlpha(0.3f);
+                .visualNodeFunction((terraprism, partialTick, rawNode) -> rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend)));
     }
 
     @Override

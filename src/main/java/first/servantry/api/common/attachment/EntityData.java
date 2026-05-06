@@ -122,7 +122,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     public void removeServant(ServantType<?> type) {
         List<Servant> targets = new ArrayList<>();
         for (AttachmentEntity entity : entities) {
-            if (entity instanceof Servant servant && servant.getServantType() == type) {
+            if (entity instanceof Servant servant && servant.getType() == type) {
                 targets.add(servant);
             }
         }
@@ -163,7 +163,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         for (AttachmentEntity entity : entities) {
             if (entity instanceof Servant s) {
                 if (s == target) return order;
-                if (s.getServantType().equals(target.getServantType())) order++;
+                if (s.getType().equals(target.getType())) order++;
             }
         }
         return -1;
@@ -178,7 +178,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     public int getSameSize(Servant target) {
         int count = 0;
         for (AttachmentEntity entity : entities) {
-            if (entity instanceof Servant s && s.getServantType().equals(target.getServantType())) {
+            if (entity instanceof Servant s && s.getType().equals(target.getType())) {
                 count++;
             }
         }
@@ -352,7 +352,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
 
             if (isServant) {
                 Servant servant = (Servant) entity;
-                ResourceLocation location = ServantryRegistries.SERVANT_TYPES.getKey(servant.getServantType());
+                ResourceLocation location = ServantryRegistries.SERVANT_TYPES.getKey(servant.getType());
                 assert location != null;
                 buf.writeResourceLocation(location);
             } else {

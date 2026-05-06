@@ -35,7 +35,7 @@ public class InvincibleData {
             target.hurt(damageSource, damage);
             target.invulnerableTime = invulnerableTime;
             if (invincibleTime > 0) {
-                if (type == Type.PARTIAL) {
+                if (type == Type.PARTIAL && uuid != null) {
                     partialInvincibleFrames.put(uuid, new AtomicInteger(invincibleTime));
                 }
                 if (type == Type.Global) {
@@ -47,7 +47,7 @@ public class InvincibleData {
 
     public boolean canDamage(UUID uuid, Type type) {
         return switch (type) {
-            case PARTIAL -> partialInvincibleFrames.getOrDefault(uuid, new AtomicInteger(0)).get() <= 0;
+            case PARTIAL -> uuid == null || partialInvincibleFrames.getOrDefault(uuid, new AtomicInteger(0)).get() <= 0;
             case Global -> globalInvincibleFrames.get() <= 0;
             case null -> false;
         };
