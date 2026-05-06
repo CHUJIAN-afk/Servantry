@@ -30,6 +30,7 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
         int index = dragon.getSegmentIndex();
         boolean b = index == total - 1;
         return RenderContext.<StardustDragon>none()
+                .modelScale(dragon.getScale())
                 .modelTranslateOffset(-0.5f, b ? -0.4845f : -0.425f, b ? -0.103075f : -0.5f)
                 .modelRotationOffset(180, 0, 0);
     }

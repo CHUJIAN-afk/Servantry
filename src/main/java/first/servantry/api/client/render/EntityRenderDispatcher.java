@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
@@ -74,7 +75,6 @@ public class EntityRenderDispatcher {
                     poseStack.pushPose();
                     poseStack.mulPose(Axis.YN.rotationDegrees(renderNode.yaw()));
                     poseStack.mulPose(Axis.XP.rotationDegrees(renderNode.pitch()));
-                    poseStack.translate(0, 0, 0.5);
                     poseStack.mulPose(Axis.ZP.rotationDegrees(renderNode.roll()));
                     LevelRenderer.renderLineBox(poseStack, debugConsumer, iCollideAttack.getHitbox(), 1.0F, 0.0F, 0.0F, 1.0F);
                     poseStack.popPose();

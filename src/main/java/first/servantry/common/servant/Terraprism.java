@@ -52,7 +52,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
     @Override
     public AABB getHitbox() {
-        return new AABB(-0.1, -0.04, -0.75, 0.1, 0.04, 0.25);
+        return new AABB(-0.1, -0.04, -0.25, 0.1, 0.04, 0.75);
     }
 
     @Override

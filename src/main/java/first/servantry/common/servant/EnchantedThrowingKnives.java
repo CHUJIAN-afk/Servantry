@@ -75,7 +75,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
 
     @Override
     public AABB getHitbox() {
-        return new AABB(-0.15, -0.025, -0.75, 0.15, 0.025, -0.25);
+        return new AABB(-0.15, -0.025, -0.25, 0.15, 0.025, 0.25);
     }
 
     // ===================== 碰撞攻击 =====================

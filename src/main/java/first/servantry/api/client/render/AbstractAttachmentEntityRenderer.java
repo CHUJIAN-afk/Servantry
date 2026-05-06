@@ -355,8 +355,7 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
      * @param config      渲染配置
      * @param alpha       透明度 [0, 1]
      */
-    private void renderEntityModel(T entity, PoseStack poseStack, MultiBufferSource bufferSource,
-                                   PathNode node, RenderContext<T> config, float alpha) {
+    private void renderEntityModel(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode node, RenderContext<T> config, float alpha) {
         poseStack.pushPose();
 
         // 应用旋转：先应用实体的朝向
@@ -368,12 +367,11 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         poseStack.mulPose(Axis.YN.rotationDegrees(config.modelYawOffset));
         poseStack.mulPose(Axis.XP.rotationDegrees(config.modelPitchOffset));
         poseStack.mulPose(Axis.ZP.rotationDegrees(config.modelRollOffset));
+        // 应用缩放
+        poseStack.scale(config.modelScale, config.modelScale, config.modelScale);
 
         // 应用平移偏移（修正模型旋转中心）
         poseStack.translate(config.modelTranslateX, config.modelTranslateY, config.modelTranslateZ);
-
-        // 应用缩放
-        poseStack.scale(config.modelScale, config.modelScale, config.modelScale);
 
         // 如果需要透明度调整，使用 AlphaBufferSource 包装
         MultiBufferSource actualBufferSource = bufferSource;

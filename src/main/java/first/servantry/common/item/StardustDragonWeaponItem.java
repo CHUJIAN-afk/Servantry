@@ -79,9 +79,8 @@ public class StardustDragonWeaponItem extends Item implements IServantWeapon<Sta
      */
     private void summonInitialSegments(Player player, EntityData data, ServantType<StardustDragon> type) {
         // 检查栏位是否足够
-        // 首次召唤的体节数量
         int initial_segments = 3;
-        if (data.getUsedSlots() + initial_segments > data.getMaxServantSize(player)) {
+        if (data.getUsedSlots() + 1 > data.getMaxServantSize(player)) {
             return;
         }
         Vec3 spawnPos = player.position().add(0, 3, 0);

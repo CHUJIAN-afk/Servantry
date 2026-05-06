@@ -63,7 +63,7 @@ public class EnchantedThrowingKnivesRendererServant extends AbstractAttachmentEn
                     float blend = Mth.lerp(partialTick, knives.idleBlendO, knives.idleBlend);
                     if (blend > 0f) {
                         Player owner = knives.getOwner();
-                        return rawNode.lerp(knives.getInterpolatedIdleState(owner, knives.getOrder(), Math.max(1, owner.getData(AttachmentRegister.EntityData).getSameSize(knives)), partialTick), partialTick);
+                        return rawNode.lerp(knives.getInterpolatedIdleState(owner, knives.getOrder(), Math.max(1, owner.getData(AttachmentRegister.EntityData).getSameSize(knives)), partialTick), blend);
                     }
                     return rawNode;
                 });
