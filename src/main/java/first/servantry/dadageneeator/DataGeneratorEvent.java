@@ -27,14 +27,12 @@ public class DataGeneratorEvent {
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         // 语言
-        generator.addProvider(event.includeServer(), new ServantryLanguageProvider(packOutput, Servantry.MODID, "en_us"));
-        generator.addProvider(event.includeServer(), new ServantryLanguageProvider(packOutput, Servantry.MODID, "zh_cn"));
+        generator.addProvider(event.includeClient(), new ServantryLanguageProvider(packOutput, Servantry.MODID, "en_us"));
+        generator.addProvider(event.includeClient(), new ServantryLanguageProvider(packOutput, Servantry.MODID, "zh_cn"));
         // 物品模型
         generator.addProvider(event.includeClient(), new ServantryItemModelProvider(packOutput, existingFileHelper));
         // 战利品掉落表
-        generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Set.of(), List.of(
-                new SubProviderEntry(ServantryEntityLootProvider::new, LootContextParamSets.ENTITY)
-        ), lookupProvider));
+        generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Set.of(), List.of(new SubProviderEntry(ServantryEntityLootProvider::new, LootContextParamSets.ENTITY)), lookupProvider));
         // 合成表
         generator.addProvider(event.includeServer(), new ServantryRecipeProvider(packOutput, lookupProvider));
         // 饰品栏

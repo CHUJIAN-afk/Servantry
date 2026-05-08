@@ -13,6 +13,7 @@ import first.servantry.register.*;
 import first.servantry.utils.ArmorSetUtil;
 import first.servantry.utils.AttributeUtils;
 import first.servantry.utils.CuriosUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -39,6 +41,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 
+import java.util.List;
 import java.util.Map;
 
 @EventBusSubscriber(modid = Servantry.MODID)
@@ -57,47 +60,16 @@ public class Event {
     @SubscribeEvent
     public static void onVillagerTrades(VillagerTradesEvent event) {
         if (event.getType() == VillagerProfession.CLERIC) {
-            // 等级1（新手）添加四件饰品交易
-            event.getTrades().get(1).add(new BasicItemListing(
-                    20,
-                    ItemRegister.ApprenticesScarf.get().getDefaultInstance(),
-                    8,
-                    10
-            ));
-            event.getTrades().get(1).add(new BasicItemListing(
-                    20,
-                    ItemRegister.HuntressesBuckler.get().getDefaultInstance(),
-                    8,
-                    10
-            ));
-            event.getTrades().get(1).add(new BasicItemListing(
-                    20,
-                    ItemRegister.MonksBelt.get().getDefaultInstance(),
-                    8,
-                    10
-            ));
-            event.getTrades().get(1).add(new BasicItemListing(
-                    20,
-                    ItemRegister.SquiresShield.get().getDefaultInstance(),
-                    8,
-                    10
-            ));
+            Int2ObjectMap<List<VillagerTrades.ItemListing>> trades = event.getTrades();
+            // 等级1（新手）添加四件基础召唤饰品交易：20绿宝石
+            Item[] items = {ItemRegister.ApprenticesScarf.get(), ItemRegister.HuntressesBuckler.get(), ItemRegister.MonksBelt.get(), ItemRegister.SquiresShield.get()};
+            for (Item item : items) {
+                trades.get(1).add(new BasicItemListing(20, item.getDefaultInstance(), 8, 10));
+            }
             // 等级3（老手）添加矮人项链交易：25绿宝石 + 1骷髅头
-            event.getTrades().get(3).add(new BasicItemListing(
-                    new ItemStack(Items.EMERALD, 25),
-                    new ItemStack(Items.SKELETON_SKULL),
-                    ItemRegister.PygmyNecklace.get().getDefaultInstance(),
-                    1,
-                    30,
-                    1.0f
-            ));
+            trades.get(3).add(new BasicItemListing(new ItemStack(Items.EMERALD, 25), new ItemStack(Items.SKELETON_SKULL), ItemRegister.PygmyNecklace.get().getDefaultInstance(), 1, 30, 1.0f));
             // 等级4（专家）添加大力士甲虫交易：30绿宝石
-            event.getTrades().get(4).add(new BasicItemListing(
-                    30,
-                    ItemRegister.HerculesBeetle.get().getDefaultInstance(),
-                    1,
-                    40
-            ));
+            trades.get(4).add(new BasicItemListing(30, ItemRegister.HerculesBeetle.get().getDefaultInstance(), 1, 40));
         }
     }
 
