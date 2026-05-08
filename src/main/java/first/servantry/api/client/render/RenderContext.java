@@ -611,6 +611,22 @@ public class RenderContext<T extends AttachmentEntity> {
      */
     public VisualNodeFunction<T> visualNodeFunction = (entity, partialTick, rawNode) -> rawNode;
 
+    /**
+     * 透明度距离修正系数，默认 1.0。
+     * <p>
+     * 用于调整第一人称视角下基于距离的透明度计算结果。
+     * 值越大，透明度越高（越不透明）。
+     * </p>
+     * <pre>{@code
+     * // 示例：使实体在近距离时更不透明
+     * .alphaDistanceFactor(1.5f)
+     *
+     * // 示例：使实体在近距离时更透明
+     * .alphaDistanceFactor(0.5f)
+     * }</pre>
+     */
+    public float alphaDistanceFactor = 1.0f;
+
     // ===================== 函数式接口定义 =====================
 
     /**
@@ -1024,6 +1040,17 @@ public class RenderContext<T extends AttachmentEntity> {
      */
     public RenderContext<T> visualNodeFunction(VisualNodeFunction<T> function) {
         this.visualNodeFunction = function;
+        return this;
+    }
+
+    /**
+     * 设置透明度距离修正系数。
+     *
+     * @param factor 修正系数，默认 1.0
+     * @return this，用于链式调用
+     */
+    public RenderContext<T> alphaDistanceFactor(float factor) {
+        this.alphaDistanceFactor = factor;
         return this;
     }
 

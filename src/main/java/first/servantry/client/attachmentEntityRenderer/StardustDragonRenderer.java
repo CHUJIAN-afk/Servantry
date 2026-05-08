@@ -32,6 +32,7 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
         return RenderContext.<StardustDragon>none()
                 .modelScale(dragon.getScale())
                 .modelTranslateOffset(-0.5f, b ? -0.4845f : -0.425f, b ? -0.103075f : -0.5f)
+                .alphaDistanceFactor(dragon.getScale())
                 .modelRotationOffset(180, 0, 0);
     }
 

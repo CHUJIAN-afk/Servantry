@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import first.servantry.api.PathNode;
 import first.servantry.api.client.renderType.TrailRenderType;
 import first.servantry.api.entity.AttachmentEntity;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -144,7 +145,6 @@ import java.util.*;
  * @see IAttachmentEntityRenderer
  */
 public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntity> implements IAttachmentEntityRenderer<T> {
-
     // ===================== 核心抽象方法 =====================
 
     /**
@@ -198,42 +198,36 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
     public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode) {
         // 1. 创建渲染配置
         RenderContext<T> config = createContext(entity);
-        if (config == null) return;
-
-        // 2. 获取视觉节点（支持插值平滑）
-        PathNode visualNode = config.visualNodeFunction.getVisualNode(entity, partialTick, renderNode);
-        Vec3 offset = visualNode.pos().subtract(renderNode.pos());
-
+        if (config == null) return;// 获取视觉节点（支持插值平滑）
         poseStack.pushPose();
+        PathNode visualNode = config.visualNodeFunction.getVisualNode(entity, partialTick, renderNode);
+        // 创建透明缓冲源包装器
+        AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);// 计算并设置第一人称视角下的透明度
+        alphaBufferSource.setAlpha(calculateFirstPersonAlpha(config, visualNode, partialTick));
+        Vec3 offset = visualNode.pos().subtract(renderNode.pos());
         poseStack.translate(offset.x, offset.y, offset.z);
-
         if (config.trailType != RenderContext.TrailType.NONE && config.trailTimer > 0) {
-            renderTrail(entity, poseStack, bufferSource, partialTick, visualNode, config);
+            renderTrail(entity, poseStack, alphaBufferSource, partialTick, visualNode, config);
         }
-
-        renderEntityModel(entity, poseStack, bufferSource, visualNode, config, 1.0f);
-
+        renderEntityModel(entity, poseStack, alphaBufferSource, visualNode, config);
         poseStack.popPose();
     }
 
     /**
      * 渲染实体模型（支持透明度控制）。
      *
-     * @param entity      附件实体
-     * @param poseStack   变换矩阵栈
+     * @param entity       附件实体
+     * @param poseStack    变换矩阵栈
      * @param bufferSource 顶点缓冲源
-     * @param node        渲染节点
-     * @param config      渲染配置
-     * @param alpha       透明度 [0, 1]
+     * @param node         渲染节点
+     * @param config       渲染配置
      */
-    private void renderEntityModel(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode node, RenderContext<T> config, float alpha) {
+    private void renderEntityModel(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode node, RenderContext<T> config) {
         poseStack.pushPose();
-
         // 应用旋转：先应用实体的朝向
         poseStack.mulPose(Axis.YN.rotationDegrees(node.yaw()));
         poseStack.mulPose(Axis.XP.rotationDegrees(node.pitch()));
         poseStack.mulPose(Axis.ZP.rotationDegrees(node.roll()));
-
         // 应用配置中的旋转偏移
         poseStack.mulPose(Axis.YN.rotationDegrees(config.modelYawOffset));
         poseStack.mulPose(Axis.XP.rotationDegrees(config.modelPitchOffset));
@@ -242,17 +236,8 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         poseStack.scale(config.modelScale, config.modelScale, config.modelScale);
         // 应用平移偏移（修正模型旋转中心）
         poseStack.translate(config.modelTranslateX, config.modelTranslateY, config.modelTranslateZ);
-        // 如果需要透明度调整，使用 AlphaBufferSource 包装
-        MultiBufferSource actualBufferSource = bufferSource;
-        if (alpha < 1.0f) {
-            AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);
-            alphaBufferSource.setAlpha(alpha);
-            actualBufferSource = alphaBufferSource;
-        }
-
         // 调用子类实现的具体渲染
-        renderEntity(entity, poseStack, actualBufferSource, node, config);
-
+        renderEntity(entity, poseStack, bufferSource, node, config);
         poseStack.popPose();
     }
 
@@ -817,6 +802,54 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
                 .rotateY((float) Math.toRadians(-yaw))
                 .rotateX((float) Math.toRadians(pitch))
                 .rotateZ((float) Math.toRadians(roll));
+    }
+
+
+    /**
+     * 计算第一人称视角下的透明度。
+     * <p>
+     * 根据附件实体与本地玩家眼睛的距离计算透明度：
+     * <ul>
+     *   <li>距离 <= 0.5 方块: 最低透明度 0.105</li>
+     *   <li>距离 >= 4.0 方块: 完全不透明 (alpha = 1)</li>
+     *   <li>介于两者之间: 线性插值</li>
+     * </ul>
+     * </p>
+     *
+     * @param config 渲染上下文
+     * @param visualNode 视觉节点
+     * @param partialTick 部分 tick
+     * @return 透明度值 [0.105, 1]
+     */
+    private float calculateFirstPersonAlpha(RenderContext<T> config, PathNode visualNode, float partialTick) {
+        Minecraft minecraft = Minecraft.getInstance();
+        Player player = minecraft.player;
+        // 检查是否为第一人称视角且是当前玩家
+        if (player == null || !minecraft.options.getCameraType().isFirstPerson()) {
+            return 1.0f;
+        }
+        // 获取视觉节点位置
+        Vec3 entityPos = visualNode.pos();
+
+        // 计算距离和透明度
+        Vec3 eyePos = player.getEyePosition(partialTick);
+        double distance = entityPos.distanceTo(eyePos);
+
+        // 距离阈值：0.5 方块内最低透明度，4.0 方块外完全不透明
+        float minDistance = 0.5f * config.alphaDistanceFactor;
+        float maxDistance = 4.0f * config.alphaDistanceFactor;
+
+        if (distance <= minDistance) {
+            return 0.0f;
+        }
+        if (distance >= maxDistance) {
+            return 1.0f;
+        }
+
+        // 线性插值，但确保不低于最低透明度
+        float alpha = (float) ((distance - minDistance) / (maxDistance - minDistance));
+        alpha = Math.max(0.102f, alpha);
+        return Math.min(1.0f, alpha);
     }
 
     // ===================== 内部数据类 =====================

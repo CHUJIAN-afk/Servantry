@@ -28,12 +28,8 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
                 .trailFadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))
                 .modelTranslateOffset(-0.5f, -0.5f, -0.5f)
                 .modelScale(0.5f)
-                .visualNodeFunction((cell, partialTick, rawNode) -> {
-                    float y = cell.getRenderYaw(partialTick);
-                    float p = cell.getRenderPitch(partialTick);
-                    float r = cell.getRenderRoll(partialTick);
-                    return new PathNode(rawNode.pos(), y, p, r);
-                });
+                .alphaDistanceFactor(1.5f)
+                .visualNodeFunction((cell, partialTick, rawNode) -> new PathNode(rawNode.pos(), cell.getRenderYaw(partialTick), cell.getRenderPitch(partialTick), cell.getRenderRoll(partialTick)));
     }
 
     @Override

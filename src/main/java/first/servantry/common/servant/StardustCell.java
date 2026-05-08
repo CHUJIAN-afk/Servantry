@@ -53,7 +53,7 @@ public class StardustCell extends MomentumServant {
     public void registerGoals(ServantGoalSelector goalSelector) {
         goalSelector.addGoal(0, new StardustCellTeleportGoal(this));
         goalSelector.addGoal(1, new StardustCellAttackGoal(this));
-        //goalSelector.addGoal(2, new StardustCellIdleGoal(this));
+        goalSelector.addGoal(2, new StardustCellIdleGoal(this));
     }
 
     @Override

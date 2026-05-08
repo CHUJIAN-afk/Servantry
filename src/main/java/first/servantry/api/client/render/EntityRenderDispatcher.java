@@ -49,9 +49,6 @@ public class EntityRenderDispatcher {
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         boolean showHitboxes = Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes();
 
-        // 创建透明缓冲源包装器
-        AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);
-
         for (AttachmentEntity entity : entities) {
             entity.setOwner(player);
             poseStack.pushPose();
@@ -61,9 +58,7 @@ public class EntityRenderDispatcher {
             IAttachmentEntityRenderer<AttachmentEntity> renderer = getRenderer(entity);
             if (renderer != null) {
                 int packedLight = LevelRenderer.getLightColor(player.level(), BlockPos.containing(renderNode.pos().x(), renderNode.pos().y(), renderNode.pos().z()));
-                // 计算并设置第一人称视角下的透明度
-                alphaBufferSource.setAlpha(calculateFirstPersonAlpha(entity, renderer, renderNode, player, partialTick));
-                renderer.render(entity, poseStack, alphaBufferSource, partialTick, packedLight, renderNode);
+                renderer.render(entity, poseStack, bufferSource, partialTick, packedLight, renderNode);
             }
             // 调试渲染（使用原始缓冲源，不受透明度影响）
             if (showHitboxes) {
@@ -82,63 +77,6 @@ public class EntityRenderDispatcher {
 
             poseStack.popPose();
         }
-    }
-
-    /**
-     * 计算第一人称视角下的透明度。
-     * <p>
-     * 如果不是第一人称视角或不是当前玩家，返回 1.0。
-     * 否则根据附件实体与玩家眼睛的距离计算透明度：
-     * <ul>
-     *   <li>距离 <= 0.5 方块: 最低透明度 0.105</li>
-     *   <li>距离 >= 4.0 方块: 完全不透明 (alpha = 1)</li>
-     *   <li>介于两者之间: 线性插值</li>
-     * </ul>
-     * </p>
-     *
-     * @param entity     附件实体
-     * @param renderer   渲染器
-     * @param renderNode 渲染节点
-     * @param player     玩家
-     * @param partialTick 部分 tick
-     * @return 透明度值 [0.105, 1]
-     */
-    private static float calculateFirstPersonAlpha(AttachmentEntity entity, IAttachmentEntityRenderer<AttachmentEntity> renderer, PathNode renderNode, Player player, float partialTick) {
-        Minecraft minecraft = Minecraft.getInstance();
-
-        // 检查是否为第一人称视角且是当前玩家
-        if (minecraft.player != player || !minecraft.options.getCameraType().isFirstPerson()) {
-            return 1.0f;
-        }
-
-        // 获取视觉节点位置
-        Vec3 entityPos = renderNode.pos();
-        if (renderer instanceof AbstractAttachmentEntityRenderer<AttachmentEntity> abstractRenderer) {
-            var config = abstractRenderer.createContext(entity);
-            if (config != null) {
-                entityPos = config.visualNodeFunction.getVisualNode(entity, partialTick, renderNode).pos();
-            }
-        }
-
-        // 计算距离和透明度
-        Vec3 eyePos = player.getEyePosition(partialTick);
-        double distance = entityPos.distanceTo(eyePos);
-
-        // 距离阈值：0.5 方块内最低透明度，4.0 方块外完全不透明
-        final float minDistance = 0.5f;
-        final float maxDistance = 4.0f;
-        final float minAlpha = 0.105f;
-
-        if (distance <= minDistance) {
-            return minAlpha;
-        }
-        if (distance >= maxDistance) {
-            return 1.0f;
-        }
-
-        // 线性插值，但确保不低于最低透明度
-        float alpha = (float) ((distance - minDistance) / (maxDistance - minDistance));
-        return Math.max(minAlpha, alpha);
     }
 
     /**
