@@ -4,11 +4,11 @@ import first.servantry.register.AttributeRegister;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
-public class ServantryLangProvider extends LanguageProvider {
+public class ServantryLanguageProvider extends LanguageProvider {
 
     private final String locale;
 
-    public ServantryLangProvider(PackOutput output, String modid, String locale) {
+    public ServantryLanguageProvider(PackOutput output, String modid, String locale) {
         super(output, modid, locale);
         this.locale = locale;
     }
@@ -206,27 +206,21 @@ public class ServantryLangProvider extends LanguageProvider {
     }
 
     private LangEntry entry(String key) {
-        return new LangEntry(key);
+        return new LangEntry(key, this);
     }
 
-    private class LangEntry {
-
-        private final String key;
-
-        public LangEntry(String key) {
-            this.key = key;
-        }
+    private record LangEntry(String key, ServantryLanguageProvider provider) {
 
         public LangEntry en(String enDesc) {
-            if ("en_us".equals(locale)) {
-                ServantryLangProvider.this.add(key, enDesc);
+            if ("en_us".equals(provider.locale)) {
+                provider.add(key, enDesc);
             }
             return this;
         }
 
         public void zh(String zhDesc) {
-            if ("zh_cn".equals(locale)) {
-                ServantryLangProvider.this.add(key, zhDesc);
+            if ("zh_cn".equals(provider.locale)) {
+                provider.add(key, zhDesc);
             }
         }
 
