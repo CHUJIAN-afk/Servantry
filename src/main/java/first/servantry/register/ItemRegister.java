@@ -64,6 +64,20 @@ public class ItemRegister {
      */
     public static final DeferredItem<Item> StardustDragonStaff = Register.register("stardust_dragon_staff", StardustDragonWeaponItem::new);
 
+    /**
+     * 光学法杖 - 召唤双子魔眼
+     */
+    public static final DeferredItem<Item> OpticStaff = Register.register("optic_staff", () ->
+            new IServantWeapon.Builder<>(ServantRegister.Twins)
+                    .sound(SoundRegister.UseServantWeapon)
+                    .onSummon(servant -> {
+                        Player owner = servant.getOwner();
+                        RandomSource random = owner.getRandom();
+                        servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
+                    })
+                    .buildItem()
+    );
+
     // ===================== 套装物品 =====================
 
     public static final DeferredItem<Item> HallowedHelmet =

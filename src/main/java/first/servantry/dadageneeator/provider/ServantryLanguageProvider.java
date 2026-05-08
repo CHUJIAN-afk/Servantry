@@ -54,7 +54,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .zh("召唤一柄光棱剑，施展近乎完美的攻击");
         entry("item.servantry.terraprism.tooltip.2")
                 .en("'A flawless blade once hailed as the \"Prism of the Earth\"'")
-                .zh("——曾被冠以“大地棱彩”美名的无暇之剑");
+                .zh("——曾被冠以\"大地棱彩\"美名的无暇之剑");
         entry("item.servantry.blade_staff")
                 .en("Blade Staff")
                 .zh("刃杖");
@@ -66,7 +66,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .zh("忽略敌人 2.5 防御力");
         entry("item.servantry.blade_staff.tooltip.2")
                 .en("'Don't let their small size fool you'")
-                .zh("“别被它们小小的个头给骗了”");
+                .zh("\"别被它们小小的个头给骗了\"");
         entry("item.servantry.stardust_cell_staff")
                 .en("Stardust Cell Staff")
                 .zh("星尘细胞法杖");
@@ -75,7 +75,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .zh("星尘细胞");
         entry("item.servantry.stardust_cell_staff.tooltip.1")
                 .en("'Cultivate the most beautiful cellular infection'")
-                .zh("“培养最美丽的细胞感染”");
+                .zh("\"培养最美丽的细胞感染\"");
         entry("item.servantry.stardust_dragon_staff")
                 .en("Stardust Dragon Staff")
                 .zh("星尘之龙法杖");
@@ -84,7 +84,13 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .zh("星尘之龙");
         entry("item.servantry.stardust_dragon_staff.tooltip.1")
                 .en("'When you have a dragon, who needs a swarm?'")
-                .zh("“有了一条巨龙后，谁还需要一群仆从呢？”");
+                .zh("\"有了一条巨龙后，谁还需要一群仆从呢？\"");
+        entry("item.servantry.optic_staff")
+                .en("Optic Staff")
+                .zh("光学法杖");
+        entry("servant.servantry.twins")
+                .en("Twins")
+                .zh("双子魔眼");
         entry(AttributeRegister.ServantMaxCount.value().getDescriptionId())
                 .en("Max Servants")
                 .zh("仆从栏");
