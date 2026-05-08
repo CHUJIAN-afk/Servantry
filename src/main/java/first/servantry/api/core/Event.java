@@ -92,7 +92,7 @@ public class Event {
     public static void register(EntityAttributeModificationEvent event) {
         event.add(EntityType.PLAYER, AttributeRegister.ServantMaxCount);
         event.add(EntityType.PLAYER, AttributeRegister.ServantDamage);
-        event.add(EntityType.PLAYER, AttributeRegister.ServantSpeed);
+        event.add(EntityType.PLAYER, AttributeRegister.ServantKnockback);
     }
 
 }

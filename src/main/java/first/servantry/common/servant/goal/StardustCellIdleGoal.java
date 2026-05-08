@@ -28,15 +28,9 @@ public class StardustCellIdleGoal extends ServantGoal<StardustCell> {
     public void tick() {
         Player owner = servant.getOwner();
         if (wanderOffset.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || wanderOffset.distanceToSqr(servant.getPos()) < 1) {
-            wanderOffset = new Vec3(
-                    (owner.getRandom().nextDouble() - 0.5) * 8,
-                    owner.getRandom().nextDouble() * 3 + 2,
-                    (owner.getRandom().nextDouble() - 0.5) * 8
-            );
+            wanderOffset = owner.getBoundingBox().getCenter().offsetRandom(owner.getRandom(), (float) owner.getBoundingBox().getSize() * 4);
         }
-
-        Vec3 targetPos = owner.position().add(wanderOffset);
-        Vec3 dir = targetPos.subtract(servant.getPos());
+        Vec3 dir = wanderOffset.subtract(servant.getPos());
         double dist = dir.length();
         if (dist > 0.05) {
             dir = dir.normalize();

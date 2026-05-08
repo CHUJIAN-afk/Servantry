@@ -1,9 +1,18 @@
-// 1.21.1	2026-04-27T18:08:34.8273528	Item Models: servantry
+// 1.21.1	2026-05-08T17:41:54.046054	Item Models: servantry
+bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 8e6344b0bcd3d3339e14a985ce707d72a02f32cc assets/servantry/models/item/blade_staff.json
 94b0d2c7d1fac32c67bd362adfa4389c9f452117 assets/servantry/models/item/hallowed_boots.json
 5f05f8a6731cb06dd3edc861def73aeeed5bca30 assets/servantry/models/item/hallowed_chestplate.json
 2c356bb2f4afbcb5583194524f9a52ca36a124cf assets/servantry/models/item/hallowed_helmet.json
 11647c9e666a6b9aa68a0ae3f43122fdf844cbf4 assets/servantry/models/item/hallowed_leggings.json
+67155e2663d25ff0a7099f7974e39fc1aa3233f1 assets/servantry/models/item/hercules_beetle.json
+9869fe0f75a3df3d8d71a2ffe00163536a23eea5 assets/servantry/models/item/huntresses_buckler.json
+27453db8a210e9975f578f4d7faf6a0dc3d184e3 assets/servantry/models/item/monks_belt.json
+cd35e7ca8216678ea8d40290aa5ea6479fedc66c assets/servantry/models/item/necromantic_scroll.json
+7d8103fe588a78e65d52cc81838281e269707c88 assets/servantry/models/item/papyrus_scarab.json
+8ae1f31b254f1558033dee33be23f6846079d47f assets/servantry/models/item/pygmy_necklace.json
+829d013458146dc92e6d175157ce5df1f13ab957 assets/servantry/models/item/squires_shield.json
 a741780070dc548c49da231eb5960f6984df9a66 assets/servantry/models/item/stardust_cell_staff.json
 65cf99610c9cb69dc7888c02ecc1fb0030a6232f assets/servantry/models/item/stardust_dragon_staff.json
+fc85c4b0542a6c73088ae615248411c1c4b65365 assets/servantry/models/item/summoner_emblem.json
 15c8f22cc643d21501adcfe2badf319b0b3b5039 assets/servantry/models/item/terraprism.json

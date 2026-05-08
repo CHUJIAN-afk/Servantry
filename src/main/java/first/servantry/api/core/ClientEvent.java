@@ -46,7 +46,6 @@ public class ClientEvent {
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         Minecraft minecraft = Minecraft.getInstance();
         ClientLevel clientLevel = minecraft.level;
-        // 使用 AFTER_TRANSLUCENT_BLOCKS 阶段，确保透明物体正确排序
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS && clientLevel != null) {
             PoseStack poseStack = event.getPoseStack();
             float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
@@ -85,10 +84,13 @@ public class ClientEvent {
                 }
 
                 // 2. 击退 (例如: "0.5 击退力")
-                String kbStr = knockback == (long) knockback ? String.format("%d", (long) knockback) : String.valueOf(knockback);
-                toolTip.add(Component.literal(kbStr).withStyle(ChatFormatting.BLUE)
-                        .append(Component.translatable("item.servantry.tooltip.knockback").withStyle(ChatFormatting.GRAY)));
-
+                if (knockback > 0) {
+                    AttributeInstance attribute = player.getAttribute(AttributeRegister.ServantKnockback);
+                    knockback = attribute != null ? (float) (knockback * attribute.getValue()) : knockback;
+                    String kbStr = String.format("%.1f", knockback);
+                    toolTip.add(Component.literal(kbStr).withStyle(ChatFormatting.BLUE)
+                            .append(Component.translatable("item.servantry.tooltip.knockback").withStyle(ChatFormatting.GRAY)));
+                }
 
                 // 3. 召唤宣言 (例如: "召唤 泰拉棱镜 为你而战")
                 toolTip.add(Component.translatable("item.servantry.tooltip.summon",

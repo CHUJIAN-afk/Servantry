@@ -1,4 +1,4 @@
-package first.servantry.client.renderer;
+package first.servantry.client.attachmentEntityRenderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
@@ -16,7 +16,7 @@ import net.minecraft.util.Mth;
  * 使用丝带拖尾，渲染飞刀本体和拖尾轨迹。
  * </p>
  */
-public class EnchantedThrowingKnivesRendererServant extends AbstractAttachmentEntityRenderer<EnchantedThrowingKnives> {
+public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRenderer<EnchantedThrowingKnives> {
 
     @Override
     protected RenderContext<EnchantedThrowingKnives> createContext(EnchantedThrowingKnives servant) {

@@ -1,4 +1,4 @@
-package first.servantry.client.renderer;
+package first.servantry.client.attachmentEntityRenderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * 使用丝带拖尾，渲染带色调渐变的棱镜模型。
  */
-public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<Terraprism> {
+public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terraprism> {
 
     @Override
     protected RenderContext<Terraprism> createContext(Terraprism servant) {
@@ -33,7 +33,7 @@ public class TerraprismRendererServant extends AbstractAttachmentEntityRenderer<
                     int order = data.getOrder(terraprism);
                     int total = Math.max(1, data.getSameSize(terraprism));
                     float hue = (((float) order / total) + timeShift) % 1.0f;
-                    float saturation = 0.95f;
+                    float saturation = 0.65f;
                     float brightness = Mth.lerp(progress, 1f, 0.4f);
                     return Mth.hsvToRgb(hue, saturation, brightness);
                 })

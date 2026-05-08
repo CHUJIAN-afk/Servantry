@@ -240,10 +240,8 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         poseStack.mulPose(Axis.ZP.rotationDegrees(config.modelRollOffset));
         // 应用缩放
         poseStack.scale(config.modelScale, config.modelScale, config.modelScale);
-
         // 应用平移偏移（修正模型旋转中心）
         poseStack.translate(config.modelTranslateX, config.modelTranslateY, config.modelTranslateZ);
-
         // 如果需要透明度调整，使用 AlphaBufferSource 包装
         MultiBufferSource actualBufferSource = bufferSource;
         if (alpha < 1.0f) {

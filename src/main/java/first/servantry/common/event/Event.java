@@ -15,6 +15,7 @@ import first.servantry.register.AttributeRegister;
 import first.servantry.register.ItemRegister;
 import first.servantry.utils.ArmorSetUtil;
 import first.servantry.utils.AttributeUtils;
+import first.servantry.utils.CuriosUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -24,20 +25,100 @@ import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.BasicItemListing;
 import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import first.servantry.register.PotionRegister;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
+import net.neoforged.neoforge.event.village.VillagerTradesEvent;
+import net.minecraft.world.entity.EntityType;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import top.theillusivec4.curios.api.event.CurioChangeEvent;
+
+import java.util.Map;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
 
     @SubscribeEvent
-    public static void servantDamage(ServantIncomingDamageEvent event) {
+    public static void onRegisterBrewingRecipes(RegisterBrewingRecipesEvent event) {
+        // 着魔药水：粗制的药水 + 凋零玫瑰
+        event.getBuilder().addMix(Potions.AWKWARD, Items.WITHER_ROSE, PotionRegister.Obsession);
+        // 长效着魔药水：着魔药水 + 红石
+        event.getBuilder().addMix(PotionRegister.Obsession, Items.REDSTONE, PotionRegister.LongObsession);
+        // 强效着魔药水：着魔药水 + 荧石
+        event.getBuilder().addMix(PotionRegister.Obsession, Items.GLOWSTONE_DUST, PotionRegister.StrongObsession);
+    }
+
+    @SubscribeEvent
+    public static void onVillagerTrades(VillagerTradesEvent event) {
+        if (event.getType() == VillagerProfession.CLERIC) {
+            // 等级1（新手）添加四件饰品交易
+            event.getTrades().get(1).add(new BasicItemListing(
+                    20,
+                    ItemRegister.ApprenticesScarf.get().getDefaultInstance(),
+                    8,
+                    10
+            ));
+            event.getTrades().get(1).add(new BasicItemListing(
+                    20,
+                    ItemRegister.HuntressesBuckler.get().getDefaultInstance(),
+                    8,
+                    10
+            ));
+            event.getTrades().get(1).add(new BasicItemListing(
+                    20,
+                    ItemRegister.MonksBelt.get().getDefaultInstance(),
+                    8,
+                    10
+            ));
+            event.getTrades().get(1).add(new BasicItemListing(
+                    20,
+                    ItemRegister.SquiresShield.get().getDefaultInstance(),
+                    8,
+                    10
+            ));
+            // 等级3（老手）添加矮人项链交易：25绿宝石 + 1骷髅头
+            event.getTrades().get(3).add(new BasicItemListing(
+                    new ItemStack(Items.EMERALD, 25),
+                    new ItemStack(Items.SKELETON_SKULL),
+                    ItemRegister.PygmyNecklace.get().getDefaultInstance(),
+                    1,
+                    30,
+                    1.0f
+            ));
+            // 等级4（专家）添加大力士甲虫交易：30绿宝石
+            event.getTrades().get(4).add(new BasicItemListing(
+                    30,
+                    ItemRegister.HerculesBeetle.get().getDefaultInstance(),
+                    1,
+                    40
+            ));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onCurioChange(CurioChangeEvent event) {
+        Map<Item, Boolean> cache = CuriosUtil.CACHE.get(event.getEntity().getUUID());
+        if (cache != null && !cache.isEmpty()) {
+            cache.clear();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServantIncomingDamage(ServantIncomingDamageEvent event) {
         Player owner = event.getSource().getServant().getOwner();
         if (!owner.level().isClientSide() && ArmorSetUtil.hasFullSet(owner, ArmorMaterialRegister.HallowedArmorMaterial)) {
             LivingEntity target = event.getEntity();
@@ -52,7 +133,7 @@ public class Event {
     }
 
     @SubscribeEvent
-    public static void equipmentChange(LivingEquipmentChangeEvent event) {
+    public static void onLivingEquipmentChange(LivingEquipmentChangeEvent event) {
         LivingEntity living = event.getEntity();
         if (living instanceof Player player && !player.level().isClientSide()) {
             AttributeUtils.condition(player, AttributeRegister.ServantMaxCount, Servantry.rl("hallowed_set_servant_max_count"), 2, AttributeModifier.Operation.ADD_VALUE, ArmorSetUtil.hasFullSet(player, ArmorMaterialRegister.HallowedArmorMaterial));
@@ -61,7 +142,7 @@ public class Event {
     }
 
     @SubscribeEvent
-    public static void itemModify(ItemAttributeModifierEvent event) {
+    public static void onItemAttributeModifier(ItemAttributeModifierEvent event) {
         Item item = event.getItemStack().getItem();
         // 头部：+2 仆从栏，+25% 仆从伤害
         if (item == ItemRegister.HallowedHelmet.get()) {
@@ -90,7 +171,7 @@ public class Event {
      * 玩家攻击联动事件 - 每个星细胞仆从有33%概率向被攻击目标发射新射弹。
      */
     @SubscribeEvent
-    public static void onPlayerAttack(LivingDamageEvent.Post event) {
+    public static void onLivingDamageEventPost(LivingDamageEvent.Post event) {
         DamageSource damageSource = event.getSource();
         if (damageSource instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof StardustCell) {
             return;

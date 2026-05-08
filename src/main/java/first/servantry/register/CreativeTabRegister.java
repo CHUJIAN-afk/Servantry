@@ -18,7 +18,7 @@ public class CreativeTabRegister {
             Register.register("tab", () -> {
                 CreativeModeTab.Builder builder = CreativeModeTab.builder();
                 builder.title(Component.translatable("modid.servantry"));
-                builder.icon(ItemRegister.TerraPrism.get()::getDefaultInstance);
+                builder.icon(ItemRegister.PygmyNecklace.get()::getDefaultInstance);
                 builder.displayItems((parameters, output) -> BuiltInRegistries.ITEM.stream()
                         .filter(item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Servantry.MODID))
                         .forEach(output::accept));

@@ -1,4 +1,4 @@
-package first.servantry.client.renderer;
+package first.servantry.client.attachmentEntityRenderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
@@ -19,14 +19,14 @@ import net.minecraft.world.phys.Vec3;
  * 使用圆锥拖尾，渲染旋转的星尘细胞模型。
  * </p>
  */
-public class StardustCellRendererServant extends AbstractAttachmentEntityRenderer<StardustCell> {
+public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<StardustCell> {
 
     @Override
     protected RenderContext<StardustCell> createContext(StardustCell servant) {
         return RenderContext.<StardustCell>cone(servant.trailTimer, 0x8AE0FF, 0.2f)
                 .trailResolution(12)
                 .trailFadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))
-                .modelTranslateOffset(-0.25f, -0.25f, -0.25f)
+                .modelTranslateOffset(-0.5f, -0.5f, -0.5f)
                 .modelScale(0.5f)
                 .visualNodeFunction((cell, partialTick, rawNode) -> {
                     float y = cell.getRenderYaw(partialTick);

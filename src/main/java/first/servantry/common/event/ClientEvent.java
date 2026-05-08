@@ -3,7 +3,7 @@ package first.servantry.common.event;
 import first.servantry.Servantry;
 import first.servantry.api.client.render.EntityRenderDispatcher;
 import first.servantry.api.client.renderType.TrailShaders;
-import first.servantry.client.renderer.*;
+import first.servantry.client.attachmentEntityRenderer.*;
 import first.servantry.common.particle.StardustScatterParticle;
 import first.servantry.register.ParticleRegister;
 import first.servantry.register.ProjectileRegister;
@@ -25,11 +25,11 @@ public class ClientEvent {
 
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
-        EntityRenderDispatcher.register(ServantRegister.TerraPrism.get(), new TerraprismRendererServant());
-        EntityRenderDispatcher.register(ServantRegister.StardustCell.get(), new StardustCellRendererServant());
-        EntityRenderDispatcher.register(ServantRegister.EnchantedThrowingKnives.get(), new EnchantedThrowingKnivesRendererServant());
+        EntityRenderDispatcher.register(ServantRegister.TerraPrism.get(), new TerraprismRenderer());
+        EntityRenderDispatcher.register(ServantRegister.StardustCell.get(), new StardustCellRenderer());
+        EntityRenderDispatcher.register(ServantRegister.EnchantedThrowingKnives.get(), new EnchantedThrowingKnivesRenderer());
         EntityRenderDispatcher.register(ServantRegister.StardustDragon.get(), new StardustDragonRenderer());
-        EntityRenderDispatcher.register(ProjectileRegister.StardustProjectile.get(), new StardustProjectileConeRenderer());
+        EntityRenderDispatcher.register(ProjectileRegister.StardustProjectile.get(), new StardustProjectileRenderer());
     }
 
     @SubscribeEvent

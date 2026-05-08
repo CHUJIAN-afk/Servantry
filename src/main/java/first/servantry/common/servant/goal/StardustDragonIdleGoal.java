@@ -34,8 +34,8 @@ public class StardustDragonIdleGoal extends ServantGoal<StardustDragon> {
             wanderTarget = Vec3.ZERO;
         }
         // 选择新目标
-        if (wanderTarget.equals(Vec3.ZERO) || servant.getPos().distanceToSqr(wanderTarget) < 1 * servant.getScale() || owner.getRandom().nextDouble() < 0.01) {
-            wanderTarget = owner.position().offsetRandom(owner.getRandom(), 6 * servant.getScale());
+        if (wanderTarget.equals(Vec3.ZERO) || servant.getPos().distanceToSqr(wanderTarget) < 2 * servant.getScale() || owner.getRandom().nextDouble() < 0.01) {
+            wanderTarget = owner.position().offsetRandom(owner.getRandom(), 8 * servant.getScale());
             /*
             double theta = owner.getRandom().nextDouble() * Math.PI * 2;
             double phi = Math.acos(2 * owner.getRandom().nextDouble() - 1);

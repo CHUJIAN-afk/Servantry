@@ -51,9 +51,9 @@ public class StardustDragonFollowGoal extends ServantGoal<StardustDragon> {
         float targetYaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
         float targetPitch = (float) Math.toDegrees(Math.asin(-direction.y));
 
-        float newYaw = Mth.rotLerp(0.5f, servant.getYaw(), targetYaw);
-        float newPitch = Mth.rotLerp(0.5f, servant.getPitch(), targetPitch);
-        float newRoll = Mth.rotLerp(0.5f, servant.getRoll(), preceding.getRoll());
+        float newYaw = Mth.rotLerp(Math.min(0.5f * servant.getScale(), 0.9f), servant.getYaw(), targetYaw);
+        float newPitch = Mth.rotLerp(Math.min(0.5f * servant.getScale(), 0.9f), servant.getPitch(), targetPitch);
+        float newRoll = Mth.rotLerp(Math.min(0.25f * servant.getScale(), 0.45f), servant.getRoll(), preceding.getRoll());
 
         servant.setDesiredRotation(newYaw, newPitch, newRoll);
     }

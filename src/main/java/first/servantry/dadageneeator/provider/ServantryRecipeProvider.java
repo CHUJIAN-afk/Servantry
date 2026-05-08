@@ -6,6 +6,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.NotNull;
@@ -93,6 +94,25 @@ public class ServantryRecipeProvider extends RecipeProvider {
                 .define('R', Items.GOLD_INGOT)
                 .define('I', Items.IRON_INGOT)
                 .unlockedBy("has_gold_ingot", has(Items.GOLD_INGOT))
+                .save(output);
+
+        // ================= 饰品合成表 =================
+        // 死灵卷轴 - 枯萎的玫瑰 + 纸
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ItemRegister.NecromanticScroll.get())
+                .pattern("PPP")
+                .pattern("PSP")
+                .pattern("PPP")
+                .define('S', Items.WITHER_SKELETON_SKULL)
+                .define('P', Items.PAPER)
+                .unlockedBy("has_wither_skeleton_skull", has(Items.WITHER_SKELETON_SKULL))
+                .save(output);
+
+        // 甲虫莎草纸 - 死灵卷轴 + 大力士甲虫
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.COMBAT, ItemRegister.PapyrusScarab.get())
+                .requires(ItemRegister.NecromanticScroll.get())
+                .requires(ItemRegister.HerculesBeetle.get())
+                .unlockedBy("has_necromantic_scroll", has(ItemRegister.NecromanticScroll.get()))
+                .unlockedBy("has_hercules_beetle", has(ItemRegister.HerculesBeetle.get()))
                 .save(output);
     }
 }

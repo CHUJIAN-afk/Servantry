@@ -9,6 +9,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @JeiPlugin
 public class JEIPlugin implements IModPlugin {
 
@@ -20,6 +22,15 @@ public class JEIPlugin implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         registration.addIngredientInfo(ItemRegister.TerraPrism.get(), Component.translatable("jei.servantry.description.terraprism"));
+        // 牧师出售
+        registration.addIngredientInfo(ItemRegister.PygmyNecklace.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ItemRegister.HerculesBeetle.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ItemRegister.ApprenticesScarf.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ItemRegister.HuntressesBuckler.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ItemRegister.MonksBelt.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ItemRegister.SquiresShield.get(), Component.translatable("jei.servantry.description.sold"));
+        // 唤魔者掉落
+        registration.addIngredientInfo(ItemRegister.SummonerEmblem.get(), Component.translatable("jei.servantry.description.drops"));
     }
 
 }

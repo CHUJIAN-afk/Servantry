@@ -51,7 +51,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     @Override
     public void tick() {
-        if (owner != null && !owner.level().isClientSide()) {
+        if (!owner.level().isClientSide()) {
             updateTotalSegments();
             // 非头部体节检查头部是否存在
             if (!isHead() && getHead() == null) {
@@ -59,8 +59,8 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
                 data.remove(uuid);
                 return;
             }
-            if (owner.getRandom().nextFloat() < 0.25) {
-                Vec3 pos = getPos().offsetRandom(owner.getRandom(), 0.25f);
+            if (owner.getRandom().nextFloat() < 0.2 * getScale()) {
+                Vec3 pos = getPos().offsetRandom(owner.getRandom(), 0.2f * getScale());
                 Vec3 velocity = getVelocity().scale(-1);
                 ((ServerLevel) owner.level()).sendParticles(
                         ParticleRegister.StardustScatter.get(),

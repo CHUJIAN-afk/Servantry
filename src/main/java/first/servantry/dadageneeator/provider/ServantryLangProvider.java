@@ -91,6 +91,41 @@ public class ServantryLangProvider extends LanguageProvider {
         entry(AttributeRegister.ServantDamage.value().getDescriptionId())
                 .en("Servant Damage")
                 .zh("仆从伤害");
+        entry(AttributeRegister.ServantKnockback.value().getDescriptionId())
+                .en("Servant Knockback")
+                .zh("仆从击退");
+        // ===================== 饰品 =====================
+        entry("curios.curios.accessories")
+                .en("Accessories")
+                .zh("配饰");
+        entry("item.servantry.necromantic_scroll")
+                .en("Necromantic Scroll")
+                .zh("死灵卷轴");
+        entry("item.servantry.papyrus_scarab")
+                .en("Papyrus Scarab")
+                .zh("甲虫莎草纸");
+        entry("item.servantry.pygmy_necklace")
+                .en("Pygmy Necklace")
+                .zh("矮人项链");
+        entry("item.servantry.hercules_beetle")
+                .en("Hercules Beetle")
+                .zh("大力士甲虫");
+        entry("item.servantry.summoner_emblem")
+                .en("Summoner Emblem")
+                .zh("召唤师徽章");
+        entry("item.servantry.apprentices_scarf")
+                .en("Apprentice's Scarf")
+                .zh("学徒围巾");
+        entry("item.servantry.huntresses_buckler")
+                .en("Huntress's Buckler")
+                .zh("女猎人圆盾");
+        entry("item.servantry.monks_belt")
+                .en("Monk's Belt")
+                .zh("武僧腰带");
+        entry("item.servantry.squires_shield")
+                .en("Squire's Shield")
+                .zh("侍卫护盾");
+        // ===================== 护甲 =====================
         entry("item.servantry.hallowed_helmet")
                 .en("Hallowed Helmet")
                 .zh("神圣兜帽");
@@ -121,6 +156,7 @@ public class ServantryLangProvider extends LanguageProvider {
         entry("effect.servantry.cell_parasitism")
                 .en("Cell Parasitism")
                 .zh("细胞寄生");
+        // 长效和强效药水
         entry("item.minecraft.potion.effect.obsession")
                 .en("Potion of Obsession")
                 .zh("着魔药水");
@@ -133,10 +169,40 @@ public class ServantryLangProvider extends LanguageProvider {
         entry("item.minecraft.tipped_arrow.effect.obsession")
                 .en("Arrow of Obsession")
                 .zh("着魔之箭");
+        entry("item.minecraft.potion.effect.long_obsession")
+                .en("Potion of Obsession")
+                .zh("着魔药水");
+        entry("item.minecraft.splash_potion.effect.long_obsession")
+                .en("Splash Potion of Obsession")
+                .zh("喷溅型着魔药水");
+        entry("item.minecraft.lingering_potion.effect.long_obsession")
+                .en("Lingering Potion of Obsession")
+                .zh("滞留型着魔药水");
+        entry("item.minecraft.tipped_arrow.effect.long_obsession")
+                .en("Arrow of Obsession")
+                .zh("着魔之箭");
+        entry("item.minecraft.potion.effect.strong_obsession")
+                .en("Potion of Obsession")
+                .zh("着魔药水");
+        entry("item.minecraft.splash_potion.effect.strong_obsession")
+                .en("Splash Potion of Obsession")
+                .zh("喷溅型着魔药水");
+        entry("item.minecraft.lingering_potion.effect.strong_obsession")
+                .en("Lingering Potion of Obsession")
+                .zh("滞留型着魔药水");
+        entry("item.minecraft.tipped_arrow.effect.strong_obsession")
+                .en("Arrow of Obsession")
+                .zh("着魔之箭");
         // JEI 描述
+        entry("jei.servantry.description.sold")
+                .en("Occasionally sold by Clerics")
+                .zh("牧师偶尔出售");
         entry("jei.servantry.description.terraprism")
-                .en("Allays have a 1% chance to drop this")
-                .zh("悦灵有 1% 概率掉落");
+                .en("Occasionally drops from Allays")
+                .zh("悦灵偶尔掉落");
+        entry("jei.servantry.description.drops")
+                .en("Occasionally drops from Evokers")
+                .zh("唤魔者偶尔掉落");
     }
 
     private LangEntry entry(String key) {

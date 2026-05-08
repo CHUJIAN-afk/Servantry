@@ -1,4 +1,4 @@
-package first.servantry.client.renderer;
+package first.servantry.client.attachmentEntityRenderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.PathNode;
@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.Sheets;
  * 使用圆锥拖尾，渲染缩小版星尘细胞模型（0.25倍）。
  * </p>
  */
-public class StardustProjectileConeRenderer extends AbstractAttachmentEntityRenderer<StardustProjectile> {
+public class StardustProjectileRenderer extends AbstractAttachmentEntityRenderer<StardustProjectile> {
 
     @Override
     protected RenderContext<StardustProjectile> createContext(StardustProjectile projectile) {
@@ -26,7 +26,7 @@ public class StardustProjectileConeRenderer extends AbstractAttachmentEntityRend
                 .trailSegmentsPerNode(16)
                 .trailResolution(4)
                 .trailFadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))
-                .modelTranslateOffset(-0.1f, -0.1f, -0.1f)
+                .modelTranslateOffset(-0.5f, -0.5f, -0.5f)
                 .modelRotationOffset(0, 0, 45)
                 .modelScale(0.2f);
     }

@@ -37,11 +37,6 @@ public class StardustDragonWeaponItem extends Item implements IServantWeapon<Sta
     }
 
     @Override
-    public void remove(Player player) {
-        IServantWeapon.super.remove(player);
-    }
-
-    @Override
     public StardustDragon getDummyServant() {
         if (stardustDragon == null) {
             stardustDragon = getType().factory().get();
