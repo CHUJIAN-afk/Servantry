@@ -2,6 +2,8 @@ package first.servantry.api.entity;
 
 import first.servantry.api.PathNode;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -13,107 +15,179 @@ import java.util.List;
 
 /**
  * 方块碰撞接口，使用原版碰撞检测API实现精确的碰撞检测与位置修正。
+ * <p>
+ * 设计原则：
+ * <ul>
+ *   <li>完全解耦：接口默认实现，实现类无需额外变量</li>
+ *   <li>高性能：直接使用原版Shapes.collide()算法</li>
+ *   <li>稳定可靠：基于运动向量的方向性体素剔除，防止吸附和穿透</li>
+ * </ul>
+ * </p>
  *
  * @param <T> 附件实体类型
  */
 public interface IBlockCollision<T extends AttachmentEntity> {
 
+    /**
+     * 清零碰撞轴的速度分量。
+     */
+    static Vec3 clearVelocity(Vec3 velocity, CollisionContext context) {
+        return new Vec3(
+                context.collisionX() ? 0 : velocity.x,
+                context.collisionY() ? 0 : velocity.y,
+                context.collisionZ() ? 0 : velocity.z
+        );
+    }
+
+    /**
+     * 获取碰撞箱大小（相对于实体中心）。
+     */
     AABB getBlockCollisionBox();
 
-    default boolean canCollideWithBlocks(T entity) {
+    /**
+     * 是否启用碰撞检测。
+     */
+    default boolean canCollideWithBlocks() {
         return true;
     }
 
     /**
-     * 碰撞回调，实现类可在此清零碰撞方向的速度。
+     * 碰撞回调，实现类可在此处理碰撞后的速度变化。
      *
-     * @param entity  附件实体
-     * @param context 碰撞上下文，包含碰撞位置和碰撞轴信息
+     * @param context 碰撞上下文
      */
-    default void onBlockCollision(T entity, CollisionContext context) {
+    default void onBlockCollision(CollisionContext context) {
     }
 
     /**
      * 执行方块碰撞检测并修正位置。
      * <p>
-     * 使用扫描检测：沿移动路径逐步检测碰撞，确保高速移动时不会穿透。
-     * 修正位置时会额外推出小间隙，防止吸附在方块表面。
+     * 核心算法：
+     * <ol>
+     *   <li>获取运动向量（从历史位置到当前位置）</li>
+     *   <li>基于运动方向严格过滤体素（只收集运动前方的方块）</li>
+     *   <li>使用Shapes.collide()计算每轴实际可移动距离</li>
+     *   <li>修正位置并触发回调</li>
+     * </ol>
      * </p>
      */
     default void processBlockCollision(T entity) {
-        if (!canCollideWithBlocks(entity)) return;
+        if (!canCollideWithBlocks()) return;
 
         var history = entity.getHistoryNodes();
-        if (history.isEmpty()) return;
+        if (history.size() < 2) return;
 
-        // 获取上一tick的位置（历史队列第二个元素，因为第一个是当前tick刚添加的）
-        Vec3 from = history.size() >= 2 ? history.get(1).pos() : history.getFirst().pos();
+        Vec3 from = history.getFirst().pos();
         Vec3 to = entity.currentPathNode.pos();
         Vec3 motion = to.subtract(from);
 
-        // 如果没有移动，只检测当前位置是否重叠
-        if (motion.lengthSqr() < 1e-8) {
+        // 无移动时检测重叠
+        if (motion.lengthSqr() < 1e-10) {
             checkAndResolveOverlap(entity, to);
             return;
         }
 
-        // 扫描移动路径，检测碰撞
-        AABB box = getBlockCollisionBox();
+        AABB box = getBlockCollisionBox().move(from);
         var level = entity.getOwner().level();
 
-        // 收集移动路径上的所有碰撞箱
-        AABB searchBox = box.move(to).expandTowards(motion.scale(-1)).inflate(1);
-        List<VoxelShape> colliders = new ArrayList<>();
-        for (BlockPos pos : BlockPos.betweenClosed(
-                BlockPos.containing(searchBox.minX, searchBox.minY, searchBox.minZ),
-                BlockPos.containing(searchBox.maxX, searchBox.maxY, searchBox.maxZ))) {
-            BlockState state = level.getBlockState(pos);
-            VoxelShape shape = state.getCollisionShape(level, pos);
-            if (!shape.isEmpty()) {
-                colliders.add(shape.move(pos.getX(), pos.getY(), pos.getZ()));
-            }
-        }
-
+        // 基于运动方向严格过滤体素
+        List<VoxelShape> colliders = collectDirectionalColliders(level, box, motion);
         if (colliders.isEmpty()) return;
 
         // 使用原版碰撞检测计算实际可移动距离
+        // 非扫描轴微收缩（1e-5），解决贴墙滑动时的"拼缝卡顿"问题
         double dx = motion.x, dy = motion.y, dz = motion.z;
-        AABB currentBox = box.move(from);
+        AABB currentBox = box;
 
-        // Y轴碰撞
-        dy = Shapes.collide(net.minecraft.core.Direction.Axis.Y, currentBox, colliders, dy);
+        // Y轴碰撞（优先处理）：收缩X和Z，防止擦墙卡顿
+        dy = Shapes.collide(Direction.Axis.Y, currentBox.inflate(-1e-5, 0, -1e-5), colliders, dy);
         boolean collisionY = dy != motion.y;
-        if (collisionY) currentBox = currentBox.move(0, dy, 0);
+        if (collisionY) {
+            currentBox = currentBox.move(0, dy, 0);
+        }
 
         // X/Z轴碰撞（根据移动大小决定顺序）
-        boolean xFirst = Math.abs(dx) > Math.abs(dz);
+        boolean xMajor = Math.abs(dx) >= Math.abs(dz);
         boolean collisionX, collisionZ;
-        if (xFirst) {
-            dx = Shapes.collide(net.minecraft.core.Direction.Axis.X, currentBox, colliders, dx);
+
+        if (xMajor) {
+            // X轴扫掠：收缩Y和Z，防止擦地/擦墙顶卡顿
+            dx = Shapes.collide(Direction.Axis.X, currentBox.inflate(0, -1e-5, -1e-5), colliders, dx);
             collisionX = dx != motion.x;
             if (collisionX) currentBox = currentBox.move(dx, 0, 0);
-            dz = Shapes.collide(net.minecraft.core.Direction.Axis.Z, currentBox, colliders, dz);
+            // Z轴扫掠：收缩X和Y
+            dz = Shapes.collide(Direction.Axis.Z, currentBox.inflate(-1e-5, -1e-5, 0), colliders, dz);
             collisionZ = dz != motion.z;
         } else {
-            dz = Shapes.collide(net.minecraft.core.Direction.Axis.Z, currentBox, colliders, dz);
+            // Z轴扫掠：收缩X和Y
+            dz = Shapes.collide(Direction.Axis.Z, currentBox.inflate(-1e-5, -1e-5, 0), colliders, dz);
             collisionZ = dz != motion.z;
             if (collisionZ) currentBox = currentBox.move(0, 0, dz);
-            dx = Shapes.collide(net.minecraft.core.Direction.Axis.X, currentBox, colliders, dx);
+            // X轴扫掠：收缩Y和Z
+            dx = Shapes.collide(Direction.Axis.X, currentBox.inflate(0, -1e-5, -1e-5), colliders, dx);
             collisionX = dx != motion.x;
         }
 
         // 发生碰撞时修正位置并回调
         if (collisionX || collisionY || collisionZ) {
-            // 添加小间隙推出，防止吸附
-            double gap = 0.001;
-            if (collisionX) dx += Math.signum(dx) * gap;
-            if (collisionY) dy += Math.signum(dy) * gap;
-            if (collisionZ) dz += Math.signum(dz) * gap;
-
             Vec3 correctedPos = from.add(dx, dy, dz);
             entity.currentPathNode = new PathNode(correctedPos, entity.currentPathNode.yaw(), entity.currentPathNode.pitch(), entity.currentPathNode.roll());
-            onBlockCollision(entity, new CollisionContext(correctedPos, collisionX, collisionY, collisionZ));
+            onBlockCollision(new CollisionContext(correctedPos, collisionX, collisionY, collisionZ));
         }
+    }
+
+    /**
+     * 基于运动方向严格过滤体素，只收集运动前方的方块。
+     * <p>
+     * 方向性剔除规则（基于方块碰撞边界）：
+     * <ul>
+     *   <li>motion.x > 0：只收集方块 minX >= box.minX 的方块</li>
+     *   <li>motion.x < 0：只收集方块 maxX <= box.maxX 的方块</li>
+     *   <li>motion.x == 0：不进行X轴方向过滤</li>
+     *   <li>Y/Z轴同理</li>
+     * </ul>
+     * </p>
+     */
+    private List<VoxelShape> collectDirectionalColliders(Level level, AABB box, Vec3 motion) {
+        List<VoxelShape> colliders = new ArrayList<>();
+
+        // 构建精确的移动路径箱体
+        AABB pathBox = box.expandTowards(motion);
+
+        BlockPos minPos = BlockPos.containing(pathBox.minX, pathBox.minY, pathBox.minZ);
+        BlockPos maxPos = BlockPos.containing(pathBox.maxX, pathBox.maxY, pathBox.maxZ);
+
+        for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
+            for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
+                for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    BlockState state = level.getBlockState(pos);
+                    VoxelShape shape = state.getCollisionShape(level, pos);
+                    if (shape.isEmpty()) continue;
+
+                    // 获取方块在世界中的实际碰撞箱
+                    VoxelShape worldShape = shape.move(x, y, z);
+                    AABB shapeBounds = worldShape.bounds();
+
+                    // 方向性过滤：只保留运动前方的方块
+                    // 使用 >= 和 <= 覆盖 motion == 0 的情况，彻底无视静止轴方向上紧贴的方块
+                    // X轴剔除
+                    if (motion.x >= 0 && shapeBounds.maxX <= box.minX) continue;
+                    if (motion.x <= 0 && shapeBounds.minX >= box.maxX) continue;
+
+                    // Y轴剔除
+                    if (motion.y >= 0 && shapeBounds.maxY <= box.minY) continue;
+                    if (motion.y <= 0 && shapeBounds.minY >= box.maxY) continue;
+
+                    // Z轴剔除
+                    if (motion.z >= 0 && shapeBounds.maxZ <= box.minZ) continue;
+                    if (motion.z <= 0 && shapeBounds.minZ >= box.maxZ) continue;
+
+                    colliders.add(worldShape);
+                }
+            }
+        }
+        return colliders;
     }
 
     /**
@@ -123,27 +197,32 @@ public interface IBlockCollision<T extends AttachmentEntity> {
         AABB box = getBlockCollisionBox().move(pos);
         var level = entity.getOwner().level();
 
-        // 收集碰撞箱
         List<VoxelShape> colliders = new ArrayList<>();
         AABB searchBox = box.inflate(0.5);
-        for (BlockPos blockPos : BlockPos.betweenClosed(
-                BlockPos.containing(searchBox.minX, searchBox.minY, searchBox.minZ),
-                BlockPos.containing(searchBox.maxX, searchBox.maxY, searchBox.maxZ))) {
-            BlockState state = level.getBlockState(blockPos);
-            VoxelShape shape = state.getCollisionShape(level, blockPos);
-            if (!shape.isEmpty()) {
-                colliders.add(shape.move(blockPos.getX(), blockPos.getY(), blockPos.getZ()));
+
+        BlockPos minPos = BlockPos.containing(searchBox.minX, searchBox.minY, searchBox.minZ);
+        BlockPos maxPos = BlockPos.containing(searchBox.maxX, searchBox.maxY, searchBox.maxZ);
+
+        for (int x = minPos.getX(); x <= maxPos.getX(); x++) {
+            for (int y = minPos.getY(); y <= maxPos.getY(); y++) {
+                for (int z = minPos.getZ(); z <= maxPos.getZ(); z++) {
+                    BlockPos blockPos = new BlockPos(x, y, z);
+                    BlockState state = level.getBlockState(blockPos);
+                    VoxelShape shape = state.getCollisionShape(level, blockPos);
+                    if (!shape.isEmpty()) {
+                        colliders.add(shape.move(x, y, z));
+                    }
+                }
             }
         }
 
         if (colliders.isEmpty()) return;
 
         // 检测重叠并推出
-        double gap = 0.001;
+        double gap = 1.0E-5;
         for (VoxelShape shape : colliders) {
             AABB shapeBounds = shape.bounds();
             if (box.intersects(shapeBounds)) {
-                // 计算最小推出距离
                 double pushX = 0, pushY = 0, pushZ = 0;
 
                 if (box.maxX > shapeBounds.minX && box.minX < shapeBounds.minX) {
@@ -164,21 +243,25 @@ public interface IBlockCollision<T extends AttachmentEntity> {
                     pushZ = shapeBounds.maxZ - box.minZ + gap;
                 }
 
-                // 选择最小推出距离
                 double absX = Math.abs(pushX), absY = Math.abs(pushY), absZ = Math.abs(pushZ);
 
+                Vec3 correctedPos = pos;
+                boolean cx = false, cy = false, cz = false;
+
                 if (absY > 0 && (absY <= absX || absX == 0) && (absY <= absZ || absZ == 0)) {
-                    Vec3 correctedPos = pos.add(0, pushY, 0);
-                    entity.currentPathNode = new PathNode(correctedPos, entity.currentPathNode.yaw(), entity.currentPathNode.pitch(), entity.currentPathNode.roll());
-                    onBlockCollision(entity, new CollisionContext(correctedPos, false, true, false));
+                    correctedPos = pos.add(0, pushY, 0);
+                    cy = true;
                 } else if (absX > 0 && (absX <= absZ || absZ == 0)) {
-                    Vec3 correctedPos = pos.add(pushX, 0, 0);
-                    entity.currentPathNode = new PathNode(correctedPos, entity.currentPathNode.yaw(), entity.currentPathNode.pitch(), entity.currentPathNode.roll());
-                    onBlockCollision(entity, new CollisionContext(correctedPos, true, false, false));
+                    correctedPos = pos.add(pushX, 0, 0);
+                    cx = true;
                 } else if (absZ > 0) {
-                    Vec3 correctedPos = pos.add(0, 0, pushZ);
+                    correctedPos = pos.add(0, 0, pushZ);
+                    cz = true;
+                }
+
+                if (cx || cy || cz) {
                     entity.currentPathNode = new PathNode(correctedPos, entity.currentPathNode.yaw(), entity.currentPathNode.pitch(), entity.currentPathNode.roll());
-                    onBlockCollision(entity, new CollisionContext(correctedPos, false, false, true));
+                    onBlockCollision(new CollisionContext(correctedPos, cx, cy, cz));
                 }
                 return;
             }
@@ -186,28 +269,7 @@ public interface IBlockCollision<T extends AttachmentEntity> {
     }
 
     /**
-     * 反转指定轴的速度分量，并应用衰减。
-     * <p>
-     * 衰减系数为0.8，若反转后分量绝对值小于0.01则清零。
-     * </p>
-     */
-    default Vec3 bounceVelocityAxis(Vec3 velocity, boolean x, boolean y, boolean z) {
-        double damping = 0.35;
-        double vx = x ? -velocity.x * damping : velocity.x;
-        double vy = y ? -velocity.y * damping : velocity.y;
-        double vz = z ? -velocity.z * damping : velocity.z;
-        return new Vec3(vx, vy, vz);
-    }
-
-    /**
-     * 反转碰撞上下文中指定轴的速度分量。
-     */
-    default Vec3 bounceVelocityAxis(Vec3 velocity, CollisionContext context) {
-        return bounceVelocityAxis(velocity, context.collisionX(), context.collisionY(), context.collisionZ());
-    }
-
-    /**
-     * 碰撞上下文记录类，封装碰撞位置和碰撞轴信息。
+     * 碰撞上下文记录类。
      */
     record CollisionContext(Vec3 position, boolean collisionX, boolean collisionY, boolean collisionZ) {
     }

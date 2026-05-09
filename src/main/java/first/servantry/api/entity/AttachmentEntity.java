@@ -110,14 +110,14 @@ public abstract class AttachmentEntity {
             if (currentPlannedPath != null && !currentPlannedPath.isFinished()) {
                 currentPathNode = currentPlannedPath.advance();
             }
+            // 方块碰撞检测（使用历史轨迹的上一tick位置）
+            if (this instanceof IBlockCollision<?> blockCollision) {
+                ((IBlockCollision<AttachmentEntity>) blockCollision).processBlockCollision(this);
+            }
             // 碰撞攻击检测
             if (this instanceof ICollideAttack<?> collideAttack) {
                 ((ICollideAttack<AttachmentEntity>) collideAttack).processCollision(this);
             }
-        }
-        // 方块碰撞检测（使用历史轨迹的上一tick位置）
-        if (this instanceof IBlockCollision<?> blockCollision) {
-            ((IBlockCollision<AttachmentEntity>) blockCollision).processBlockCollision(this);
         }
         // 更新历史轨迹
         updateHistoryNodes();

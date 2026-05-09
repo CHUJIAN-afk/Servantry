@@ -35,8 +35,8 @@ public class Twins extends MomentumServant implements IBlockCollision<Twins> {
     }
 
     @Override
-    public void onBlockCollision(Twins entity, CollisionContext context) {
-        setVelocity(bounceVelocityAxis(getVelocity(), context));
+    public void onBlockCollision(CollisionContext context) {
+        setVelocity(IBlockCollision.clearVelocity(getVelocity(), context));
     }
 
     @Override
