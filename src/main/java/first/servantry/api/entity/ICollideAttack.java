@@ -8,7 +8,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 碰撞攻击接口，为附件实体提供基于历史轨迹的精确碰撞检测与攻击触发能力。
@@ -133,7 +136,7 @@ public interface ICollideAttack<T extends AttachmentEntity> {
         double minDim = Math.min(Math.min(dx, dy), dz);
 
         // 获取历史节点
-        LinkedList<PathNode> historyNodes = entity.getHistoryNodes();
+        ArrayList<PathNode> historyNodes = entity.getHistoryNodes();
         int sampleNodes = getCollisionSampleNodes();
 
         // 前置条件检查：碰撞盒有效、历史节点足够、采样节点数合法

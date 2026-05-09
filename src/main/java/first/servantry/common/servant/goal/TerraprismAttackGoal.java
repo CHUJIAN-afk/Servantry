@@ -477,7 +477,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         // 获取当前运动状态
         double speed;
         Vec3 currentVel = servant.getCurrentVelocity(startPos);
-        var history = servant.getHistoryNodes();
+        ArrayList<PathNode> history = servant.getHistoryNodes();
         if (history.size() > 1) {
             speed = startPos.subtract(history.get(1).pos()).length();
         } else {

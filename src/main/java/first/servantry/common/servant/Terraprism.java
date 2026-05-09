@@ -17,8 +17,8 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
@@ -131,7 +131,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
      * 获取当前速度向量
      */
     public Vec3 getCurrentVelocity(Vec3 currentPos) {
-        LinkedList<PathNode> history = getHistoryNodes();
+        ArrayList<PathNode> history = getHistoryNodes();
         if (history.size() > 1) {
             Vec3 rawVel = currentPos.subtract(history.get(1).pos());
             if (rawVel.lengthSqr() > 1e-5) return rawVel.normalize();

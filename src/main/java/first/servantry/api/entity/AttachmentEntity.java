@@ -6,7 +6,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,7 +63,7 @@ public abstract class AttachmentEntity {
      * 容量由 {@link #getHistoryNodesSize()} 控制。
      * </p>
      */
-    protected final LinkedList<PathNode> historyNodes = new LinkedList<>();
+    protected final ArrayList<PathNode> historyNodes = new ArrayList<>();
 
     /** 服务端当前精确的路径节点（位置 + 三轴旋转） */
     protected PathNode currentPathNode;
@@ -254,7 +254,7 @@ public abstract class AttachmentEntity {
      *
      * @return 历史节点队列
      */
-    public LinkedList<PathNode> getHistoryNodes() {
+    public ArrayList<PathNode> getHistoryNodes() {
         return historyNodes;
     }
 

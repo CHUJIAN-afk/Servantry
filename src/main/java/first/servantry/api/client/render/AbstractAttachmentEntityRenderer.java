@@ -601,7 +601,7 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
      * @return 插值后的节点列表
      */
     private List<InterpolatedNode> buildSmoothNodes(T entity, PathNode visualNode, RenderContext<T> config) {
-        LinkedList<PathNode> history = entity.getHistoryNodes();
+        ArrayList<PathNode> history = entity.getHistoryNodes();
         int actualLength = Math.min(history.size(), config.trailHistoryLength);
         if (actualLength < 2) return List.of();
 
