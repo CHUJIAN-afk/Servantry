@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.EntityType;
+import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.client.Minecraft;
@@ -64,7 +65,9 @@ public class EntityRenderDispatcher {
             if (showHitboxes) {
                 VertexConsumer debugConsumer = bufferSource.getBuffer(RenderType.lines());
                 LevelRenderer.renderLineBox(poseStack, debugConsumer, -0.002, -0.002, -0.002, 0.002, 0.002, 0.002, 1.0F, 1.0F, 0.0F, 1.0F);
-
+                if (entity instanceof IBlockCollision<?> iBlockCollision) {
+                    LevelRenderer.renderLineBox(poseStack, debugConsumer, iBlockCollision.getBlockCollisionBox(), 0.0F, 1.0F, 0.0F, 1.0F);
+                }
                 if (entity instanceof ICollideAttack<?> iCollideAttack) {
                     poseStack.pushPose();
                     poseStack.mulPose(Axis.YN.rotationDegrees(renderNode.yaw()));

@@ -112,10 +112,6 @@ public abstract class Servant extends AttachmentEntity {
             setTargetChange(false);
             setTarget(searchTarget());
             goalSelector.tick();
-            // 路径推进
-            if (currentPlannedPath != null && !currentPlannedPath.isFinished()) {
-                currentPathNode = currentPlannedPath.advance();
-            }
         } else {
             // 客户端：使用同步数据更新位置
             currentPathNode = clientTargetNode;

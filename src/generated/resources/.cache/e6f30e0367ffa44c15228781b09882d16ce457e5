@@ -1,4 +1,4 @@
-// 1.21.1	2026-05-08T17:41:54.046054	Item Models: servantry
+// 1.21.1	2026-05-09T18:34:11.2423302	Item Models: servantry
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 8e6344b0bcd3d3339e14a985ce707d72a02f32cc assets/servantry/models/item/blade_staff.json
 94b0d2c7d1fac32c67bd362adfa4389c9f452117 assets/servantry/models/item/hallowed_boots.json
@@ -9,6 +9,7 @@ bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentice
 9869fe0f75a3df3d8d71a2ffe00163536a23eea5 assets/servantry/models/item/huntresses_buckler.json
 27453db8a210e9975f578f4d7faf6a0dc3d184e3 assets/servantry/models/item/monks_belt.json
 cd35e7ca8216678ea8d40290aa5ea6479fedc66c assets/servantry/models/item/necromantic_scroll.json
+ba1f28a328a4e9e41446a0a2d44f6c13dac07f24 assets/servantry/models/item/optic_staff.json
 7d8103fe588a78e65d52cc81838281e269707c88 assets/servantry/models/item/papyrus_scarab.json
 8ae1f31b254f1558033dee33be23f6846079d47f assets/servantry/models/item/pygmy_necklace.json
 829d013458146dc92e6d175157ce5df1f13ab957 assets/servantry/models/item/squires_shield.json

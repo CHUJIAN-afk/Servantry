@@ -4,6 +4,8 @@ import first.servantry.api.PathNode;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Collections;
+
 /**
  * 基于动量物理的仆从抽象基类，提供视角和动量调度器简化子类控制。
  * <p>
@@ -95,13 +97,13 @@ public abstract class MomentumServant extends Servant {
 
         // 根据速度更新位置
         Vec3 newPos = getPos().add(velocity);
-        currentPathNode = new PathNode(newPos, desiredYaw, desiredPitch, desiredRoll);
+        setPath(Collections.singletonList(new PathNode(newPos, desiredYaw, desiredPitch, desiredRoll)));
     }
 
     /**
      * 视角更新：平滑过渡到期望朝向。
      */
-    private void tickOrientation() {
+    protected void tickOrientation() {
         float deltaYaw = Mth.wrapDegrees(desiredYaw - getYaw());
         float deltaPitch = Mth.wrapDegrees(desiredPitch - getPitch());
         float deltaRoll = Mth.wrapDegrees(desiredRoll - getRoll());
@@ -171,7 +173,7 @@ public abstract class MomentumServant extends Servant {
         this.desiredYaw = yaw;
         this.desiredPitch = pitch;
         this.desiredRoll = roll;
-        currentPathNode = new PathNode(getPos(), yaw, pitch, roll);
+        setPath(Collections.singletonList(new PathNode(getPos(), yaw, pitch, roll)));
     }
 
     // ===================== 动量调度器方法 =====================
@@ -237,7 +239,7 @@ public abstract class MomentumServant extends Servant {
      */
     public void teleportTo(Vec3 targetPos) {
         velocity = Vec3.ZERO;
-        currentPathNode = new PathNode(targetPos, desiredYaw, desiredPitch, desiredRoll);
+        setPath(Collections.singletonList(new PathNode(targetPos, desiredYaw, desiredPitch, desiredRoll)));
     }
 
     /**

@@ -32,6 +32,7 @@
   "item.servantry.huntresses_buckler": "Huntress's Buckler",
   "item.servantry.monks_belt": "Monk's Belt",
   "item.servantry.necromantic_scroll": "Necromantic Scroll",
+  "item.servantry.optic_staff": "Optic Staff",
   "item.servantry.papyrus_scarab": "Papyrus Scarab",
   "item.servantry.pygmy_necklace": "Pygmy Necklace",
   "item.servantry.squires_shield": "Squire's Shield",
@@ -57,7 +58,8 @@
   "servant.servantry.stardust_cell": "Stardust Cell",
   "servant.servantry.stardust_dragon": "Stardust Dragon",
   "servant.servantry.terraprism": "Terraprism",
-  "servantry:attribute.name.servantry.servant_damage": "Servant Damage",
-  "servantry:attribute.name.servantry.servant_max_count": "Max Servants",
-  "servantry:servant_knockback": "Servant Knockback"
+  "servant.servantry.twins": "Twins",
+  "servantry:servant_damage": "Servant Damage",
+  "servantry:servant_knockback": "Servant Knockback",
+  "servantry:servant_max_count": "Max Servants"
 }

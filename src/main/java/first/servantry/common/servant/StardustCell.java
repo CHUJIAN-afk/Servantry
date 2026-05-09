@@ -1,5 +1,6 @@
 package first.servantry.common.servant;
 
+import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
@@ -11,6 +12,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Random;
@@ -26,7 +28,7 @@ import java.util.Random;
  * </ul>
  * </p>
  */
-public class StardustCell extends MomentumServant {
+public class StardustCell extends MomentumServant implements IBlockCollision<StardustCell> {
 
     // ===================== 渲染状态 =====================
     private float renderYaw = 0f, renderPitch = 0f, renderRoll = 0f;
@@ -47,6 +49,16 @@ public class StardustCell extends MomentumServant {
 
     public StardustCell() {
         super();
+    }
+
+    @Override
+    public AABB getBlockCollisionBox() {
+        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
+    }
+
+    @Override
+    public void onBlockCollision(StardustCell entity, CollisionContext context) {
+        setVelocity(bounceVelocityAxis(getVelocity(), context));
     }
 
     @Override
@@ -145,4 +157,5 @@ public class StardustCell extends MomentumServant {
     public void setTeleportTarget(Vec3 pos) { this.teleportTarget = pos; }
 
     public void setTrailTimer(int timer) { this.trailTimer = timer; }
+
 }

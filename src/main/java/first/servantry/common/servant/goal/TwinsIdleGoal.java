@@ -1,27 +1,21 @@
 package first.servantry.common.servant.goal;
 
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.servant.StardustCell;
+import first.servantry.common.servant.Twins;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-/**
- * 星尘细胞空闲游荡Goal。
- * <p>
- * 当没有攻击目标时，仆从在玩家周围随机游荡。
- * </p>
- */
-public class StardustCellIdleGoal extends ServantGoal<StardustCell> {
+public class TwinsIdleGoal extends ServantGoal<Twins> {
 
     private Vec3 wanderOffset = Vec3.ZERO;
 
-    public StardustCellIdleGoal(StardustCell servant) {
-        super(servant);
+    public TwinsIdleGoal(Twins twins) {
+        super(twins);
     }
 
     @Override
     public boolean canUse() {
-        return servant.getTarget() == null && servant.getTeleportTimer() <= 0;
+        return servant.getTarget() == null;
     }
 
     @Override
@@ -37,7 +31,7 @@ public class StardustCellIdleGoal extends ServantGoal<StardustCell> {
             double force = Math.min(dist * 0.01, 0.1);
             servant.applyForce(dir.scale(force));
         }
-
+        wanderOffset = owner.getBoundingBox().getCenter();
         // 缓慢朝向运动方向
         if (servant.getVelocity().lengthSqr() > 0.01) {
             Vec3 vel = servant.getVelocity().normalize();

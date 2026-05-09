@@ -87,7 +87,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .zh("\"有了一条巨龙后，谁还需要一群仆从呢？\"");
         entry("item.servantry.optic_staff")
                 .en("Optic Staff")
-                .zh("光学法杖");
+                .zh("魔眼法杖");
         entry("servant.servantry.twins")
                 .en("Twins")
                 .zh("双子魔眼");

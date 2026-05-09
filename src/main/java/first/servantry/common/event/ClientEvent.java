@@ -26,9 +26,10 @@ public class ClientEvent {
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
         EntityRenderDispatcher.register(ServantRegister.TerraPrism.get(), new TerraprismRenderer());
-        EntityRenderDispatcher.register(ServantRegister.StardustCell.get(), new StardustCellRenderer());
         EntityRenderDispatcher.register(ServantRegister.EnchantedThrowingKnives.get(), new EnchantedThrowingKnivesRenderer());
+        EntityRenderDispatcher.register(ServantRegister.StardustCell.get(), new StardustCellRenderer());
         EntityRenderDispatcher.register(ServantRegister.StardustDragon.get(), new StardustDragonRenderer());
+        EntityRenderDispatcher.register(ServantRegister.Twins.get(), new TwinsRenderer());
         EntityRenderDispatcher.register(ProjectileRegister.StardustProjectile.get(), new StardustProjectileRenderer());
     }
 

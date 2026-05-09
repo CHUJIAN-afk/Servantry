@@ -12,8 +12,8 @@ public class AttributeRegister {
 
     private static final DeferredRegister<Attribute> Register = DeferredRegister.create(Registries.ATTRIBUTE, Servantry.MODID);
 
-    public static final Holder<Attribute> ServantMaxCount = register("attribute.name.servantry.servant_max_count", 1, 0, 1000);
-    public static final Holder<Attribute> ServantDamage = register("attribute.name.servantry.servant_damage", 1, 0, 1000);
+    public static final Holder<Attribute> ServantMaxCount = register("servant_max_count", 1, 0, 1000);
+    public static final Holder<Attribute> ServantDamage = register("servant_damage", 1, 0, 1000);
     public static final Holder<Attribute> ServantKnockback = register("servant_knockback", 1, 0, 1000);
 
     private static Holder<Attribute> register(String name, double defaultValue, double min, double max) {
