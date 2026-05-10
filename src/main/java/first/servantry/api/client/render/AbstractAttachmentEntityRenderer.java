@@ -176,7 +176,9 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
      * @param visualNode  视觉节点（插值后的位置和朝向）
      * @param config      渲染配置
      */
-    protected abstract void renderEntity(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> config);
+    protected void renderEntity(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> config) {
+
+    }
 
     // ===================== 主渲染入口 =====================
 

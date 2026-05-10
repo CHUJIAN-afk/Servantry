@@ -60,7 +60,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         if (isExecutingPath()) {
             for (LivingEntity target : hitTargets) {
                 if (this.hitTargets.add(target)) {
-                    InvincibleData.servantAttack(target, this, -1, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+                    InvincibleData.criteriaAttack(target, getUuid(), -1, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
                 }
             }
         }

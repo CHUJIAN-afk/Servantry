@@ -2,9 +2,7 @@ package first.servantry.common.servant.goal;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.StardustCell;
-import first.servantry.register.AttachmentRegister;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -39,7 +37,7 @@ public class StardustCellTeleportGoal extends ServantGoal<StardustCell> {
         // 检查是否需要瞬移回玩家
         double distToOwnerSqr = servant.getPos().distanceToSqr(owner.position());
         if (distToOwnerSqr > PLAYER_TELEPORT_DISTANCE * PLAYER_TELEPORT_DISTANCE) {
-            initTeleportToOwner(owner);
+            initTeleportToOwner();
             return true;
         }
 
@@ -51,18 +49,18 @@ public class StardustCellTeleportGoal extends ServantGoal<StardustCell> {
 
         if (!shouldTeleport) return false;
 
-        initTeleportToTarget(owner, target);
+        initTeleportToTarget(target);
         return true;
     }
 
-    private void initTeleportToOwner(Player owner) {
+    private void initTeleportToOwner() {
         servant.setTeleportTimer(TELEPORT_DURATION);
         servant.setTeleportStart(servant.getPos());
-        servant.setTeleportTarget(owner.position().add(0, 2, 0));
+        servant.setTeleportTarget(servant.getOwner().position().add(0, 2, 0));
         servant.setTrailTimer(15);
     }
 
-    private void initTeleportToTarget(Player owner, LivingEntity target) {
+    private void initTeleportToTarget(LivingEntity target) {
         servant.setTeleportTimer(TELEPORT_DURATION);
         servant.setTeleportStart(servant.getPos());
         servant.setTeleportTarget(target.getBoundingBox().getCenter());
@@ -77,8 +75,6 @@ public class StardustCellTeleportGoal extends ServantGoal<StardustCell> {
 
     @Override
     public void tick() {
-        Player owner = servant.getOwner();
-
         servant.setTeleportTimer(servant.getTeleportTimer() - 1);
         float progress = 1.0f - (float) servant.getTeleportTimer() / TELEPORT_DURATION;
         float ease = 1.0f - (float) Math.pow(1.0f - progress, 3);
@@ -87,15 +83,8 @@ public class StardustCellTeleportGoal extends ServantGoal<StardustCell> {
 
         if (servant.getTeleportTimer() == 0) {
             LivingEntity target = servant.getTarget();
-            if (target != null && target.isAlive()) {
-                // 发射星细胞射弹而非直接造成伤害
-                StardustProjectile projectile = new StardustProjectile(
-                        owner.getUUID(),
-                        servant.getUuid(),
-                        servant.getPos(),
-                        target
-                );
-                owner.getData(AttachmentRegister.EntityData).addProjectile(projectile);
+            if (servant.isTarget(target)) {
+                servant.shootAtTarget(servant.getTarget());
             }
             servant.setTeleportTimer(0);
         }

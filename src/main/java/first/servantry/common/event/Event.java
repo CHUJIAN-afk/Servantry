@@ -7,7 +7,6 @@ import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.StardustCell;
-import first.servantry.common.servant.goal.StardustCellAttackGoal;
 import first.servantry.mixin.MobEffectInstanceAccessor;
 import first.servantry.register.*;
 import first.servantry.utils.ArmorSetUtil;
@@ -147,13 +146,14 @@ public class Event {
                 for (Servant servant : entityData.getServants()) {
                     if (servant instanceof StardustCell cell && cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
                         Vec3 startPos = servant.getPos();
-                        StardustProjectile newProjectile = new StardustProjectile(player.getUUID(), servant.getUuid(), startPos, target);
+                        StardustProjectile newProjectile = new StardustProjectile(servant.getDamageSource(), startPos);
+                        newProjectile.setTarget(target);
                         newProjectile.life = 10;
                         entityData.addProjectile(newProjectile);
                         cell.setExtraShootCooldown(14);
                         // 后坐力
                         Vec3 direction = target.getBoundingBox().getCenter().subtract(startPos).normalize();
-                        StardustCellAttackGoal.spawnShootParticles((ServerLevel) player.level(), startPos, direction);
+                        StardustCell.spawnShootParticles((ServerLevel) player.level(), startPos, direction);
                         cell.applyForce(direction.scale(-0.5));
                     }
                 }

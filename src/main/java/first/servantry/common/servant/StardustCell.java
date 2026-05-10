@@ -4,12 +4,17 @@ import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.goal.StardustCellAttackGoal;
 import first.servantry.common.servant.goal.StardustCellIdleGoal;
 import first.servantry.common.servant.goal.StardustCellTeleportGoal;
+import first.servantry.register.AttachmentRegister;
+import first.servantry.register.ParticleRegister;
 import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
@@ -120,6 +125,43 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
 
         Vec3 targetCenter = target.position().add(0, target.getBbHeight() / 2.0, 0);
         return targetCenter.add(offsetX, offsetY, offsetZ);
+    }
+
+    public static void spawnShootParticles(ServerLevel level, Vec3 pos, Vec3 direction) {
+        RandomSource rand = level.getRandom();
+        int particleCount = 2 + rand.nextInt(4);
+
+        for (int i = 0; i < particleCount; i++) {
+            double spreadAngle = (rand.nextDouble() - 0.5) * 0.8;
+            double rollAngle = rand.nextDouble() * Math.PI * 2.0;
+            double speed = 0.15 + rand.nextDouble() * 0.25;
+
+            // 基于前进方向散射
+            double vx = direction.x * speed + Math.cos(rollAngle) * spreadAngle * 0.1;
+            double vy = direction.y * speed + Math.sin(rollAngle) * spreadAngle * 0.1;
+            double vz = direction.z * speed + rand.nextDouble() * 0.1;
+
+            level.sendParticles(
+                    ParticleRegister.StardustScatter.get(),
+                    pos.x, pos.y, pos.z,
+                    0,
+                    vx, vy, vz,
+                    1.0
+            );
+        }
+    }
+
+    public void shootAtTarget(LivingEntity target) {
+        Vec3 start = getPos();
+        // 创建并发射星细胞射弹
+        StardustProjectile projectile = new StardustProjectile(getDamageSource(), start);
+        projectile.setTarget(target);
+        projectile.life = 10;
+        owner.getData(AttachmentRegister.EntityData).addProjectile(projectile);
+        // 后坐力
+        Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
+        spawnShootParticles((ServerLevel) owner.level(), start, direction);
+        applyForce(direction.scale(-0.5));
     }
 
     // ===================== 渲染数据 =====================

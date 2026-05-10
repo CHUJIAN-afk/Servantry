@@ -6,10 +6,10 @@ import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ProjectileType;
 import first.servantry.api.servant.Servant;
-import first.servantry.register.AttachmentRegister;
+import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.register.ProjectileRegister;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -32,73 +32,55 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
 
     public LaserProjectile() {
         super();
-        setDrag(1.0f);
-        setMaxSpeed(2.0f);
     }
 
-    public LaserProjectile(UUID ownerUuid, UUID sourceServantUuid, Vec3 startPos, Vec3 direction) {
-        super(startPos, null);
-        setOwnerUuid(ownerUuid);
-        setSourceServantUuid(sourceServantUuid);
-        setDrag(1.0f);
-        setMaxSpeed(2.0f);
-
-        // 设置初始速度方向
-        Vec3 normalizedDir = direction.normalize().scale(1.5);
-        setVelocity(normalizedDir);
-
-        // 设置朝向
-        float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
-        float pitch = (float) Math.toDegrees(Math.atan2(-direction.y, Math.sqrt(direction.x * direction.x + direction.z * direction.z)));
-        setDesiredRotation(yaw, pitch, 0);
+    public LaserProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
+        super(startPos, direction);
+        setDamageSource(damageSource);
     }
 
     @Override
-    public void tickBehavior(Player owner) {
-        // 保持拖尾效果
-        setTrailTimer(getTrailDuration());
-
-        // 远距离检测
-        if (getPos().distanceToSqr(owner.position()) > getMaxDistance() * getMaxDistance()) {
-            markForRemoval();
+    public void tick() {
+        if (getOwner().level().isClientSide()) {
+            setTrailTimer(getTrailDuration());
         }
+        super.tick();
     }
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        // 碰到方块后消失
-        markForRemoval();
+        setRemove();
     }
 
     @Override
     public void onCollisionAttack(Set<LivingEntity> hitTargets) {
-        Player owner = getOwner();
-        if (owner == null) return;
-
-        Servant sourceServant = findServantByUuid(owner, getSourceServantUuid());
-        if (sourceServant == null) return;
-
         for (LivingEntity target : hitTargets) {
-            InvincibleData.servantAttack(target, sourceServant, 0,
-                    sourceServant.getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+            DamageSource source = getDamageSource();
+            if (source != null) {
+                UUID uuid = null;
+                if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
+                    uuid = servant.getUuid();
+                }
+                InvincibleData.criteriaAttack(target, uuid, 0, source, getDamage(), InvincibleData.Type.PARTIAL);
+            }
         }
-
-        // 命中后消失
-        markForRemoval();
     }
 
-    private Servant findServantByUuid(Player owner, UUID servantUuid) {
-        for (Servant servant : owner.getData(AttachmentRegister.EntityData).getServants()) {
-            if (servant.getUuid().equals(servantUuid)) return servant;
+    @Override
+    public boolean isValidCollisionTarget(LaserProjectile entity, LivingEntity target) {
+        if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
+            Servant servant = servantDamageSource.getServant();
+            if (servant != null) {
+                return servant.isTarget(target);
+            }
         }
-        return null;
+        return false;
     }
 
     // ===================== IBlockCollision =====================
 
     @Override
     public AABB getBlockCollisionBox() {
-        // 方块碰撞箱为正方形小块
         return new AABB(-0.1, -0.1, -0.1, 0.1, 0.1, 0.1);
     }
 
@@ -106,7 +88,6 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
 
     @Override
     public AABB getHitbox() {
-        // 伤害碰撞箱为长条形（沿运动方向延伸）
         return new AABB(-0.1, -0.1, -0.5, 0.1, 0.1, 0.5);
     }
 

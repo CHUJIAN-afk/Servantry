@@ -2,7 +2,6 @@ package first.servantry.api.common.attachment;
 
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.projectile.Projectile;
-import first.servantry.api.projectile.ProjectileState;
 import first.servantry.api.register.ProjectileType;
 import first.servantry.api.register.ServantType;
 import first.servantry.api.register.ServantryRegistries;
@@ -246,7 +245,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         Iterator<AttachmentEntity> iterator = entities.iterator();
         while (iterator.hasNext()) {
             AttachmentEntity entity = iterator.next();
-            if (entity instanceof Projectile p && p.isMarkedForRemoval()) {
+            if (entity.isRemove()) {
                 if (ticking) {
                     pendingRemove.add(entity);
                 } else {
@@ -258,30 +257,6 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         if (removed) {
             changed = true;
         }
-    }
-
-    /**
-     * 获取所有处于ATTACHED状态的射弹。
-     *
-     * @return ATTACHED状态的射弹列表
-     */
-    public List<Projectile> getAttachedProjectiles() {
-        return entities.stream()
-                .filter(e -> e instanceof Projectile p && p.getState() == ProjectileState.ATTACHED)
-                .map(e -> (Projectile) e)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 获取所有处于FLYING状态的射弹。
-     *
-     * @return FLYING状态的射弹列表
-     */
-    public List<Projectile> getFlyingProjectiles() {
-        return entities.stream()
-                .filter(e -> e instanceof Projectile p && p.getState() == ProjectileState.FLYING)
-                .map(e -> (Projectile) e)
-                .collect(Collectors.toList());
     }
 
     // ===================== Tick 更新 =====================

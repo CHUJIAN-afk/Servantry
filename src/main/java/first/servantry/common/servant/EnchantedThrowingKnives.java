@@ -85,7 +85,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
     public void onCollisionAttack(Set<LivingEntity> targets) {
         if (isExecutingPath()) {
             for (LivingEntity target : targets) {
-                InvincibleData.servantAttack(target, this, 10, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+                InvincibleData.criteriaAttack(target, this.getUuid(), 10, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
             }
         }
     }

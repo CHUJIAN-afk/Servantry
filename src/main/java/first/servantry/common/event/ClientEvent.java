@@ -31,6 +31,7 @@ public class ClientEvent {
         EntityRenderDispatcher.register(ServantRegister.StardustDragon.get(), new StardustDragonRenderer());
         EntityRenderDispatcher.register(ServantRegister.Twins.get(), new TwinsRenderer());
         EntityRenderDispatcher.register(ProjectileRegister.StardustProjectile.get(), new StardustProjectileRenderer());
+        EntityRenderDispatcher.register(ProjectileRegister.LaserProjectile.get(), new LaserProjectileRenderer());
     }
 
     @SubscribeEvent

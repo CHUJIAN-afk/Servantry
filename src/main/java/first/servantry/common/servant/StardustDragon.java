@@ -145,7 +145,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     @Override
     public void onCollisionAttack(Set<LivingEntity> targets) {
         for (LivingEntity target : targets) {
-            InvincibleData.servantAttack(target, getHead(), 2, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+            InvincibleData.criteriaAttack(target, getHead().getUuid(), 2, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
         }
     }
 
