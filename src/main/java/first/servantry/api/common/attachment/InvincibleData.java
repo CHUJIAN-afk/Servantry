@@ -20,11 +20,11 @@ public class InvincibleData {
         globalInvincibleFrames.addAndGet(-1);
     }
 
-    public static void criteriaAttack(LivingEntity target, UUID uuid, int invincibleTime, @NotNull DamageSource damageSource, float damage, Type type) {
-        target.getData(AttachmentRegister.InvincibleData).attack(target, uuid, invincibleTime, damageSource, damage, type);
+    public static boolean criteriaAttack(LivingEntity target, UUID uuid, int invincibleTime, @NotNull DamageSource damageSource, float damage, Type type) {
+        return target.getData(AttachmentRegister.InvincibleData).attack(target, uuid, invincibleTime, damageSource, damage, type);
     }
 
-    public void attack(LivingEntity target, UUID uuid, int invincibleTime, @NotNull DamageSource damageSource, float damage, Type type) {
+    public boolean attack(LivingEntity target, UUID uuid, int invincibleTime, @NotNull DamageSource damageSource, float damage, Type type) {
         if (canDamage(uuid, type)) {
             int invulnerableTime = target.invulnerableTime;
             target.invulnerableTime = 0;
@@ -42,7 +42,9 @@ public class InvincibleData {
                     globalInvincibleFrames.set(invincibleTime);
                 }
             }
+            return true;
         }
+        return false;
     }
 
     public boolean canDamage(UUID uuid, Type type) {

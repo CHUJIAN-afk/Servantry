@@ -2,7 +2,6 @@ package first.servantry.common.projectile;
 
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
@@ -30,7 +29,7 @@ import java.util.UUID;
  * </ul>
  * </p>
  */
-public class LaserProjectile extends Projectile implements IBlockCollision<LaserProjectile>, ICollideAttack<LaserProjectile> {
+public class LaserProjectile extends Projectile implements ICollideAttack<LaserProjectile> {
 
     public LaserProjectile() {
         super();
@@ -44,17 +43,6 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
     }
 
     @Override
-    public void tick() {
-        super.tick();
-    }
-
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-
-        setRemove();
-    }
-
-    @Override
     public void onCollisionAttack(Set<LivingEntity> hitTargets) {
         for (LivingEntity target : hitTargets) {
             DamageSource source = getDamageSource();
@@ -63,7 +51,9 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
                 if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
                     uuid = servant.getUuid();
                 }
-                InvincibleData.criteriaAttack(target, uuid, 4, source, getDamage(), InvincibleData.Type.PARTIAL);
+                if (InvincibleData.criteriaAttack(target, uuid, 4, source, getDamage(), InvincibleData.Type.PARTIAL)) {
+                    target.setRemainingFireTicks(Math.min(120, target.getRemainingFireTicks() + 60));
+                }
             }
         }
     }
@@ -77,13 +67,6 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
             }
         }
         return false;
-    }
-
-    // ===================== IBlockCollision =====================
-
-    @Override
-    public @NotNull AABB getBlockCollisionBox() {
-        return new AABB(-0.1, -0.1, -0.1, 0.1, 0.1, 0.1);
     }
 
     // ===================== ICollideAttack =====================

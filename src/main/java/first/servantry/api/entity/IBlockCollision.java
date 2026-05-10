@@ -102,8 +102,7 @@ public interface IBlockCollision<T extends AttachmentEntity> {
         CollisionResult result = computeCollision(box, motion, colliders);
         if (result.collided()) {
             Vec3 correctedPos = from.add(result.dx(), result.dy(), result.dz());
-            entity.currentPathNode = new PathNode(correctedPos,
-                    entity.currentPathNode.yaw(), entity.currentPathNode.pitch(), entity.currentPathNode.roll());
+            entity.currentPathNode = new PathNode(correctedPos, entity.currentPathNode.yaw(), entity.currentPathNode.pitch(), entity.currentPathNode.roll());
             onBlockCollision(new CollisionContext(correctedPos, result.collisionX(), result.collisionY(), result.collisionZ()));
         }
     }

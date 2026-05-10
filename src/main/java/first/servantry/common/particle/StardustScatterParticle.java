@@ -3,9 +3,10 @@ package first.servantry.common.particle;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.*;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +19,7 @@ public class StardustScatterParticle extends TextureSheetParticle {
     private float prevScale;
     private float currentScale;
 
-    protected StardustScatterParticle(ClientLevel level, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteSet) {
+    public StardustScatterParticle(ClientLevel level, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteSet) {
         super(level, x, y, z, vx, vy, vz);
         this.spriteSet = spriteSet;
 
@@ -44,6 +45,10 @@ public class StardustScatterParticle extends TextureSheetParticle {
 
         // 初始化贴图
         this.setSpriteFromAge(spriteSet);
+    }
+
+    public static StardustScatterParticle create(ClientLevel level, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteSet) {
+        return new StardustScatterParticle(level, x, y, z, vx, vy, vz, spriteSet);
     }
 
     @Override
@@ -72,22 +77,6 @@ public class StardustScatterParticle extends TextureSheetParticle {
     @Override
     public int getLightColor(float partialTick) {
         return LightTexture.FULL_BRIGHT;
-    }
-
-    // 粒子提供者，用于绑定贴图和实例化
-    public static class Provider implements ParticleProvider<SimpleParticleType> {
-
-        private final SpriteSet sprite;
-
-        public Provider(SpriteSet sprite) {
-            this.sprite = sprite;
-        }
-
-        @Override
-        public Particle createParticle(@NotNull SimpleParticleType type, @NotNull ClientLevel level, double x, double y, double z, double vx, double vy, double vz) {
-            return new StardustScatterParticle(level, x, y, z, vx, vy, vz, this.sprite);
-        }
-
     }
 
 }

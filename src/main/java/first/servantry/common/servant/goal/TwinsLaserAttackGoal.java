@@ -33,12 +33,7 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
 
     @Override
     public boolean canUse() {
-        return servant.isLaserEye() && servant.getTarget() != null && servant.isTarget(servant.getTarget());
-    }
-
-    @Override
-    public boolean canContinueToUse() {
-        return servant.isLaserEye() && servant.getTarget() != null && servant.getTarget().isAlive();
+        return servant.isLaserEye() && servant.isTarget(servant.getTarget());
     }
 
     @Override
@@ -72,7 +67,7 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         // 射击冷却
         if (shootCooldown <= 0) {
             shootAtTarget(owner, target);
-            shootCooldown = SHOOT_COOLDOWN;
+            shootCooldown = SHOOT_COOLDOWN + owner.getRandom().nextInt(-2, 2);
         } else {
             shootCooldown--;
         }
@@ -103,12 +98,12 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         double offsetY = radius * Math.cos(phi) + Math.sin(owner.tickCount * 0.05 + rand.nextDouble() * Math.PI) * 0.5;
         double offsetZ = radius * Math.sin(phi) * Math.sin(currentTheta);
 
-        Vec3 targetCenter = target.position().add(0, target.getBbHeight() / 2.0, 0);
-        return targetCenter.add(offsetX, offsetY, offsetZ);
+        Vec3 targetCenter = target.getBoundingBox().getCenter();
+        return targetCenter.add(offsetX, offsetY + target.getBoundingBox().getYsize(), offsetZ);
     }
 
     @Override
     public void stop() {
-        shootCooldown = 0;
+        shootCooldown = SHOOT_COOLDOWN;
     }
 }
