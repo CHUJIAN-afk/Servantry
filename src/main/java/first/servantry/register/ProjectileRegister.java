@@ -3,6 +3,7 @@ package first.servantry.register;
 import first.servantry.Servantry;
 import first.servantry.api.register.ProjectileType;
 import first.servantry.api.register.ServantryRegistries;
+import first.servantry.common.projectile.LaserProjectile;
 import first.servantry.common.projectile.StardustProjectile;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -22,6 +23,12 @@ public class ProjectileRegister {
     /** 星细胞射弹类型 */
     public static final DeferredHolder<ProjectileType<?>, ProjectileType<StardustProjectile>> StardustProjectile =
             Register.register("stardust_projectile", () -> new ProjectileType<>(StardustProjectile::new));
+
+    /**
+     * 激光射弹类型
+     */
+    public static final DeferredHolder<ProjectileType<?>, ProjectileType<LaserProjectile>> LaserProjectile =
+            Register.register("laser_projectile", () -> new ProjectileType<>(LaserProjectile::new));
 
     /**
      * 注册射弹类型到事件总线。

@@ -270,6 +270,7 @@ public interface IBlockCollision<T extends AttachmentEntity> {
      */
     record CollisionResult(double dx, double dy, double dz, boolean collisionX, boolean collisionY, boolean collisionZ) {
         boolean collided() {
-            return collisionX || collisionY || collisionZ; }
+            return collisionX || collisionY || collisionZ;
+        }
     }
 }

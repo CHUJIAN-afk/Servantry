@@ -110,7 +110,7 @@ public abstract class AttachmentEntity {
             if (currentPlannedPath != null && !currentPlannedPath.isFinished()) {
                 currentPathNode = currentPlannedPath.advance();
             }
-            // 方块碰撞检测（使用历史轨迹的上一tick位置）
+            // 方块碰撞检测
             if (this instanceof IBlockCollision<?> blockCollision) {
                 ((IBlockCollision<AttachmentEntity>) blockCollision).processBlockCollision(this);
             }
@@ -118,6 +118,9 @@ public abstract class AttachmentEntity {
             if (this instanceof ICollideAttack<?> collideAttack) {
                 ((ICollideAttack<AttachmentEntity>) collideAttack).processCollision(this);
             }
+        } else {
+            // 客户端：使用同步数据更新位置
+            currentPathNode = clientTargetNode;
         }
         // 更新历史轨迹
         updateHistoryNodes();

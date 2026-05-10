@@ -165,9 +165,6 @@ public abstract class Projectile extends AttachmentEntity {
             if (++life >= 200) {
                 markForRemoval();
             }
-        } else {
-            // 客户端：使用同步数据更新位置
-            currentPathNode = clientTargetNode;
         }
 
         // 拖尾计时器衰减
