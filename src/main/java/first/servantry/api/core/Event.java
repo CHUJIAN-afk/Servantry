@@ -55,8 +55,8 @@ public class Event {
         }
         EntityData data = player.getData(AttachmentRegister.EntityData);
         List<Servant> servants = data.getServants();
-        while (!servants.isEmpty() && data.getMaxServantSize(player) < data.getUsedSlots()) {
-            Servant toRemove = servants.getFirst();
+        while (!servants.isEmpty() && !data.canSummon(player, 0)) {
+            Servant toRemove = servants.getLast();
             data.remove(toRemove.getUuid());
             servants = data.getServants();
         }

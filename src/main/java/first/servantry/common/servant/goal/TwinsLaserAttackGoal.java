@@ -98,8 +98,4 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         return targetCenter.add(offsetX, offsetY, offsetZ);
     }
 
-    @Override
-    public void stop() {
-        //shootCooldown = SHOOT_COOLDOWN;
-    }
 }

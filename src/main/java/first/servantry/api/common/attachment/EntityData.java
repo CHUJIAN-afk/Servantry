@@ -80,14 +80,19 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
 
     /**
      * 获取当前已占用的仆从栏位数。
-     *
-     * @return 已占用栏位数
      */
     public int getUsedSlots() {
         return entities.stream()
                 .filter(e -> e instanceof Servant)
                 .mapToInt(e -> ((Servant) e).getSlotCost())
                 .sum();
+    }
+
+    /**
+     * 检查是否可以召唤指定栏位消耗的仆从。
+     */
+    public boolean canSummon(Player player, int slotCost) {
+        return getMaxServantSize(player) - getUsedSlots() >= slotCost;
     }
 
     /**
@@ -98,9 +103,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      * @return 是否成功
      */
     public boolean summonServant(Player player, Servant servant) {
-        int maxSlots = getMaxServantSize(player);
-        int usedSlots = getUsedSlots();
-        if (maxSlots >= usedSlots + servant.getSlotCost()) {
+        if (canSummon(player, servant.getSlotCost())) {
             if (ticking) {
                 pendingAdd.add(servant);
             } else {

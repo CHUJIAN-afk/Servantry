@@ -36,16 +36,6 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
     }
 
     @Override
-    public void start() {
-        //cooldown = 14;
-    }
-
-    @Override
-    public void stop() {
-        //cooldown = 0;
-    }
-
-    @Override
     public void tick() {
         LivingEntity target = servant.getTarget();
         Vec3 toTarget = target.getBoundingBox().getCenter().subtract(servant.getPos());

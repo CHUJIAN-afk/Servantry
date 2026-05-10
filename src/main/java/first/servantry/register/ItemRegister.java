@@ -3,9 +3,11 @@ package first.servantry.register;
 import com.google.common.collect.ImmutableMultimap;
 import first.servantry.Servantry;
 import first.servantry.api.PathNode;
+import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.common.item.CurioItem;
-import first.servantry.common.item.StardustDragonWeaponItem;
+import first.servantry.common.servant.StardustDragon;
 import first.servantry.common.servant.Twins;
 import net.minecraft.core.Holder;
 import net.minecraft.util.RandomSource;
@@ -20,6 +22,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.List;
 
 public class ItemRegister {
 
@@ -63,10 +67,62 @@ public class ItemRegister {
     /**
      * 星尘龙杖 - 召唤星尘龙（多体节仆从）
      */
-    public static final DeferredItem<Item> StardustDragonStaff = Register.register("stardust_dragon_staff", StardustDragonWeaponItem::new);
+    public static final DeferredItem<Item> StardustDragonStaff = Register.register("stardust_dragon_staff", () ->
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.StardustDragon)
+                    .sound(SoundRegister.UseServantWeapon)
+                    .summonPre((player, servant) -> player.getData(AttachmentRegister.EntityData).canSummon(player, 1))
+                    .summonPost(stardustDragon -> {
+                        Player owner = stardustDragon.getOwner();
+                        EntityData data = owner.getData(AttachmentRegister.EntityData);
+                        AttachmentEntityType<StardustDragon> type = AttachmentEntityRegister.StardustDragon.get();
+                        List<StardustDragon> existing = data.getEntities().stream()
+                                .filter(e -> e instanceof StardustDragon)
+                                .map(e -> (StardustDragon) e)
+                                .toList();
+
+                        if (existing.size() == 1) {
+                            // 首次召唤：设置索引0，额外召唤2个体节
+                            stardustDragon.setSegmentIndex(0);
+                            stardustDragon.setTotalSegments(3);
+                            stardustDragon.init(new PathNode(owner.position().add(0, 3, 0), 0, 0, 0));
+
+                            for (int i = 1; i < 3; i++) {
+                                StardustDragon segment = type.factory().get();
+                                segment.setOwner(owner);
+                                segment.setSegmentIndex(i);
+                                segment.setTotalSegments(3);
+                                if (data.summonServant(owner, segment)) {
+                                    segment.init(new PathNode(owner.position().add(0, 3, -i * segment.getSegmentDistance()), 0, 0, 0));
+                                }
+                            }
+                        } else {
+                            // 增加体节：找到最大索引，设置新索引
+                            int maxIndex = existing.stream()
+                                    .mapToInt(StardustDragon::getSegmentIndex)
+                                    .max()
+                                    .orElse(0);
+
+                            stardustDragon.setSegmentIndex(maxIndex + 1);
+
+                            // 更新所有体节的总数
+                            int newTotal = maxIndex + 2;
+                            existing.forEach(s -> s.setTotalSegments(newTotal));
+                            stardustDragon.setTotalSegments(newTotal);
+
+                            // 在最后一个体节位置初始化
+                            Vec3 lastPos = existing.stream()
+                                    .filter(e -> e.getSegmentIndex() == maxIndex)
+                                    .findFirst()
+                                    .map(StardustDragon::getPos)
+                                    .orElse(owner.position().add(0, 3, 0));
+                            stardustDragon.init(new PathNode(lastPos, 0, 0, 0));
+                        }
+                    })
+                    .buildItem()
+    );
 
     /**
-     * 光学法杖 - 召唤双子魔眼
+     * 魔眼法杖 - 召唤双子魔眼
      */
     public static final DeferredItem<Item> OpticStaff = Register.register("optic_staff", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.Twins)
