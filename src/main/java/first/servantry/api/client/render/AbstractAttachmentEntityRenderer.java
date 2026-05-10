@@ -177,7 +177,6 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
      * @param config      渲染配置
      */
     protected void renderEntity(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> config) {
-
     }
 
     // ===================== 主渲染入口 =====================

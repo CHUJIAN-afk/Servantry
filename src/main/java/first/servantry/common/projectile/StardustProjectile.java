@@ -35,6 +35,7 @@ public class StardustProjectile extends AttachingProjectile {
         super();
         setDrag(0.9f);
         setMaxSpeed(1.2f);
+        maxLife = 100;
     }
 
     public StardustProjectile(DamageSource damageSource, Vec3 startPos) {
