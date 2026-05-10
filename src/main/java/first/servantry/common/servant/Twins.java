@@ -1,15 +1,22 @@
 package first.servantry.common.servant;
 
+import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
+import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.servantry.common.servant.goal.TwinsCursedFlameAttackGoal;
 import first.servantry.common.servant.goal.TwinsIdleGoal;
 import first.servantry.common.servant.goal.TwinsLaserAttackGoal;
 import first.servantry.register.AttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * 双子魔眼 - 由Retinazer和Spazmatism组成的双瞳仆从。
@@ -21,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  * </ul>
  * </p>
  */
-public class Twins extends MomentumServant implements IBlockCollision<Twins> {
+public class Twins extends MomentumServant implements IBlockCollision<Twins>, ICollideAttack<Twins> {
 
     /**
      * 是否为激光眼（true=激光眼，false=咒焰眼）
@@ -30,22 +37,55 @@ public class Twins extends MomentumServant implements IBlockCollision<Twins> {
 
     public Twins() {
         super();
+        setDrag(0.75f);
+        setRotationSpeed(0.5f);
     }
 
     @Override
     public void registerGoals(ServantGoalSelector goalSelector) {
-        goalSelector.addGoal(1, new TwinsLaserAttackGoal(this));
+        goalSelector.addGoal(0, new TwinsLaserAttackGoal(this));
+        goalSelector.addGoal(0, new TwinsCursedFlameAttackGoal(this));
         goalSelector.addGoal(2, new TwinsIdleGoal(this));
     }
 
     @Override
-    public @NotNull AABB getBlockCollisionBox() {
-        return new AABB(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25);
+    public @NotNull AABB getHitbox() {
+        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
     }
 
     @Override
-    public void onBlockCollision(CollisionContext context) {
-        setVelocity(IBlockCollision.clearVelocity(getVelocity(), context));
+    public boolean canCollideAttack() {
+        return !isLaserEye() && isTarget(getTarget());
+    }
+
+    @Override
+    public boolean isValidCollisionTarget(Twins entity, LivingEntity target) {
+        return isTarget(target);
+    }
+
+    @Override
+    public void onCollisionAttack(List<LivingEntity> hitTargets) {
+        for (LivingEntity target : hitTargets) {
+            InvincibleData.criteriaAttack(target, getUuid(), 4, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+        }
+    }
+
+    @Override
+    public @NotNull AABB getBlockCollisionBox() {
+        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
+    }
+
+    @Override
+    public void tick() {
+        if (!owner.level().isClientSide()) {
+            if (!isLaserEye() || !isTarget(getTarget())) {
+                Vec3 motionDir = getVelocity().normalize();
+                float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
+                float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
+                setDesiredRotation(targetYaw, targetPitch, 0);
+            }
+        }
+        super.tick();
     }
 
     @Override
@@ -90,4 +130,5 @@ public class Twins extends MomentumServant implements IBlockCollision<Twins> {
     public void setLaserEye(boolean laserEye) {
         this.isLaserEye = laserEye;
     }
+
 }

@@ -54,7 +54,7 @@ public interface IBlockCollision<T extends AttachmentEntity> {
     }
 
     static Vec3 bounceVelocity(Vec3 velocity, CollisionContext context) {
-        return bounceVelocity(velocity, context, 0.4, 0.01);
+        return bounceVelocity(velocity, context, 0.8, 0.001);
     }
 
     /**

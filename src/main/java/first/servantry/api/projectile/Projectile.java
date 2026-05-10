@@ -167,6 +167,10 @@ public abstract class Projectile extends AttachmentEntity {
         this.maxSpeed = maxSpeed;
     }
 
+    public void setMaxLife(int maxLife) {
+        this.maxLife = maxLife;
+    }
+
     public int getTrailTimer() {
         return trailTimer;
     }

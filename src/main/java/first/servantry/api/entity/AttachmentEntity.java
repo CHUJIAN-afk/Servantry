@@ -216,7 +216,7 @@ public abstract class AttachmentEntity {
     public void setPath(List<PathNode> nodes) {
         this.currentPlannedPath = new PlannedPath("default", nodes);
         if (!nodes.isEmpty()) {
-            this.currentPathNode = nodes.getLast();
+            this.currentPathNode = nodes.getFirst();
         }
     }
 

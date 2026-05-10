@@ -6,7 +6,6 @@ import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.common.servant.Twins;
 import first.servantry.register.AttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,7 +13,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -35,6 +34,7 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
         super();
         setDrag(1);
         setMaxSpeed(4);
+        setMaxLife(34);
     }
 
     public LaserProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
@@ -43,19 +43,17 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
     }
 
     @Override
-    public void onCollisionAttack(Set<LivingEntity> hitTargets) {
-        for (LivingEntity target : hitTargets) {
-            DamageSource source = getDamageSource();
-            if (source != null) {
-                UUID uuid = null;
-                if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
-                    uuid = servant.getUuid();
-                }
-                if (InvincibleData.criteriaAttack(target, uuid, 4, source, getDamage(), InvincibleData.Type.PARTIAL)) {
-                    target.setRemainingFireTicks(Math.min(120, target.getRemainingFireTicks() + 60));
-                }
+    public void onCollisionAttack(List<LivingEntity> hitTargets) {
+        LivingEntity target = hitTargets.getFirst();
+        DamageSource source = getDamageSource();
+        if (source != null) {
+            UUID uuid = null;
+            if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
+                uuid = servant.getUuid();
             }
+            InvincibleData.criteriaAttack(target, uuid, 4, source, getDamage(), InvincibleData.Type.PARTIAL);
         }
+        setRemove();
     }
 
     @Override
@@ -73,7 +71,7 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.05, -0.05, -1, 0.05, 0.05, 0);
+        return new AABB(-0.03, -0.03, -1, 0.03, 0.03, 0);
     }
 
     @Override
@@ -88,14 +86,10 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
         if (damageSource instanceof ServantDamageSource source) {
             Servant servant = source.getServant();
             if (servant != null) {
-                float damage = servant.getDamage();
-                if (servant instanceof Twins) {
-                    damage *= 1.15f;
-                }
-                return damage;
+                return servant.getDamage() * 1.15f;
             }
         }
-        return 6;
+        return 2.4f;
     }
 
     @Override

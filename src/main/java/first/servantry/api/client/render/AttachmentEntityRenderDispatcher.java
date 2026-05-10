@@ -75,7 +75,6 @@ public class AttachmentEntityRenderDispatcher {
                     poseStack.mulPose(Axis.ZP.rotationDegrees(renderNode.roll()));
                     LevelRenderer.renderLineBox(poseStack, debugConsumer, iCollideAttack.getHitbox(), 1.0F, 0.0F, 0.0F, 1.0F);
                     poseStack.popPose();
-
                 }
             }
 

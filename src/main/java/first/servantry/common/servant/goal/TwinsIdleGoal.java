@@ -21,17 +21,19 @@ public class TwinsIdleGoal extends ServantGoal<Twins> {
     @Override
     public void tick() {
         Player owner = servant.getOwner();
-        if (wanderOffset.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || wanderOffset.distanceToSqr(servant.getPos()) < 1) {
-            wanderOffset = owner.getBoundingBox().getCenter().offsetRandom(owner.getRandom(), (float) owner.getBoundingBox().getSize() * 4);
+        if (wanderOffset.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || wanderOffset.distanceToSqr(servant.getPos()) < 1 || wanderOffset.distanceToSqr(owner.position()) > 8) {
+            wanderOffset = owner.getBoundingBox().getCenter().offsetRandom(owner.getRandom(), (float) owner.getBoundingBox().getSize() * 6);
+        }
+        if (servant.getPos().distanceToSqr(owner.position()) > 32 * 32) {
+            servant.teleportTo(wanderOffset);
         }
         Vec3 dir = wanderOffset.subtract(servant.getPos());
         double dist = dir.length();
         if (dist > 0.05) {
             dir = dir.normalize();
-            double force = Math.min(dist * 0.01, 0.1);
+            double force = Math.min(dist * 0.02, 0.2);
             servant.applyForce(dir.scale(force));
         }
-        wanderOffset = owner.getBoundingBox().getCenter();
         // 缓慢朝向运动方向
         if (servant.getVelocity().lengthSqr() > 0.01) {
             servant.lookAt(servant.getVelocity().normalize());

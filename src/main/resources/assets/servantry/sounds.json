@@ -8,5 +8,10 @@
     "sounds": [
       "servantry:use_servant_weapon"
     ]
+  },
+  "laser": {
+    "sounds": [
+      "servantry:laser"
+    ]
   }
 }

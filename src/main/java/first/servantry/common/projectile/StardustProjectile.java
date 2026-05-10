@@ -19,8 +19,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.UUID;
-
 /**
  * 星细胞射弹 - 追踪目标并黏着施加寄生效果。
  */
@@ -35,7 +33,7 @@ public class StardustProjectile extends AttachingProjectile {
         super();
         setDrag(0.9f);
         setMaxSpeed(1.2f);
-        maxLife = 100;
+        setMaxLife(100);
     }
 
     public StardustProjectile(DamageSource damageSource, Vec3 startPos) {
@@ -85,21 +83,19 @@ public class StardustProjectile extends AttachingProjectile {
         AABB box = target.getBoundingBox();
         RandomSource random = target.getRandom();
         random.setSeed(getUuid().hashCode());
-        attachTo(box.getCenter().offsetRandom(random, (float) box.getSize()));
+        // 在碰撞箱内随机选择一点
+        double x = box.minX + random.nextDouble() * box.getXsize();
+        double y = box.minY + random.nextDouble() * box.getYsize();
+        double z = box.minZ + random.nextDouble() * box.getZsize();
+        attachTo(new Vec3(x, y, z));
     }
 
     private void onHit(LivingEntity target) {
         attachTo(getPos());
-
         DamageSource source = getDamageSource();
         if (source != null) {
-            UUID uuid = null;
-            if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
-                uuid = servant.getUuid();
-            }
-            InvincibleData.criteriaAttack(target, uuid, 0, source, getDamage(), InvincibleData.Type.PARTIAL);
+            InvincibleData.criteriaAttack(target, getUuid(), 0, source, getDamage(), InvincibleData.Type.PARTIAL);
         }
-
         MobEffectInstance existing = target.getEffect(MobEffectRegister.CellParasitism);
         int amplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, MAX_PARASITISM_LEVEL - 1);
         target.addEffect(new MobEffectInstance(MobEffectRegister.CellParasitism, PARASITISM_DURATION, amplifier));
@@ -119,15 +115,14 @@ public class StardustProjectile extends AttachingProjectile {
 
     private void spawnSplit(Player owner, LivingEntity target, DamageSource source, ServerLevel level) {
         RandomSource rand = level.getRandom();
-        for (int i = 0; i < rand.nextInt(1, 3); i++) {
+        int nextInt = rand.nextInt(0, 2);
+        for (int i = 0; i < nextInt; i++) {
             StardustProjectile stardustProjectile = new StardustProjectile(source, getPos());
             stardustProjectile.target = target;
             double theta = rand.nextDouble() * Math.PI * 2;
             double phi = rand.nextDouble() * Math.PI * 0.5;
             double speed = 0.15 + rand.nextDouble() * 0.15;
             stardustProjectile.applyForce(new Vec3(Math.sin(phi) * Math.cos(theta), Math.cos(phi), Math.sin(phi) * Math.sin(theta)).scale(speed));
-
-
             owner.getData(AttachmentRegister.EntityData).addProjectile(stardustProjectile);
         }
     }

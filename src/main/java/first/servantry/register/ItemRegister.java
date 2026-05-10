@@ -6,6 +6,7 @@ import first.servantry.api.PathNode;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.common.item.CurioItem;
 import first.servantry.common.item.StardustDragonWeaponItem;
+import first.servantry.common.servant.Twins;
 import net.minecraft.core.Holder;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -30,7 +31,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.TerraPrism)
                     .sound(SoundRegister.UseTerraprism)
-                    .onSummon(servant -> servant.init(servant.getInterpolatedIdleState(1)))
+                    .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1)))
                     .buildItem()
     );
 
@@ -38,7 +39,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> BladeStaff = Register.register("blade_staff", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.EnchantedThrowingKnives)
                     .sound(SoundRegister.UseServantWeapon)
-                    .onSummon(servant -> {
+                    .summonPost(servant -> {
                         Player owner = servant.getOwner();
                         PathNode idle = servant.getInterpolatedIdleState(1.0f);
                         Vec3 center = owner.getBoundingBox().getCenter();
@@ -51,7 +52,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> StardustCellStaff = Register.register("stardust_cell_staff", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.StardustCell)
                     .sound(SoundRegister.UseServantWeapon)
-                    .onSummon(servant -> {
+                    .summonPost(servant -> {
                         Player owner = servant.getOwner();
                         RandomSource random = owner.getRandom();
                         servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
@@ -69,14 +70,20 @@ public class ItemRegister {
      */
     public static final DeferredItem<Item> OpticStaff = Register.register("optic_staff", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.Twins)
-                    .sound(SoundRegister.UseServantWeapon)
-                    .onSummon(servant -> {
+                    .sound(SoundRegister.UseTerraprism)
+                    .summonCount(2)
+                    .summonPre((player, twins) -> {
+                        long count = player.getData(AttachmentRegister.EntityData).getEntities().stream()
+                                .filter(attachmentEntity -> attachmentEntity instanceof Twins)
+                                .count();
+                        twins.setLaserEye(count % 2 == 0);
+                        return true;
+                    })
+                    .summonPost(servant -> {
                         Player owner = servant.getOwner();
                         RandomSource random = owner.getRandom();
+                        random.setSeed(owner.level().getGameTime());
                         servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
-                        if (servant.getOrder() % 2 == 0) {
-                            servant.setLaserEye(false);
-                        }
                     })
                     .buildItem()
     );

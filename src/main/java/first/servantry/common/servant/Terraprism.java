@@ -20,6 +20,7 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
@@ -62,7 +63,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     }
 
     @Override
-    public void onCollisionAttack(Set<LivingEntity> hitTargets) {
+    public void onCollisionAttack(List<LivingEntity> hitTargets) {
         if (isExecutingPath()) {
             for (LivingEntity target : hitTargets) {
                 if (this.hitTargets.add(target)) {

@@ -13,6 +13,7 @@ public class SoundRegister {
 
     public static final DeferredHolder<SoundEvent, SoundEvent> UseTerraprism = create("use_terraprism");
     public static final DeferredHolder<SoundEvent, SoundEvent> UseServantWeapon = create("use_servant_weapon");
+    public static final DeferredHolder<SoundEvent, SoundEvent> Laser = create("laser");
 
     private static DeferredHolder<SoundEvent, SoundEvent> create(String name) {
         return Register.register(name, () -> SoundEvent.createVariableRangeEvent(Servantry.rl(name)));

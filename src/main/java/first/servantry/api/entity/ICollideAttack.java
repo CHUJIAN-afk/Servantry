@@ -9,10 +9,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 碰撞攻击接口，为附件实体提供基于历史轨迹的精确碰撞检测与攻击触发能力。
@@ -27,8 +24,10 @@ public interface ICollideAttack<T extends AttachmentEntity> {
     @NotNull
     AABB getHitbox();
 
-    /** 当碰撞检测命中目标时调用，执行具体的攻击逻辑 */
-    void onCollisionAttack(Set<LivingEntity> hitTargets);
+    /**
+     * 当碰撞检测命中目标时调用，执行具体的攻击逻辑，已根据命中顺序排序
+     */
+    void onCollisionAttack(List<LivingEntity> hitTargets);
 
     /**
      * 获取用于碰撞检测采样的历史节点数量
@@ -104,14 +103,19 @@ public interface ICollideAttack<T extends AttachmentEntity> {
         // 阶段三：精确 OBB-AABB 相交检测
         Set<LivingEntity> hitTargets = new HashSet<>();
         for (LivingEntity target : potentialTargets) {
-            if (!isValidCollisionTarget(entity, target)) continue;
-            if (checkOBBCollision(sweepOBBs, target.getBoundingBox())) {
-                hitTargets.add(target);
+            if (isValidCollisionTarget(entity, target)) {
+                if (checkOBBCollision(sweepOBBs, target.getBoundingBox())) {
+                    hitTargets.add(target);
+                }
             }
         }
 
         if (!hitTargets.isEmpty()) {
-            onCollisionAttack(hitTargets);
+            Vec3 earliestPoint = historyNodes.get(segments).pos();
+            List<LivingEntity> sortedTargets = hitTargets.stream()
+                    .sorted(Comparator.comparingDouble(target -> target.getBoundingBox().getCenter().distanceToSqr(earliestPoint)))
+                    .toList();
+            onCollisionAttack(sortedTargets);
         }
     }
 

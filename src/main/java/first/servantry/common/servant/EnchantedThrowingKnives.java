@@ -19,6 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -88,7 +89,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
     }
 
     @Override
-    public void onCollisionAttack(Set<LivingEntity> targets) {
+    public void onCollisionAttack(List<LivingEntity> targets) {
         if (isExecutingPath()) {
             for (LivingEntity target : targets) {
                 InvincibleData.criteriaAttack(target, this.getUuid(), 10, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);

@@ -4,6 +4,7 @@ import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.projectile.LaserProjectile;
 import first.servantry.common.servant.Twins;
 import first.servantry.register.AttachmentRegister;
+import first.servantry.register.SoundRegister;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -54,16 +55,10 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
             servant.applyForce(toAnchor.normalize().scale(force));
         }
 
-        // 动态摩擦与限速
-        float friction = dist < 1.5 ? 0.55f : 0.85f;
-        float maxSpd = (float) Math.min(1.8, dist * 0.8 + 0.05);
-        Vec3 vel = servant.getVelocity();
-        if (vel.lengthSqr() > maxSpd * maxSpd) vel = vel.normalize().scale(maxSpd);
-        servant.setVelocity(vel.scale(friction));
-
-        // 持续看向目标
-        servant.lookAt(target.position().subtract(servant.getPos()).normalize());
-
+        Vec3 motionDir = target.getBoundingBox().getCenter().subtract(servant.getPos()).normalize();
+        float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
+        float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
+        servant.setDesiredRotation(targetYaw, targetPitch, servant.getRoll());
         // 射击冷却
         if (shootCooldown <= 0) {
             shootAtTarget(owner, target);
@@ -76,8 +71,9 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
     private void shootAtTarget(Player owner, LivingEntity target) {
         Vec3 start = servant.getPos();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
-        LaserProjectile projectile = new LaserProjectile(servant.getDamageSource(), start, direction.scale(4));
+        LaserProjectile projectile = new LaserProjectile(servant.getDamageSource(), start, direction.scale(2));
         owner.getData(AttachmentRegister.EntityData).addProjectile(projectile);
+        owner.level().playSound(null, start.x(), start.y(), start.z(), SoundRegister.Laser.get(), owner.getSoundSource());
         // 后坐力
         servant.applyForce(direction.scale(-0.1));
     }
@@ -90,20 +86,20 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         Random rand = new Random(seed);
         double baseTheta = rand.nextDouble() * Math.PI * 2;
         double phi = Math.acos(1.0 - rand.nextDouble() * 1.4);
-        double radius = 3.5 + rand.nextDouble() * 2.0 + order * 0.15;
+        double radius = 3.5 + rand.nextDouble() * 2.0;
         double rotationSpeed = (rand.nextDouble() * 0.02 + 0.01) * (rand.nextBoolean() ? 1 : -1);
         double currentTheta = baseTheta + owner.tickCount * rotationSpeed;
 
         double offsetX = radius * Math.sin(phi) * Math.cos(currentTheta);
-        double offsetY = radius * Math.cos(phi) + Math.sin(owner.tickCount * 0.05 + rand.nextDouble() * Math.PI) * 0.5;
+        double offsetY = radius * 0.5 * Math.cos(phi) + Math.sin(owner.tickCount * 0.05 + rand.nextDouble() * Math.PI) * 0.5;
         double offsetZ = radius * Math.sin(phi) * Math.sin(currentTheta);
 
         Vec3 targetCenter = target.getBoundingBox().getCenter();
-        return targetCenter.add(offsetX, offsetY + target.getBoundingBox().getYsize(), offsetZ);
+        return targetCenter.add(offsetX, offsetY, offsetZ);
     }
 
     @Override
     public void stop() {
-        shootCooldown = SHOOT_COOLDOWN;
+        //shootCooldown = SHOOT_COOLDOWN;
     }
 }

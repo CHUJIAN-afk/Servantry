@@ -54,7 +54,12 @@ public class ModelRegister {
     /**
      * 星尘龙尾部模型
      */
-    STARDUST_DRAGON_BODY3 = standalone("servant/stardust_dragon_body3");
+    STARDUST_DRAGON_BODY3 = standalone("servant/stardust_dragon_body3"),
+
+    /**
+     * 激光模型
+     */
+    LaserProjectile = standalone("projectile/laser_projectile");
 
     @SubscribeEvent
     public static void registerAdditional(ModelEvent.RegisterAdditional event) {

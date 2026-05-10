@@ -53,8 +53,6 @@ public class StardustCellAttackGoal extends ServantGoal<StardustCell> {
         Vec3 vel = servant.getVelocity();
         if (vel.lengthSqr() > maxSpd * maxSpd) vel = vel.normalize().scale(maxSpd);
         servant.setVelocity(vel.scale(friction));
-        // 朝向目标
-        servant.lookAt(target.getBoundingBox().getCenter());
         // 射击冷却
         if (servant.getShootCooldown() <= 0) {
             servant.shootAtTarget(target);

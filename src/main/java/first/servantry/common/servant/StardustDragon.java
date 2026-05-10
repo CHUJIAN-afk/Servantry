@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 星尘龙 - 多体节龙形仆从。
@@ -149,7 +148,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     }
 
     @Override
-    public void onCollisionAttack(Set<LivingEntity> targets) {
+    public void onCollisionAttack(List<LivingEntity> targets) {
         for (LivingEntity target : targets) {
             InvincibleData.criteriaAttack(target, getHead().getUuid(), 2, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
         }
