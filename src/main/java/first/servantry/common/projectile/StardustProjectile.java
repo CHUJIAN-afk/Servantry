@@ -15,6 +15,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -56,7 +57,7 @@ public class StardustProjectile extends AttachingProjectile {
 
     private void tickFlying() {
         if (life >= 10) {
-            if (target != null) {
+            if (target != null && target.isAlive()) {
                 Vec3 targetCenter = target.getBoundingBox().getCenter();
                 double dist = getPos().distanceTo(targetCenter);
 
@@ -81,7 +82,9 @@ public class StardustProjectile extends AttachingProjectile {
         }
         // 更新黏着位置跟随目标
         AABB box = target.getBoundingBox();
-        attachTo(box.getCenter().offsetRandom(target.getRandom(), (float) box.getSize() / 2));
+        RandomSource random = target.getRandom();
+        random.setSeed(getUuid().hashCode());
+        attachTo(box.getCenter().offsetRandom(random, (float) box.getSize()));
     }
 
     private void onHit(LivingEntity target) {
@@ -111,7 +114,6 @@ public class StardustProjectile extends AttachingProjectile {
                         .ifPresent(newTarget -> spawnSplit(owner, newTarget, source, level));
             }
         }
-        spawnParticles(level, getPos(), owner.getRandom().nextInt(8, 12));
     }
 
     private void spawnSplit(Player owner, LivingEntity target, DamageSource source, ServerLevel level) {
@@ -127,13 +129,19 @@ public class StardustProjectile extends AttachingProjectile {
         }
     }
 
-    private void spawnParticles(ServerLevel level, Vec3 pos, int count) {
-        RandomSource rand = level.getRandom();
-        for (int i = 0; i < count; i++) {
-            double theta = rand.nextDouble() * Math.PI * 2;
-            double phi = rand.nextDouble() * Math.PI;
-            double s = 0.5 + rand.nextDouble() * 0.5;
-            level.sendParticles(ParticleRegister.StardustScatter.get(), pos.x(), pos.y(), pos.z(), 0, Math.sin(phi) * Math.cos(theta) * s, Math.cos(phi) * s, Math.sin(phi) * Math.sin(theta) * s, 1.0);
+    @Override
+    public void omRemove() {
+        Level level = owner.level();
+        if (!level.isClientSide()) {
+            Vec3 pos = getPos();
+            int count = owner.getRandom().nextInt(8, 12);
+            RandomSource rand = level.getRandom();
+            for (int i = 0; i < count; i++) {
+                double theta = rand.nextDouble() * Math.PI * 2;
+                double phi = rand.nextDouble() * Math.PI;
+                double s = 0.5 + rand.nextDouble() * 0.5;
+                ((ServerLevel) level).sendParticles(ParticleRegister.StardustScatter.get(), pos.x(), pos.y(), pos.z(), 0, Math.sin(phi) * Math.cos(theta) * s, Math.cos(phi) * s, Math.sin(phi) * Math.sin(theta) * s, 1.0);
+            }
         }
     }
 

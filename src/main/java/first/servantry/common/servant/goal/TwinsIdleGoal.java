@@ -34,8 +34,7 @@ public class TwinsIdleGoal extends ServantGoal<Twins> {
         wanderOffset = owner.getBoundingBox().getCenter();
         // 缓慢朝向运动方向
         if (servant.getVelocity().lengthSqr() > 0.01) {
-            Vec3 vel = servant.getVelocity().normalize();
-            servant.setDesiredRotation((float) Math.toDegrees(Math.atan2(-vel.x, vel.z)), servant.getDesiredPitch(), servant.getDesiredRoll());
+            servant.lookAt(servant.getVelocity().normalize());
         }
     }
 

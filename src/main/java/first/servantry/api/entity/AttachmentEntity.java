@@ -164,6 +164,12 @@ public abstract class AttachmentEntity {
     public void readAdditional(RegistryFriendlyByteBuf buf) {
     }
 
+    /**
+     * 被移除前调用
+     */
+    public void omRemove() {
+    }
+
     // ===================== 路径管理 =====================
 
     /**

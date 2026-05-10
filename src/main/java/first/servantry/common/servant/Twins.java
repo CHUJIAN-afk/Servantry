@@ -5,7 +5,9 @@ import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.TwinsIdleGoal;
+import first.servantry.common.servant.goal.TwinsLaserAttackGoal;
 import first.servantry.register.ServantRegister;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.phys.AABB;
 
 /**
@@ -20,13 +22,19 @@ import net.minecraft.world.phys.AABB;
  */
 public class Twins extends MomentumServant implements IBlockCollision<Twins> {
 
+    /**
+     * 是否为激光眼（true=激光眼，false=咒焰眼）
+     */
+    private boolean isLaserEye = true;
+
     public Twins() {
         super();
     }
 
     @Override
     public void registerGoals(ServantGoalSelector goalSelector) {
-        goalSelector.addGoal(1, new TwinsIdleGoal(this));
+        goalSelector.addGoal(1, new TwinsLaserAttackGoal(this));
+        goalSelector.addGoal(2, new TwinsIdleGoal(this));
     }
 
     @Override
@@ -37,6 +45,24 @@ public class Twins extends MomentumServant implements IBlockCollision<Twins> {
     @Override
     public void onBlockCollision(CollisionContext context) {
         setVelocity(IBlockCollision.clearVelocity(getVelocity(), context));
+    }
+
+    @Override
+    public void writeAdditional(RegistryFriendlyByteBuf buf) {
+        buf.writeBoolean(isLaserEye);
+    }
+
+    @Override
+    public void readAdditional(RegistryFriendlyByteBuf buf) {
+        isLaserEye = buf.readBoolean();
+    }
+
+    @Override
+    public int getSlotCost() {
+        if (!isLaserEye()) {
+            return 0;
+        }
+        return super.getSlotCost();
     }
 
     @Override
@@ -54,4 +80,13 @@ public class Twins extends MomentumServant implements IBlockCollision<Twins> {
         return ServantRegister.Twins.get();
     }
 
+    // ===================== 访问器 =====================
+
+    public boolean isLaserEye() {
+        return isLaserEye;
+    }
+
+    public void setLaserEye(boolean laserEye) {
+        this.isLaserEye = laserEye;
+    }
 }

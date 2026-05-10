@@ -14,8 +14,6 @@ import java.util.Collections;
 
 /**
  * 射弹实体抽象基类，代表由玩家拥有、动量驱动的飞行攻击物。
- *
- * @param <T> 附件实体类型
  */
 public abstract class Projectile extends AttachmentEntity {
 
@@ -61,7 +59,7 @@ public abstract class Projectile extends AttachmentEntity {
         super();
         this.currentPathNode = new PathNode(startPos, 0, 0, 0);
         if (direction != null) {
-            setVelocity(direction.normalize().scale(maxSpeed));
+            setVelocity(direction);
             updateRotationFromVelocity();
         }
     }

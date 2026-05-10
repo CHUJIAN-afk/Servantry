@@ -74,6 +74,9 @@ public class ItemRegister {
                         Player owner = servant.getOwner();
                         RandomSource random = owner.getRandom();
                         servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
+                        if (servant.getOrder() % 2 == 0) {
+                            servant.setLaserEye(false);
+                        }
                     })
                     .buildItem()
     );

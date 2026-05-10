@@ -19,4 +19,5 @@ public class ProjectileType<T extends Projectile> extends EntityType<T> {
     public ProjectileType(Supplier<T> factory) {
         super(factory);
     }
+
 }

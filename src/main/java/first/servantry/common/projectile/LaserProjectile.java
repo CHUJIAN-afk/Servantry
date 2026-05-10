@@ -7,6 +7,7 @@ import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ProjectileType;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
+import first.servantry.common.servant.Twins;
 import first.servantry.register.ProjectileRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -32,6 +33,8 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
 
     public LaserProjectile() {
         super();
+        setDrag(1);
+        setMaxSpeed(4);
     }
 
     public LaserProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
@@ -41,14 +44,12 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
 
     @Override
     public void tick() {
-        if (getOwner().level().isClientSide()) {
-            setTrailTimer(getTrailDuration());
-        }
         super.tick();
     }
 
     @Override
     public void onBlockCollision(CollisionContext context) {
+
         setRemove();
     }
 
@@ -61,7 +62,7 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
                 if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
                     uuid = servant.getUuid();
                 }
-                InvincibleData.criteriaAttack(target, uuid, 0, source, getDamage(), InvincibleData.Type.PARTIAL);
+                InvincibleData.criteriaAttack(target, uuid, 4, source, getDamage(), InvincibleData.Type.PARTIAL);
             }
         }
     }
@@ -88,7 +89,7 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
 
     @Override
     public AABB getHitbox() {
-        return new AABB(-0.1, -0.1, -0.5, 0.1, 0.1, 0.5);
+        return new AABB(-0.05, -0.05, -1, 0.05, 0.05, 0);
     }
 
     @Override
@@ -100,7 +101,17 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
 
     @Override
     public float getDamage() {
-        return 8f;
+        if (damageSource instanceof ServantDamageSource source) {
+            Servant servant = source.getServant();
+            if (servant != null) {
+                float damage = servant.getDamage();
+                if (servant instanceof Twins) {
+                    damage *= 1.15f;
+                }
+                return damage;
+            }
+        }
+        return 6;
     }
 
     @Override

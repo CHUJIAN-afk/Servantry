@@ -279,6 +279,9 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
 
         // 处理待移除的实体
         if (!pendingRemove.isEmpty()) {
+            for (AttachmentEntity entity : pendingRemove) {
+                entity.omRemove();
+            }
             entities.removeAll(pendingRemove);
             pendingRemove.clear();
             changed = true;
