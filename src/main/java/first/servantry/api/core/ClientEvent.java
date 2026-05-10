@@ -2,10 +2,10 @@ package first.servantry.api.core;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
-import first.servantry.api.client.render.EntityRenderDispatcher;
+import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
 import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.item.IServantWeapon;
-import first.servantry.api.register.ServantType;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.register.ArmorMaterialRegister;
 import first.servantry.register.AttachmentRegister;
@@ -51,7 +51,7 @@ public class ClientEvent {
             float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
             MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();
             for (Player player : clientLevel.players()) {
-                EntityRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
+                AttachmentEntityRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
             }
         }
     }
@@ -65,8 +65,8 @@ public class ClientEvent {
         List<Component> toolTip = event.getToolTip();
 
         if (itemStack.getItem() instanceof IServantWeapon<?> iServantWeapon && player != null) {
-            ServantType<?> type = iServantWeapon.getType();
-            ResourceLocation location = ServantryRegistries.SERVANT_TYPES.getKey(type);
+            AttachmentEntityType<?> type = iServantWeapon.getType();
+            ResourceLocation location = ServantryRegistries.ATTACHMENT_ENTITY_TYPES.getKey(type);
 
             if (location != null) {
                 String key = "servant." + location.getNamespace() + "." + location.getPath();

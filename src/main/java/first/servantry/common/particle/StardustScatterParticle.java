@@ -1,15 +1,22 @@
 package first.servantry.common.particle;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
 public class StardustScatterParticle extends TextureSheetParticle {
 
     private final SpriteSet spriteSet;
     private final float baseScale;
+
+    // 平滑缩放：存储上一帧的缩放值用于渲染插值
+    private float prevScale;
+    private float currentScale;
 
     protected StardustScatterParticle(ClientLevel level, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteSet) {
         super(level, x, y, z, vx, vy, vz);
@@ -26,6 +33,8 @@ public class StardustScatterParticle extends TextureSheetParticle {
         // 基础大小与寿命
         this.quadSize = 0.1F + this.random.nextFloat() * 0.05F;
         this.baseScale = this.quadSize;
+        this.prevScale = this.baseScale;
+        this.currentScale = this.baseScale;
         this.lifetime = 5 + this.random.nextInt(25); // 寿命较短，符合爆发感
 
         // 【星尘调色】：青蓝色调，带一点随机偏差增加层次感
@@ -41,9 +50,18 @@ public class StardustScatterParticle extends TextureSheetParticle {
     public void tick() {
         super.tick();
         this.setSpriteFromAge(this.spriteSet);
-        // 【视觉动画】：随时间流逝逐渐平滑缩小，而不是突然消失
+        // 保存上一帧的缩放值
+        this.prevScale = this.currentScale;
+        // 计算当前帧的目标缩放值
         float lifeProgress = (float) this.age / (float) this.lifetime;
-        this.quadSize = this.baseScale * (1.0F - (float) Math.pow(lifeProgress, 2.0));
+        this.currentScale = this.baseScale * (1.0F - (float) Math.pow(lifeProgress, 2.0));
+    }
+
+    @Override
+    public void render(@NotNull VertexConsumer buffer, @NotNull Camera renderInfo, float partialTick) {
+        // 在渲染时进行平滑插值
+        this.quadSize = Mth.lerp(partialTick, this.prevScale, this.currentScale);
+        super.render(buffer, renderInfo, partialTick);
     }
 
     @Override
@@ -66,7 +84,7 @@ public class StardustScatterParticle extends TextureSheetParticle {
         }
 
         @Override
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double vx, double vy, double vz) {
+        public Particle createParticle(@NotNull SimpleParticleType type, @NotNull ClientLevel level, double x, double y, double z, double vx, double vy, double vz) {
             return new StardustScatterParticle(level, x, y, z, vx, vy, vz, this.sprite);
         }
 

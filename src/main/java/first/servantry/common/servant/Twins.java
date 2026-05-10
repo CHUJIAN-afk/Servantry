@@ -1,14 +1,15 @@
 package first.servantry.common.servant;
 
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
-import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.TwinsIdleGoal;
 import first.servantry.common.servant.goal.TwinsLaserAttackGoal;
-import first.servantry.register.ServantRegister;
+import first.servantry.register.AttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 双子魔眼 - 由Retinazer和Spazmatism组成的双瞳仆从。
@@ -38,7 +39,7 @@ public class Twins extends MomentumServant implements IBlockCollision<Twins> {
     }
 
     @Override
-    public AABB getBlockCollisionBox() {
+    public @NotNull AABB getBlockCollisionBox() {
         return new AABB(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25);
     }
 
@@ -76,8 +77,8 @@ public class Twins extends MomentumServant implements IBlockCollision<Twins> {
     }
 
     @Override
-    public ServantType<? extends MomentumServant> getType() {
-        return ServantRegister.Twins.get();
+    public AttachmentEntityType<? extends MomentumServant> getType() {
+        return AttachmentEntityRegister.Twins.get();
     }
 
     // ===================== 访问器 =====================

@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,6 +24,7 @@ public interface ICollideAttack<T extends AttachmentEntity> {
     /**
      * 获取用于碰撞检测的局部碰撞盒
      */
+    @NotNull
     AABB getHitbox();
 
     /** 当碰撞检测命中目标时调用，执行具体的攻击逻辑 */
@@ -53,7 +55,6 @@ public interface ICollideAttack<T extends AttachmentEntity> {
         if (!canCollideAttack()) return;
 
         AABB localBox = getHitbox();
-        if (localBox == null) return;
 
         double minDim = Math.min(Math.min(localBox.getXsize(), localBox.getYsize()), localBox.getZsize());
         ArrayList<PathNode> historyNodes = entity.getHistoryNodes();

@@ -1,14 +1,14 @@
 package first.servantry.common.projectile;
 
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.projectile.AttachingProjectile;
-import first.servantry.api.register.ProjectileType;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
+import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.MobEffectRegister;
 import first.servantry.register.ParticleRegister;
-import first.servantry.register.ProjectileRegister;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -33,7 +33,7 @@ public class StardustProjectile extends AttachingProjectile {
 
     public StardustProjectile() {
         super();
-        setDrag(0.95f);
+        setDrag(0.9f);
         setMaxSpeed(1.2f);
     }
 
@@ -61,12 +61,12 @@ public class StardustProjectile extends AttachingProjectile {
                 Vec3 targetCenter = target.getBoundingBox().getCenter();
                 double dist = getPos().distanceTo(targetCenter);
 
-                if (dist < 0.5 + target.getBbWidth() / 2.0) {
+                if (dist < target.getBoundingBox().getSize() * 1.5) {
                     onHit(target);
                     return;
                 }
 
-                applyForce(targetCenter.subtract(getPos()).normalize().scale(Math.min(dist * 0.1, 0.3)));
+                applyForce(targetCenter.subtract(getPos()).normalize().scale(0.3));
                 setTrailTimer(getTrailDuration());
             } else {
                 setRemove();
@@ -123,8 +123,10 @@ public class StardustProjectile extends AttachingProjectile {
             stardustProjectile.target = target;
             double theta = rand.nextDouble() * Math.PI * 2;
             double phi = rand.nextDouble() * Math.PI * 0.5;
-            double speed = 0.15 + rand.nextDouble() * 0.1;
-            stardustProjectile.applyForce(new Vec3(Math.sin(phi) * Math.cos(theta), Math.cos(phi), Math.sin(phi) * Math.sin(theta)).scale(speed * 2));
+            double speed = 0.15 + rand.nextDouble() * 0.15;
+            stardustProjectile.applyForce(new Vec3(Math.sin(phi) * Math.cos(theta), Math.cos(phi), Math.sin(phi) * Math.sin(theta)).scale(speed));
+
+
             owner.getData(AttachmentRegister.EntityData).addProjectile(stardustProjectile);
         }
     }
@@ -134,13 +136,21 @@ public class StardustProjectile extends AttachingProjectile {
         Level level = owner.level();
         if (!level.isClientSide()) {
             Vec3 pos = getPos();
-            int count = owner.getRandom().nextInt(8, 12);
+            int count = owner.getRandom().nextInt(2, 3);
+            double speed = 0.2;
+            if (isAttached()) {
+                if (target != null && target.isAlive()) {
+                    onHit(target);
+                }
+                count *= 4;
+                speed *= 4;
+            }
             RandomSource rand = level.getRandom();
             for (int i = 0; i < count; i++) {
                 double theta = rand.nextDouble() * Math.PI * 2;
                 double phi = rand.nextDouble() * Math.PI;
                 double s = 0.5 + rand.nextDouble() * 0.5;
-                ((ServerLevel) level).sendParticles(ParticleRegister.StardustScatter.get(), pos.x(), pos.y(), pos.z(), 0, Math.sin(phi) * Math.cos(theta) * s, Math.cos(phi) * s, Math.sin(phi) * Math.sin(theta) * s, 1.0);
+                ((ServerLevel) level).sendParticles(ParticleRegister.StardustScatter.get(), pos.x(), pos.y(), pos.z(), 0, Math.sin(phi) * Math.cos(theta) * s, Math.cos(phi) * s, Math.sin(phi) * Math.sin(theta) * s, speed);
             }
         }
     }
@@ -157,8 +167,8 @@ public class StardustProjectile extends AttachingProjectile {
     }
 
     @Override
-    public ProjectileType<? extends AttachingProjectile> getProjectileType() {
-        return ProjectileRegister.StardustProjectile.get();
+    public AttachmentEntityType<? extends AttachingProjectile> getType() {
+        return AttachmentEntityRegister.StardustProjectile.get();
     }
 
     public void setTarget(LivingEntity target) {

@@ -2,11 +2,11 @@ package first.servantry.common.item;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.item.IServantWeapon;
-import first.servantry.api.register.ServantType;
 import first.servantry.common.servant.StardustDragon;
+import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.AttachmentRegister;
-import first.servantry.register.ServantRegister;
 import first.servantry.register.SoundRegister;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
@@ -32,8 +32,8 @@ public class StardustDragonWeaponItem extends Item implements IServantWeapon<Sta
     }
 
     @Override
-    public ServantType<StardustDragon> getType() {
-        return ServantRegister.StardustDragon.get();
+    public AttachmentEntityType<StardustDragon> getType() {
+        return AttachmentEntityRegister.StardustDragon.get();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class StardustDragonWeaponItem extends Item implements IServantWeapon<Sta
     @Override
     public void handleSummon(Player player) {
         EntityData data = player.getData(AttachmentRegister.EntityData);
-        ServantType<StardustDragon> type = getType();
+        AttachmentEntityType<StardustDragon> type = getType();
 
         // 查找现有体节
         List<StardustDragon> existing = data.getEntities().stream()
@@ -72,7 +72,7 @@ public class StardustDragonWeaponItem extends Item implements IServantWeapon<Sta
     /**
      * 首次召唤：创建初始体节组。
      */
-    private void summonInitialSegments(Player player, EntityData data, ServantType<StardustDragon> type) {
+    private void summonInitialSegments(Player player, EntityData data, AttachmentEntityType<StardustDragon> type) {
         // 检查栏位是否足够
         int initial_segments = 3;
         if (data.getUsedSlots() + 1 > data.getMaxServantSize(player)) {
@@ -94,7 +94,7 @@ public class StardustDragonWeaponItem extends Item implements IServantWeapon<Sta
     /**
      * 增加体节：在现有体节组末尾添加新体节。
      */
-    private void addSegment(Player player, EntityData data, ServantType<StardustDragon> type, List<StardustDragon> existing) {
+    private void addSegment(Player player, EntityData data, AttachmentEntityType<StardustDragon> type, List<StardustDragon> existing) {
         // 检查栏位是否足够
         if (data.getUsedSlots() + 1 > data.getMaxServantSize(player)) {
             return;

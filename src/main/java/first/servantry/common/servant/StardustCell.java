@@ -1,16 +1,16 @@
 package first.servantry.common.servant;
 
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
-import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.goal.StardustCellAttackGoal;
 import first.servantry.common.servant.goal.StardustCellIdleGoal;
 import first.servantry.common.servant.goal.StardustCellTeleportGoal;
+import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ParticleRegister;
-import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -19,6 +19,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
@@ -57,7 +58,7 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
     }
 
     @Override
-    public AABB getBlockCollisionBox() {
+    public @NotNull AABB getBlockCollisionBox() {
         return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
     }
 
@@ -179,7 +180,9 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
     public float getKnockback() { return 0.2f; }
 
     @Override
-    public ServantType<? extends MomentumServant> getType() { return ServantRegister.StardustCell.get(); }
+    public AttachmentEntityType<? extends MomentumServant> getType() {
+        return AttachmentEntityRegister.StardustCell.get();
+    }
 
     // ===================== 访问器 =====================
 

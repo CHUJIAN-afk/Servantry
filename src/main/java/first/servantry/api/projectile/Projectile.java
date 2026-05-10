@@ -2,8 +2,6 @@ package first.servantry.api.projectile;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.EntityType;
-import first.servantry.api.register.ProjectileType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -64,17 +62,7 @@ public abstract class Projectile extends AttachmentEntity {
         }
     }
 
-    // ===================== 抽象方法 =====================
-
-    /** 返回射弹的注册类型 */
-    public abstract ProjectileType<? extends Projectile> getProjectileType();
-
     // ===================== AttachmentEntity 实现 =====================
-
-    @Override
-    public EntityType<? extends AttachmentEntity> getType() {
-        return getProjectileType();
-    }
 
     @Override
     public int getHistoryNodesSize() {

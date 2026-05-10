@@ -18,12 +18,11 @@ public class Servantry {
         AttachmentRegister.register(eventBus);
         AttributeRegister.register(eventBus);
         CreativeTabRegister.register(eventBus);
+        AttachmentEntityRegister.register(eventBus);
         ItemRegister.register(eventBus);
         MobEffectRegister.register(eventBus);
         ParticleRegister.register(eventBus);
         PotionRegister.register(eventBus);
-        ProjectileRegister.register(eventBus);
-        ServantRegister.register(eventBus);
         SoundRegister.register(eventBus);
     }
 

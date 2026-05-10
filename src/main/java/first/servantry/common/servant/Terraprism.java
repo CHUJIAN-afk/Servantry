@@ -2,18 +2,19 @@ package first.servantry.common.servant;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.TerraprismAttackGoal;
 import first.servantry.common.servant.goal.TerraprismIdleGoal;
-import first.servantry.register.ServantRegister;
+import first.servantry.register.AttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -51,8 +52,13 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     }
 
     @Override
-    public AABB getHitbox() {
+    public @NotNull AABB getHitbox() {
         return new AABB(-0.1, -0.04, -0.25, 0.1, 0.04, 0.75);
+    }
+
+    @Override
+    public boolean canCollideAttack() {
+        return isTarget(getTarget());
     }
 
     @Override
@@ -176,8 +182,8 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     }
 
     @Override
-    public ServantType<? extends Servant> getType() {
-        return ServantRegister.TerraPrism.get();
+    public AttachmentEntityType<? extends Servant> getType() {
+        return AttachmentEntityRegister.TerraPrism.get();
     }
 
 }

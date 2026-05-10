@@ -1,13 +1,12 @@
 package first.servantry.common.event;
 
 import first.servantry.Servantry;
-import first.servantry.api.client.render.EntityRenderDispatcher;
+import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
 import first.servantry.api.client.renderType.TrailShaders;
 import first.servantry.client.attachmentEntityRenderer.*;
 import first.servantry.common.particle.StardustScatterParticle;
+import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.ParticleRegister;
-import first.servantry.register.ProjectileRegister;
-import first.servantry.register.ServantRegister;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -25,13 +24,13 @@ public class ClientEvent {
 
     @SubscribeEvent
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
-        EntityRenderDispatcher.register(ServantRegister.TerraPrism.get(), new TerraprismRenderer());
-        EntityRenderDispatcher.register(ServantRegister.EnchantedThrowingKnives.get(), new EnchantedThrowingKnivesRenderer());
-        EntityRenderDispatcher.register(ServantRegister.StardustCell.get(), new StardustCellRenderer());
-        EntityRenderDispatcher.register(ServantRegister.StardustDragon.get(), new StardustDragonRenderer());
-        EntityRenderDispatcher.register(ServantRegister.Twins.get(), new TwinsRenderer());
-        EntityRenderDispatcher.register(ProjectileRegister.StardustProjectile.get(), new StardustProjectileRenderer());
-        EntityRenderDispatcher.register(ProjectileRegister.LaserProjectile.get(), new LaserProjectileRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.TerraPrism.get(), new TerraprismRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.EnchantedThrowingKnives.get(), new EnchantedThrowingKnivesRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustCell.get(), new StardustCellRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustDragon.get(), new StardustDragonRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.Twins.get(), new TwinsRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustProjectile.get(), new StardustProjectileRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.LaserProjectile.get(), new LaserProjectileRenderer());
     }
 
     @SubscribeEvent

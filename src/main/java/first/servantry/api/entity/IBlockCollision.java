@@ -9,6 +9,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,10 @@ public interface IBlockCollision<T extends AttachmentEntity> {
         return bounceVelocity(velocity, context, 0.4, 0.01);
     }
 
-    /** 获取碰撞箱（相对于实体中心） */
+    /**
+     * 获取碰撞箱（相对于实体中心）
+     */
+    @NotNull
     AABB getBlockCollisionBox();
 
     /**

@@ -28,7 +28,7 @@ public class ItemRegister {
 
     /** 泰拉棱镜 - 召唤泰拉棱镜仆从 */
     public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
-            new IServantWeapon.Builder<>(ServantRegister.TerraPrism)
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.TerraPrism)
                     .sound(SoundRegister.UseTerraprism)
                     .onSummon(servant -> servant.init(servant.getInterpolatedIdleState(1)))
                     .buildItem()
@@ -36,7 +36,7 @@ public class ItemRegister {
 
     /** 刃杖 - 召唤附魔飞刀群 */
     public static final DeferredItem<Item> BladeStaff = Register.register("blade_staff", () ->
-            new IServantWeapon.Builder<>(ServantRegister.EnchantedThrowingKnives)
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.EnchantedThrowingKnives)
                     .sound(SoundRegister.UseServantWeapon)
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();
@@ -49,7 +49,7 @@ public class ItemRegister {
 
     /** 星尘细胞杖 - 召唤星尘细胞仆从 */
     public static final DeferredItem<Item> StardustCellStaff = Register.register("stardust_cell_staff", () ->
-            new IServantWeapon.Builder<>(ServantRegister.StardustCell)
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.StardustCell)
                     .sound(SoundRegister.UseServantWeapon)
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();
@@ -68,7 +68,7 @@ public class ItemRegister {
      * 光学法杖 - 召唤双子魔眼
      */
     public static final DeferredItem<Item> OpticStaff = Register.register("optic_staff", () ->
-            new IServantWeapon.Builder<>(ServantRegister.Twins)
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.Twins)
                     .sound(SoundRegister.UseServantWeapon)
                     .onSummon(servant -> {
                         Player owner = servant.getOwner();

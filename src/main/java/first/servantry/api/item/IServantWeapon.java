@@ -1,7 +1,7 @@
 package first.servantry.api.item;
 
 import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.register.ServantType;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.sounds.SoundEvent;
@@ -61,7 +61,7 @@ public interface IServantWeapon<T extends Servant> {
      *
      * @return 仆从类型注册项
      */
-    ServantType<T> getType();
+    AttachmentEntityType<T> getType();
 
     /**
      * 获取临时仆从实例，用于预览或获取基础属性。
@@ -146,7 +146,7 @@ public interface IServantWeapon<T extends Servant> {
         // -------------------- 核心配置 --------------------
 
         /** 仆从类型供应器 */
-        private final Supplier<ServantType<T>> typeSupplier;
+        private final Supplier<AttachmentEntityType<T>> typeSupplier;
 
         /** 召唤音效供应器 */
         private Supplier<SoundEvent> soundEventSupplier = () -> null;
@@ -167,7 +167,7 @@ public interface IServantWeapon<T extends Servant> {
          *
          * @param typeSupplier 仆从类型供应器，通常传入 DeferredHolder::get
          */
-        public Builder(@NotNull Supplier<ServantType<T>> typeSupplier) {
+        public Builder(@NotNull Supplier<AttachmentEntityType<T>> typeSupplier) {
             this.typeSupplier = typeSupplier;
         }
 
@@ -255,7 +255,7 @@ public interface IServantWeapon<T extends Servant> {
             }
 
             @Override
-            public ServantType<T> getType() {
+            public AttachmentEntityType<T> getType() {
                 return typeSupplier.get();
             }
 
@@ -275,7 +275,7 @@ public interface IServantWeapon<T extends Servant> {
             @Override
             public void handleSummon(Player player) {
                 EntityData data = player.getData(AttachmentRegister.EntityData);
-                ServantType<T> type = getType();
+                AttachmentEntityType<T> type = getType();
 
                 // 检查当前数量是否已达上限
                 long currentCount = data.getEntities().stream()

@@ -3,7 +3,6 @@ package first.servantry.api.servant;
 import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.DamageRegister;
@@ -83,13 +82,6 @@ public abstract class Servant extends AttachmentEntity {
      * @return 击退系数
      */
     public abstract float getKnockback();
-
-    /**
-     * 返回仆从的注册类型。
-     *
-     * @return 仆从类型
-     */
-    public abstract ServantType<? extends Servant> getType();
 
     /**
      * 获取仆从占用的栏位数。

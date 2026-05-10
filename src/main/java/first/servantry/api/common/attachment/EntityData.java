@@ -1,9 +1,8 @@
 package first.servantry.api.common.attachment;
 
 import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.projectile.Projectile;
-import first.servantry.api.register.ProjectileType;
-import first.servantry.api.register.ServantType;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttributeRegister;
@@ -118,7 +117,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      *
      * @param type 仆从类型
      */
-    public void removeServant(ServantType<?> type) {
+    public void removeServant(AttachmentEntityType<?> type) {
         List<Servant> targets = new ArrayList<>();
         for (AttachmentEntity entity : entities) {
             if (entity instanceof Servant servant && servant.getType() == type) {
@@ -249,6 +248,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                 if (ticking) {
                     pendingRemove.add(entity);
                 } else {
+                    entity.omRemove();
                     iterator.remove();
                 }
                 removed = true;
@@ -324,22 +324,9 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     public void write(RegistryFriendlyByteBuf buf, EntityData data, boolean isSelf) {
         buf.writeVarInt(data.entities.size());
         for (AttachmentEntity entity : data.entities) {
-            // 写入实体类型标记（0=仆从, 1=射弹）
-            boolean isServant = entity instanceof Servant;
-            buf.writeBoolean(isServant);
-
-            if (isServant) {
-                Servant servant = (Servant) entity;
-                ResourceLocation location = ServantryRegistries.SERVANT_TYPES.getKey(servant.getType());
-                assert location != null;
-                buf.writeResourceLocation(location);
-            } else {
-                Projectile projectile = (Projectile) entity;
-                ResourceLocation location = ServantryRegistries.PROJECTILE_TYPES.getKey(projectile.getProjectileType());
-                assert location != null;
-                buf.writeResourceLocation(location);
-            }
-
+            ResourceLocation location = ServantryRegistries.ATTACHMENT_ENTITY_TYPES.getKey(entity.getType());
+            assert location != null;
+            buf.writeResourceLocation(location);
             buf.writeUUID(entity.getUuid());
             entity.writeBase(buf);
         }
@@ -359,21 +346,14 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         int size = buf.readVarInt();
 
         for (int i = 0; i < size; i++) {
-            boolean isServant = buf.readBoolean();
             ResourceLocation typeId = buf.readResourceLocation();
             UUID uuid = buf.readUUID();
 
             AttachmentEntity entity = existingEntities.get(uuid);
             if (entity == null) {
-                if (isServant) {
-                    ServantType<?> type = ServantryRegistries.SERVANT_TYPES.get(typeId);
-                    assert type != null;
-                    entity = type.factory().get();
-                } else {
-                    ProjectileType<?> type = ServantryRegistries.PROJECTILE_TYPES.get(typeId);
-                    assert type != null;
-                    entity = type.factory().get();
-                }
+                AttachmentEntityType<?> type = ServantryRegistries.ATTACHMENT_ENTITY_TYPES.get(typeId);
+                assert type != null;
+                entity = type.factory().get();
                 entity.setUuid(uuid);
             }
             entity.readBase(buf);

@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.EntityType;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.register.AttachmentRegister;
@@ -32,10 +32,10 @@ import java.util.Map;
  * 根据附件实体与玩家眼睛的距离动态调整透明度。
  * </p>
  */
-public class EntityRenderDispatcher {
+public class AttachmentEntityRenderDispatcher {
 
     /** 渲染器映射表，按实体类型存储对应的渲染器 */
-    private static final Map<EntityType<?>, IAttachmentEntityRenderer<?>> renderers = new HashMap<>();
+    private static final Map<AttachmentEntityType<?>, IAttachmentEntityRenderer<?>> renderers = new HashMap<>();
 
     /**
      * 渲染玩家的所有附件实体。
@@ -75,6 +75,7 @@ public class EntityRenderDispatcher {
                     poseStack.mulPose(Axis.ZP.rotationDegrees(renderNode.roll()));
                     LevelRenderer.renderLineBox(poseStack, debugConsumer, iCollideAttack.getHitbox(), 1.0F, 0.0F, 0.0F, 1.0F);
                     poseStack.popPose();
+
                 }
             }
 
@@ -90,7 +91,7 @@ public class EntityRenderDispatcher {
      */
     @SuppressWarnings("unchecked")
     public static <T extends AttachmentEntity> IAttachmentEntityRenderer<T> getRenderer(T entity) {
-        EntityType<T> type = (EntityType<T>) entity.getType();
+        AttachmentEntityType<T> type = (AttachmentEntityType<T>) entity.getType();
         return (IAttachmentEntityRenderer<T>) renderers.get(type);
     }
 
@@ -103,7 +104,7 @@ public class EntityRenderDispatcher {
      * @param type     实体类型
      * @param renderer 渲染器实例
      */
-    public static <T extends AttachmentEntity> void register(EntityType<T> type, IAttachmentEntityRenderer<T> renderer) {
+    public static <T extends AttachmentEntity> void register(AttachmentEntityType<T> type, IAttachmentEntityRenderer<T> renderer) {
         if (!renderers.containsKey(type)) {
             renderers.put(type, renderer);
         }

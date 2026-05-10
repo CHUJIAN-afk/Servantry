@@ -1,18 +1,19 @@
 package first.servantry.common.projectile;
 
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.projectile.Projectile;
-import first.servantry.api.register.ProjectileType;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.servant.Twins;
-import first.servantry.register.ProjectileRegister;
+import first.servantry.register.AttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 import java.util.UUID;
@@ -81,14 +82,14 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
     // ===================== IBlockCollision =====================
 
     @Override
-    public AABB getBlockCollisionBox() {
+    public @NotNull AABB getBlockCollisionBox() {
         return new AABB(-0.1, -0.1, -0.1, 0.1, 0.1, 0.1);
     }
 
     // ===================== ICollideAttack =====================
 
     @Override
-    public AABB getHitbox() {
+    public @NotNull AABB getHitbox() {
         return new AABB(-0.05, -0.05, -1, 0.05, 0.05, 0);
     }
 
@@ -115,8 +116,8 @@ public class LaserProjectile extends Projectile implements IBlockCollision<Laser
     }
 
     @Override
-    public ProjectileType<? extends Projectile> getProjectileType() {
-        return ProjectileRegister.LaserProjectile.get();
+    public AttachmentEntityType<? extends Projectile> getType() {
+        return AttachmentEntityRegister.LaserProjectile.get();
     }
 
     @Override

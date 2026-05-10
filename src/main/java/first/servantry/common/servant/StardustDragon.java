@@ -2,21 +2,22 @@ package first.servantry.common.servant;
 
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.StardustDragonAttackGoal;
 import first.servantry.common.servant.goal.StardustDragonFollowGoal;
 import first.servantry.common.servant.goal.StardustDragonIdleGoal;
+import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.ParticleRegister;
-import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.List;
@@ -131,7 +132,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     }
 
     @Override
-    public AABB getHitbox() {
+    public @NotNull AABB getHitbox() {
         int segment = getSegmentIndex();
         int total = getTotalSegments();
         boolean isHead = segment == 0;
@@ -140,6 +141,11 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         double maxZ = isHead ? 0.65 : isTail ? 0.3 : 0.35;
         double scale = getScale();
         return new AABB(-0.25 * scale, -0.25 * scale, minZ * scale, 0.25 * scale, 0.25 * scale, maxZ * scale);
+    }
+
+    @Override
+    public boolean canCollideAttack() {
+        return isTarget(getTarget());
     }
 
     @Override
@@ -190,8 +196,8 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     public float getKnockback() { return 0.5f; }
 
     @Override
-    public ServantType<? extends MomentumServant> getType() {
-        return ServantRegister.StardustDragon.get();
+    public AttachmentEntityType<? extends MomentumServant> getType() {
+        return AttachmentEntityRegister.StardustDragon.get();
     }
 
     public int getSegmentIndex() {

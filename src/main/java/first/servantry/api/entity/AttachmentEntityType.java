@@ -10,15 +10,6 @@ import java.util.function.Supplier;
  *
  * @param <T> 实体类型
  */
-public class EntityType<T extends AttachmentEntity> {
+public record AttachmentEntityType<T extends AttachmentEntity>(Supplier<T> factory) {
 
-    private final Supplier<T> factory;
-
-    public EntityType(Supplier<T> factory) {
-        this.factory = factory;
-    }
-
-    public Supplier<T> factory() {
-        return factory;
-    }
 }

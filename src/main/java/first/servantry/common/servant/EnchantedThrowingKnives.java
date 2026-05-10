@@ -2,20 +2,21 @@ package first.servantry.common.servant;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.register.ServantType;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.EnchantedThrowingKnivesAttackGoal;
 import first.servantry.common.servant.goal.EnchantedThrowingKnivesIdleGoal;
+import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.AttachmentRegister;
-import first.servantry.register.ServantRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -75,11 +76,16 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
     }
 
     @Override
-    public AABB getHitbox() {
+    public @NotNull AABB getHitbox() {
         return new AABB(-0.15, -0.025, -0.25, 0.15, 0.025, 0.25);
     }
 
     // ===================== 碰撞攻击 =====================
+
+    @Override
+    public boolean canCollideAttack() {
+        return isTarget(getTarget());
+    }
 
     @Override
     public void onCollisionAttack(Set<LivingEntity> targets) {
@@ -174,7 +180,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
     // ===================== 注册类型 =====================
 
     @Override
-    public ServantType<? extends Servant> getType() {
-        return ServantRegister.EnchantedThrowingKnives.get();
+    public AttachmentEntityType<? extends Servant> getType() {
+        return AttachmentEntityRegister.EnchantedThrowingKnives.get();
     }
 }

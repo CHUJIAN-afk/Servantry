@@ -138,7 +138,7 @@ public abstract class AttachmentEntity {
      *
      * @return 实体类型
      */
-    public abstract EntityType<? extends AttachmentEntity> getType();
+    public abstract AttachmentEntityType<? extends AttachmentEntity> getType();
 
     /**
      * 写入实体特有的附加同步数据。
