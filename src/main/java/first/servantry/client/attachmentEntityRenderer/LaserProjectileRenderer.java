@@ -12,8 +12,9 @@ public class LaserProjectileRenderer extends AbstractAttachmentEntityRenderer<La
     @Override
     protected RenderContext<LaserProjectile> createContext(LaserProjectile laser) {
         return RenderContext.<LaserProjectile>droplet(laser.getTrailDuration(), 0xFF3333, 0.04f)
-                .trailHistoryLength(8)
+                .trailHistoryLength(4)
                 .trailResolution(16)
+                .trailMinRadiusRatio(0.5f)
                 //.modelTranslateOffset(-0.47f, -0.03f, 0f)
                 //.modelRotationOffset(180, 0, 0)
                 .trailSegmentsPerNode(2);

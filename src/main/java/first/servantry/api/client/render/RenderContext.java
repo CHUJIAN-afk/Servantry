@@ -334,6 +334,35 @@ public class RenderContext<T extends AttachmentEntity> {
     public float trailMaxRadius = 0.2f;
 
     /**
+     * 圆锥/水滴拖尾最小半径比例，默认 0.0。
+     * <p>
+     * 控制拖尾尾端不会完全缩成一点。值为 0.0 时尾端完全收缩，值越大尾端越粗。
+     * </p>
+     * <pre>{@code
+     * 效果对比：
+     *
+     * minRadiusRatio=0.0:    ╭──╮    (尾端收缩成点)
+     *                       ╱    ╲
+     *                      │      │
+     *                       ╲    ╱
+     *                        ╰─╯
+     *
+     * minRadiusRatio=0.3:    ╭──╮    (尾端保留一定宽度)
+     *                       ╱    ╲
+     *                      │      │
+     *                       ╲    ╱
+     *                        ╰──╯
+     *
+     * minRadiusRatio=0.5:    ╭──╮    (尾端较粗)
+     *                       ╱    ╲
+     *                      │      │
+     *                      │      │
+     *                       ╰────╯
+     * }</pre>
+     */
+    public float trailMinRadiusRatio = 0.0f;
+
+    /**
      * 圆锥截面正多边形边数，默认 6。
      * <p>
      * 每个节点处绘制的正多边形边数。边数越多，截面越接近圆形。
@@ -897,6 +926,20 @@ public class RenderContext<T extends AttachmentEntity> {
      */
     public RenderContext<T> trailMaxRadius(float radius) {
         this.trailMaxRadius = radius;
+        return this;
+    }
+
+    /**
+     * 设置圆锥/水滴拖尾最小半径比例。
+     * <p>
+     * 控制拖尾尾端不会完全缩成一点。
+     * </p>
+     *
+     * @param ratio 最小半径比例 [0, 1]，0 表示尾端完全收缩，1 表示尾端与头部同宽
+     * @return this，用于链式调用
+     */
+    public RenderContext<T> trailMinRadiusRatio(float ratio) {
+        this.trailMinRadiusRatio = ratio;
         return this;
     }
 

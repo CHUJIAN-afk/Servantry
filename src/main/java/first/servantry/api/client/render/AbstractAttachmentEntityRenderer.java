@@ -319,8 +319,9 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
             // 计算淡出系数和半径
             float currFade = config.trailFadeOut.getFade(currProgress);
             float prevFade = config.trailFadeOut.getFade(prevProgress);
-            float currRadius = config.trailMaxRadius * currFade;
-            float prevRadius = config.trailMaxRadius * prevFade;
+            // 应用最小半径比例，使尾端不会完全缩成一点
+            float currRadius = config.trailMaxRadius * (config.trailMinRadiusRatio + (1 - config.trailMinRadiusRatio) * currFade);
+            float prevRadius = config.trailMaxRadius * (config.trailMinRadiusRatio + (1 - config.trailMinRadiusRatio) * prevFade);
 
             // 获取颜色
             int currColor = config.trailColorFunction.getColor(entity, currProgress, timeShift);
@@ -392,8 +393,9 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
 
             float currFade = config.trailFadeOut.getFade(currProgress);
             float prevFade = config.trailFadeOut.getFade(prevProgress);
-            float currRadius = config.trailMaxRadius * currFade;
-            float prevRadius = config.trailMaxRadius * prevFade;
+            // 应用最小半径比例，使尾端不会完全缩成一点
+            float currRadius = config.trailMaxRadius * (config.trailMinRadiusRatio + (1 - config.trailMinRadiusRatio) * currFade);
+            float prevRadius = config.trailMaxRadius * (config.trailMinRadiusRatio + (1 - config.trailMinRadiusRatio) * prevFade);
 
             int currColor = config.trailColorFunction.getColor(entity, currProgress, timeShift);
             int prevColor = config.trailColorFunction.getColor(entity, prevProgress, timeShift);

@@ -79,6 +79,9 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins> {
                 float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
                 setDesiredRotation(targetYaw, targetPitch, 0);
             }
+            if (trailTimer > 0) {
+                trailTimer--;
+            }
         }
         super.tick();
     }
