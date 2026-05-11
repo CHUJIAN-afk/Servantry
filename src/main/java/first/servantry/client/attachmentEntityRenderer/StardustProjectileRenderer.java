@@ -5,6 +5,8 @@ import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
+import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
+import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -20,15 +22,22 @@ public class StardustProjectileRenderer extends AbstractAttachmentEntityRenderer
 
     @Override
     protected RenderContext<StardustProjectile> createContext(StardustProjectile projectile) {
-        return RenderContext.<StardustProjectile>cone(projectile.getTrailTimer(), 0x8AE0FF, 0.125f)
-                .trailHistoryLength(5)
-                .trailMaxRadius(0.105f)
-                .trailSegmentsPerNode(16)
-                .trailResolution(4)
-                .trailFadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))
-                .modelTranslateOffset(-0.5f, -0.5f, -0.5f)
-                .modelRotationOffset(0, 0, 45)
-                .modelScale(0.2f);
+        return RenderContext.<StardustProjectile>builder()
+                .trail(new ConeTrailConfig<StardustProjectile>()
+                        .timer(projectile.getTrailTimer())
+                        .colorRGB(0x8AE0FF)
+                        .historyLength(5)
+                        .segmentsPerNode(16)
+                        .startIndex(0)
+                        .maxRadius(0.105f)
+                        .minRadiusRatio(0f)
+                        .resolution(4)
+                        .fadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0)))
+                .model(new ModelConfig<StardustProjectile>()
+                        .scale(0.2f)
+                        .translateOffset(-0.5f, -0.5f, -0.5f)
+                        .rotationOffset(0, 0, 45))
+                .build();
     }
 
     @Override

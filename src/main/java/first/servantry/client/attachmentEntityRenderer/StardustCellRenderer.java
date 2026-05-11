@@ -5,6 +5,8 @@ import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
+import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
+import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.register.ModelRegister;
 import first.servantry.register.ParticleRegister;
@@ -23,18 +25,24 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
 
     @Override
     protected RenderContext<StardustCell> createContext(StardustCell servant) {
-        return RenderContext.<StardustCell>cone(servant.trailTimer, 0x8AE0FF, 0.2f)
-                .trailResolution(12)
-                .trailFadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))
-                .modelTranslateOffset(-0.5f, -0.5f, -0.5f)
-                .modelScale(0.5f)
-                .alphaDistanceFactor(1.5f)
-                .visualNodeFunction((cell, partialTick, rawNode) -> new PathNode(rawNode.pos(), cell.getRenderYaw(partialTick), cell.getRenderPitch(partialTick), cell.getRenderRoll(partialTick)));
+        return RenderContext.<StardustCell>builder()
+                .trail(new ConeTrailConfig<StardustCell>()
+                        .timer(servant.trailTimer)
+                        .colorRGB(0x8AE0FF)
+                        .maxRadius(0.2f)
+                        .resolution(12)
+                        .fadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0)))
+                .model(new ModelConfig<StardustCell>()
+                        .scale(0.5f)
+                        .translateOffset(-0.5f, -0.5f, -0.5f)
+                        .alphaDistanceFactor(1.5f)
+                        .visualNodeFunction((cell, partialTick, rawNode) -> new PathNode(rawNode.pos(), cell.getRenderYaw(partialTick), cell.getRenderPitch(partialTick), cell.getRenderRoll(partialTick))))
+                .build();
     }
 
     @Override
     protected void renderEntity(StardustCell servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> config) {
-        if (config.trailTimer > 0) {
+        if (config.hasTrail()) {
             Player owner = servant.getOwner();
             Vec3 pos = visualNode.pos().offsetRandom(owner.getRandom(), 0.25f);
             owner.level().addParticle(ParticleRegister.StardustScatter.get(), true, pos.x(), pos.y(), pos.z(), 0, 0, 0);

@@ -1,27 +1,24 @@
 package first.servantry.client.attachmentEntityRenderer;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
+import first.servantry.api.client.render.renderConfig.DropletTrailConfig;
 import first.servantry.common.projectile.LaserProjectile;
-import net.minecraft.client.renderer.MultiBufferSource;
 
 public class LaserProjectileRenderer extends AbstractAttachmentEntityRenderer<LaserProjectile> {
 
     @Override
     protected RenderContext<LaserProjectile> createContext(LaserProjectile laser) {
-        return RenderContext.<LaserProjectile>droplet(laser.getTrailDuration(), 0xFF3333, 0.04f)
-                .trailHistoryLength(4)
-                .trailResolution(16)
-                .trailMinRadiusRatio(0.5f)
-                //.modelTranslateOffset(-0.47f, -0.03f, 0f)
-                //.modelRotationOffset(180, 0, 0)
-                .trailSegmentsPerNode(2);
+        return RenderContext.<LaserProjectile>builder()
+                .trail(new DropletTrailConfig<LaserProjectile>()
+                        .timer(laser.getTrailDuration())
+                        .colorRGB(0xFF3333)
+                        .historyLength(4)
+                        .segmentsPerNode(2)
+                        .maxRadius(0.04f)
+                        .minRadiusRatio(0.5f)
+                        .resolution(16))
+                .build();
     }
 
-    @Override
-    protected void renderEntity(LaserProjectile entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<LaserProjectile> config) {
-        //ModelRenderer.renderModel(ModelRegister.LaserProjectile, poseStack, bufferSource);
-    }
 }

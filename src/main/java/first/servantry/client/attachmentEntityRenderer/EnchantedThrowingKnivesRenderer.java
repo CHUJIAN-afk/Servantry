@@ -5,6 +5,8 @@ import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
+import first.servantry.api.client.render.renderConfig.ModelConfig;
+import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
 import first.servantry.common.servant.EnchantedThrowingKnives;
 import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,41 +23,26 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
     @Override
     protected RenderContext<EnchantedThrowingKnives> createContext(EnchantedThrowingKnives servant) {
         int trailTimer = servant.attacking ? servant.trailTimer : 0;
-        return RenderContext.<EnchantedThrowingKnives>ribbon(trailTimer, 0x88CCFF)
-                .trailHistoryLength(3)
-                .ribbonDiamondSize(0.25f)
-                .ribbonWidth(0.225f)
-                .trailStartIndex(Math.max(0, 10 - trailTimer))
-                .trailColorFunction((s, progress, timeShift) -> {
-                    // 淡蓝色基调 (136, 204, 255)
-                    int r = 136;
-                    int g = 204;
-                    int b = 255;
-
-                    // 亮度随进度递减
-                    float brightness = Mth.lerp(progress, 1.0f, 0.5f);
-                    r = Math.round(r * brightness);
-                    g = Math.round(g * brightness);
-                    b = Math.round(b * brightness);
-
-                    return (r << 16) | (g << 8) | b;
-                })
-                .trailTipAlphaBoost((s, progress) -> {
-                    if (progress < 0.3f) {
-                        return Mth.lerp(progress / 0.3f, 2.0f, 1.0f);
-                    }
-                    return 1.0f;
-                })
-                .trailTipBrightnessBoost((s, progress) -> {
-                    if (progress < 0.25f) {
-                        return Mth.lerp(progress / 0.25f, 1.3f, 1.0f);
-                    }
-                    return 1.0f;
-                })
-                .modelTranslateOffset(-0.25f, -0.25f, -0.25f)
-                .modelScale(0.5f)
-                .modelRotationOffset(0, 90, 0)
-                .visualNodeFunction((knives, partialTick, rawNode) -> rawNode.lerp(knives.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, knives.idleBlendO, knives.idleBlend)));
+        return RenderContext.<EnchantedThrowingKnives>builder()
+                .trail(new RibbonTrailConfig<EnchantedThrowingKnives>()
+                        .timer(trailTimer)
+                        .colorRGB(0x88CCFF)
+                        .historyLength(3)
+                        .width(0.225f)
+                        .diamondSize(0.25f)
+                        .colorFunction((s, progress, timeShift) -> {
+                            int r = 136, g = 204, b = 255;
+                            float brightness = Mth.lerp(progress, 1.0f, 0.5f);
+                            return (Math.round(r * brightness) << 16) | (Math.round(g * brightness) << 8) | Math.round(b * brightness);
+                        })
+                        .tipAlphaBoost((s, progress) -> progress < 0.3f ? Mth.lerp(progress / 0.3f, 2.0f, 1.0f) : 1.0f)
+                        .tipBrightnessBoost((s, progress) -> progress < 0.25f ? Mth.lerp(progress / 0.25f, 1.3f, 1.0f) : 1.0f))
+                .model(new ModelConfig<EnchantedThrowingKnives>()
+                        .scale(0.5f)
+                        .translateOffset(-0.5f, -0.5f, -0.5f)
+                        .rotationOffset(0, 90, 0)
+                        .visualNodeFunction((knives, partialTick, rawNode) -> rawNode.lerp(knives.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, knives.idleBlendO, knives.idleBlend))))
+                .build();
     }
 
     @Override
