@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 方块碰撞接口，使用原版碰撞检测API实现精确的碰撞检测与位置修正。
+ * 方块碰撞接口，使用原版碰撞检测API实现精确的碰撞检测与位置修正，未完成。
  *
  * @param <T> 附件实体类型
  */

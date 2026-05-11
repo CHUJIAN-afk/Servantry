@@ -285,7 +285,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
         // 生成随机椭圆参数
         float randAngle = owner.getRandom().nextFloat() * Mth.TWO_PI;
-        float randRadius = (float) target.getBoundingBox().getSize() * 4;
+        float randRadius = 4;
         float randY = 0.5f + owner.getRandom().nextFloat() * 2.5f;
         Vec3 farPoint = T.add(Math.cos(randAngle) * randRadius, randY, Math.sin(randAngle) * randRadius);
 

@@ -66,6 +66,7 @@ public class TrailRenderType extends RenderType {
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setCullState(NO_CULL)
                     .setLightmapState(LIGHTMAP)
+                    .setWriteMaskState(COLOR_DEPTH_WRITE)  // 写颜色，写深度
                     .setOverlayState(OVERLAY)
                     .createCompositeState(false);
             return create("servantry_trail_vanilla", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, false, true, state);
@@ -80,6 +81,7 @@ public class TrailRenderType extends RenderType {
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setCullState(NO_CULL)
                     .setLightmapState(LIGHTMAP)
+                    .setWriteMaskState(COLOR_WRITE)  // 只写颜色，不写深度
                     .setOverlayState(OVERLAY)
                     .createCompositeState(false);
             return create("servantry_trail_custom", TrailShaders.TRAIL_FORMAT, VertexFormat.Mode.QUADS, 256, false, true, state);

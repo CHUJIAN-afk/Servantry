@@ -21,7 +21,7 @@ public class TwinsIdleGoal extends ServantGoal<Twins> {
     @Override
     public void tick() {
         Player owner = servant.getOwner();
-        if (wanderOffset.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || wanderOffset.distanceToSqr(servant.getPos()) < 1 || wanderOffset.distanceToSqr(owner.position()) > 8) {
+        if (wanderOffset.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || wanderOffset.distanceToSqr(servant.getPos()) < 1 || wanderOffset.distanceToSqr(owner.position()) > 8 * 8) {
             wanderOffset = owner.getBoundingBox().getCenter().offsetRandom(owner.getRandom(), (float) owner.getBoundingBox().getSize() * 6);
         }
         if (servant.getPos().distanceToSqr(owner.position()) > 32 * 32) {

@@ -270,16 +270,6 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      * @param player 所有者玩家
      */
     public void tickAll(Player player) {
-        ticking = true;
-        try {
-            for (AttachmentEntity entity : entities) {
-                entity.setOwner(player);
-                entity.tick();
-            }
-        } finally {
-            ticking = false;
-        }
-
         // 处理待移除的实体
         if (!pendingRemove.isEmpty()) {
             for (AttachmentEntity entity : pendingRemove) {
@@ -299,6 +289,15 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
 
         // 清理标记移除的射弹
         cleanupMarked();
+        ticking = true;
+        try {
+            for (AttachmentEntity entity : entities) {
+                entity.setOwner(player);
+                entity.tick();
+            }
+        } finally {
+            ticking = false;
+        }
     }
 
     // ===================== 变更标记 =====================

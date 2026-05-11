@@ -1,7 +1,6 @@
 package first.servantry.common.servant;
 
 import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.projectile.StardustProjectile;
@@ -17,9 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
@@ -34,7 +31,7 @@ import java.util.Random;
  * </ul>
  * </p>
  */
-public class StardustCell extends MomentumServant implements IBlockCollision<StardustCell> {
+public class StardustCell extends MomentumServant {
 
     // ===================== 渲染状态 =====================
     private float renderYaw = 0f, renderPitch = 0f, renderRoll = 0f;
@@ -55,16 +52,6 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
 
     public StardustCell() {
         super();
-    }
-
-    @Override
-    public @NotNull AABB getBlockCollisionBox() {
-        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
-    }
-
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        setVelocity(IBlockCollision.clearVelocity(getVelocity(), context));
     }
 
     @Override

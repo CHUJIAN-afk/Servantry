@@ -1,5 +1,6 @@
 package first.servantry.common.projectile;
 
+import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
@@ -32,14 +33,14 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
 
     public LaserProjectile() {
         super();
-        setDrag(1);
-        setMaxSpeed(4);
-        setMaxLife(34);
     }
 
     public LaserProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
+        setDrag(1);
+        setMaxSpeed(4);
+        setMaxLife(34);
     }
 
     @Override
@@ -53,6 +54,7 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
             }
             InvincibleData.criteriaAttack(target, uuid, 4, source, getDamage(), InvincibleData.Type.PARTIAL);
         }
+        currentPathNode = new PathNode(target.getBoundingBox().getCenter(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
         setRemove();
     }
 
@@ -101,4 +103,5 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
     public int getTrailDuration() {
         return 10;
     }
+
 }
