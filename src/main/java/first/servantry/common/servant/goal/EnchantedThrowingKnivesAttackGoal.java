@@ -38,8 +38,7 @@ public class EnchantedThrowingKnivesAttackGoal extends ServantGoal<EnchantedThro
 
     @Override
     public boolean canUse() {
-        LivingEntity target = servant.getTarget();
-        return target != null && servant.isTarget(target);
+        return servant.isTarget(servant.getTarget());
     }
 
     /**
@@ -78,14 +77,12 @@ public class EnchantedThrowingKnivesAttackGoal extends ServantGoal<EnchantedThro
     @Override
     public void start() {
         servant.attacking = true;
-        servant.hitTargets.clear();
         planDashAttack(servant.getTarget());
     }
 
     @Override
     public void stop() {
         servant.attacking = false;
-        servant.hitTargets.clear();
         lastTargetPos = null;
     }
 
@@ -96,7 +93,6 @@ public class EnchantedThrowingKnivesAttackGoal extends ServantGoal<EnchantedThro
         // 目标切换检测
         if (servant.isTargetChange() && target != null && servant.isExecutingPath()) {
             // 目标切换时重新规划攻击
-            servant.hitTargets.clear();
             planDashAttack(target);
             return;
         }
@@ -122,8 +118,6 @@ public class EnchantedThrowingKnivesAttackGoal extends ServantGoal<EnchantedThro
         Player owner = servant.getOwner();
         if (owner == null) return;
 
-        servant.hitTargets.clear();
-
         // 随机偏移目标位置
         float hw = target.getBbWidth() * 0.4f;
         double offsetX = (owner.getRandom().nextDouble() - 0.5) * 2.0 * hw;
@@ -145,7 +139,7 @@ public class EnchantedThrowingKnivesAttackGoal extends ServantGoal<EnchantedThro
         if (dashNormal.lengthSqr() < 1e-4) dashNormal = new Vec3(0, 1, 0);
 
         // 生成冲刺路径节点
-        int ticks = owner.getRandom().nextInt(8, 12);
+        int ticks = owner.getRandom().nextInt(6, 10);
         List<PathNode> nodes = new ArrayList<>();
         for (int i = 1; i <= ticks; i++) {
             float t = (float) i / ticks;

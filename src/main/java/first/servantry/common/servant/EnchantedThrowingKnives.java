@@ -18,9 +18,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 附魔飞刀仆从 - 围绕玩家旋转并冲刺攻击敌人。
@@ -46,11 +44,6 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
 
     /** 攻击状态标记 */
     public boolean attacking = false;
-
-    // ===================== 碰撞攻击状态 =====================
-
-    /** 本轮攻击已命中的目标 */
-    public final Set<LivingEntity> hitTargets = new HashSet<>();
 
     public EnchantedThrowingKnives() {
         super();
@@ -91,7 +84,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
-            InvincibleData.criteriaAttack(hit.entity(), this.getUuid(), 10, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+            InvincibleData.criteriaAttack(hit.entity(), this.getUuid(), 2, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
         }
     }
 

@@ -27,7 +27,7 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
                 .trail(new RibbonTrailConfig<EnchantedThrowingKnives>()
                         .timer(trailTimer)
                         .colorRGB(0x88CCFF)
-                        .historyLength(3)
+                        .historyLength(2)
                         .width(0.225f)
                         .diamondSize(0.25f)
                         .colorFunction((s, progress, timeShift) -> {

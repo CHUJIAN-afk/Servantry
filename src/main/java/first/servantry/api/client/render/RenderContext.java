@@ -15,53 +15,6 @@ import first.servantry.api.entity.AttachmentEntity;
  * </ul>
  * </p>
  *
- * <h2>使用示例</h2>
- *
- * <h3>圆锥拖尾（能量球）</h3>
- * <pre>{@code
- * @Override
- * protected RenderContext<EnergyBall> createContext(EnergyBall entity) {
- *     return RenderContext.<EnergyBall>builder()
- *         .trail(new ConeTrailConfig<EnergyBall>()
- *             .timer(entity.getTrailTimer())
- *             .colorRGB(0xFF6600)
- *             .maxRadius(0.3f)
- *             .historyLength(6)
- *             .resolution(8))
- *         .model(new ModelConfig<EnergyBall>()
- *             .scale(0.8f))
- *         .build();
- * }
- * }</pre>
- *
- * <h3>丝带拖尾（剑刃）</h3>
- * <pre>{@code
- * @Override
- * protected RenderContext<SwordEntity> createContext(SwordEntity entity) {
- *     return RenderContext.<SwordEntity>builder()
- *         .trail(new RibbonTrailConfig<SwordEntity>()
- *             .timer(entity.getTrailTimer())
- *             .colorRGB(0x88CCFF)
- *             .width(0.5f)
- *             .diamondSize(0.25f)
- *             .tipAlphaBoost((e, p) -> p < 0.2f ? 2.0f : 1.0f))
- *         .model(new ModelConfig<SwordEntity>()
- *             .rotationOffset(0, 90, 0))
- *         .build();
- * }
- * }</pre>
- *
- * <h3>无拖尾（仅模型）</h3>
- * <pre>{@code
- * @Override
- * protected RenderContext<MyEntity> createContext(MyEntity entity) {
- *     return RenderContext.<MyEntity>builder()
- *         .model(new ModelConfig<MyEntity>()
- *             .scale(1.0f))
- *         .build();
- * }
- * }</pre>
- *
  * @param <T> 附件实体类型
  * @see TrailConfig
  * @see ModelConfig
@@ -73,9 +26,8 @@ public class RenderContext<T extends AttachmentEntity> {
      * 拖尾配置，null 表示无拖尾
      */
     public final TrailConfig<T, ?> trail;
-    /**
-     * 模型配置
-     */
+
+    /** 模型配置 */
     public final ModelConfig<T> model;
 
     private RenderContext(TrailConfig<T, ?> trail, ModelConfig<T> model) {
@@ -83,63 +35,12 @@ public class RenderContext<T extends AttachmentEntity> {
         this.model = model;
     }
 
-    // ===================== 函数式接口定义 =====================
-
-    /**
-     * 颜色计算函数。
-     */
-    @FunctionalInterface
-    public interface ColorFunction<T extends AttachmentEntity> {
-        int getColor(T entity, float progress, float timeShift);
-    }
-
-    /**
-     * 淡出函数。
-     */
-    @FunctionalInterface
-    public interface FadeFunction {
-        float getFade(float progress);
-    }
-
-    /**
-     * 透明度增强函数。
-     */
-    @FunctionalInterface
-    public interface AlphaBoostFunction<T extends AttachmentEntity> {
-        float getBoost(T entity, float progress);
-    }
-
-    /**
-     * 亮度增强函数。
-     */
-    @FunctionalInterface
-    public interface BrightnessBoostFunction<T extends AttachmentEntity> {
-        float getBoost(T entity, float progress);
-    }
-
-    /**
-     * 视觉节点计算函数。
-     */
-    @FunctionalInterface
-    public interface VisualNodeFunction<T extends AttachmentEntity> {
-        PathNode getVisualNode(T entity, float partialTick, PathNode rawNode);
-    }
-
-    // ===================== 构造方法 =====================
-
-    /**
-     * 创建 Builder 实例。
-     */
+    /** 创建 Builder 实例 */
     public static <T extends AttachmentEntity> Builder<T> builder() {
         return new Builder<>();
     }
 
-    /**
-     * 获取拖尾类型
-     */
-    public TrailType getTrailType() {
-        return trail != null ? trail.getType() : TrailType.NONE;
-    }
+    // ===================== 函数式接口定义 =====================
 
     /**
      * 是否有拖尾
@@ -148,50 +49,56 @@ public class RenderContext<T extends AttachmentEntity> {
         return trail != null && trail.timer > 0;
     }
 
-    // ===================== Builder =====================
-
-    /**
-     * 拖尾渲染类型。
-     */
-    public enum TrailType {
-        /**
-         * 无拖尾
-         */
-        NONE,
-        /** 圆锥拖尾 */
-        CONE,
-        /** 水滴拖尾 */
-        DROPLET,
-        /** 丝带拖尾 */
-        RIBBON
+    /** 颜色计算函数 */
+    @FunctionalInterface
+    public interface ColorFunction<T extends AttachmentEntity> {
+        int getColor(T entity, float progress, float timeShift);
     }
 
-    /**
-     * 渲染上下文构建器。
-     */
+    /** 淡出函数 */
+    @FunctionalInterface
+    public interface FadeFunction {
+        float getFade(float progress);
+    }
+
+    /** 透明度增强函数 */
+    @FunctionalInterface
+    public interface AlphaBoostFunction<T extends AttachmentEntity> {
+        float getBoost(T entity, float progress);
+    }
+
+    /** 亮度增强函数 */
+    @FunctionalInterface
+    public interface BrightnessBoostFunction<T extends AttachmentEntity> {
+        float getBoost(T entity, float progress);
+    }
+
+    // ===================== Builder =====================
+
+    /** 视觉节点计算函数 */
+    @FunctionalInterface
+    public interface VisualNodeFunction<T extends AttachmentEntity> {
+        PathNode getVisualNode(T entity, float partialTick, PathNode rawNode);
+    }
+
+    /** 渲染上下文构建器 */
     public static class Builder<T extends AttachmentEntity> {
         private TrailConfig<T, ?> trail;
         private ModelConfig<T> model = new ModelConfig<>();
 
-        /**
-         * 设置拖尾配置。
-         */
+        /** 设置拖尾配置 */
         public Builder<T> trail(TrailConfig<T, ?> trail) {
             this.trail = trail;
             return this;
         }
 
-        /**
-         * 设置模型配置。
-         */
+        /** 设置模型配置 */
         public Builder<T> model(ModelConfig<T> model) {
             this.model = model;
             return this;
         }
 
-        /**
-         * 构建渲染上下文。
-         */
+        /** 构建渲染上下文 */
         public RenderContext<T> build() {
             return new RenderContext<>(trail, model);
         }
