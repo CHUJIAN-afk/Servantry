@@ -63,12 +63,10 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     }
 
     @Override
-    public void onCollisionAttack(List<LivingEntity> hitTargets) {
-        if (isExecutingPath()) {
-            for (LivingEntity target : hitTargets) {
-                if (this.hitTargets.add(target)) {
-                    InvincibleData.criteriaAttack(target, getUuid(), -1, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
-                }
+    public void onCollisionAttack(List<HitContext> hitContexts) {
+        for (HitContext hit : hitContexts) {
+            if (this.hitTargets.add(hit.entity())) {
+                InvincibleData.criteriaAttack(hit.entity(), getUuid(), -1, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
             }
         }
     }

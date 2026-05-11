@@ -29,10 +29,7 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
 
     @Override
     public boolean canUse() {
-        if (!servant.isLaserEye()) {
-            return servant.isTarget(servant.getTarget());
-        }
-        return false;
+        return !servant.isLaserEye() && servant.isTarget(servant.getTarget());
     }
 
     @Override
@@ -47,6 +44,7 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                 Vec3 direction = toTarget.offsetRandom(servant.getOwner().getRandom(), (float) target.getBoundingBox().getSize()).normalize();
                 servant.applyForce(direction.scale(2));
                 cooldown = 14 + servant.getOwner().getRandom().nextInt(-2, 2);
+                servant.setTrailTimer(10);
             }
         } else {
             // 冷却期间缓慢靠近目标

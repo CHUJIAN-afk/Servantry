@@ -25,24 +25,22 @@ public interface ICollideAttack<T extends AttachmentEntity> {
     AABB getHitbox();
 
     /**
-     * 当碰撞检测命中目标时调用，执行具体的攻击逻辑，已根据命中顺序排序
+     * 当碰撞检测命中目标时调用，执行具体的攻击逻辑
+     *
+     * @param hitContexts 命中上下文列表，按碰撞先后顺序排序
      */
-    void onCollisionAttack(List<LivingEntity> hitTargets);
-
-    /**
-     * 获取用于碰撞检测采样的历史节点数量
-     */
-    default int getCollisionSampleNodes() {
-        return 2;
-    }
+    void onCollisionAttack(List<HitContext> hitContexts);
 
     /**
      * 是否启用碰撞攻击检测
      */
     default boolean canCollideAttack() {
-        return true; }
+        return true;
+    }
 
-    /** 判断目标是否为有效的碰撞对象 */
+    /**
+     * 判断目标是否为有效的碰撞对象
+     */
     default boolean isValidCollisionTarget(T entity, LivingEntity target) {
         return target.isAlive() && target != entity.getOwner();
     }
@@ -53,85 +51,103 @@ public interface ICollideAttack<T extends AttachmentEntity> {
     default void processCollision(T entity) {
         if (!canCollideAttack()) return;
 
-        AABB localBox = getHitbox();
-
-        double minDim = Math.min(Math.min(localBox.getXsize(), localBox.getYsize()), localBox.getZsize());
         ArrayList<PathNode> historyNodes = entity.getHistoryNodes();
-        int sampleNodes = getCollisionSampleNodes();
+        if (historyNodes.size() < 2) return;
 
-        if (minDim <= 0 || historyNodes.size() < 2 || sampleNodes < 2) return;
+        // 采样点：上一tick、上上tick、当前位置
+        PathNode prevTick = historyNodes.get(0);      // 上一tick
+        PathNode prevPrevTick = historyNodes.get(1);  // 上上tick
+        PathNode current = entity.currentPathNode;    // 当前位置
 
-        int segments = Math.min(sampleNodes - 1, historyNodes.size() - 1);
-
-        // 阶段一：轨迹采样并构建 OBB
-        List<OBB> sweepOBBs = new ArrayList<>();
-        AABB broadAABB = null;
-
-        Vec3 boxCenterOffset = localBox.getCenter();
+        AABB localBox = getHitbox();
         Vec3 boxSize = new Vec3(localBox.getXsize(), localBox.getYsize(), localBox.getZsize());
+        Vec3 boxCenterOffset = localBox.getCenter();
         boolean hasCenterOffset = boxCenterOffset.lengthSqr() > 1e-5;
 
-        for (int s = 0; s < segments; s++) {
-            PathNode current = historyNodes.get(s);
-            PathNode prev = historyNodes.get(s + 1);
-            PathNode older = historyNodes.size() > s + 2 ? historyNodes.get(s + 2) : prev;
+        // 构建贝塞尔曲线采样 OBB 序列
+        List<SampledOBB> sweepOBBs = buildSweepOBBs(prevPrevTick, prevTick, current, boxSize, boxCenterOffset, hasCenterOffset);
+        if (sweepOBBs.isEmpty()) return;
 
-            // 二次贝塞尔曲线控制点
-            Vec3 P0 = prev.pos();
-            Vec3 P1 = current.pos();
-            Vec3 controlPoint = P0.add(P0.subtract(older.pos()).scale(0.5));
-
-            double stepDist = minDim * 0.5;
-            int steps = Math.max(1, (int) Math.ceil(P0.distanceTo(P1) / stepDist));
-
-            for (int i = 0; i <= steps; i++) {
-                float t = (float) i / steps;
-                OBB obb = createSweepOBB(P0, controlPoint, P1, prev, current, t, boxCenterOffset, boxSize, hasCenterOffset);
-                sweepOBBs.add(obb);
-                broadAABB = (broadAABB == null) ? obb.getBoundingBox() : broadAABB.minmax(obb.getBoundingBox());
-            }
+        // 计算包围盒用于粗筛
+        AABB broadAABB = null;
+        for (SampledOBB sampled : sweepOBBs) {
+            broadAABB = (broadAABB == null) ? sampled.obb.getBoundingBox() : broadAABB.minmax(sampled.obb.getBoundingBox());
         }
-
         if (broadAABB == null) return;
 
-        // 阶段二：粗筛潜在目标
+        // 粗筛潜在目标
         Player owner = entity.getOwner();
         if (owner == null) return;
 
         List<LivingEntity> potentialTargets = owner.level().getEntitiesOfClass(LivingEntity.class, broadAABB);
 
-        // 阶段三：精确 OBB-AABB 相交检测
-        Set<LivingEntity> hitTargets = new HashSet<>();
+        // 精确碰撞检测并收集碰撞点
+        Map<LivingEntity, Vec3> hitPoints = new HashMap<>();
         for (LivingEntity target : potentialTargets) {
             if (isValidCollisionTarget(entity, target)) {
-                if (checkOBBCollision(sweepOBBs, target.getBoundingBox())) {
-                    hitTargets.add(target);
+                Vec3 hitPoint = findHitPoint(sweepOBBs, target.getBoundingBox(), prevTick.pos());
+                if (hitPoint != null) {
+                    hitPoints.put(target, hitPoint);
                 }
             }
         }
 
-        if (!hitTargets.isEmpty()) {
-            Vec3 earliestPoint = historyNodes.get(segments).pos();
-            List<LivingEntity> sortedTargets = hitTargets.stream()
-                    .sorted(Comparator.comparingDouble(target -> target.getBoundingBox().getCenter().distanceToSqr(earliestPoint)))
+        if (!hitPoints.isEmpty()) {
+            // 按碰撞点距离上一tick位置的远近排序
+            List<HitContext> hitContexts = hitPoints.entrySet().stream()
+                    .sorted(Comparator.comparingDouble(e -> e.getValue().distanceToSqr(prevTick.pos())))
+                    .map(e -> new HitContext(e.getKey(), e.getValue()))
                     .toList();
-            onCollisionAttack(sortedTargets);
+            onCollisionAttack(hitContexts);
         }
     }
 
     /**
-     * 创建扫掠 OBB（贝塞尔曲线插值）
+     * 构建扫掠 OBB 序列
+     * <p>
+     * 采样标准：连续两个 OBB 至少 50% 重合
+     * </p>
      */
-    private OBB createSweepOBB(Vec3 P0, Vec3 controlPoint, Vec3 P1, PathNode prev, PathNode current,
-                               float t, Vec3 boxCenterOffset, Vec3 boxSize, boolean hasCenterOffset) {
-        double mt = 1.0 - t;
+    private List<SampledOBB> buildSweepOBBs(PathNode prevPrev, PathNode prev, PathNode current,
+                                            Vec3 boxSize, Vec3 boxCenterOffset, boolean hasCenterOffset) {
+        List<SampledOBB> result = new ArrayList<>();
 
+        // 贝塞尔曲线控制点：使用上上tick位置作为控制点方向参考
+        Vec3 P0 = prev.pos();           // 起点（上一tick）
+        Vec3 P1 = current.pos();        // 终点（当前位置）
+        Vec3 controlPoint = P0.add(P0.subtract(prevPrev.pos()).scale(0.5)); // 控制点
+
+        // 计算曲线总长度估算
+        double estimatedLength = P0.distanceTo(P1);
+        double minDim = Math.min(Math.min(boxSize.x, boxSize.y), boxSize.z);
+
+        // 计算需要的采样数量（确保相邻 OBB 50% 重合）
+        // 重合 50% 意味着步进距离不超过 minDim 的一半
+        double stepSize = minDim * 0.5;
+        int steps = Math.max(2, (int) Math.ceil(estimatedLength / stepSize));
+
+        for (int i = 0; i <= steps; i++) {
+            float t = (float) i / steps;
+            SampledOBB sampled = createSampledOBB(P0, controlPoint, P1, prev, current, t, boxSize, boxCenterOffset, hasCenterOffset);
+            result.add(sampled);
+        }
+
+        return result;
+    }
+
+    /**
+     * 创建采样的 OBB
+     */
+    private SampledOBB createSampledOBB(Vec3 P0, Vec3 controlPoint, Vec3 P1,
+                                        PathNode prev, PathNode current, float t,
+                                        Vec3 boxSize, Vec3 boxCenterOffset, boolean hasCenterOffset) {
         // 二次贝塞尔曲线插值位置: B(t) = (1-t)²P0 + 2(1-t)tC + t²P1
+        double mt = 1.0 - t;
         Vec3 pos = P0.scale(mt * mt)
                 .add(controlPoint.scale(2 * mt * t))
                 .add(P1.scale(t * t));
 
-        // 线性插值旋转角度
+        // 欧拉角插值
         float yaw = Mth.rotLerp(t, prev.yaw(), current.yaw());
         float pitch = Mth.rotLerp(t, prev.pitch(), current.pitch());
         float roll = Mth.rotLerp(t, prev.roll(), current.roll());
@@ -143,16 +159,55 @@ public interface ICollideAttack<T extends AttachmentEntity> {
                     .yRot((float) Math.toRadians(-yaw)));
         }
 
-        return new OBB(hitCenter, boxSize, yaw, pitch, roll);
+        return new SampledOBB(new OBB(hitCenter, boxSize, yaw, pitch, roll), t);
     }
 
     /**
-     * 检查目标 AABB 是否与任意 OBB 相交
+     * 查找碰撞点
+     *
+     * @return 返回最靠近上一tick位置的碰撞点，如果没有碰撞返回 null
      */
-    private boolean checkOBBCollision(List<OBB> sweepOBBs, AABB targetBox) {
-        for (OBB obb : sweepOBBs) {
-            if (obb.intersects(targetBox)) return true;
+    private Vec3 findHitPoint(List<SampledOBB> sweepOBBs, AABB targetBox, Vec3 prevPos) {
+        Vec3 closestHitPoint = null;
+        double closestDist = Double.MAX_VALUE;
+
+        for (SampledOBB sampled : sweepOBBs) {
+            if (sampled.obb.intersects(targetBox)) {
+                // 计算 OBB 中心到目标碰撞箱的最近点
+                Vec3 obbCenter = new Vec3(sampled.obb.center.x, sampled.obb.center.y, sampled.obb.center.z);
+                Vec3 hitPoint = getClosestPointOnAABB(obbCenter, targetBox);
+
+                double dist = hitPoint.distanceToSqr(prevPos);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closestHitPoint = hitPoint;
+                }
+            }
         }
-        return false;
+
+        return closestHitPoint;
+    }
+
+    /**
+     * 获取点到 AABB 的最近点
+     */
+    private Vec3 getClosestPointOnAABB(Vec3 point, AABB box) {
+        return new Vec3(
+                Mth.clamp(point.x, box.minX, box.maxX),
+                Mth.clamp(point.y, box.minY, box.maxY),
+                Mth.clamp(point.z, box.minZ, box.maxZ)
+        );
+    }
+
+    /**
+     * 采样的 OBB，包含参数 t 用于追踪曲线位置
+     */
+    record SampledOBB(OBB obb, float t) {
+    }
+
+    /**
+     * 碰撞命中上下文
+     */
+    record HitContext(LivingEntity entity, Vec3 hitPoint) {
     }
 }

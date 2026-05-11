@@ -147,8 +147,8 @@ public class Event {
                     if (servant instanceof StardustCell cell && cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
                         Vec3 startPos = servant.getPos();
                         StardustProjectile newProjectile = new StardustProjectile(servant.getDamageSource(), startPos);
-                        newProjectile.setTarget(target);
-                        newProjectile.life = 10;
+                        newProjectile.setChaseTarget(target);
+                        newProjectile.setLife(10);
                         entityData.addProjectile(newProjectile);
                         cell.setExtraShootCooldown(14);
                         // 后坐力

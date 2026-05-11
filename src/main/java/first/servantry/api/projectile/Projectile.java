@@ -20,7 +20,7 @@ public abstract class Projectile extends AttachmentEntity {
     /**
      * 生命周期计数器
      */
-    public int life = 0;
+    protected int life = 0;
     /**
      * 当前速度向量（格/tick）
      */
@@ -169,6 +169,14 @@ public abstract class Projectile extends AttachmentEntity {
 
     public void setMaxLife(int maxLife) {
         this.maxLife = maxLife;
+    }
+
+    public int getLife() {
+        return life;
+    }
+
+    public void setLife(int life) {
+        this.life = life;
     }
 
     public int getTrailTimer() {

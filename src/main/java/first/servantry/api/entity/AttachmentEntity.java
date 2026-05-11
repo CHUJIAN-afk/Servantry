@@ -167,7 +167,7 @@ public abstract class AttachmentEntity {
     /**
      * 被移除前调用
      */
-    public void omRemove() {
+    public void onRemove() {
     }
 
     // ===================== 路径管理 =====================

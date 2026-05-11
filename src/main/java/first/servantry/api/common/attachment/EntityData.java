@@ -251,7 +251,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                 if (ticking) {
                     pendingRemove.add(entity);
                 } else {
-                    entity.omRemove();
+                    entity.onRemove();
                     iterator.remove();
                 }
                 removed = true;
@@ -273,7 +273,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         // 处理待移除的实体
         if (!pendingRemove.isEmpty()) {
             for (AttachmentEntity entity : pendingRemove) {
-                entity.omRemove();
+                entity.onRemove();
             }
             entities.removeAll(pendingRemove);
             pendingRemove.clear();
@@ -364,4 +364,9 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
 
         return data;
     }
+
+    public List<AttachmentEntity> getPendingAdd() {
+        return pendingAdd;
+    }
+
 }

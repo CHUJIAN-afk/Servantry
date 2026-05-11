@@ -19,15 +19,6 @@ import java.util.UUID;
 
 /**
  * 激光射弹 - 高速直线飞行的红色激光束。
- * <p>
- * 特性：
- * <ul>
- *   <li>高速直线飞行，无追踪</li>
- *   <li>长条形伤害碰撞箱</li>
- *   <li>方块碰撞检测，碰到方块后消失</li>
- *   <li>红色球形头部拖尾渲染</li>
- * </ul>
- * </p>
  */
 public class LaserProjectile extends Projectile implements ICollideAttack<LaserProjectile> {
 
@@ -44,8 +35,9 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
     }
 
     @Override
-    public void onCollisionAttack(List<LivingEntity> hitTargets) {
-        LivingEntity target = hitTargets.getFirst();
+    public void onCollisionAttack(List<HitContext> hitContexts) {
+        HitContext hit = hitContexts.getFirst();
+        LivingEntity target = hit.entity();
         DamageSource source = getDamageSource();
         if (source != null) {
             UUID uuid = null;
@@ -53,8 +45,9 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
                 uuid = servant.getUuid();
             }
             InvincibleData.criteriaAttack(target, uuid, 4, source, getDamage(), InvincibleData.Type.PARTIAL);
+            target.setRemainingFireTicks(Math.min(target.getRemainingFireTicks() + 20, 120));
         }
-        currentPathNode = new PathNode(target.getBoundingBox().getCenter(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        currentPathNode = new PathNode(hit.hitPoint().add(getVelocity()), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
         setRemove();
     }
 
@@ -69,19 +62,10 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
         return false;
     }
 
-    // ===================== ICollideAttack =====================
-
     @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.03, -0.03, -1, 0.03, 0.03, 0);
     }
-
-    @Override
-    public int getCollisionSampleNodes() {
-        return 4;
-    }
-
-    // ===================== 属性 =====================
 
     @Override
     public float getDamage() {

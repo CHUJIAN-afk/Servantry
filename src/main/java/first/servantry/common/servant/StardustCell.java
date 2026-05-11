@@ -143,8 +143,8 @@ public class StardustCell extends MomentumServant {
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
         StardustProjectile projectile = new StardustProjectile(getDamageSource(), start);
-        projectile.setTarget(target);
-        projectile.life = 10;
+        projectile.setChaseTarget(target);
+        projectile.setLife(10);
         owner.getData(AttachmentRegister.EntityData).addProjectile(projectile);
         // 后坐力
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();

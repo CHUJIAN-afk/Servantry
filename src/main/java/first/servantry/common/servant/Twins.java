@@ -33,6 +33,7 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins> {
      * 是否为激光眼（true=激光眼，false=咒焰眼）
      */
     private boolean isLaserEye = true;
+    private int trailTimer = 0;
 
     public Twins() {
         super();
@@ -63,9 +64,9 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins> {
     }
 
     @Override
-    public void onCollisionAttack(List<LivingEntity> hitTargets) {
-        for (LivingEntity target : hitTargets) {
-            InvincibleData.criteriaAttack(target, getUuid(), 4, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+    public void onCollisionAttack(List<HitContext> hitContexts) {
+        for (HitContext hit : hitContexts) {
+            InvincibleData.criteriaAttack(hit.entity(), getUuid(), 4, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
         }
     }
 
@@ -85,11 +86,13 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins> {
     @Override
     public void writeAdditional(RegistryFriendlyByteBuf buf) {
         buf.writeBoolean(isLaserEye);
+        buf.writeInt(trailTimer);
     }
 
     @Override
     public void readAdditional(RegistryFriendlyByteBuf buf) {
         isLaserEye = buf.readBoolean();
+        trailTimer = buf.readInt();
     }
 
     @Override
@@ -125,4 +128,11 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins> {
         this.isLaserEye = laserEye;
     }
 
+    public int getTrailTimer() {
+        return trailTimer;
+    }
+
+    public void setTrailTimer(int trailTimer) {
+        this.trailTimer = trailTimer;
+    }
 }

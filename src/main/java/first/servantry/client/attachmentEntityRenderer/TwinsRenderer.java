@@ -12,12 +12,15 @@ import net.minecraft.client.renderer.MultiBufferSource;
 public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
 
     @Override
-    protected RenderContext<Twins> createContext(Twins servant) {
-        return RenderContext.<Twins>none()
-                .modelTranslateOffset(-0.5f, -0.5f, -0.5f)
+    protected RenderContext<Twins> createContext(Twins twins) {
+        int trailTimer = twins.getTrailTimer();
+        return RenderContext.<Twins>cone(trailTimer, 0xFF3333, 0.15f)
+                .trailStartIndex(Math.max(0, 10 - trailTimer))
+                .trailHistoryLength(3)
                 .alphaDistanceFactor(1.5f)
-                .modelScale(0.5f)
-                .modelRotationOffset(180, 0, 0);
+                .modelTranslateOffset(-0.5f, -0.375f, -0.5f)
+                .modelRotationOffset(180, 0, 0)
+                .modelScale(0.5f);
     }
 
     @Override
