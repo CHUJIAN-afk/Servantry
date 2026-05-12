@@ -1,7 +1,7 @@
 package first.servantry.common.servant.goal.twins;
 
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.projectile.DemonFlame;
+import first.servantry.common.projectile.DemonFlameProjectile;
 import first.servantry.common.servant.Twins;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.world.entity.LivingEntity;
@@ -70,8 +70,8 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                 }
                 servant.lookAtPos(targetPos);
                 Vec3 direction = targetPos.subtract(servant.getPos()).normalize();
-                DemonFlame demonFlame = new DemonFlame(servant.getDamageSource(), servant.getPos().add(direction.scale(-1)), direction);
-                demonFlame.join(owner);
+                DemonFlameProjectile demonFlameProjectile = new DemonFlameProjectile(servant.getDamageSource(), servant.getPos().add(direction.scale(-1)), direction);
+                demonFlameProjectile.join(owner);
                 ParticleHelper.create(owner.level())
                         .generic(builder -> builder
                                 .color(0x28ff09)
