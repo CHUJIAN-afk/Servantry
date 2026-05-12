@@ -66,6 +66,7 @@ public class GenericParticle extends TextureSheetParticle {
         this.roll = this.random.nextFloat() * Mth.TWO_PI;
         this.oRoll = this.roll;
 
+        this.hasPhysics = false;
         this.setSpriteFromAge(spriteSet);
     }
 

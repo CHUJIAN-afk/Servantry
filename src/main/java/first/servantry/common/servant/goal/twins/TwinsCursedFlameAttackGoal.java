@@ -1,7 +1,7 @@
 package first.servantry.common.servant.goal.twins;
 
-import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.servant.ai.ServantGoal;
+import first.servantry.common.projectile.DemonFlame;
 import first.servantry.common.servant.Twins;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.world.entity.LivingEntity;
@@ -43,33 +43,13 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
         Vec3 toTarget = targetPos.subtract(servant.getPos());
         Player owner = servant.getOwner();
         if (!emited) {
-            Vec3 motionDir = servant.getVelocity().normalize();
-            float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
-            float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
-            servant.setDesiredRotation(targetYaw, targetPitch, 0);
-            if (servant.getTrailTimer() > 0) {
-                ParticleHelper.create(owner.level())
-                        .generic(builder -> builder
-                                .color(0x8a0801)
-                                .lifetime(10)
-                                .lifetimeRandom(4)
-                                .friction(0.75F)
-                                .spin(0.1F)
-                                .spinRandom(0.05F)
-                        )
-                        .pos(servant.getPos())
-                        .velocity(servant.getVelocity().scale(-0.1))
-                        .count(2)
-                        .speed(0.05)
-                        .spread(0.5)
-                        .emit();
-            }
+            servant.lookAtDirection(servant.getVelocity().normalize());
             if (--cooldown <= 0 && targetPos.distanceToSqr(servant.getPos()) < 16 * 16) {
-                emit += 10;
-                if (emit > 60) {
+                emit += 5;
+                if (emit > 40) {
                     emited = true;
                 } else {
-                    cooldown = 10;
+                    cooldown = 8 + owner.getRandom().nextInt(-2, 2);
                     Vec3 direction = toTarget.offsetRandom(owner.getRandom(), (float) target.getBoundingBox().getSize()).normalize();
                     servant.applyForce(direction.scale(2));
                     servant.setTrailTimer(10);
@@ -88,8 +68,10 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                     double force = Math.min(dist * 0.08, 0.4);
                     servant.applyForce(toAnchor.normalize().scale(force));
                 }
-                servant.setDesiredRotation(targetPos);
-                InvincibleData.criteriaAttack(target, servant.getUuid(), 2, servant.getDamageSource(), servant.getDamage(), InvincibleData.Type.PARTIAL);
+                servant.lookAtPos(targetPos);
+                Vec3 direction = targetPos.subtract(servant.getPos()).normalize();
+                DemonFlame demonFlame = new DemonFlame(servant.getDamageSource(), servant.getPos().add(direction.scale(-1)), direction);
+                demonFlame.join(owner);
                 ParticleHelper.create(owner.level())
                         .generic(builder -> builder
                                 .color(0x28ff09)
@@ -102,9 +84,9 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                         )
                         .pos(servant.getPos())
                         .velocity(targetPos.subtract(servant.getPos()))
-                        .count(5)
+                        .count(4)
                         .speed(1)
-                        .spread(0.2)
+                        .spread(0.25)
                         .emit();
             } else {
                 emited = false;

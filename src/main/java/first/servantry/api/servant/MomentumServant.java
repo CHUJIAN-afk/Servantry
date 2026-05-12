@@ -1,6 +1,7 @@
 package first.servantry.api.servant;
 
 import first.servantry.api.PathNode;
+import first.servantry.api.PlannedPath;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
@@ -63,7 +64,7 @@ public abstract class MomentumServant extends Servant {
     private float desiredRoll;
 
     /** 转向速度（度/tick），控制朝向平滑过渡 */
-    private float rotationSpeed = 10.0f;
+    private float rotationSpeed = 1f;
 
     // ===================== 构造方法 =====================
 
@@ -80,10 +81,17 @@ public abstract class MomentumServant extends Servant {
     public void tick() {
         if (!owner.level().isClientSide()) {
             // 应用物理更新
-            tickPhysics();
+            if (!isExecutingPath()) {
+                tickPhysics();
+            }
             tickOrientation();
         }
         super.tick();
+    }
+
+    @Override
+    public boolean isExecutingPath() {
+        return super.isExecutingPath() && currentPlannedPath.getIdentifier() != "physics";
     }
 
     // ===================== 物理更新（私有实现） =====================
@@ -97,7 +105,8 @@ public abstract class MomentumServant extends Servant {
 
         // 根据速度更新位置
         Vec3 newPos = getPos().add(velocity);
-        setPath(Collections.singletonList(new PathNode(newPos, desiredYaw, desiredPitch, desiredRoll)));
+
+        setPath(new PlannedPath("physics", Collections.singletonList(new PathNode(newPos, desiredYaw, desiredPitch, desiredRoll))));
     }
 
     /**
@@ -115,41 +124,13 @@ public abstract class MomentumServant extends Servant {
 
     // ===================== 视角调度器方法 =====================
 
-    /**
-     * 朝向指定位置。
-     * <p>
-     * 计算从当前位置到目标位置的方向，设置期望朝向。
-     * 朝向将在后续tick中平滑过渡。
-     * </p>
-     *
-     * @param targetPos 目标位置
-     */
-    public void lookAt(Vec3 targetPos) {
-        Vec3 dir = targetPos.subtract(getPos());
-        if (dir.lengthSqr() < 1e-6) return;
-
-        dir = dir.normalize();
-        desiredYaw = (float) Math.toDegrees(Math.atan2(-dir.x, dir.z));
-        desiredPitch = (float) Math.toDegrees(Math.atan2(-dir.y, Math.sqrt(dir.x * dir.x + dir.z * dir.z)));
+    public void lookAtPos(Vec3 targetPos) {
+        lookAtDirection(targetPos.subtract(getPos()).normalize());
     }
 
-    /**
-     * 朝向指定方向。
-     *
-     * @param direction 目标方向（无需归一化）
-     */
-    public void lookToward(Vec3 direction) {
-        if (direction.lengthSqr() < 1e-6) return;
-
-        Vec3 dir = direction.normalize();
-        desiredYaw = (float) Math.toDegrees(Math.atan2(-dir.x, dir.z));
-        desiredPitch = (float) Math.toDegrees(Math.atan2(-dir.y, Math.sqrt(dir.x * dir.x + dir.z * dir.z)));
-    }
-
-    public void setDesiredRotation(Vec3 target) {
-        Vec3 motionDir = target.subtract(getPos()).normalize();
-        float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
-        float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
+    public void lookAtDirection(Vec3 direction) {
+        float targetYaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
+        float targetPitch = (float) Math.toDegrees(Math.asin(-direction.y));
         setDesiredRotation(targetYaw, targetPitch, getRoll());
     }
 
@@ -169,50 +150,7 @@ public abstract class MomentumServant extends Servant {
         this.desiredRoll = roll;
     }
 
-    /**
-     * 立即设置朝向（无过渡动画）。
-     *
-     * @param yaw   偏航角（度）
-     * @param pitch 俯仰角（度）
-     * @param roll  滚转角（度）
-     */
-    public void setRotationImmediate(float yaw, float pitch, float roll) {
-        this.desiredYaw = yaw;
-        this.desiredPitch = pitch;
-        this.desiredRoll = roll;
-        setPath(Collections.singletonList(new PathNode(getPos(), yaw, pitch, roll)));
-    }
-
     // ===================== 动量调度器方法 =====================
-
-    /**
-     * 向目标位置移动。
-     * <p>
-     * 计算从当前位置到目标的方向向量，施加指定强度的力。
-     * 适合持续追踪目标的场景。
-     * </p>
-     *
-     * @param targetPos 目标位置
-     * @param strength  移动力度
-     */
-    public void moveToward(Vec3 targetPos, double strength) {
-        Vec3 dir = targetPos.subtract(getPos());
-        if (dir.lengthSqr() < 1e-6) return;
-
-        applyForce(dir.normalize().scale(strength));
-    }
-
-    /**
-     * 施加冲量（立即改变速度）。
-     * <p>
-     * 冲量直接叠加到当前速度上，适合瞬时加速场景。
-     * </p>
-     *
-     * @param impulse 冲量向量
-     */
-    public void applyImpulse(Vec3 impulse) {
-        velocity = velocity.add(impulse);
-    }
 
     /**
      * 施加力（累加到速度）。
@@ -249,23 +187,10 @@ public abstract class MomentumServant extends Servant {
         setPath(Collections.singletonList(new PathNode(targetPos, desiredYaw, desiredPitch, desiredRoll)));
     }
 
-    /**
-     * 停止移动。
-     * <p>
-     * 清零速度，仆从将逐渐停止（受阻力影响）。
-     * </p>
-     */
-    public void stopMoving() {
-        velocity = Vec3.ZERO;
-    }
-
     // ===================== 访问器 =====================
 
     /** @return 当前速度 */
     public Vec3 getVelocity() { return velocity; }
-
-    /** @return 阻力系数 */
-    public float getDrag() { return drag; }
 
     /**
      * 设置阻力系数。
@@ -273,9 +198,6 @@ public abstract class MomentumServant extends Servant {
      * @param drag 阻力系数 [0, 1]
      */
     public void setDrag(float drag) { this.drag = Mth.clamp(drag, 0.0f, 1.0f); }
-
-    /** @return 转向速度（度/tick） */
-    public float getRotationSpeed() { return rotationSpeed; }
 
     /**
      * 设置转向速度。

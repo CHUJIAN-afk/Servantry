@@ -34,10 +34,7 @@ public class TwinsIdleGoal extends ServantGoal<Twins> {
             double force = Math.min(dist * 0.02, 0.2);
             servant.applyForce(dir.scale(force));
         }
-        // 缓慢朝向运动方向
-        if (servant.getVelocity().lengthSqr() > 0.01) {
-            servant.lookAt(servant.getVelocity().normalize());
-        }
+        servant.lookAtDirection(servant.getVelocity().normalize());
     }
 
 }

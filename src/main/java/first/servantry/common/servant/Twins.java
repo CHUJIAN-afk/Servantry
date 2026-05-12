@@ -12,7 +12,6 @@ import first.servantry.register.AttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -38,7 +37,6 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins> {
     public Twins() {
         super();
         setDrag(0.75f);
-        setRotationSpeed(0.5f);
     }
 
     @Override
@@ -78,12 +76,6 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins> {
     @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
-            if (!isTarget(getTarget())) {
-                Vec3 motionDir = getVelocity().normalize();
-                float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
-                float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
-                setDesiredRotation(targetYaw, targetPitch, 0);
-            }
             if (trailTimer > 0) {
                 trailTimer--;
             }

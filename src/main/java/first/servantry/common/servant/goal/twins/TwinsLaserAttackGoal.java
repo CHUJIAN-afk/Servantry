@@ -59,12 +59,12 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
             double force = Math.min(dist * 0.08, 0.4);
             servant.applyForce(toAnchor.normalize().scale(force));
         }
-        servant.setDesiredRotation(target.getBoundingBox().getCenter());
+        servant.lookAtPos(target.getBoundingBox().getCenter());
         // 射击冷却
         if (shootCooldown <= 0) {
             shootAtTarget(owner, target);
             shotCount = (shotCount + 1) % 12;
-            shootCooldown = shotCount < 5 ? 20 : 1;
+            shootCooldown = shotCount < 5 ? 18 + owner.getRandom().nextInt(-2, 2) : 1;
         } else {
             shootCooldown--;
         }

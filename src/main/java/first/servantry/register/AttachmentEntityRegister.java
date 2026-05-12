@@ -3,6 +3,7 @@ package first.servantry.register;
 import first.servantry.Servantry;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.register.ServantryRegistries;
+import first.servantry.common.projectile.DemonFlame;
 import first.servantry.common.projectile.LaserProjectile;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.*;
@@ -35,6 +36,7 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustProjectile>> StardustProjectile = Register.register("stardust_projectile", () -> new AttachmentEntityType<>(StardustProjectile::new));
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<LaserProjectile>> LaserProjectile = Register.register("laser_projectile", () -> new AttachmentEntityType<>(LaserProjectile::new));
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DemonFlame>> DemonFlameProjectile = Register.register("demon_flame", () -> new AttachmentEntityType<>(DemonFlame::new));
 
     /**
      * 注册到事件总线。

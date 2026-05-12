@@ -24,7 +24,7 @@ public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
                         .maxRadius(0.2f)
                         .minRadiusRatio(0.75f)
                         .resolution(4)
-                        .fadeOut(progress -> (1 - progress) * (1 - progress) * (1 - progress)))
+                        .fadeOut(progress -> (1 - progress) * (1 - progress)))
                 .model(new ModelConfig<Twins>()
                         .scale(0.5f)
                         .translateOffset(-0.5f, -0.375f, -0.5f)

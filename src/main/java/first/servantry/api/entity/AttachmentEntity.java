@@ -222,6 +222,13 @@ public abstract class AttachmentEntity {
         }
     }
 
+    public void setPath(PlannedPath plannedPath) {
+        List<PathNode> nodes = plannedPath.getNodes();
+        if (!nodes.isEmpty()) {
+            this.currentPathNode = nodes.getFirst();
+        }
+    }
+
     public boolean isRemove() {
         return remove;
     }

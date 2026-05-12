@@ -13,7 +13,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class StardustCellIdleGoal extends ServantGoal<StardustCell> {
 
-    private Vec3 wanderOffset = Vec3.ZERO;
+    private Vec3 wanderTarget = Vec3.ZERO;
 
     public StardustCellIdleGoal(StardustCell servant) {
         super(servant);
@@ -21,27 +21,24 @@ public class StardustCellIdleGoal extends ServantGoal<StardustCell> {
 
     @Override
     public boolean canUse() {
-        return servant.getTarget() == null && servant.getTeleportTimer() <= 0;
+        return !servant.isTarget(servant.getTarget());
     }
 
     @Override
     public void tick() {
         Player owner = servant.getOwner();
-        if (wanderOffset.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || wanderOffset.distanceToSqr(servant.getPos()) < 1 || wanderOffset.distanceToSqr(owner.position()) > 8 * 8) {
-            wanderOffset = owner.getBoundingBox().getCenter().offsetRandom(owner.getRandom(), (float) owner.getBoundingBox().getSize() * 4);
+        Vec3 ownerPos = owner.getBoundingBox().getCenter();
+        if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || wanderTarget.distanceToSqr(servant.getPos()) < 1 || wanderTarget.distanceToSqr(owner.position()) > 8 * 8) {
+            wanderTarget = ownerPos.offsetRandom(owner.getRandom(), (float) owner.getBoundingBox().getSize() * 4);
         }
-        Vec3 dir = wanderOffset.subtract(servant.getPos());
-        double dist = dir.length();
-        if (dist > 0.05) {
-            dir = dir.normalize();
+        Vec3 dir = wanderTarget.subtract(servant.getPos());
+        if (!dir.equals(Vec3.ZERO)) {
+            double dist = dir.length();
             double force = Math.min(dist * 0.01, 0.1);
-            servant.applyForce(dir.scale(force));
+            servant.applyForce(dir.normalize().scale(force));
         }
-
-        // 缓慢朝向运动方向
-        if (servant.getVelocity().lengthSqr() > 0.01) {
-            Vec3 vel = servant.getVelocity().normalize();
-            servant.setDesiredRotation((float) Math.toDegrees(Math.atan2(-vel.x, vel.z)), servant.getDesiredPitch(), servant.getDesiredRoll());
+        if (wanderTarget.distanceToSqr(ownerPos) > 128 * 128) {
+            servant.teleportTo(ownerPos);
         }
     }
 

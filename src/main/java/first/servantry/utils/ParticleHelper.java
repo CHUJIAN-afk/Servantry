@@ -27,6 +27,7 @@ public class ParticleHelper {
     private int count = 1;
     private double speed = 1.0;
     private double spreadAngle = 0.4;
+    private double offsetX = 0, offsetY = 0, offsetZ = 0;
 
     public ParticleHelper(Level level) {
         this.level = level;
@@ -106,6 +107,24 @@ public class ParticleHelper {
     }
 
     /**
+     * 设置位置偏移范围（仅当 count > 0 时有效，每个粒子在基础位置上添加随机偏移）。
+     */
+    public ParticleHelper offset(double x, double y, double z) {
+        this.offsetX = x;
+        this.offsetY = y;
+        this.offsetZ = z;
+        return this;
+    }
+
+    /**
+     * 设置位置偏移范围（仅当 count > 0 时有效）。
+     */
+    public ParticleHelper offset(double radius) {
+        this.offsetX = this.offsetY = this.offsetZ = radius;
+        return this;
+    }
+
+    /**
      * 发射粒子，根据 count 自动选择模式。
      */
     public void emit() {
@@ -116,7 +135,7 @@ public class ParticleHelper {
         if (count <= 0) {
             ParticleOptions options = genericBuilder != null ? genericBuilder.build() : particleType;
             if (!level.isClientSide()) {
-                ((ServerLevel) level).sendParticles(options, x, y, z, 0, vx, vy, vz, 1.0);
+                ((ServerLevel) level).sendParticles(options, x, y, z, 0, vx, vy, vz, 1);
             } else {
                 level.addParticle(options, false, x, y, z, vx, vy, vz);
             }
@@ -130,12 +149,16 @@ public class ParticleHelper {
                 Vec3 scatteredDir = baseDir.yRot((float) theta).xRot((float) phi);
                 Vec3 velocity = scatteredDir.scale(speedVar);
 
-                // 每个粒子单独build，确保随机偏差生效
+                // 位置偏移
+                double px = x + (offsetX > 0 ? (random.nextDouble() - 0.5) * 2 * offsetX : 0);
+                double py = y + (offsetY > 0 ? (random.nextDouble() - 0.5) * 2 * offsetY : 0);
+                double pz = z + (offsetZ > 0 ? (random.nextDouble() - 0.5) * 2 * offsetZ : 0);
+
                 ParticleOptions options = genericBuilder != null ? genericBuilder.build() : particleType;
                 if (!level.isClientSide()) {
-                    ((ServerLevel) level).sendParticles(options, x, y, z, 0, velocity.x, velocity.y, velocity.z, 1);
+                    ((ServerLevel) level).sendParticles(options, px, py, pz, 0, velocity.x, velocity.y, velocity.z, 1);
                 } else {
-                    level.addParticle(options, false, x, y, z, velocity.x, velocity.y, velocity.z);
+                    level.addParticle(options, false, px, py, pz, velocity.x, velocity.y, velocity.z);
                 }
             }
         }
