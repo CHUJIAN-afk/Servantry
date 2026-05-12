@@ -1,4 +1,4 @@
-package first.servantry.common.servant.goal;
+package first.servantry.common.servant.goal.stardustCell;
 
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.StardustCell;
