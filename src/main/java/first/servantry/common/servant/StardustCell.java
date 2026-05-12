@@ -8,10 +8,8 @@ import first.servantry.common.servant.goal.StardustCellAttackGoal;
 import first.servantry.common.servant.goal.StardustCellIdleGoal;
 import first.servantry.common.servant.goal.StardustCellTeleportGoal;
 import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.AttachmentRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -102,7 +100,7 @@ public class StardustCell extends MomentumServant {
         Random rand = new Random(seed);
         double baseTheta = rand.nextDouble() * Math.PI * 2;
         double phi = Math.acos(1.0 - rand.nextDouble() * 1.4);
-        double radius = 3.5 + rand.nextDouble() * 2.0 + order * 0.15;
+        double radius = 3.5 + rand.nextDouble() * 4.0;
         double rotationSpeed = (rand.nextDouble() * 0.02 + 0.01) * (rand.nextBoolean() ? 1 : -1);
         double currentTheta = baseTheta + owner.tickCount * rotationSpeed;
 
@@ -114,22 +112,18 @@ public class StardustCell extends MomentumServant {
         return targetCenter.add(offsetX, offsetY, offsetZ);
     }
 
-    public static void spawnShootParticles(ServerLevel level, Vec3 pos, Vec3 direction) {
-
-    }
-
     public void shootAtTarget(LivingEntity target) {
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
         StardustProjectile projectile = new StardustProjectile(getDamageSource(), start);
         projectile.setChaseTarget(target);
         projectile.setLife(10);
-        owner.getData(AttachmentRegister.EntityData).addProjectile(projectile);
+        projectile.join(owner);
         // 后坐力
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
         applyForce(direction.scale(-0.5));
         // 喷射粒子 - 星尘调色：青蓝色带随机偏差
-        ParticleHelper.create((ServerLevel) owner.level())
+        ParticleHelper.create(owner.level())
                 .generic(builder -> builder
                         .color(51, 204, 255)
                         .colorRandom(0.2F, 0.2F, 0.0F)
@@ -158,10 +152,12 @@ public class StardustCell extends MomentumServant {
     public float getDamage() { return 6f; }
 
     @Override
-    public float getKnockback() { return 0.2f; }
+    public float getKnockback() {
+        return 0.2f;
+    }
 
     @Override
-    public AttachmentEntityType<? extends MomentumServant> getType() {
+    public AttachmentEntityType<StardustCell> getType() {
         return AttachmentEntityRegister.StardustCell.get();
     }
 

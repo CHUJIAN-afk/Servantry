@@ -2,9 +2,11 @@ package first.servantry.api.projectile;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.register.AttachmentRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
@@ -113,6 +115,13 @@ public abstract class Projectile extends AttachmentEntity {
             float pitch = (float) Math.toDegrees(Math.atan2(-dir.y, Math.sqrt(dir.x * dir.x + dir.z * dir.z)));
             currentPathNode = new PathNode(getPos(), yaw, pitch, getRoll());
         }
+    }
+
+    /**
+     * 加入到玩家的射弹数据
+     */
+    public void join(Player owner) {
+        owner.getData(AttachmentRegister.EntityData).addProjectile(this);
     }
 
     // ===================== 可重写配置 =====================

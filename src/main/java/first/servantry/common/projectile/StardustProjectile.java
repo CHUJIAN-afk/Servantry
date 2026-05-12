@@ -26,9 +26,6 @@ import java.util.List;
  */
 public class StardustProjectile extends AttachingProjectile implements ICollideAttack<StardustProjectile> {
 
-    private static final int PARASITISM_DURATION = 100;
-    private static final int MAX_PARASITISM_LEVEL = 10;
-
     private LivingEntity chaseTarget;
 
     public StardustProjectile() {
@@ -75,8 +72,8 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
             InvincibleData.criteriaAttack(target, getUuid(), 0, source, getDamage(), InvincibleData.Type.PARTIAL);
         }
         MobEffectInstance existing = target.getEffect(MobEffectRegister.CellParasitism);
-        int amplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, MAX_PARASITISM_LEVEL - 1);
-        target.addEffect(new MobEffectInstance(MobEffectRegister.CellParasitism, PARASITISM_DURATION, amplifier));
+        int amplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, 10 - 1);
+        target.addEffect(new MobEffectInstance(MobEffectRegister.CellParasitism, 100, amplifier));
     }
 
     @Override
