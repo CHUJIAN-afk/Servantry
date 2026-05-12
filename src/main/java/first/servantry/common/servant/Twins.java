@@ -59,6 +59,11 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins> {
     }
 
     @Override
+    public boolean renderHitbox() {
+        return !isLaserEye();
+    }
+
+    @Override
     public boolean isValidCollisionTarget(Twins entity, LivingEntity target) {
         return isTarget(target);
     }
@@ -73,7 +78,7 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins> {
     @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
-            if (!isLaserEye() || !isTarget(getTarget())) {
+            if (!isTarget(getTarget())) {
                 Vec3 motionDir = getVelocity().normalize();
                 float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
                 float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));

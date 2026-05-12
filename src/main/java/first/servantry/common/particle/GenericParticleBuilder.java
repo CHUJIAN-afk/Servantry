@@ -112,7 +112,7 @@ public class GenericParticleBuilder {
      */
     public GenericParticleOptions build() {
         int finalColor = applyColorRandom();
-        int finalLifetime = lifetime + (lifetimeRandom > 0 ? random.nextInt(lifetime, lifetimeRandom) : 0);
+        int finalLifetime = lifetime + (lifetimeRandom > 0 ? random.nextInt(lifetimeRandom) : 0);
         float finalSpin = spinSpeed + (spinRandom > 0 ? random.nextFloat() * spinRandom * 2 - spinRandom : 0);
         return new GenericParticleOptions(finalColor, endColor, finalLifetime, finalSpin, friction);
     }

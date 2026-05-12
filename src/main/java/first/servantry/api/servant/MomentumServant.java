@@ -146,6 +146,13 @@ public abstract class MomentumServant extends Servant {
         desiredPitch = (float) Math.toDegrees(Math.atan2(-dir.y, Math.sqrt(dir.x * dir.x + dir.z * dir.z)));
     }
 
+    public void setDesiredRotation(Vec3 target) {
+        Vec3 motionDir = target.subtract(getPos()).normalize();
+        float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
+        float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
+        setDesiredRotation(targetYaw, targetPitch, getRoll());
+    }
+
     /**
      * 设置期望朝向角度。
      * <p>

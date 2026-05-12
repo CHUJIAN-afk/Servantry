@@ -3,7 +3,6 @@ package first.servantry.common.servant.goal.twins;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.projectile.LaserProjectile;
 import first.servantry.common.servant.Twins;
-import first.servantry.register.AttachmentRegister;
 import first.servantry.register.SoundRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -47,28 +46,25 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         if (target == null || !target.isAlive()) return;
 
         Player owner = servant.getOwner();
-        int order = owner.getData(AttachmentRegister.EntityData).getOrder(servant);
 
         // 计算环绕位置
-        Vec3 anchor = getHaloAnchorPos(owner, target, order);
-        Vec3 toAnchor = anchor.subtract(servant.getPos());
+        if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025) {
+            wanderTarget = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), (float) target.getBoundingBox().getSize() * 6);
+            wanderTarget.add(0, target.getBoundingBox().getSize() * 12, 0);
+        }
+        Vec3 toAnchor = wanderTarget.subtract(servant.getPos());
         double dist = toAnchor.length();
 
         if (dist > 0.05) {
             double force = Math.min(dist * 0.08, 0.4);
             servant.applyForce(toAnchor.normalize().scale(force));
         }
-
-        Vec3 motionDir = target.getBoundingBox().getCenter().subtract(servant.getPos()).normalize();
-        float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
-        float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
-        servant.setDesiredRotation(targetYaw, targetPitch, servant.getRoll());
-
+        servant.setDesiredRotation(target.getBoundingBox().getCenter());
         // 射击冷却
         if (shootCooldown <= 0) {
             shootAtTarget(owner, target);
             shotCount = (shotCount + 1) % 12;
-            shootCooldown = shotCount < 5 ? 10 : 1;
+            shootCooldown = shotCount < 5 ? 20 : 1;
         } else {
             shootCooldown--;
         }
@@ -84,26 +80,22 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         level.playSound(null, start.x(), start.y(), start.z(), SoundRegister.Laser.get(), owner.getSoundSource());
         // 后坐力
         servant.applyForce(direction.scale(-0.1));
-        // 喷射粒子 - 星尘调色：青蓝色带随机偏差
         ParticleHelper.create(level)
-                .generic(b -> b.color(0x33CCFF).colorRandom(0.2F, 0.2F, 0.0F).lifetime(15).friction(0.75F).spin(0.1F).spinRandom(0.05F))
+                .generic(builder -> builder
+                        .color(0xFF0700)
+                        .colorRandom(0, 0.2F, 0.2F)
+                        .lifetime(5)
+                        .lifetimeRandom(5)
+                        .friction(0.75F)
+                        .spin(0.1F)
+                        .spinRandom(0.05F)
+                )
                 .pos(start)
                 .velocity(direction)
-                .count(5)
-                .speed(0.85)
+                .count(2)
+                .speed(0.65)
                 .spread(0.2)
                 .emit();
-    }
-
-    /**
-     * 计算光环锚点位置（用于攻击目标周围环绕）。
-     */
-    private Vec3 getHaloAnchorPos(Player owner, LivingEntity target, int order) {
-        if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025) {
-            wanderTarget = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), (float) target.getBoundingBox().getSize() * 6);
-            wanderTarget.add(0, target.getBoundingBox().getSize() * 12, 0);
-        }
-        return wanderTarget;
     }
 
 }

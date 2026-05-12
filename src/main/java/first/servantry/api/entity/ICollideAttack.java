@@ -25,6 +25,13 @@ public interface ICollideAttack<T extends AttachmentEntity> {
     AABB getHitbox();
 
     /**
+     * 是否在客户端渲染碰撞箱
+     */
+    default boolean renderHitbox() {
+        return true;
+    }
+
+    /**
      * 当碰撞检测命中目标时调用，执行具体的攻击逻辑
      *
      * @param hitContexts 命中上下文列表，按碰撞先后顺序排序

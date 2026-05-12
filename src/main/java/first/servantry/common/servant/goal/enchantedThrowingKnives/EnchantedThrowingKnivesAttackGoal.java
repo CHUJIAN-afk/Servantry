@@ -131,7 +131,7 @@ public class EnchantedThrowingKnivesAttackGoal extends ServantGoal<EnchantedThro
         if (dir.lengthSqr() < 1e-4) dir = new Vec3(0, -1, 0);
         dir = dir.normalize();
 
-        Vec3 dashEndPos = targetPoint.add(dir.scale(3.0));
+        Vec3 dashEndPos = targetPoint.add(dir);
         Vec3 dashDir = dir;
 
         Vec3 randomUp = new Vec3(owner.getRandom().nextFloat() - 0.5, owner.getRandom().nextFloat() - 0.5, owner.getRandom().nextFloat() - 0.5).normalize();

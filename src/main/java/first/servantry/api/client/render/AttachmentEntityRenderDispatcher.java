@@ -69,12 +69,14 @@ public class AttachmentEntityRenderDispatcher {
                     LevelRenderer.renderLineBox(poseStack, debugConsumer, iBlockCollision.getBlockCollisionBox(), 0.0F, 1.0F, 0.0F, 1.0F);
                 }
                 if (entity instanceof ICollideAttack<?> iCollideAttack) {
-                    poseStack.pushPose();
-                    poseStack.mulPose(Axis.YN.rotationDegrees(renderNode.yaw()));
-                    poseStack.mulPose(Axis.XP.rotationDegrees(renderNode.pitch()));
-                    poseStack.mulPose(Axis.ZP.rotationDegrees(renderNode.roll()));
-                    LevelRenderer.renderLineBox(poseStack, debugConsumer, iCollideAttack.getHitbox(), 1.0F, 0.0F, 0.0F, 1.0F);
-                    poseStack.popPose();
+                    if (iCollideAttack.renderHitbox()) {
+                        poseStack.pushPose();
+                        poseStack.mulPose(Axis.YN.rotationDegrees(renderNode.yaw()));
+                        poseStack.mulPose(Axis.XP.rotationDegrees(renderNode.pitch()));
+                        poseStack.mulPose(Axis.ZP.rotationDegrees(renderNode.roll()));
+                        LevelRenderer.renderLineBox(poseStack, debugConsumer, iCollideAttack.getHitbox(), 1.0F, 0.0F, 0.0F, 1.0F);
+                        poseStack.popPose();
+                    }
                 }
             }
 
