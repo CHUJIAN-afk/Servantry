@@ -5,7 +5,6 @@ import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.mixin.MobEffectInstanceAccessor;
 import first.servantry.register.*;
@@ -14,7 +13,6 @@ import first.servantry.utils.AttributeUtils;
 import first.servantry.utils.CuriosUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -29,7 +27,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.BasicItemListing;
@@ -145,16 +142,8 @@ public class Event {
                 EntityData entityData = player.getData(AttachmentRegister.EntityData);
                 for (Servant servant : entityData.getServants()) {
                     if (servant instanceof StardustCell cell && cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
-                        Vec3 startPos = servant.getPos();
-                        StardustProjectile newProjectile = new StardustProjectile(servant.getDamageSource(), startPos);
-                        newProjectile.setChaseTarget(target);
-                        newProjectile.setLife(10);
-                        entityData.addProjectile(newProjectile);
                         cell.setExtraShootCooldown(14);
-                        // 后坐力
-                        Vec3 direction = target.getBoundingBox().getCenter().subtract(startPos).normalize();
-                        StardustCell.spawnShootParticles((ServerLevel) player.level(), startPos, direction);
-                        cell.applyForce(direction.scale(-0.5));
+                        cell.shootAtTarget(target);
                     }
                 }
             }

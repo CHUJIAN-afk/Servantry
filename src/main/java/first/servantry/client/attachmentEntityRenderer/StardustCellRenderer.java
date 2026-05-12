@@ -9,7 +9,7 @@ import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.register.ModelRegister;
-import first.servantry.register.ParticleRegister;
+import first.servantry.utils.ParticleHelper;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.world.entity.player.Player;
@@ -45,7 +45,20 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
         if (config.hasTrail()) {
             Player owner = servant.getOwner();
             Vec3 pos = visualNode.pos().offsetRandom(owner.getRandom(), 0.25f);
-            owner.level().addParticle(ParticleRegister.StardustScatter.get(), true, pos.x(), pos.y(), pos.z(), 0, 0, 0);
+            ParticleHelper.create(owner.level())
+                    .generic(builder -> builder
+                            .color(51, 204, 255)
+                            .colorRandom(0.2F, 0.2F, 0.0F)
+                            .lifetime(5)
+                            .lifetimeRandom(10)
+                            .friction(0.75F)
+                            .spinRandom(0.5F)
+                    )
+                    .pos(pos)
+                    .velocity(Vec3.ZERO)
+                    .spread(0)
+                    .speed(0)
+                    .emit();
         }
         ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource, Sheets.translucentItemSheet());
     }

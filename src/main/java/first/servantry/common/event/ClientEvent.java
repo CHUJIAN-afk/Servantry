@@ -4,7 +4,6 @@ import first.servantry.Servantry;
 import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
 import first.servantry.api.client.renderType.TrailShaders;
 import first.servantry.client.attachmentEntityRenderer.*;
-import first.servantry.common.particle.StardustScatterParticle;
 import first.servantry.common.particle.provider.GenericParticleProvider;
 import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.ParticleRegister;
@@ -20,7 +19,7 @@ public class ClientEvent {
 
     @SubscribeEvent
     public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
-        event.registerSpriteSet(ParticleRegister.StardustScatter.get(), GenericParticleProvider.registration(StardustScatterParticle::new));
+        event.registerSpriteSet(ParticleRegister.Generic.get(), GenericParticleProvider.registration());
     }
 
     @SubscribeEvent

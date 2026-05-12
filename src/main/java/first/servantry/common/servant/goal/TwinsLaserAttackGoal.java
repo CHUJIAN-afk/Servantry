@@ -5,11 +5,12 @@ import first.servantry.common.projectile.LaserProjectile;
 import first.servantry.common.servant.Twins;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.SoundRegister;
+import first.servantry.utils.ParticleHelper;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.Random;
 
 /**
  * 双子魔眼激光攻击Goal。
@@ -17,16 +18,19 @@ import java.util.Random;
  * 激光眼（Retinazer）的攻击行为：
  * <ul>
  *   <li>环绕目标飞行</li>
- *   <li>每15tick发射一道激光</li>
- *   <li>攻击期间持续看向目标</li>
+ *   <li>射击18次为一个循环：前6次间隔10tick，后12次间隔2tick</li>
+ *   <li>切换目标不重置攻击次数</li>
  * </ul>
  * </p>
  */
 public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
 
     private Vec3 wanderTarget = Vec3.ZERO;
-    private int cooldown = 15;
     private int shootCooldown = 0;
+    /**
+     * 当前循环内已射击次数（0-17）
+     */
+    private int shotCount = 0;
 
     public TwinsLaserAttackGoal(Twins twins) {
         super(twins);
@@ -35,11 +39,6 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
     @Override
     public boolean canUse() {
         return servant.isLaserEye() && servant.isTarget(servant.getTarget());
-    }
-
-    @Override
-    public void start() {
-        cooldown = 15;
     }
 
     @Override
@@ -64,15 +63,12 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
         float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
         servant.setDesiredRotation(targetYaw, targetPitch, servant.getRoll());
+
         // 射击冷却
         if (shootCooldown <= 0) {
             shootAtTarget(owner, target);
-            shootCooldown = cooldown + owner.getRandom().nextInt(-1, 1);
-            if (cooldown > 5) {
-                cooldown--;
-            } else {
-                cooldown = 15;
-            }
+            shotCount = (shotCount + 1) % 12;
+            shootCooldown = shotCount < 5 ? 10 : 1;
         } else {
             shootCooldown--;
         }
@@ -80,40 +76,34 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
 
     private void shootAtTarget(Player owner, LivingEntity target) {
         Vec3 start = servant.getPos();
-        Vec3 direction = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), Math.abs(cooldown - 15) * 0.1f).subtract(start).normalize();
+        RandomSource random = owner.getRandom();
+        Vec3 direction = target.getBoundingBox().getCenter().offsetRandom(random, shotCount < 5 ? 0.3f : 1).subtract(start).normalize();
         LaserProjectile projectile = new LaserProjectile(servant.getDamageSource(), start.add(direction.scale(-0.75)), direction);
         owner.getData(AttachmentRegister.EntityData).addProjectile(projectile);
-        owner.level().playSound(null, start.x(), start.y(), start.z(), SoundRegister.Laser.get(), owner.getSoundSource());
+        ServerLevel level = (ServerLevel) owner.level();
+        level.playSound(null, start.x(), start.y(), start.z(), SoundRegister.Laser.get(), owner.getSoundSource());
         // 后坐力
         servant.applyForce(direction.scale(-0.1));
+        // 喷射粒子 - 星尘调色：青蓝色带随机偏差
+        ParticleHelper.create(level)
+                .generic(b -> b.color(0x33CCFF).colorRandom(0.2F, 0.2F, 0.0F).lifetime(15).friction(0.75F).spin(0.1F).spinRandom(0.05F))
+                .pos(start)
+                .velocity(direction)
+                .count(5)
+                .speed(0.85)
+                .spread(0.2)
+                .emit();
     }
 
     /**
      * 计算光环锚点位置（用于攻击目标周围环绕）。
      */
     private Vec3 getHaloAnchorPos(Player owner, LivingEntity target, int order) {
-        if (false) {
-            long seed = target.getId() * 31337L + order * 1021L;
-            Random rand = new Random(seed);
-            double baseTheta = rand.nextDouble() * Math.PI * 2;
-            double phi = Math.acos(1.0 - rand.nextDouble() * 1.4);
-            double radius = target.getBoundingBox().getSize() * 3 + rand.nextDouble() * 2.0;
-            double rotationSpeed = (rand.nextDouble() * 0.02 + 0.01) * (rand.nextBoolean() ? 1 : -1);
-            double currentTheta = baseTheta + owner.tickCount * rotationSpeed;
-
-            double offsetX = radius * Math.sin(phi) * Math.cos(currentTheta);
-            double offsetY = radius * 0.25 * Math.cos(phi) + Math.sin(owner.tickCount * 0.05 + rand.nextDouble() * Math.PI) * 0.5;
-            double offsetZ = radius * Math.sin(phi) * Math.sin(currentTheta);
-
-            Vec3 targetCenter = target.getBoundingBox().getCenter();
-            return targetCenter.add(offsetX, offsetY, offsetZ);
-        } else {
-            if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025) {
-                wanderTarget = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), (float) target.getBoundingBox().getSize() * 8);
-                wanderTarget.add(0, target.getBoundingBox().getSize(), 0);
-            }
-            return wanderTarget;
+        if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025) {
+            wanderTarget = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), (float) target.getBoundingBox().getSize() * 6);
+            wanderTarget.add(0, target.getBoundingBox().getSize() * 12, 0);
         }
+        return wanderTarget;
     }
 
 }

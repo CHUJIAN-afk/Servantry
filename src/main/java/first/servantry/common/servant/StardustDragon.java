@@ -11,9 +11,8 @@ import first.servantry.common.servant.goal.StardustDragonFollowGoal;
 import first.servantry.common.servant.goal.StardustDragonIdleGoal;
 import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.AttachmentRegister;
-import first.servantry.register.ParticleRegister;
+import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -60,15 +59,20 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
                 return;
             }
             if (owner.getRandom().nextFloat() < 0.2 * getScale()) {
-                Vec3 pos = getPos().offsetRandom(owner.getRandom(), 0.2f * getScale());
-                Vec3 velocity = getVelocity().scale(-1);
-                ((ServerLevel) owner.level()).sendParticles(
-                        ParticleRegister.StardustScatter.get(),
-                        pos.x, pos.y, pos.z,
-                        0,
-                        velocity.x, velocity.y, velocity.z,
-                        1.0
-                );
+                ParticleHelper.create(owner.level())
+                        .generic(builder -> builder
+                                .color(51, 204, 255)
+                                .colorRandom(0.2F, 0.2F, 0.0F)
+                                .lifetime(5)
+                                .lifetimeRandom(10)
+                                .friction(0.75F)
+                                .spinRandom(0.5F)
+                        )
+                        .pos(getPos().offsetRandom(owner.getRandom(), 0.2f * getScale()))
+                        .velocity(getVelocity().scale(-1))
+                        .spread(0)
+                        .speed(0)
+                        .emit();
             }
         }
 

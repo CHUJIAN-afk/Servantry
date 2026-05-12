@@ -1,38 +1,28 @@
 package first.servantry.common.particle.provider;
 
+import first.servantry.common.particle.GenericParticle;
+import first.servantry.common.particle.GenericParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.NotNull;
 
-public class GenericParticleProvider implements ParticleProvider<SimpleParticleType> {
+public class GenericParticleProvider implements ParticleProvider<GenericParticleOptions> {
 
     private final SpriteSet sprite;
-    private final ParticleFactory factory;
 
-    public GenericParticleProvider(SpriteSet sprite, ParticleFactory factory) {
+    public GenericParticleProvider(SpriteSet sprite) {
         this.sprite = sprite;
-        this.factory = factory;
     }
 
-    /**
-     * 返回与{@code registerSpriteSet}兼容的注册函数。
-     */
-    public static ParticleEngine.SpriteParticleRegistration<SimpleParticleType> registration(ParticleFactory factory) {
-        return sprite -> new GenericParticleProvider(sprite, factory);
+    public static ParticleEngine.SpriteParticleRegistration<GenericParticleOptions> registration() {
+        return GenericParticleProvider::new;
     }
 
     @Override
-    public Particle createParticle(@NotNull SimpleParticleType type, @NotNull ClientLevel level, double x, double y, double z, double vx, double vy, double vz) {
-        return factory.create(level, x, y, z, vx, vy, vz, sprite);
+    public Particle createParticle(@NotNull GenericParticleOptions options, @NotNull ClientLevel level, double x, double y, double z, double vx, double vy, double vz) {
+        return GenericParticle.createWithOptions(level, x, y, z, vx, vy, vz, sprite, options);
     }
-
-    @FunctionalInterface
-    public interface ParticleFactory {
-        Particle create(ClientLevel level, double x, double y, double z, double vx, double vy, double vz, SpriteSet sprite);
-    }
-
 }

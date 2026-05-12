@@ -8,7 +8,7 @@ import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.MobEffectRegister;
-import first.servantry.register.ParticleRegister;
+import first.servantry.utils.ParticleHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -109,7 +109,8 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
         Level level = owner.level();
         if (!level.isClientSide()) {
             Vec3 pos = getPos();
-            int count = owner.getRandom().nextInt(2, 3);
+            RandomSource random = owner.getRandom();
+            int count = random.nextInt(2, 3);
             double baseSpeed = 0.2;
             if (isAttached()) {
                 DamageSource source = getDamageSource();
@@ -120,13 +121,29 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
                 count *= 4;
                 baseSpeed *= 4;
             }
-            Vec3 dir = getVelocity().lengthSqr() > 1e-6 ? getVelocity().normalize() : new Vec3(0, 1, 0);
-            RandomSource rand = level.getRandom();
-            for (int i = 0; i < count; i++) {
-                Vec3 scatter = dir.add(new Vec3(rand.nextGaussian(), rand.nextGaussian(), rand.nextGaussian()).scale(0.5)).normalize();
-                double speed = baseSpeed * (0.5 + rand.nextDouble() * 0.5);
-                ((ServerLevel) level).sendParticles(ParticleRegister.StardustScatter.get(), pos.x(), pos.y(), pos.z(), 0, scatter.x * speed, scatter.y * speed, scatter.z * speed, 1.0);
+            Vec3 velocity;
+            if (attachedTarget != null) {
+                velocity = attachedTarget.getBoundingBox().getCenter().subtract(pos.offsetRandom(random, (float) (attachedTarget.getBoundingBox().getSize() * 2)));
+            } else {
+                velocity = pos.subtract(pos.offsetRandom(random, 1f)).scale(0.5);
             }
+
+            ParticleHelper.create((ServerLevel) owner.level())
+                    .generic(builder -> builder
+                            .color(51, 204, 255)
+                            .colorRandom(0.2F, 0.2F, 0.0F)
+                            .lifetime(5)
+                            .lifetimeRandom(10)
+                            .friction(0.75F)
+                            .spinRandom(0.5F)
+                    )
+                    .pos(pos)
+                    .velocity(velocity)
+                    .spread(90)
+                    .count(count)
+                    .speed(baseSpeed)
+                    .spread(1)
+                    .emit();
         }
     }
 

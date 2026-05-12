@@ -9,11 +9,10 @@ import first.servantry.common.servant.goal.StardustCellIdleGoal;
 import first.servantry.common.servant.goal.StardustCellTeleportGoal;
 import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.AttachmentRegister;
-import first.servantry.register.ParticleRegister;
+import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -116,27 +115,7 @@ public class StardustCell extends MomentumServant {
     }
 
     public static void spawnShootParticles(ServerLevel level, Vec3 pos, Vec3 direction) {
-        RandomSource rand = level.getRandom();
-        int particleCount = 2 + rand.nextInt(4);
 
-        for (int i = 0; i < particleCount; i++) {
-            double spreadAngle = (rand.nextDouble() - 0.5) * 0.8;
-            double rollAngle = rand.nextDouble() * Math.PI * 2.0;
-            double speed = 0.15 + rand.nextDouble() * 0.25;
-
-            // 基于前进方向散射
-            double vx = direction.x * speed + Math.cos(rollAngle) * spreadAngle * 0.1;
-            double vy = direction.y * speed + Math.sin(rollAngle) * spreadAngle * 0.1;
-            double vz = direction.z * speed + rand.nextDouble() * 0.1;
-
-            level.sendParticles(
-                    ParticleRegister.StardustScatter.get(),
-                    pos.x, pos.y, pos.z,
-                    0,
-                    vx, vy, vz,
-                    1.0
-            );
-        }
     }
 
     public void shootAtTarget(LivingEntity target) {
@@ -148,8 +127,23 @@ public class StardustCell extends MomentumServant {
         owner.getData(AttachmentRegister.EntityData).addProjectile(projectile);
         // 后坐力
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
-        spawnShootParticles((ServerLevel) owner.level(), start, direction);
         applyForce(direction.scale(-0.5));
+        // 喷射粒子 - 星尘调色：青蓝色带随机偏差
+        ParticleHelper.create((ServerLevel) owner.level())
+                .generic(builder -> builder
+                        .color(51, 204, 255)
+                        .colorRandom(0.2F, 0.2F, 0.0F)
+                        .lifetime(5)
+                        .lifetimeRandom(25)
+                        .friction(0.75F)
+                        .spinRandom(0.5F)
+                )
+                .pos(start)
+                .velocity(direction)
+                .count(5)
+                .speed(0.65)
+                .spread(1.0)
+                .emit();
     }
 
     // ===================== 渲染数据 =====================
