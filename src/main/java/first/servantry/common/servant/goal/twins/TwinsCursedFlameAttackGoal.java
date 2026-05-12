@@ -61,6 +61,10 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                 if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || targetPos.distanceToSqr(servant.getPos()) > 6 * 6) {
                     wanderTarget = targetPos.offsetRandom(target.getRandom(), (float) target.getBoundingBox().getSize() * 6);
                     wanderTarget.add(0, target.getBoundingBox().getSize() * 12, 0);
+                    double height = target.position().y() + target.getBoundingBox().getYsize() / 2;
+                    while (wanderTarget.y() < height) {
+                        wanderTarget = wanderTarget.add(0, 1, 0);
+                    }
                 }
                 Vec3 toAnchor = wanderTarget.subtract(servant.getPos());
                 double dist = toAnchor.length();

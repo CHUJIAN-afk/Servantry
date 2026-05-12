@@ -2,6 +2,7 @@ package first.servantry.common.servant;
 
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
@@ -26,7 +27,7 @@ import java.util.List;
  * </ul>
  * </p>
  */
-public class Twins extends MomentumServant implements ICollideAttack<Twins> {
+public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBlockCollision<Twins> {
 
     /**
      * 是否为激光眼（true=激光眼，false=咒焰眼）
@@ -44,6 +45,11 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins> {
         goalSelector.addGoal(0, new TwinsLaserAttackGoal(this));
         goalSelector.addGoal(0, new TwinsCursedFlameAttackGoal(this));
         goalSelector.addGoal(2, new TwinsIdleGoal(this));
+    }
+
+    @Override
+    public @NotNull AABB getBlockCollisionBox() {
+        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
     }
 
     @Override

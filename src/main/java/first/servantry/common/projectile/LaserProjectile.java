@@ -3,6 +3,7 @@ package first.servantry.common.projectile;
 import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
@@ -20,7 +21,7 @@ import java.util.UUID;
 /**
  * 激光射弹 - 高速直线飞行的红色激光束。
  */
-public class LaserProjectile extends Projectile implements ICollideAttack<LaserProjectile> {
+public class LaserProjectile extends Projectile implements ICollideAttack<LaserProjectile>, IBlockCollision<LaserProjectile> {
 
     public LaserProjectile() {
         super();
@@ -88,4 +89,14 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
         return 10;
     }
 
+    @Override
+    public @NotNull AABB getBlockCollisionBox() {
+        return new AABB(-0.03, -0.03, -0.03, 0.03, 0.03, 0.03);
+    }
+
+    @Override
+    public void onBlockCollision(CollisionContext context) {
+        currentPathNode = new PathNode(context.position(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        setRemove();
+    }
 }

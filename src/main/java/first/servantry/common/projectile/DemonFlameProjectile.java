@@ -1,8 +1,10 @@
 package first.servantry.common.projectile;
 
+import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
@@ -17,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class DemonFlameProjectile extends Projectile implements ICollideAttack<DemonFlameProjectile> {
+public class DemonFlameProjectile extends Projectile implements ICollideAttack<DemonFlameProjectile>, IBlockCollision<DemonFlameProjectile> {
 
     public DemonFlameProjectile() {
         super();
@@ -28,7 +30,7 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
         setDamageSource(damageSource);
         setDrag(1);
         setMaxSpeed(4);
-        setMaxLife(7);
+        setMaxLife(6);
     }
 
     @Override
@@ -75,7 +77,17 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.4, -0.4, -0.2, 0.4, 0.4, 0.2);
+        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
     }
 
+    @Override
+    public @NotNull AABB getBlockCollisionBox() {
+        return getHitbox();
+    }
+
+    @Override
+    public void onBlockCollision(CollisionContext context) {
+        currentPathNode = new PathNode(context.position(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        setRemove();
+    }
 }

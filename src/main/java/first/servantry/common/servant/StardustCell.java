@@ -2,6 +2,7 @@ package first.servantry.common.servant;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.projectile.StardustProjectile;
@@ -11,7 +12,9 @@ import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +30,21 @@ import java.util.List;
  * </ul>
  * </p>
  */
-public class StardustCell extends MomentumServant {
+public class StardustCell extends MomentumServant implements IBlockCollision<StardustCell> {
 
-    /** 拖尾计时器 */
+    /**
+     * 拖尾计时器
+     */
     private int trailTimer = 0;
 
-    /** 基础射击冷却 */
+    /**
+     * 基础射击冷却
+     */
     private int shootCooldown = 0;
 
-    /** 玩家攻击联动冷却 */
+    /**
+     * 玩家攻击联动冷却
+     */
     private int extraShootCooldown = 0;
 
 
@@ -128,7 +137,9 @@ public class StardustCell extends MomentumServant {
     }
 
     @Override
-    public float getDamage() { return 6f; }
+    public float getDamage() {
+        return 6f;
+    }
 
     @Override
     public float getKnockback() {
@@ -140,16 +151,32 @@ public class StardustCell extends MomentumServant {
         return AttachmentEntityRegister.StardustCell.get();
     }
 
-    public int getShootCooldown() { return shootCooldown; }
-    public void setShootCooldown(int cooldown) { this.shootCooldown = cooldown; }
+    public int getShootCooldown() {
+        return shootCooldown;
+    }
 
-    public int getExtraShootCooldown() { return extraShootCooldown; }
-    public void setExtraShootCooldown(int cooldown) { this.extraShootCooldown = cooldown; }
+    public void setShootCooldown(int cooldown) {
+        this.shootCooldown = cooldown;
+    }
+
+    public int getExtraShootCooldown() {
+        return extraShootCooldown;
+    }
+
+    public void setExtraShootCooldown(int cooldown) {
+        this.extraShootCooldown = cooldown;
+    }
 
     public int getTrailTimer() {
         return trailTimer;
     }
 
-    public void setTrailTimer(int timer) { this.trailTimer = timer; }
+    public void setTrailTimer(int timer) {
+        this.trailTimer = timer;
+    }
 
+    @Override
+    public @NotNull AABB getBlockCollisionBox() {
+        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
+    }
 }

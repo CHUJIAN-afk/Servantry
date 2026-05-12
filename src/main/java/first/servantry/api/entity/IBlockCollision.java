@@ -59,7 +59,8 @@ public interface IBlockCollision<T extends AttachmentEntity> {
     /**
      * 碰撞回调，实现类可在此处理碰撞后的速度变化
      */
-    default void onBlockCollision(CollisionContext context) {}
+    default void onBlockCollision(CollisionContext context) {
+    }
 
     /**
      * 执行方块碰撞检测并修正位置
