@@ -37,7 +37,7 @@ public class StardustCellIdleGoal extends ServantGoal<StardustCell> {
             double force = Math.min(dist * 0.01, 0.1);
             servant.applyForce(dir.normalize().scale(force));
         }
-        if (wanderTarget.distanceToSqr(ownerPos) > 128 * 128) {
+        if (servant.getPos().distanceToSqr(ownerPos) > 48 * 48) {
             servant.teleportTo(ownerPos);
         }
     }

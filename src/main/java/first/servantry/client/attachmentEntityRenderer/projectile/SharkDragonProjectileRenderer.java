@@ -1,18 +1,18 @@
-package first.servantry.client.attachmentEntityRenderer;
+package first.servantry.client.attachmentEntityRenderer.projectile;
 
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.DropletTrailConfig;
-import first.servantry.common.projectile.LaserProjectile;
+import first.servantry.common.projectile.SharkDragonProjectile;
 
-public class LaserProjectileRenderer extends AbstractAttachmentEntityRenderer<LaserProjectile> {
+public class SharkDragonProjectileRenderer extends AbstractAttachmentEntityRenderer<SharkDragonProjectile> {
 
     @Override
-    protected RenderContext<LaserProjectile> createContext(LaserProjectile laser) {
-        return RenderContext.<LaserProjectile>builder()
-                .trail(new DropletTrailConfig<LaserProjectile>()
+    protected RenderContext<SharkDragonProjectile> createContext(SharkDragonProjectile laser) {
+        return RenderContext.<SharkDragonProjectile>builder()
+                .trail(new DropletTrailConfig<SharkDragonProjectile>()
                         .timer(laser.getTrailDuration())
-                        .colorRGB(0xFF3333)
+                        .colorRGB(0x4282ff)
                         .historyLength(4)
                         .segmentsPerNode(2)
                         .maxRadius(0.04f)

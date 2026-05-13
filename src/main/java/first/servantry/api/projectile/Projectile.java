@@ -2,6 +2,8 @@ package first.servantry.api.projectile;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.api.servant.Servant;
+import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
@@ -57,11 +59,38 @@ public abstract class Projectile extends AttachmentEntity {
 
     public Projectile(Vec3 startPos, Vec3 direction) {
         super();
-        this.currentPathNode = new PathNode(startPos, 0, 0, 0);
+        init(new PathNode(startPos, 0, 0, 0));
         if (direction != null) {
             setVelocity(direction);
             updateRotationFromVelocity();
         }
+    }
+
+    @Nullable
+    public DamageSource getDamageSource() {
+        return damageSource;
+    }
+
+    @Override
+    public float getKnockback() {
+        if (damageSource instanceof ServantDamageSource source) {
+            Servant servant = source.getServant();
+            if (servant != null) {
+                return servant.getKnockback();
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public float getDamage() {
+        if (damageSource instanceof ServantDamageSource source) {
+            Servant servant = source.getServant();
+            if (servant != null) {
+                return servant.getDamage();
+            }
+        }
+        return 0;
     }
 
     // ===================== AttachmentEntity 实现 =====================
@@ -198,11 +227,6 @@ public abstract class Projectile extends AttachmentEntity {
 
     public void applyForce(Vec3 force) {
         this.velocity = this.velocity.add(force);
-    }
-
-    @Nullable
-    public DamageSource getDamageSource() {
-        return damageSource;
     }
 
     public void setDamageSource(DamageSource damageSource) {

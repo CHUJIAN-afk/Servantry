@@ -9,8 +9,6 @@
     "LivingEntityMixin",
     "MobEffectInstanceAccessor"
   ],
-  "client": [
-  ],
   "injectors": {
     "defaultRequire": 1
   },

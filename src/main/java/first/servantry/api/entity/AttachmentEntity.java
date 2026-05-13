@@ -12,78 +12,23 @@ import java.util.UUID;
 
 /**
  * 附件实体抽象基类，为仆从和射弹提供统一的存储架构和渲染支持。
- * <p>
- * 附件实体采用"数据存储在玩家附件中"的设计模式，而非传统的独立实体。
- * 这种设计适合大量小型战斗单位，避免了实体注册和同步的复杂性。
- * </p>
- *
- * <h3>核心架构</h3>
- * <ul>
- *   <li><b>服务端</b>：执行行为逻辑（AI、物理），更新路径节点</li>
- *   <li><b>客户端</b>：接收网络同步数据，渲染视觉表现</li>
- *   <li><b>数据同步</b>：通过玩家附件数据包自动同步</li>
- * </ul>
- *
- * <h3>子类分类</h3>
- * <ul>
- *   <li>{@link first.servantry.api.servant.Servant} - 仆从：AI驱动，自主行动，碰撞攻击</li>
- *   <li>{@link first.servantry.api.projectile.Projectile} - 射弹：动量物理，追踪目标，可黏贴</li>
- * </ul>
- *
- * <h3>子类需实现的方法</h3>
- * <ul>
- *   <li>{@link #tick()} - 每tick更新逻辑（服务端行为 + 客户端渲染）</li>
- *   <li>{@link #getDamage()} - 返回伤害值</li>
- *   <li>{@link #getType()} - 返回注册类型</li>
- *   <li>{@link #writeAdditional(RegistryFriendlyByteBuf)} / {@link #readAdditional(RegistryFriendlyByteBuf)} - 自定义数据同步</li>
- * </ul>
- *
- * @see first.servantry.api.servant.Servant
- * @see first.servantry.api.projectile.Projectile
  */
 public abstract class AttachmentEntity {
 
     // ===================== 基础标识 =====================
 
-    /** 实体的唯一标识符，用于网络同步和持久化识别 */
     protected UUID uuid;
-
-    /** 拥有该实体的玩家引用，由附件数据管理器在tick前设置 */
     protected Player owner;
 
     // ===================== 路径与轨迹 =====================
 
-    /** 当前正在执行的计划路径，null 表示无路径任务 */
     protected PlannedPath currentPlannedPath = null;
-
-    /**
-     * 历史节点队列，用于拖尾渲染。
-     * <p>
-     * 队列结构：头部为最新节点，尾部为最旧节点。
-     * 容量由 {@link #getHistoryNodesSize()} 控制。
-     * </p>
-     */
     protected final ArrayList<PathNode> historyNodes = new ArrayList<>();
-
-    /** 服务端当前精确的路径节点（位置 + 三轴旋转） */
     protected PathNode currentPathNode;
-
-    /** 客户端接收到的目标节点，用于插值渲染 */
     protected PathNode clientTargetNode;
-
-    /** 标记客户端是否已完成首次位置同步 */
     protected boolean clientInitialized = false;
-
     protected boolean remove = false;
 
-    // ===================== 构造方法 =====================
-
-    /**
-     * 构造附件实体，初始化默认状态。
-     * <p>
-     * 默认位置为零点，历史队列初始化为两个相同节点以保证渲染安全。
-     * </p>
-     */
     public AttachmentEntity() {
         this.uuid = UUID.randomUUID();
         this.currentPathNode = new PathNode(Vec3.ZERO, 0, 0, 0);
@@ -93,28 +38,37 @@ public abstract class AttachmentEntity {
 
     // ===================== 抽象方法 =====================
 
+    public abstract float getDamage();
+
+    public abstract float getKnockback();
+
+    public abstract AttachmentEntityType<? extends AttachmentEntity> getType();
+
+    public void writeAdditional(RegistryFriendlyByteBuf buf) {
+    }
+
+    public void readAdditional(RegistryFriendlyByteBuf buf) {
+    }
+
+    public void onRemove() {
+    }
+
+    // ===================== 生命周期 =====================
+
     /**
      * 每tick更新方法，由附件数据管理器调用。
-     * <p>
-     * 实现模式：
-     * <ul>
-     *   <li><b>服务端</b>：执行行为逻辑、物理更新、路径推进，更新历史节点</li>
-     *   <li><b>客户端</b>：使用 clientTargetNode 更新 currentPathNode，更新历史节点</li>
-     * </ul>
-     * </p>
      */
     @SuppressWarnings("unchecked")
     public void tick() {
-        if (!owner.level().isClientSide()) {
-            // 路径推进
-            if (currentPlannedPath != null && !currentPlannedPath.isFinished()) {
-                currentPathNode = currentPlannedPath.advance();
-            }
+        boolean clientSide = owner.level().isClientSide();
+        if (!clientSide) {
             if (!isRemove()) {
                 // 方块碰撞检测
                 if (this instanceof IBlockCollision<?> blockCollision) {
                     ((IBlockCollision<AttachmentEntity>) blockCollision).processBlockCollision(this);
                 }
+            }
+            if (!isRemove()) {
                 // 碰撞攻击检测
                 if (this instanceof ICollideAttack<?> collideAttack) {
                     ((ICollideAttack<AttachmentEntity>) collideAttack).processCollision(this);
@@ -125,54 +79,15 @@ public abstract class AttachmentEntity {
             currentPathNode = clientTargetNode;
         }
         // 更新历史轨迹
-        updateHistoryNodes();
+        this.historyNodes.addFirst(this.currentPathNode);
+        if (this.historyNodes.size() > getHistoryNodesSize()) {
+            this.historyNodes.removeLast();
+        }
+        // 路径推进
+        if (!clientSide && currentPlannedPath != null && !currentPlannedPath.isFinished()) {
+            currentPathNode = currentPlannedPath.advance();
+        }
     }
-
-    /**
-     * 获取实体的单次攻击伤害值。
-     *
-     * @return 伤害数值
-     */
-    public abstract float getDamage();
-
-    /**
-     * 返回该实体对应的注册类型，用于网络序列化与工厂创建。
-     *
-     * @return 实体类型
-     */
-    public abstract AttachmentEntityType<? extends AttachmentEntity> getType();
-
-    /**
-     * 写入实体特有的附加同步数据。
-     * <p>
-     * 在 {@link #writeBase(RegistryFriendlyByteBuf)} 中被调用，
-     * 子类应在此写入自定义字段（如状态、目标UUID等）。
-     * </p>
-     *
-     * @param buf 数据包缓冲区
-     */
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-    }
-
-    /**
-     * 读取实体特有的附加同步数据。
-     * <p>
-     * 在 {@link #readBase(RegistryFriendlyByteBuf)} 中被调用，
-     * 子类应在此读取自定义字段，顺序需与 writeAdditional 一致。
-     * </p>
-     *
-     * @param buf 数据包缓冲区
-     */
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-    }
-
-    /**
-     * 被移除前调用
-     */
-    public void onRemove() {
-    }
-
-    // ===================== 路径管理 =====================
 
     /**
      * 设置当前要执行的计划路径。
@@ -274,20 +189,6 @@ public abstract class AttachmentEntity {
      */
     public ArrayList<PathNode> getHistoryNodes() {
         return historyNodes;
-    }
-
-    /**
-     * 更新历史节点队列，将当前节点添加到头部。
-     * <p>
-     * 应在每tick结束时调用，用于拖尾渲染。
-     * 队列超出容量时自动移除尾部节点。
-     * </p>
-     */
-    protected void updateHistoryNodes() {
-        this.historyNodes.addFirst(this.currentPathNode);
-        if (this.historyNodes.size() > getHistoryNodesSize()) {
-            this.historyNodes.removeLast();
-        }
     }
 
     // ===================== 渲染支持 =====================

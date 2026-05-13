@@ -114,7 +114,9 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     }
 
     public PathNode getInterpolatedIdleState(float partialTick) {
-        float playerYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
+        float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
+        float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);
+        float playerYaw = Mth.wrapDegrees(bodyYaw + Mth.wrapDegrees(headYaw - bodyYaw) * 0.5f);
         float rad = (float) Math.toRadians(-playerYaw + 180);
         float backX = (float) Math.sin(rad);
         float backZ = (float) Math.cos(rad);

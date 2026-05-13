@@ -6,6 +6,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.projectile.DemonFlameProjectile;
 import first.servantry.common.projectile.LaserProjectile;
+import first.servantry.common.projectile.SharkDragonProjectile;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.*;
 import net.neoforged.bus.api.IEventBus;
@@ -39,7 +40,9 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<LaserProjectile>> LaserProjectile = register("laser_projectile", LaserProjectile::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DemonFlameProjectile>> DemonFlameProjectile = register("demon_flame", DemonFlameProjectile::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DemonFlameProjectile>> DemonFlameProjectile = register("demon_flame_projectile", DemonFlameProjectile::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SharkDragonProjectile>> SharkDragonProjectile = register("shark_dragon_projectile", SharkDragonProjectile::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));

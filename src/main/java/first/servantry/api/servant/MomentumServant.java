@@ -105,8 +105,8 @@ public abstract class MomentumServant extends Servant {
         Vec3 start = getPos();
         float yaw = getYaw(), pitch = getPitch(), roll = getRoll();
         List<PathNode> path = new ArrayList<>();
-        int tick = 3;
-        for (int i = 0; i <= tick; i++) {
+        int tick = 4;
+        for (int i = 1; i <= tick; i++) {
             float t = (float) i / tick;
             Vec3 pos = start.lerp(targetPos, t);
             path.add(new PathNode(pos, yaw, pitch, roll));

@@ -1,6 +1,5 @@
 package first.servantry.common.servant;
 
-import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
@@ -15,9 +14,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 星尘细胞仆从 - 追踪敌人并发射星细胞射弹。
@@ -121,19 +117,8 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
 
     @Override
     public void teleportTo(Vec3 targetPos) {
-        if (getTrailTimer() == 0) {
-            setTrailTimer(4);
-            Vec3 start = getPos();
-            float yaw = getYaw(), pitch = getPitch(), roll = getRoll();
-            List<PathNode> path = new ArrayList<>();
-            int tick = 3;
-            for (int i = 0; i <= tick; i++) {
-                float t = (float) i / tick;
-                Vec3 pos = start.lerp(targetPos, t);
-                path.add(new PathNode(pos, yaw, pitch, roll));
-            }
-            setPath(path);
-        }
+        setTrailTimer(4);
+        super.teleportTo(targetPos);
     }
 
     @Override
@@ -178,5 +163,10 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
     @Override
     public @NotNull AABB getBlockCollisionBox() {
         return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
+    }
+
+    @Override
+    public void onBlockCollision(CollisionContext context) {
+        setVelocity(IBlockCollision.bounceVelocity(getVelocity(), context, 0.25, 0.001));
     }
 }

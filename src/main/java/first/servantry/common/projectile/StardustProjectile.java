@@ -9,7 +9,6 @@ import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.MobEffectRegister;
 import first.servantry.utils.ParticleHelper;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -120,12 +119,11 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
             }
             Vec3 velocity;
             if (attachedTarget != null) {
-                velocity = attachedTarget.getBoundingBox().getCenter().subtract(pos.offsetRandom(random, (float) (attachedTarget.getBoundingBox().getSize() * 2)));
+                velocity = pos.subtract(attachedTarget.getBoundingBox().getCenter());
             } else {
                 velocity = pos.subtract(pos.offsetRandom(random, 1f)).scale(0.5);
             }
-
-            ParticleHelper.create((ServerLevel) owner.level())
+            ParticleHelper.create(owner.level())
                     .generic(builder -> builder
                             .color(51, 204, 255)
                             .colorRandom(0.2F, 0.2F, 0.0F)
@@ -135,8 +133,8 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
                             .spinRandom(0.5F)
                     )
                     .pos(pos)
-                    .velocity(velocity)
-                    .spread(90)
+                    .velocity(velocity.normalize())
+                    .spread(0.02)
                     .count(count)
                     .speed(baseSpeed)
                     .spread(1)
@@ -146,13 +144,8 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
 
     @Override
     public float getDamage() {
-        if (damageSource instanceof ServantDamageSource source) {
-            Servant servant = source.getServant();
-            if (servant != null) {
-                return servant.getDamage();
-            }
-        }
-        return 6;
+        float damage = super.getDamage();
+        return damage != 0 ? damage : 6;
     }
 
     @Override

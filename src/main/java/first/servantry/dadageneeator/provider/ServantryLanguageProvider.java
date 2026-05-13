@@ -162,6 +162,9 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("effect.servantry.cell_parasitism")
                 .en("Cell Parasitism")
                 .zh("细胞寄生");
+        entry("effect.servantry.cursed_flame")
+                .en("Cursed Flame")
+                .zh("诅咒焰");
         // 长效和强效药水
         entry("item.minecraft.potion.effect.obsession")
                 .en("Potion of Obsession")
@@ -199,7 +202,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("item.minecraft.tipped_arrow.effect.strong_obsession")
                 .en("Arrow of Obsession")
                 .zh("着魔之箭");
-        // JEI 描述
+        // JEI 兼容
         entry("jei.servantry.description.sold")
                 .en("Occasionally sold by Clerics")
                 .zh("牧师偶尔出售");

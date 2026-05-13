@@ -18,7 +18,7 @@ import java.io.IOException;
 public class TrailShaders {
 
     /** 标准透明轨迹着色器 */
-    public static ShaderInstance trailShader;
+    private static ShaderInstance trailShader;
 
     /** 轨迹顶点格式：Position + Color + UV0 + UV1 + UV2 + Normal */
     public static final VertexFormat TRAIL_FORMAT = VertexFormat.builder()
@@ -46,5 +46,9 @@ public class TrailShaders {
                 ),
                 shader -> trailShader = shader
         );
+    }
+
+    public static ShaderInstance getTrailShader() {
+        return trailShader;
     }
 }

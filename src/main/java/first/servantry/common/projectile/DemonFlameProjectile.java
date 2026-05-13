@@ -10,7 +10,9 @@ import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.MobEffectRegister;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -35,15 +37,16 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        for (HitContext hitContext : hitContexts) {
-            LivingEntity target = hitContext.entity();
-            DamageSource source = getDamageSource();
-            if (source != null) {
-                UUID uuid = null;
-                if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
-                    uuid = servant.getUuid();
-                }
+        DamageSource source = getDamageSource();
+        if (source != null) {
+            UUID uuid = null;
+            if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
+                uuid = servant.getUuid();
+            }
+            for (HitContext hitContext : hitContexts) {
+                LivingEntity target = hitContext.entity();
                 InvincibleData.criteriaAttack(target, uuid, 2, source, getDamage(), InvincibleData.Type.PARTIAL);
+                target.addEffect(new MobEffectInstance(MobEffectRegister.CursedFlame, 100, 0));
             }
         }
     }
@@ -61,13 +64,8 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
 
     @Override
     public float getDamage() {
-        if (damageSource instanceof ServantDamageSource source) {
-            Servant servant = source.getServant();
-            if (servant != null) {
-                return servant.getDamage();
-            }
-        }
-        return 2.4f;
+        float damage = super.getDamage();
+        return damage != 0 ? damage : 2.4f;
     }
 
     @Override

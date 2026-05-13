@@ -74,9 +74,8 @@ public class TrailRenderType extends RenderType {
 
         private static RenderType createTrailCustom() {
             // 使用自定义着色器，无光影时效果最佳
-            ShaderStateShard customShader = new ShaderStateShard(() -> TrailShaders.trailShader);
             CompositeState state = CompositeState.builder()
-                    .setShaderState(customShader)
+                    .setShaderState(new ShaderStateShard(TrailShaders::getTrailShader))
                     .setTextureState(new TextureStateShard(TRAIL_TEXTURE, false, false))
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setCullState(NO_CULL)

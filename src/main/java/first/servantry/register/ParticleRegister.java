@@ -14,7 +14,7 @@ public class ParticleRegister {
     private static final DeferredRegister<ParticleType<?>> Register = DeferredRegister.create(Registries.PARTICLE_TYPE, Servantry.MODID);
 
     public static final DeferredHolder<ParticleType<?>, ParticleType<GenericParticleOptions>> Generic = Register.register("generic", () ->
-            new ParticleType<>(false) {
+            new ParticleType<>(true) {
                 @Override
                 public com.mojang.serialization.@NotNull MapCodec<GenericParticleOptions> codec() {
                     return GenericParticleOptions.CODEC;
