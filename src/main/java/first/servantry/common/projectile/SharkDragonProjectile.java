@@ -27,9 +27,9 @@ public class SharkDragonProjectile extends Projectile implements ICollideAttack<
     public SharkDragonProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
-        setDrag(1);
-        setMaxSpeed(4);
-        setMaxLife(6);
+        setDrag(1f);
+        setGravity(-0.002f);
+        setMaxLife(100);
     }
 
     @Override

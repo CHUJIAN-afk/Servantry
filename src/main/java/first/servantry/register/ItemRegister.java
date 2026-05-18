@@ -6,6 +6,7 @@ import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.item.IServantWeapon;
+import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.item.CurioItem;
 import first.servantry.common.servant.StardustDragon;
 import first.servantry.common.servant.Twins;
@@ -30,6 +31,13 @@ public class ItemRegister {
     private static final DeferredRegister.Items Register = DeferredRegister.createItems(Servantry.MODID);
 
     // ===================== 仆从武器 =====================
+
+    public static final DeferredItem<Item> InfiniteScabbard = Register.register("infinite_scabbard", () ->
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.InfiniteShadow)
+                    .sound(SoundRegister.UseTerraprism)
+                    .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1)))
+                    .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1).component(DataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
+    );
 
     /** 泰拉棱镜 - 召唤泰拉棱镜仆从 */
     public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
@@ -139,6 +147,20 @@ public class ItemRegister {
                         Player owner = servant.getOwner();
                         RandomSource random = owner.getRandom();
                         random.setSeed(owner.level().getGameTime());
+                        servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
+                    })
+                    .buildItem()
+    );
+
+    /**
+     * 暴风雨法杖 - 召唤鲨鱼龙卷
+     */
+    public static final DeferredItem<Item> TempestStaff = Register.register("tempest_staff", () ->
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.Sharknado)
+                    .sound(SoundRegister.UseServantWeapon)
+                    .summonPost(servant -> {
+                        Player owner = servant.getOwner();
+                        RandomSource random = owner.getRandom();
                         servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
                     })
                     .buildItem()

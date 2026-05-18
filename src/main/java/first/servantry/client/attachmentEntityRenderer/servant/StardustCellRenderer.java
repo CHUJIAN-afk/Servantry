@@ -44,12 +44,16 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
             int trailTimer = servant.getTrailTimer();
             ParticleHelper.create(servant.getOwner().level())
                     .generic(builder -> builder
-                            .color(51, 204, 255)
+                            .color(0x2fb2e1)
+                            .edgeColor(0x33ccff)
                             .colorRandom(0.2F, 0.2F, 0.0F)
                             .lifetime(7 - trailTimer)
                             .lifetimeRandom(4)
                             .spin(trailTimer * 0.25f)
                             .spinRandom(0.5F)
+                            .friction(0.75F)
+                            .scale(0.035f)
+                            .scaleRandom(0.005f)
                     )
                     .pos(visualNode.pos())
                     .offset(0.25)

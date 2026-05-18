@@ -34,6 +34,10 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustCell.get(), new StardustCellRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustDragon.get(), new StardustDragonRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.Twins.get(), new TwinsRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.Sharknado.get(), new SharknadoRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.InfiniteShadow.get(), new InfiniteShadowRenderer());
+
+
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustProjectile.get(), new StardustProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.LaserProjectile.get(), new LaserProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.SharkDragonProjectile.get(), new SharkDragonProjectileRenderer());

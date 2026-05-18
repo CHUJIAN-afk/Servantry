@@ -18,6 +18,7 @@ public class Servantry {
         AttachmentRegister.register(eventBus);
         AttributeRegister.register(eventBus);
         CreativeTabRegister.register(eventBus);
+        DataComponentRegister.register(eventBus);
         AttachmentEntityRegister.register(eventBus);
         ItemRegister.register(eventBus);
         MobEffectRegister.register(eventBus);

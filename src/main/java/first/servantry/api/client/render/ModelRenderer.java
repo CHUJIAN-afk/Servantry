@@ -114,7 +114,7 @@ public final class ModelRenderer {
     /**
      * 创建独立模型资源位置。
      *
-     * @param location 模型资源位置（如 "servantry:item/my_model"）
+     * @param location 模型资源位置（如 "servantry:itemStack/my_model"）
      * @return 模型资源位置
      */
     public static ModelResourceLocation standalone(ResourceLocation location) {

@@ -143,6 +143,10 @@ public interface IServantWeapon<T extends Servant> {
             return new ServantWeaponItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1));
         }
 
+        public Item buildItem(Item.Properties properties) {
+            return new ServantWeaponItem(properties);
+        }
+
         private class ServantWeaponItem extends Item implements IServantWeapon<T> {
 
             private T dummyServant = null;

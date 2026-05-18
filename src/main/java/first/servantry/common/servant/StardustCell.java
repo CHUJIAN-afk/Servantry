@@ -97,21 +97,25 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
         // 后坐力
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
         applyForce(direction.scale(-0.5));
-        // 喷射粒子 - 星尘调色：青蓝色带随机偏差
+        // 喷射粒子 - 星尘调色
         ParticleHelper.create(owner.level())
                 .generic(builder -> builder
-                        .color(51, 204, 255)
+                        .color(0x2fb2e1)
+                        .edgeColor(0x33ccff)
                         .colorRandom(0.2F, 0.2F, 0.0F)
                         .lifetime(5)
                         .lifetimeRandom(25)
-                        .friction(0.75F)
+                        .spin(0.1f)
                         .spinRandom(0.5F)
+                        .friction(0.75F)
+                        .scale(0.035f)
+                        .scaleRandom(0.005f)
                 )
                 .pos(start)
                 .velocity(direction)
                 .count(5)
                 .speed(0.65)
-                .spread(1.0)
+                .spread(0.5)
                 .emit();
     }
 

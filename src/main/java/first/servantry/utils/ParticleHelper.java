@@ -55,6 +55,14 @@ public class ParticleHelper {
         return this;
     }
 
+    /**
+     * 使用通用粒子类型，通过Builder配置参数。
+     */
+    public ParticleHelper generic(GenericParticleBuilder builder) {
+        this.genericBuilder = builder;
+        return this;
+    }
+
     public ParticleHelper pos(Vec3 position) {
         this.x = position.x;
         this.y = position.y;

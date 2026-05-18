@@ -24,6 +24,8 @@ public class AttachmentEntityRegister {
 
     // ===================== 仆从类型 =====================
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<InfiniteShadow>> InfiniteShadow = register("infinite_shadow", InfiniteShadow::new);
+
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Terraprism>> TerraPrism = register("terraprism", Terraprism::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustCell>> StardustCell = register("stardust_cell", StardustCell::new);
@@ -33,6 +35,8 @@ public class AttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustDragon>> StardustDragon = register("stardust_dragon", StardustDragon::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Twins>> Twins = register("twins", Twins::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Sharknado>> Sharknado = register("sharknado", Sharknado::new);
 
     // ===================== 射弹类型 =====================
 

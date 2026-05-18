@@ -37,14 +37,9 @@ public class StardustCellAttackGoal extends ServantGoal<StardustCell> {
         if (!dir.equals(Vec3.ZERO)) {
             double force = Math.min(dist * 0.1, 0.6);
             servant.applyForce(dir.normalize().scale(force));
+            float friction = dist < 1.5 ? 0.55f : 0.95f;
+            servant.setVelocity(servant.getVelocity().scale(friction));
         }
-        float friction = dist < 1.5 ? 0.55f : 0.85f;
-        float maxSpd = (float) Math.min(1.8, dist * 0.8 + 0.05);
-        Vec3 vel = servant.getVelocity();
-        if (vel.lengthSqr() > maxSpd * maxSpd) {
-            vel = vel.normalize().scale(maxSpd);
-        }
-        servant.setVelocity(vel.scale(friction));
 
         double distanceToSqr = servant.getPos().distanceToSqr(target.getBoundingBox().getCenter());
         if (distanceToSqr > 14 * 14 && distanceToSqr < 26 * 26) {

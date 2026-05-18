@@ -111,7 +111,7 @@ public class ClientEvent {
         if (registryName.getNamespace().equals(Servantry.MODID)) {
             List<MutableComponent> cachedLore = Cache.computeIfAbsent(item, k -> {
                 List<MutableComponent> lines = new ArrayList<>();
-                String baseKey = "item." + Servantry.MODID + "." + registryName.getPath() + ".tooltip.";
+                String baseKey = "itemStack." + Servantry.MODID + "." + registryName.getPath() + ".tooltip.";
                 int index = 1;
                 while (I18n.exists(baseKey + index)) {
                     lines.add(Component.translatable(baseKey + index));

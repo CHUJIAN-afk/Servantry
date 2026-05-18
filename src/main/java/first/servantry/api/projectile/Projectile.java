@@ -34,6 +34,10 @@ public abstract class Projectile extends AttachmentEntity {
      */
     protected float drag = 1.0f;
     /**
+     * 重力
+     */
+    protected float gravity = 0;
+    /**
      * 最大速度上限（格/tick）
      */
     protected float maxSpeed = 2.0f;
@@ -118,7 +122,7 @@ public abstract class Projectile extends AttachmentEntity {
 
     protected void tickPhysics() {
         // 应用阻力
-        velocity = velocity.scale(drag);
+        velocity = velocity.scale(drag).add(0, gravity, 0);
 
         // 限制速度
         double speed = velocity.length();
@@ -197,6 +201,14 @@ public abstract class Projectile extends AttachmentEntity {
     public float getDrag() { return drag; }
 
     public void setDrag(float drag) { this.drag = Mth.clamp(drag, 0.0f, 1.0f); }
+
+    public float getGravity() {
+        return gravity;
+    }
+
+    public void setGravity(float gravity) {
+        this.gravity = gravity;
+    }
 
     public float getMaxSpeed() { return maxSpeed;
     }
