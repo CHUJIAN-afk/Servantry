@@ -1,6 +1,7 @@
 package first.servantry.api.servant;
 
 import first.servantry.api.PathNode;
+import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.register.AttachmentRegister;
@@ -83,7 +84,7 @@ public abstract class Servant extends AttachmentEntity {
             boolean isEnemy = target instanceof Enemy;
             boolean targetingOwner = target instanceof Targeting t && t.getTarget() == owner;
             boolean hurtOwner = owner.getLastHurtByMob() == target;
-            boolean hurtTarget = target.getLastHurtByMob() == owner;
+            boolean hurtTarget = InvincibleData.recentlyAttacked(target, owner.getUUID()) || InvincibleData.recentlyAttacked(target, this.getUuid());
             return isEnemy || targetingOwner || hurtOwner || hurtTarget;
         }
         return false;

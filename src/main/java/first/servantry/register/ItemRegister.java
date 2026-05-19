@@ -18,6 +18,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
@@ -35,7 +36,16 @@ public class ItemRegister {
     public static final DeferredItem<Item> InfiniteScabbard = Register.register("infinite_scabbard", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.InfiniteShadow)
                     .sound(SoundRegister.UseTerraprism)
-                    .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1)))
+                    .summonPre((player, infiniteShadow) -> {
+                        ItemStack mainHandItem = player.getMainHandItem();
+                        ScabbardContainer container = mainHandItem.getComponents().getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                        if (!container.isEmpty()) {
+                            infiniteShadow.setItemStack(container.itemStack());
+                            return true;
+                        }
+                        return false;
+                    })
+                    .summonPost(infiniteShadow -> infiniteShadow.init(infiniteShadow.getInterpolatedIdleState(1)))
                     .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1).component(DataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
     );
 

@@ -9,6 +9,7 @@ import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -19,11 +20,13 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.EntityTravelToDimensionEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
@@ -95,4 +98,11 @@ public class Event {
         event.add(EntityType.PLAYER, AttributeRegister.ServantKnockback);
     }
 
+    @SubscribeEvent
+    public static void onLivingDamageEventPost(LivingDamageEvent.Post event) {
+        DamageSource damageSource = event.getSource();
+        if (damageSource.getEntity() instanceof Player attacker) {
+            event.getEntity().getData(AttachmentRegister.InvincibleData).getHurtHistory().put(attacker.getUUID(), new AtomicInteger(100));
+        }
+    }
 }

@@ -5,8 +5,9 @@ import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
+import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.servant.StardustCell;
-import first.servantry.mixin.MobEffectInstanceAccessor;
+import first.servantry.mixin.servantry.MobEffectInstanceAccessor;
 import first.servantry.register.*;
 import first.servantry.utils.ArmorSetUtil;
 import first.servantry.utils.AttributeUtils;
@@ -18,11 +19,14 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -31,6 +35,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.BasicItemListing;
 import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
+import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
@@ -42,6 +47,38 @@ import java.util.Map;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
+
+    @SubscribeEvent
+    public static void onItemStackedOnOther(ItemStackedOnOtherEvent event) {
+        if (event.getClickAction() != ClickAction.PRIMARY) return;
+
+        ItemStack carried = event.getCarriedItem();
+        ItemStack stackedOn = event.getStackedOnItem();
+        Slot slot = event.getSlot();
+        SlotAccess carriedAccess = event.getCarriedSlotAccess();
+
+        // 情况1：鼠标上有剑类物品，点击无限剑鞘 → 存入
+        if (stackedOn.getItem() == ItemRegister.InfiniteScabbard.get()) {
+            ScabbardContainer scabbard = stackedOn.get(DataComponentRegister.Scabbard.get());
+            if (scabbard == null || scabbard.isEmpty()) {
+                // 剑鞘为空，存入鼠标上的物品
+                stackedOn.set(DataComponentRegister.Scabbard.get(), new ScabbardContainer(carried.copy()));
+                carriedAccess.set(ItemStack.EMPTY);
+                event.setCanceled(true);
+            }
+        }
+
+        // 情况2：鼠标上有无限剑鞘（含物品），点击空格子 → 放出
+        if (carried.getItem() == ItemRegister.InfiniteScabbard.get()) {
+            ScabbardContainer scabbard = carried.get(DataComponentRegister.Scabbard.get());
+            if (scabbard != null && !scabbard.isEmpty() && stackedOn.isEmpty()) {
+                // 放出剑鞘中的物品到格子
+                slot.set(scabbard.itemStack().copy());
+                carried.set(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                event.setCanceled(true);
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void onRegisterBrewingRecipes(RegisterBrewingRecipesEvent event) {
@@ -149,5 +186,4 @@ public class Event {
             }
         }
     }
-
 }

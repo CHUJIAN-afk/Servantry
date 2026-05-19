@@ -1,4 +1,4 @@
-package first.servantry.mixin;
+package first.servantry.mixin.api;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import first.servantry.api.servant.Servant;

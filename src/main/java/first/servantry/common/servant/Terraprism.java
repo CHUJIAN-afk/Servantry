@@ -2,6 +2,7 @@ package first.servantry.common.servant;
 
 import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.Servant;
@@ -9,6 +10,7 @@ import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.terraprism.TerraprismAttackGoal;
 import first.servantry.common.servant.goal.terraprism.TerraprismIdleGoal;
 import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.AttachmentRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -122,7 +124,15 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         float backZ = (float) Math.cos(rad);
         float rightX = (float) Math.cos(rad);
         float rightZ = (float) -Math.sin(rad);
-        int order = getOrder();
+        int order = 0;
+        for (AttachmentEntity entity : getOwner().getData(AttachmentRegister.EntityData).getEntities()) {
+            if (entity instanceof Terraprism terraprism) {
+                if (terraprism == this) {
+                    break;
+                }
+                order++;
+            }
+        }
         double localZ = 0.5 + order * 0.12;
         double floatSpeed = 0.08 + order * 0.01;
         double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;

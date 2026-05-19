@@ -1,4 +1,4 @@
-package first.servantry.mixin;
+package first.servantry.mixin.servantry;
 
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
