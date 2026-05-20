@@ -16,18 +16,17 @@ public class StardustDragonAttackGoal extends ServantGoal<StardustDragon> {
 
     @Override
     public boolean canUse() {
-        return servant.isHead() && servant.getTarget() != null;
+        return servant.isHead() && servant.isTarget(servant.getTarget());
     }
 
     @Override
     public boolean canContinueToUse() {
-        return servant.isHead() && servant.getTarget() != null && servant.getTarget().isAlive();
+        return servant.isHead() && servant.isTarget(servant.getTarget());
     }
 
     @Override
     public void tick() {
         LivingEntity target = servant.getTarget();
-        if (target == null || !target.isAlive()) return;
         Vec3 targetPos = target.getBoundingBox().getCenter();
         servant.spiralToward(targetPos, 0.25);
     }

@@ -1,3 +1,4 @@
-// 1.21.1	2026-05-08T18:25:22.1491678	Loot Tables
+// 1.21.1	2026-05-19T17:27:16.9208895	Loot Tables
 5a51b6e3e7b1bf962b4b20219bcbb450c9592820 data/minecraft/loot_table/entities/allay.json
 ce33cf0ad406a80b242ffa6ecbca0a4ff7201220 data/minecraft/loot_table/entities/evoker.json
+6566c1387fe5c075279983cc286a85a79520187d data/minecraft/loot_table/entities/zombie.json

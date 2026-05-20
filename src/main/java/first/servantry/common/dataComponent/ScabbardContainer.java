@@ -21,4 +21,15 @@ public record ScabbardContainer(ItemStack itemStack) {
     public boolean isEmpty() {
         return itemStack.isEmpty();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof ScabbardContainer(ItemStack item)) {
+            return ItemStack.isSameItemSameComponents(item, itemStack);
+        }
+        return false;
+    }
 }

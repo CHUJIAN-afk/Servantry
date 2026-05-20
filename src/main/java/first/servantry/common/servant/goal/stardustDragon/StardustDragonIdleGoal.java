@@ -18,12 +18,12 @@ public class StardustDragonIdleGoal extends ServantGoal<StardustDragon> {
 
     @Override
     public boolean canUse() {
-        return servant.isHead() && servant.getTarget() == null;
+        return servant.isHead() && !servant.isTarget(servant.getTarget());
     }
 
     @Override
     public boolean canContinueToUse() {
-        return servant.isHead() && servant.getTarget() == null;
+        return servant.isHead() && !servant.isTarget(servant.getTarget());
     }
 
     @Override

@@ -1,29 +1,35 @@
 package first.servantry.common.servant;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
+import first.servantry.Servantry;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.AttachmentRegister;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.UsernameCache;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class InfiniteShadow extends Terraprism {
 
@@ -50,13 +56,20 @@ public class InfiniteShadow extends Terraprism {
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         InfiniteShadowFakePlayer player = getFakePlayer();
-        if (player != null) {
+        if (!itemStack.isEmpty() && player != null) {
+            fakePlayer.setPos(getPos());
             for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
                 if (this.hitTargets.add(living)) {
+                    living.getData(AttachmentRegister.InvincibleData).getHurtHistory().put(owner.getUUID(), new AtomicInteger(100));
                     int invulnerableTime = living.invulnerableTime;
                     living.invulnerableTime = 0;
-                    player.attack(living);
+                    if (!itemStack.is(Items.TNT)) {
+                        player.attack(living);
+                    } else {
+                        Vec3 point = hit.hitPoint();
+                        owner.level().explode(owner, getDamageSource(), null, point.x(), point.y(), point.z(), 1, false, Level.ExplosionInteraction.TNT);
+                    }
                     living.invulnerableTime = invulnerableTime;
                 }
             }
@@ -72,7 +85,6 @@ public class InfiniteShadow extends Terraprism {
     @Override
     public void writeAdditional(RegistryFriendlyByteBuf buf) {
         super.writeAdditional(buf);
-
         ItemStack.STREAM_CODEC.encode(buf, this.itemStack);
     }
 
@@ -97,20 +109,31 @@ public class InfiniteShadow extends Terraprism {
         Player player = getOwner();
         if (player != null) {
             Level level = player.level();
+            if (fakePlayer != null && !fakePlayer.isAlive()) {
+                fakePlayer = null;
+            }
             if (fakePlayer == null && !level.isClientSide()) {
                 fakePlayer = new InfiniteShadowFakePlayer((ServerLevel) level, this);
+                fakePlayer.setItemSlot(EquipmentSlot.MAINHAND, itemStack.copy());
+                ItemAttributeModifiers attributeModifiers = itemStack.getAttributeModifiers();
+                List<ItemAttributeModifiers.Entry> modifiers = attributeModifiers.modifiers();
+                for (ItemAttributeModifiers.Entry entry : modifiers) {
+                    Holder<Attribute> attribute = entry.attribute();
+                    AttributeModifier modifier = entry.modifier();
+                    if (fakePlayer.getAttribute(attribute) instanceof AttributeInstance attributeInstance) {
+                        if (attributeInstance.getModifier(modifier.id()) != null) {
+                            attributeInstance.removeModifier(modifier);
+                        }
+                        attributeInstance.addPermanentModifier(modifier);
+                    }
+                }
+                if (BuiltInRegistries.ITEM.getKey(itemStack.getItem()).getNamespace().equals("minecraft")) {
+                    AttributeInstance instance = fakePlayer.getAttribute(Attributes.ATTACK_DAMAGE);
+                    if (instance != null) {
+                        instance.addPermanentModifier(new AttributeModifier(Servantry.rl("infinite_shadow_fake_player"), 2, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+                    }
+                }
             }
-        }
-        if (fakePlayer != null) {
-            fakePlayer.setItemSlot(EquipmentSlot.MAINHAND, itemStack.copy());
-            ItemAttributeModifiers attributeModifiers = itemStack.getAttributeModifiers();
-            List<ItemAttributeModifiers.Entry> modifiers = attributeModifiers.modifiers();
-            Multimap<Holder<Attribute>, AttributeModifier> multimap = HashMultimap.create();
-            for (ItemAttributeModifiers.Entry modifier : modifiers) {
-                multimap.put(modifier.attribute(), modifier.modifier());
-            }
-            fakePlayer.getAttributes().addTransientAttributeModifiers(multimap);
-            fakePlayer.setPos(getPos());
         }
         return fakePlayer;
     }
@@ -173,6 +196,5 @@ public class InfiniteShadow extends Terraprism {
                 return result;
             }
         }
-
     }
 }

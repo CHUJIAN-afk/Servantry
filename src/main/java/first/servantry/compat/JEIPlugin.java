@@ -27,8 +27,10 @@ public class JEIPlugin implements IModPlugin {
         registration.addIngredientInfo(ItemRegister.HuntressesBuckler.get(), Component.translatable("jei.servantry.description.sold"));
         registration.addIngredientInfo(ItemRegister.MonksBelt.get(), Component.translatable("jei.servantry.description.sold"));
         registration.addIngredientInfo(ItemRegister.SquiresShield.get(), Component.translatable("jei.servantry.description.sold"));
-        // 唤魔者掉落
-        registration.addIngredientInfo(ItemRegister.SummonerEmblem.get(), Component.translatable("jei.servantry.description.drops"));
+        // 掉落
+        registration.addIngredientInfo(ItemRegister.SummonerEmblem.get(), Component.translatable("jei.servantry.description.drops_from_evokers"));
+        registration.addIngredientInfo(ItemRegister.BlackLens.get(), Component.translatable("jei.servantry.description.drops_from_zombie"));
+        registration.addIngredientInfo(ItemRegister.TempestStaff.get(), Component.translatable("jei.servantry.description.fishing"));
     }
 
 }

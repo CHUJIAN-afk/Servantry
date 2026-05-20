@@ -1,6 +1,7 @@
 package first.servantry.common.servant.goal.twins;
 
 import first.servantry.api.servant.ai.ServantGoal;
+import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.DemonFlameProjectile;
 import first.servantry.common.servant.Twins;
 import first.servantry.utils.ParticleHelper;
@@ -44,7 +45,7 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
         Player owner = servant.getOwner();
         if (!emited) {
             servant.lookAtDirection(servant.getVelocity().normalize());
-            if (--cooldown <= 0 && targetPos.distanceToSqr(servant.getPos()) < 16 * 16) {
+            if (--cooldown <= 0) {
                 emit += 5;
                 if (emit > 40) {
                     emited = true;
@@ -78,7 +79,7 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                 demonFlameProjectile.join(owner);
                 // 喷射粒子 - 诅咒焰调色，高速小角度散射
                 ParticleHelper.create(owner.level())
-                        .generic(builder -> builder
+                        .generic(GenericParticleBuilder.create()
                                 .color(0x24d509)
                                 .edgeColor(0x1FF109)
                                 .colorRandom(0.2f, 0f, 0.2f)
@@ -86,11 +87,12 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                                 .lifetimeRandom(15)
                                 .spin(0.4f)
                                 .spinRandom(0.1F)
-                                .friction(0.75F)
+                                .friction(0.85F)
                                 .scale(0.035f)
                                 .scaleRandom(0.005f)
                         )
                         .pos(servant.getPos())
+                        .offset(0.025)
                         .velocity(targetPos.subtract(servant.getPos()))
                         .count(4)
                         .speed(1)

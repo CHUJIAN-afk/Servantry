@@ -4,6 +4,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.goal.stardustCell.StardustCellAttackGoal;
 import first.servantry.common.servant.goal.stardustCell.StardustCellIdleGoal;
@@ -99,7 +100,7 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
         applyForce(direction.scale(-0.5));
         // 喷射粒子 - 星尘调色
         ParticleHelper.create(owner.level())
-                .generic(builder -> builder
+                .generic(GenericParticleBuilder.create()
                         .color(0x2fb2e1)
                         .edgeColor(0x33ccff)
                         .colorRandom(0.2F, 0.2F, 0.0F)

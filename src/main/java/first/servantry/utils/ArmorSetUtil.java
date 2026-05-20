@@ -45,7 +45,7 @@ public class ArmorSetUtil {
             List<MutableComponent> lines = new ArrayList<>();
             ResourceLocation location = BuiltInRegistries.ARMOR_MATERIAL.getKey(material.value());
             assert location != null;
-            String baseKey = "itemStack." + Servantry.MODID + "." + location.getPath() + ".set.";
+            String baseKey = "item." + Servantry.MODID + "." + location.getPath() + ".set.";
             int index = 1;
             while (I18n.exists(baseKey + index)) {
                 lines.add(Component.translatable(baseKey + index));

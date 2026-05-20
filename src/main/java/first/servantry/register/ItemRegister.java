@@ -176,6 +176,12 @@ public class ItemRegister {
                     .buildItem()
     );
 
+    // ===================== 材料 =====================
+
+    public static final DeferredItem<Item> BlackLens = Register.register("black_lens", () ->
+            new Item(new Item.Properties())
+    );
+
     // ===================== 套装物品 =====================
 
     public static final DeferredItem<Item> HallowedHelmet =

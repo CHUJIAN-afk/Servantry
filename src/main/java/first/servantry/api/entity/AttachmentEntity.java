@@ -58,20 +58,23 @@ public abstract class AttachmentEntity {
     /**
      * 每tick更新方法，由附件数据管理器调用。
      */
-    @SuppressWarnings("unchecked")
     public void tick() {
         boolean clientSide = owner.level().isClientSide();
         if (!clientSide) {
             if (!isRemove()) {
                 // 方块碰撞检测
-                if (this instanceof IBlockCollision<?> blockCollision) {
-                    ((IBlockCollision<AttachmentEntity>) blockCollision).processBlockCollision(this);
+                if (this instanceof IBlockCollision<?>) {
+                    @SuppressWarnings("unchecked")
+                    IBlockCollision<AttachmentEntity> blockCollision = (IBlockCollision<AttachmentEntity>) this;
+                    blockCollision.processBlockCollision(this);
                 }
             }
             if (!isRemove()) {
                 // 碰撞攻击检测
-                if (this instanceof ICollideAttack<?> collideAttack) {
-                    ((ICollideAttack<AttachmentEntity>) collideAttack).processCollision(this);
+                if (this instanceof ICollideAttack<?>) {
+                    @SuppressWarnings("unchecked")
+                    ICollideAttack<AttachmentEntity> collideAttack = (ICollideAttack<AttachmentEntity>) this;
+                    collideAttack.processCollision(this);
                 }
             }
         } else {

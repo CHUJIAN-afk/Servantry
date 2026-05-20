@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "L": {
+      "item": "servantry:black_lens"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    " L ",
+    " SL",
+    "S  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "servantry:optic_staff"
+  }
+}

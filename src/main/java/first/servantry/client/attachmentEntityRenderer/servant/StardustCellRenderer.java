@@ -7,6 +7,7 @@ import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
+import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.register.ModelRegister;
 import first.servantry.utils.ParticleHelper;
@@ -29,7 +30,8 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
                         .colorRGB(0x8AE0FF)
                         .maxRadius(0.2f)
                         .resolution(12)
-                        .fadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0)))
+                        .fadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0))
+                )
                 .model(new ModelConfig<StardustCell>()
                         .scale(0.5f)
                         .translateOffset(-0.5f, -0.5f, -0.5f)
@@ -43,7 +45,7 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
         if (config.hasTrail()) {
             int trailTimer = servant.getTrailTimer();
             ParticleHelper.create(servant.getOwner().level())
-                    .generic(builder -> builder
+                    .generic(GenericParticleBuilder.create()
                             .color(0x2fb2e1)
                             .edgeColor(0x33ccff)
                             .colorRandom(0.2F, 0.2F, 0.0F)

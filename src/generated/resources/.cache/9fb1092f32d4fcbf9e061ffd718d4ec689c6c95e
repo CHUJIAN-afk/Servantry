@@ -1,10 +1,11 @@
-// 1.21.1	2026-05-07T22:17:27.1552682	Recipes
+// 1.21.1	2026-05-19T17:27:16.921892	Recipes
 d43b857b6f9beae704d11308e988aef159bb3a16 data/servantry/advancement/recipes/combat/blade_staff.json
 512ed4ac017a6335b17fdaf6ca08e58b9c2ade93 data/servantry/advancement/recipes/combat/hallowed_boots.json
 aded4cf09c1e806c06ba76b8bc0d13d7d0f2c23d data/servantry/advancement/recipes/combat/hallowed_chestplate.json
 6f57c0ddfbe31afd0612f7bc6443aa7930b66419 data/servantry/advancement/recipes/combat/hallowed_helmet.json
 981f3c1e6b58b661b962469ce252d171452b12c5 data/servantry/advancement/recipes/combat/hallowed_leggings.json
 a987838d7b11f1045bdb4d0f7aefb7c2e38d443d data/servantry/advancement/recipes/combat/necromantic_scroll.json
+53d0734c92b9b46a212c02b21476c97862cfd3ae data/servantry/advancement/recipes/combat/optic_staff.json
 f4fd40935700ef5cdac774b8631f5d2dbb0ead05 data/servantry/advancement/recipes/combat/papyrus_scarab.json
 06cfd61d54b2aa7ec8507a884ebc2c9f94ae5a91 data/servantry/advancement/recipes/combat/stardust_cell_staff.json
 6f56c33ec71467a9f2814d139c57808fd14a70f3 data/servantry/advancement/recipes/combat/stardust_dragon_staff.json
@@ -14,6 +15,7 @@ f4fd40935700ef5cdac774b8631f5d2dbb0ead05 data/servantry/advancement/recipes/comb
 04c0293f2fa532c13956ee1744837bd05c38da11 data/servantry/recipe/hallowed_helmet.json
 cb37eb68ee4e368ce09393438d43d370fb4962a3 data/servantry/recipe/hallowed_leggings.json
 c21145715e2908269cc8126aff9a745fa8ab7f03 data/servantry/recipe/necromantic_scroll.json
+d288a9a22d45d206a5123536c7678f24f12af368 data/servantry/recipe/optic_staff.json
 50ed3749792cab00b67825546fddc0760056c4b0 data/servantry/recipe/papyrus_scarab.json
 ea57e3bd43218a949674f12a118aa4e19690f053 data/servantry/recipe/stardust_cell_staff.json
 9e2c6d379b29d8c24b31d7272ab21a5c4c748114 data/servantry/recipe/stardust_dragon_staff.json

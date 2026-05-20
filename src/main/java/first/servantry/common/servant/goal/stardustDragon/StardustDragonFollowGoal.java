@@ -1,9 +1,13 @@
 package first.servantry.common.servant.goal.stardustDragon;
 
+import first.servantry.api.PathNode;
+import first.servantry.api.PlannedPath;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.StardustDragon;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Collections;
 
 /**
  * 星尘龙跟随目标（非头部体节）。
@@ -44,9 +48,8 @@ public class StardustDragonFollowGoal extends ServantGoal<StardustDragon> {
         if (distance > targetDistance) {
             // 移到前一体节后方固定距离
             Vec3 targetPos = precedingPos.subtract(direction.scale(targetDistance));
-            servant.teleportTo(targetPos);
+            servant.setPath(new PlannedPath("physics", Collections.singletonList(new PathNode(targetPos, servant.getYaw(), servant.getPitch(), servant.getRoll()))));
         }
-
         // 朝向前一体节
         float targetYaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
         float targetPitch = (float) Math.toDegrees(Math.asin(-direction.y));

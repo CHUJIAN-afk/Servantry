@@ -20,5 +20,4 @@ public class LaserProjectileRenderer extends AbstractAttachmentEntityRenderer<La
                         .resolution(16))
                 .build();
     }
-
 }

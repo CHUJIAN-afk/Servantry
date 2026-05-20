@@ -6,6 +6,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.servant.goal.stardustDragon.StardustDragonAttackGoal;
 import first.servantry.common.servant.goal.stardustDragon.StardustDragonFollowGoal;
 import first.servantry.common.servant.goal.stardustDragon.StardustDragonIdleGoal;
@@ -60,7 +61,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
             }
             if (owner.getRandom().nextFloat() < 0.2 * getScale()) {
                 ParticleHelper.create(owner.level())
-                        .generic(builder -> builder
+                        .generic(GenericParticleBuilder.create()
                                 .color(0x2fb2e1)
                                 .edgeColor(0x33ccff)
                                 .colorRandom(0.2F, 0.2F, 0.0F)
@@ -78,14 +79,13 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
                         .speed(0)
                         .emit();
             }
-        }
-
-        // 限制最大速度
-        double maxSpeed = 1.0;
-        Vec3 vel = getVelocity();
-        double speed = vel.length();
-        if (speed > maxSpeed) {
-            setVelocity(vel.normalize().scale(maxSpeed));
+            // 限制最大速度
+            double maxSpeed = 1.0;
+            Vec3 vel = getVelocity();
+            double speed = vel.length();
+            if (speed > maxSpeed) {
+                setVelocity(vel.normalize().scale(maxSpeed));
+            }
         }
         super.tick();
     }
@@ -113,7 +113,9 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         EntityData data = owner.getData(AttachmentRegister.EntityData);
         int count = 0;
         for (var entity : data.getEntities()) {
-            if (entity instanceof StardustDragon) count++;
+            if (entity instanceof StardustDragon) {
+                count++;
+            }
         }
         this.totalSegments = Math.max(3, count);
     }

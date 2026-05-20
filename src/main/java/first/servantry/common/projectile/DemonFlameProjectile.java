@@ -30,9 +30,9 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
     public DemonFlameProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
-        setDrag(1);
+        setDrag(0.92f);
         setMaxSpeed(4);
-        setMaxLife(6);
+        setMaxLife(7);
     }
 
     @Override

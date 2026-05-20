@@ -14,12 +14,13 @@ import first.servantry.utils.AttributeUtils;
 import first.servantry.utils.CuriosUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -31,14 +32,20 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.BasicItemListing;
 import net.neoforged.neoforge.event.ItemAttributeModifierEvent;
 import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
+import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 
@@ -50,32 +57,24 @@ public class Event {
 
     @SubscribeEvent
     public static void onItemStackedOnOther(ItemStackedOnOtherEvent event) {
-        if (event.getClickAction() != ClickAction.PRIMARY) return;
-
-        ItemStack carried = event.getCarriedItem();
-        ItemStack stackedOn = event.getStackedOnItem();
-        Slot slot = event.getSlot();
-        SlotAccess carriedAccess = event.getCarriedSlotAccess();
-
-        // 情况1：鼠标上有剑类物品，点击无限剑鞘 → 存入
-        if (stackedOn.getItem() == ItemRegister.InfiniteScabbard.get()) {
-            ScabbardContainer scabbard = stackedOn.get(DataComponentRegister.Scabbard.get());
-            if (scabbard == null || scabbard.isEmpty()) {
-                // 剑鞘为空，存入鼠标上的物品
-                stackedOn.set(DataComponentRegister.Scabbard.get(), new ScabbardContainer(carried.copy()));
-                carriedAccess.set(ItemStack.EMPTY);
-                event.setCanceled(true);
-            }
-        }
-
-        // 情况2：鼠标上有无限剑鞘（含物品），点击空格子 → 放出
-        if (carried.getItem() == ItemRegister.InfiniteScabbard.get()) {
-            ScabbardContainer scabbard = carried.get(DataComponentRegister.Scabbard.get());
-            if (scabbard != null && !scabbard.isEmpty() && stackedOn.isEmpty()) {
-                // 放出剑鞘中的物品到格子
-                slot.set(scabbard.itemStack().copy());
-                carried.set(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
-                event.setCanceled(true);
+        if (event.getClickAction() == ClickAction.SECONDARY) {
+            ItemStack carried = event.getCarriedItem();
+            ItemStack stackedOn = event.getStackedOnItem();
+            if (carried.is(ItemRegister.InfiniteScabbard.get())) {
+                Slot slot = event.getSlot();
+                Player player = event.getPlayer();
+                ScabbardContainer scabbard = carried.getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                if (!stackedOn.isEmpty() && scabbard.isEmpty()) {
+                    carried.set(DataComponentRegister.Scabbard.get(), new ScabbardContainer(stackedOn.copy()));
+                    slot.set(ItemStack.EMPTY);
+                    player.playSound(SoundEvents.ARMOR_EQUIP_LEATHER.value(), 1.0F, 1.2F);
+                    event.setCanceled(true);
+                } else if (stackedOn.isEmpty() && !scabbard.isEmpty()) {
+                    slot.set(scabbard.itemStack().copy());
+                    carried.set(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                    player.playSound(SoundEvents.ARMOR_EQUIP_LEATHER.value(), 1.0F, 0.9F);
+                    event.setCanceled(true);
+                }
             }
         }
     }
@@ -163,10 +162,28 @@ public class Event {
             event.addModifier(Attributes.MOVEMENT_SPEED, new AttributeModifier(ResourceLocation.fromNamespaceAndPath(Servantry.MODID, "witch_boots_speed"), 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.FEET);
         }
     }
-    
-    /**
-     * 玩家攻击联动事件 - 每个星细胞仆从有33%概率向被攻击目标发射新射弹。
-     */
+
+    @SubscribeEvent
+    public static void onItemFished(ItemFishedEvent event) {
+        Player player = event.getEntity();
+        Level level = player.level();
+        if (!level.isClientSide() && level.isRaining() && level.getBiome(player.blockPosition()).is(BiomeTags.IS_OCEAN)) {
+            if (player.getRandom().nextFloat() < 0.01f) {
+                event.getDrops().add(ItemRegister.TempestStaff.get().getDefaultInstance());
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLootTableLoad(LootTableLoadEvent event) {
+        if (event.getName().equals(ResourceLocation.withDefaultNamespace("chests/ancient_city"))) {
+            event.getTable().addPool(LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(0.05f))
+                    .add(LootItem.lootTableItem(ItemRegister.InfiniteScabbard.get()))
+                    .build());
+        }
+    }
+
     @SubscribeEvent
     public static void onLivingDamageEventPost(LivingDamageEvent.Post event) {
         DamageSource damageSource = event.getSource();

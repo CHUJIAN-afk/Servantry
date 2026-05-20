@@ -11,7 +11,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class SharknadoAttackGoal extends ServantGoal<Sharknado> {
 
-    private Vec3 orbitTarget = Vec3.ZERO;
+    private Vec3 wanderTarget = Vec3.ZERO;
 
     public SharknadoAttackGoal(Sharknado servant) {
         super(servant);
@@ -24,36 +24,28 @@ public class SharknadoAttackGoal extends ServantGoal<Sharknado> {
 
     @Override
     public void tick() {
-        Player owner = servant.getOwner();
         LivingEntity target = servant.getTarget();
+        Player owner = servant.getOwner();
 
-        // 在玩家周围选择一个点
-        if (orbitTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.02 || orbitTarget.distanceToSqr(owner.position()) > 8 * 8) {
-            double angle = owner.getRandom().nextDouble() * Math.PI * 2;
-            double radius = 3 + owner.getRandom().nextDouble() * 2;
-            double height = owner.getRandom().nextDouble() * 2 - 1;
-            orbitTarget = owner.position().add(
-                    Math.cos(angle) * radius,
-                    height + owner.getBbHeight() / 2,
-                    Math.sin(angle) * radius
-            );
+        // 计算环绕位置
+        if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025) {
+            wanderTarget = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), (float) target.getBoundingBox().getSize() * 6);
+            wanderTarget.add(0, target.getBoundingBox().getSize() * 12, 0);
+            double height = target.position().y() + target.getBoundingBox().getYsize() / 2;
+            while (wanderTarget.y() < height) {
+                wanderTarget = wanderTarget.add(0, 1, 0);
+            }
         }
+        Vec3 toAnchor = wanderTarget.subtract(servant.getPos());
+        double dist = toAnchor.length();
 
-        // 向目标点靠近（离玩家越远越快）
-        Vec3 servantPos = servant.getPos();
-        double distToOwner = servantPos.distanceTo(owner.position());
-        double distToTarget = servantPos.distanceTo(orbitTarget);
-
-        Vec3 toTarget = orbitTarget.subtract(servantPos);
-        if (toTarget.lengthSqr() > 0.01) {
-            // 离玩家越远，靠近速度越快
-            double speedFactor = Math.min(0.05 + distToOwner * 0.02, 0.25);
-            double force = Math.min(distToTarget * 0.03, speedFactor);
-            servant.applyForce(toTarget.normalize().scale(force));
+        if (dist > 0.05) {
+            double force = Math.min(dist * 0.08, 0.4);
+            servant.applyForce(toAnchor.normalize().scale(force));
         }
 
         // 每10(+-1)tick发射射弹
-        if (servant.getShootCooldown() <= 0 && target != null) {
+        if (servant.getShootCooldown() <= 0) {
             servant.shootAtTarget(target);
             servant.setShootCooldown(10 + owner.getRandom().nextIntBetweenInclusive(-1, 1));
         }

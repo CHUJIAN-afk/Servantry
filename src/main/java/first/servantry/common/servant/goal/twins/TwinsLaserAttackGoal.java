@@ -1,6 +1,7 @@
 package first.servantry.common.servant.goal.twins;
 
 import first.servantry.api.servant.ai.ServantGoal;
+import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.LaserProjectile;
 import first.servantry.common.servant.Twins;
 import first.servantry.register.SoundRegister;
@@ -43,8 +44,6 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
     @Override
     public void tick() {
         LivingEntity target = servant.getTarget();
-        if (target == null || !target.isAlive()) return;
-
         Player owner = servant.getOwner();
 
         // 计算环绕位置
@@ -85,7 +84,7 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         // 后坐力
         servant.applyForce(direction.scale(-0.1));
         ParticleHelper.create(level)
-                .generic(builder -> builder
+                .generic(GenericParticleBuilder.create()
                         .color(0xb70700)
                         .edgeColor(0xFF0700)
                         .colorRandom(0, 0.2F, 0.2F)

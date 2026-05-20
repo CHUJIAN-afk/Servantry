@@ -133,6 +133,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                 if (ticking) {
                     pendingRemove.add(target);
                 } else {
+                    target.onRemove();
                     entities.remove(target);
                 }
             }
@@ -211,6 +212,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         if (ticking) {
             pendingRemove.add(projectile);
         } else {
+            projectile.onRemove();
             entities.remove(projectile);
         }
         changed = true;
@@ -233,6 +235,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
             if (ticking) {
                 pendingRemove.add(target);
             } else {
+                target.onRemove();
                 entities.remove(target);
             }
             changed = true;

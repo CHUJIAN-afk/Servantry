@@ -50,11 +50,8 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .en("Terraprism")
                 .zh("泰拉棱镜");
         entry("item.servantry.terraprism.tooltip.1")
-                .en("'Summons a light prism blade to perform near-flawless attacks'")
-                .zh("召唤一柄光棱剑，施展近乎完美的攻击");
-        entry("item.servantry.terraprism.tooltip.2")
                 .en("'A flawless blade once hailed as the \"Prism of the Earth\"'")
-                .zh("——曾被冠以\"大地棱彩\"美名的无暇之剑");
+                .zh("曾被冠以“大地棱彩”美名的无暇之剑");
         entry("item.servantry.infinite_scabbard")
                 .en("Infinite Scabbard")
                 .zh("无限剑鞘");
@@ -63,7 +60,10 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .zh("无限之影");
         entry("item.servantry.infinite_scabbard.tooltip.1")
                 .en("'A scabbard that stores a blade of infinite potential'")
-                .zh("蕴含无限可能之剑的剑鞘");
+                .zh("蕴含无限可能之“剑”的剑鞘");
+        entry("item.servantry.infinite_scabbard.tooltip.2")
+                .en("Right-click an item to store, right-click an empty slot to retrieve")
+                .zh("右键物品存入，右键空格子取出");
         entry("item.servantry.blade_staff")
                 .en("Blade Staff")
                 .zh("刃杖");
@@ -75,7 +75,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .zh("忽略敌人 2.5 防御力");
         entry("item.servantry.blade_staff.tooltip.2")
                 .en("'Don't let their small size fool you'")
-                .zh("\"别被它们小小的个头给骗了\"");
+                .zh("“别被它们小小的个头给骗了”");
         entry("item.servantry.stardust_cell_staff")
                 .en("Stardust Cell Staff")
                 .zh("星尘细胞法杖");
@@ -84,7 +84,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .zh("星尘细胞");
         entry("item.servantry.stardust_cell_staff.tooltip.1")
                 .en("'Cultivate the most beautiful cellular infection'")
-                .zh("\"培养最美丽的细胞感染\"");
+                .zh("“培养最美丽的细胞感染”");
         entry("item.servantry.stardust_dragon_staff")
                 .en("Stardust Dragon Staff")
                 .zh("星尘之龙法杖");
@@ -93,7 +93,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .zh("星尘之龙");
         entry("item.servantry.stardust_dragon_staff.tooltip.1")
                 .en("'When you have a dragon, who needs a swarm?'")
-                .zh("\"有了一条巨龙后，谁还需要一群仆从呢？\"");
+                .zh("“有了一条巨龙后，谁还需要一群仆从呢？”");
         entry("item.servantry.optic_staff")
                 .en("Optic Staff")
                 .zh("魔眼法杖");
@@ -106,9 +106,6 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("servant.servantry.sharknado")
                 .en("Sharknado")
                 .zh("鲨鱼龙卷");
-        entry("item.servantry.tempest_staff.tooltip.1")
-                .en("'A storm of sharks is the best kind of storm'")
-                .zh("\"鲨鱼风暴是最好的风暴\"");
         entry(AttributeRegister.ServantMaxCount.value().getDescriptionId())
                 .en("Max Servants")
                 .zh("仆从栏");
@@ -134,6 +131,9 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("item.servantry.hercules_beetle")
                 .en("Hercules Beetle")
                 .zh("大力士甲虫");
+        entry("item.servantry.black_lens")
+                .en("Black Lens")
+                .zh("黑色晶状体");
         entry("item.servantry.summoner_emblem")
                 .en("Summoner Emblem")
                 .zh("召唤师徽章");
@@ -227,9 +227,18 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("jei.servantry.description.terraprism")
                 .en("Occasionally drops from Allays")
                 .zh("悦灵偶尔掉落");
-        entry("jei.servantry.description.drops")
+        entry("jei.servantry.description.drops_from_evokers")
                 .en("Occasionally drops from Evokers")
                 .zh("唤魔者偶尔掉落");
+        entry("jei.servantry.description.drops_from_zombie")
+                .en("Occasionally drops from Zombie")
+                .zh("僵尸偶尔掉落");
+        entry("jei.servantry.description.fishing")
+                .en("Occasionally obtained from fishing in the ocean during rain")
+                .zh("在海洋中雨天钓鱼时偶尔获得");
+        entry("jei.servantry.description.ancient_city")
+                .en("Occasionally found in Ancient City chests")
+                .zh("偶尔在远古城市宝箱中发现");
     }
 
     private LangEntry entry(String key) {

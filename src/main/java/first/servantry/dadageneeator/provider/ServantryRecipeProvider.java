@@ -110,5 +110,15 @@ public class ServantryRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_necromantic_scroll", has(ItemRegister.NecromanticScroll.get()))
                 .unlockedBy("has_hercules_beetle", has(ItemRegister.HerculesBeetle.get()))
                 .save(output);
+
+        // 魔眼法杖 - 2黑色晶状体 + 2木棍，倾斜摆放
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, ItemRegister.OpticStaff.get())
+                .pattern(" L ")
+                .pattern(" SL")
+                .pattern("S  ")
+                .define('L', ItemRegister.BlackLens.get())
+                .define('S', Items.STICK)
+                .unlockedBy("has_black_lens", has(ItemRegister.BlackLens.get()))
+                .save(output);
     }
 }

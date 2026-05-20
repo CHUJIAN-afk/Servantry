@@ -9,7 +9,9 @@ import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
 import first.servantry.common.servant.EnchantedThrowingKnives;
 import first.servantry.register.ModelRegister;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.util.Mth;
 
 /**
@@ -23,17 +25,21 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
     @Override
     protected RenderContext<EnchantedThrowingKnives> createContext(EnchantedThrowingKnives servant) {
         int trailTimer = servant.attacking ? servant.trailTimer : 0;
+        BakedModel bakedModel = Minecraft.getInstance().getModelManager().getModel(ModelRegister.ENCHANTED_THROWING_KNIVES);
+        int dominantColor = InfiniteShadowRenderer.extractDominantColor(bakedModel);
         return RenderContext.<EnchantedThrowingKnives>builder()
                 .trail(new RibbonTrailConfig<EnchantedThrowingKnives>()
                         .timer(trailTimer)
-                        .colorRGB(0x88CCFF)
-                        .historyLength(2)
+                        .colorRGB(dominantColor)
+                        .historyLength(4)
                         .width(0.225f)
                         .diamondSize(0.25f)
                         .colorFunction((s, progress, timeShift) -> {
-                            int r = 136, g = 204, b = 255;
-                            float brightness = Mth.lerp(progress, 1.0f, 0.5f);
-                            return (Math.round(r * brightness) << 16) | (Math.round(g * brightness) << 8) | Math.round(b * brightness);
+                            float brightness = Mth.lerp(progress, 1f, 0.4f);
+                            int r = (int) (((dominantColor >> 16) & 0xFF) * brightness);
+                            int g = (int) (((dominantColor >> 8) & 0xFF) * brightness);
+                            int b = (int) ((dominantColor & 0xFF) * brightness);
+                            return (r << 16) | (g << 8) | b;
                         })
                         .tipAlphaBoost((s, progress) -> progress < 0.3f ? Mth.lerp(progress / 0.3f, 2.0f, 1.0f) : 1.0f)
                         .tipBrightnessBoost((s, progress) -> progress < 0.25f ? Mth.lerp(progress / 0.25f, 1.3f, 1.0f) : 1.0f))

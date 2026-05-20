@@ -1,5 +1,6 @@
 package first.servantry.mixin.servantry;
 
+import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.servant.InfiniteShadow;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
@@ -19,7 +20,15 @@ public class DamageSourcesMixin {
     )
     private void playerAttack(Player player, CallbackInfoReturnable<DamageSource> cir) {
         if (player instanceof InfiniteShadow.InfiniteShadowFakePlayer infiniteShadowFakePlayer) {
-            cir.setReturnValue(infiniteShadowFakePlayer.getInfiniteShadow().getDamageSource());
+            ServantDamageSource damageSource = infiniteShadowFakePlayer.getInfiniteShadow().getDamageSource();
+            ServantDamageSource source = new ServantDamageSource(
+                    damageSource.typeHolder(),
+                    infiniteShadowFakePlayer,
+                    damageSource.getEntity(),
+                    damageSource.getSourcePosition(),
+                    damageSource.getServant()
+            );
+            cir.setReturnValue(source);
         }
     }
 }

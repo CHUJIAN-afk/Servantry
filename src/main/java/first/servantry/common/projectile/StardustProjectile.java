@@ -6,6 +6,7 @@ import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.projectile.AttachingProjectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
+import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.MobEffectRegister;
 import first.servantry.utils.ParticleHelper;
@@ -124,7 +125,7 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
                 velocity = pos.subtract(pos.offsetRandom(random, 1f)).scale(0.5);
             }
             ParticleHelper.create(owner.level())
-                    .generic(builder -> builder
+                    .generic(GenericParticleBuilder.create()
                             .color(0x2fb2e1)
                             .edgeColor(0x33ccff)
                             .colorRandom(0.2F, 0.2F, 0.0F)

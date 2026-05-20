@@ -38,10 +38,18 @@ public class ServantryEntityLootProvider extends EntityLootSubProvider {
                         )
                 )
         );
+        this.add(EntityType.ZOMBIE, LootTable.lootTable()
+                .withPool(LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1f))
+                        .add(LootItem.lootTableItem(ItemRegister.BlackLens.get())
+                                .when(LootItemRandomChanceCondition.randomChance(0.01f))
+                        )
+                )
+        );
     }
 
     @Override
     protected @NotNull Stream<EntityType<?>> getKnownEntityTypes() {
-        return Stream.of(EntityType.ALLAY, EntityType.EVOKER);
+        return Stream.of(EntityType.ALLAY, EntityType.EVOKER, EntityType.ZOMBIE);
     }
 }

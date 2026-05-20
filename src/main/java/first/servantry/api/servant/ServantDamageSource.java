@@ -20,5 +20,4 @@ public class ServantDamageSource extends DamageSource {
     public Servant getServant() {
         return servant;
     }
-
 }

@@ -5,6 +5,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.SharkDragonProjectile;
 import first.servantry.common.servant.goal.sharknado.SharknadoAttackGoal;
 import first.servantry.common.servant.goal.sharknado.SharknadoIdleGoal;
@@ -48,21 +49,21 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
             setDesiredRotation(getCurrentPathNode().yaw() + (10 + (float) (getVelocity().length()) * 50), getPitch(), getRoll());
             // 产生粒子
             ParticleHelper.create(owner.level())
-                    .generic(builder -> builder
+                    .generic(GenericParticleBuilder.create()
                             .color(0x04c7e3)
                             .edgeColor(0x047a95)
                             .colorRandom(0, 0.1F, 0.2F)
                             .lifetime(5)
-                            .lifetimeRandom(20)
+                            .lifetimeRandom(10)
                             .spin(0.075f)
                             .spinRandom(0.3F)
                             .friction(0.9F)
-                            .scale(0.03f)
-                            .scaleRandom(0.0015f)
+                            .scale(0.02f)
+                            .scaleRandom(0.001f)
                     )
                     .velocity(Vec3.ZERO)
                     .pos(getPos())
-                    .offset(1)
+                    .offset(0.5)
                     .count(2)
                     .spread(1.5)
                     .emit();
