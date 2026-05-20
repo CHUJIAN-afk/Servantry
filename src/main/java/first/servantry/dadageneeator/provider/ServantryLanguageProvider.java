@@ -106,6 +106,12 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("servant.servantry.sharknado")
                 .en("Sharknado")
                 .zh("鲨鱼龙卷");
+        entry("item.servantry.deadly_sphere_staff")
+                .en("Deadly Sphere Staff")
+                .zh("致命球法杖");
+        entry("servant.servantry.deadly_sphere")
+                .en("Deadly Sphere")
+                .zh("致命球");
         entry(AttributeRegister.ServantMaxCount.value().getDescriptionId())
                 .en("Max Servants")
                 .zh("仆从栏");
@@ -259,7 +265,5 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 provider.add(key, zhDesc);
             }
         }
-
     }
-
 }

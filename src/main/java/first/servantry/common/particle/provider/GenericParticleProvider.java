@@ -4,7 +4,6 @@ import first.servantry.common.particle.GenericParticle;
 import first.servantry.common.particle.GenericParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
 import org.jetbrains.annotations.NotNull;
@@ -15,10 +14,6 @@ public class GenericParticleProvider implements ParticleProvider<GenericParticle
 
     public GenericParticleProvider(SpriteSet sprite) {
         this.sprite = sprite;
-    }
-
-    public static ParticleEngine.SpriteParticleRegistration<GenericParticleOptions> registration() {
-        return GenericParticleProvider::new;
     }
 
     @Override

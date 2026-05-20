@@ -29,30 +29,29 @@ public record GenericParticleOptions(int color, int endColor, int edgeColor, int
     );
 
     public static final StreamCodec<RegistryFriendlyByteBuf, GenericParticleOptions> STREAM_CODEC = StreamCodec.of(
-            GenericParticleOptions::encode,
-            GenericParticleOptions::decode
+            (buffer, options) -> {
+                buffer.writeInt(options.color);
+                buffer.writeInt(options.endColor);
+                buffer.writeInt(options.edgeColor);
+                buffer.writeInt(options.endEdgeColor);
+                buffer.writeInt(options.lifetime);
+                buffer.writeFloat(options.spinSpeed);
+                buffer.writeFloat(options.friction);
+                buffer.writeFloat(options.scale);
+                buffer.writeFloat(options.scaleOffset);
+            },
+            buffer -> new GenericParticleOptions(
+                    buffer.readInt(),
+                    buffer.readInt(),
+                    buffer.readInt(),
+                    buffer.readInt(),
+                    buffer.readInt(),
+                    buffer.readFloat(),
+                    buffer.readFloat(),
+                    buffer.readFloat(),
+                    buffer.readFloat()
+            )
     );
-
-    private static void encode(RegistryFriendlyByteBuf buffer, GenericParticleOptions options) {
-        buffer.writeInt(options.color);
-        buffer.writeInt(options.endColor);
-        buffer.writeInt(options.edgeColor);
-        buffer.writeInt(options.endEdgeColor);
-        buffer.writeInt(options.lifetime);
-        buffer.writeFloat(options.spinSpeed);
-        buffer.writeFloat(options.friction);
-        buffer.writeFloat(options.scale);
-        buffer.writeFloat(options.scaleOffset);
-    }
-
-    private static GenericParticleOptions decode(RegistryFriendlyByteBuf buffer) {
-        return new GenericParticleOptions(
-                buffer.readInt(), buffer.readInt(),
-                buffer.readInt(), buffer.readInt(),
-                buffer.readInt(), buffer.readFloat(), buffer.readFloat(),
-                buffer.readFloat(), buffer.readFloat()
-        );
-    }
 
     @Override
     public @NotNull ParticleType<GenericParticleOptions> getType() {

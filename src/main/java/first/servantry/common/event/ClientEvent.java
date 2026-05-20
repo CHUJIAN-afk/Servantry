@@ -30,7 +30,7 @@ public class ClientEvent {
 
     @SubscribeEvent
     public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
-        event.registerSpriteSet(ParticleRegister.Generic.get(), GenericParticleProvider.registration());
+        event.registerSpriteSet(ParticleRegister.Generic.get(), GenericParticleProvider::new);
     }
 
     @SubscribeEvent
@@ -42,6 +42,7 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.Twins.get(), new TwinsRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.Sharknado.get(), new SharknadoRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.InfiniteShadow.get(), new InfiniteShadowRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.DeadlySphere.get(), new DeadlySphereRenderer());
 
 
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustProjectile.get(), new StardustProjectileRenderer());

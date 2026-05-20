@@ -176,6 +176,20 @@ public class ItemRegister {
                     .buildItem()
     );
 
+    /**
+     * 致命球法杖 - 召唤致命球仆从
+     */
+    public static final DeferredItem<Item> DeadlySphereStaff = Register.register("deadly_sphere_staff", () ->
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.DeadlySphere)
+                    .sound(SoundRegister.UseServantWeapon)
+                    .summonPost(servant -> {
+                        Player owner = servant.getOwner();
+                        RandomSource random = owner.getRandom();
+                        servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
+                    })
+                    .buildItem()
+    );
+
     // ===================== 材料 =====================
 
     public static final DeferredItem<Item> BlackLens = Register.register("black_lens", () ->
