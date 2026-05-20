@@ -9,33 +9,18 @@ import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
 import first.servantry.api.client.render.renderConfig.TrailConfig;
 import first.servantry.common.servant.InfiniteShadow;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.SpriteContents;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<InfiniteShadow> {
-
-    private static final Map<ItemStack, Integer> COLOR_CACHE = new WeakHashMap<>();
-
-    public static int getDominantColor(ItemStack itemStack) {
-        return COLOR_CACHE.computeIfAbsent(itemStack, item -> extractDominantColor(Minecraft.getInstance().getItemRenderer().getModel(item, null, null, 0)));
-    }
 
     @Override
     protected void renderEntity(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> config) {
@@ -55,56 +40,12 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
         }
     }
 
-    @SuppressWarnings("deprecation")
-    public static int extractDominantColor(BakedModel model) {
-        try {
-            Minecraft minecraft = Minecraft.getInstance();
-            ClientLevel level = minecraft.level;
-            if (level == null) return 0xFFFFFF;
-            List<BakedQuad> quads = model.getQuads(null, null, level.random);
-            if (quads.isEmpty()) {
-                for (Direction dir : Direction.values()) {
-                    quads = model.getQuads(null, dir, minecraft.level.random);
-                    if (!quads.isEmpty()) break;
-                }
-            }
-            if (quads.isEmpty()) return 0xFFFFFF;
-
-            TextureAtlasSprite sprite = quads.getFirst().getSprite();
-            SpriteContents contents = sprite.contents();
-            int width = contents.width();
-            int height = contents.height();
-            if (width <= 0 || height <= 0) return 0xFFFFFF;
-
-            long totalR = 0, totalG = 0, totalB = 0;
-            long count = 0;
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    int pixel = contents.getOriginalImage().getPixelRGBA(x, y);
-                    int a = (pixel >> 24) & 0xFF;
-                    if (a < 128) continue;
-                    int r = pixel & 0xFF;
-                    int g = (pixel >> 8) & 0xFF;
-                    int b = (pixel >> 16) & 0xFF;
-                    totalR += r;
-                    totalG += g;
-                    totalB += b;
-                    count++;
-                }
-            }
-            if (count == 0) return 0xFFFFFF;
-            return ((int) (totalR / count) << 16) | ((int) (totalG / count) << 8) | (int) (totalB / count);
-        } catch (Exception e) {
-            return 0xFFFFFF;
-        }
-    }
-
     @Override
     protected RenderContext<InfiniteShadow> createContext(InfiniteShadow infiniteShadow) {
         int timer = infiniteShadow.attacking ? infiniteShadow.trailTimer : 0;
         ItemStack itemStack = infiniteShadow.getItemStack();
         if (!itemStack.isEmpty()) {
-            int dominantColor = getDominantColor(itemStack);
+            int dominantColor = RenderUtil.getDominantColor(itemStack);
             TrailConfig<InfiniteShadow, ?> trailConfig;
             if (!(itemStack.getItem() instanceof BlockItem)) {
                 trailConfig = new RibbonTrailConfig<InfiniteShadow>()

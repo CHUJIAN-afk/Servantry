@@ -9,6 +9,7 @@ import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
 import first.servantry.common.servant.EnchantedThrowingKnives;
 import first.servantry.register.ModelRegister;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.BakedModel;
@@ -26,7 +27,7 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
     protected RenderContext<EnchantedThrowingKnives> createContext(EnchantedThrowingKnives servant) {
         int trailTimer = servant.attacking ? servant.trailTimer : 0;
         BakedModel bakedModel = Minecraft.getInstance().getModelManager().getModel(ModelRegister.ENCHANTED_THROWING_KNIVES);
-        int dominantColor = InfiniteShadowRenderer.extractDominantColor(bakedModel);
+        int dominantColor = RenderUtil.extractDominantColor(bakedModel);
         return RenderContext.<EnchantedThrowingKnives>builder()
                 .trail(new RibbonTrailConfig<EnchantedThrowingKnives>()
                         .timer(trailTimer)

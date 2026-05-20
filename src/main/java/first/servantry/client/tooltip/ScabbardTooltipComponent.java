@@ -1,6 +1,6 @@
 package first.servantry.client.tooltip;
 
-import first.servantry.client.attachmentEntityRenderer.servant.InfiniteShadowRenderer;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -23,7 +23,7 @@ public record ScabbardTooltipComponent(ItemStack itemStack) implements ClientToo
 
     @Override
     public void renderImage(@NotNull Font font, int tooltipX, int tooltipY, @NotNull GuiGraphics guiGraphics) {
-        int dominantColor = InfiniteShadowRenderer.getDominantColor(itemStack);
+        int dominantColor = RenderUtil.getDominantColor(itemStack);
         tooltipX -= 1;
         tooltipY -= 39;
         TooltipRenderUtil.renderTooltipBackground(
