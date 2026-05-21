@@ -19,7 +19,7 @@ public class DeadlySphereRenderer extends AbstractAttachmentEntityRenderer<Deadl
         return RenderContext.<DeadlySphere>builder()
                 .trail(new ConeTrailConfig<DeadlySphere>()
                         .timer(trailTimer)
-                        .colorRGB(0x9f9f9f)
+                        .colorRGB(deadlySphere.getAppearance().getEdgeColor())
                         .historyLength(trailTimer / 2)
                         .maxRadius(0.2f)
                         .minRadiusRatio(0.75f)

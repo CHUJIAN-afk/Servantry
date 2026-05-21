@@ -6,12 +6,17 @@ import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.servant.goal.deadlysphere.DeadlySphereAttackGoal;
 import first.servantry.common.servant.goal.deadlysphere.DeadlySphereIdleGoal;
 import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -23,6 +28,7 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
 
     private int trailTimer = 0;
     private Appearance appearance = Appearance.FIRE;
+    private int preTimer = 0;
 
     public DeadlySphere() {
         super();
@@ -58,13 +64,23 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
-            InvincibleData.criteriaAttack(hit.entity(), getUuid(), 4, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+            LivingEntity living = hit.entity();
+            InvincibleData.criteriaAttack(living, getUuid(), 4, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+            if (appearance == Appearance.ICE) {
+                living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40));
+            }
+            if (appearance == Appearance.FIRE) {
+                living.setRemainingFireTicks(40);
+            }
+            if (appearance == Appearance.LIGHT) {
+                living.addEffect(new MobEffectInstance(MobEffects.GLOWING, 40));
+            }
         }
     }
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        setVelocity(IBlockCollision.bounceVelocity(getVelocity(), context, 0.95, 0.01));
+        setVelocity(IBlockCollision.bounceVelocity(getVelocity(), context, 0.98, 0.01));
     }
 
     @Override
@@ -72,6 +88,12 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
         if (!owner.level().isClientSide()) {
             if (trailTimer > 0) {
                 trailTimer--;
+            }
+            if (--preTimer == 0) {
+                appearance = appearance.next();
+            }
+            if (getGoalSelector().getCurrentGoal() instanceof DeadlySphereAttackGoal && getVelocity().length() > 0.45) {
+                emitAppearanceParticles();
             }
             setDesiredRotation(currentPathNode.yaw() + 8, currentPathNode.pitch() + 8, currentPathNode.roll() + 8);
         }
@@ -117,14 +139,67 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
         return appearance;
     }
 
-    public void setAppearance(Appearance appearance) {
-        this.appearance = appearance;
+    public void nextAppearance() {
+        preTimer = 20;
+    }
+
+    private void emitAppearanceParticles() {
+        float yaw = currentPathNode.yaw() * ((float) Math.PI / 180F);
+        float pitch = currentPathNode.pitch() * ((float) Math.PI / 180F);
+        float roll = currentPathNode.roll() * ((float) Math.PI / 180F);
+        int color = appearance.getColor();
+        int edgeColor = appearance.getEdgeColor();
+        Vec3 pos = getPos();
+
+        for (int i = 0; i < 8; i++) {
+            float dx = ((i & 1) == 0 ? -1 : 1);
+            float dy = ((i & 2) == 0 ? -1 : 1);
+            float dz = ((i & 4) == 0 ? -1 : 1);
+            Vec3 dir = new Vec3(dx, dy, dz).normalize();
+            dir = dir.yRot(yaw).xRot(pitch);
+            if (roll != 0) dir = dir.zRot(roll);
+
+            ParticleHelper.create(owner.level())
+                    .generic(GenericParticleBuilder.create()
+                            .color(color)
+                            .edgeColor(edgeColor)
+                            .colorRandom(0.15f)
+                            .lifetime(10)
+                            .lifetimeRandom(10)
+                            .spin(0.1f)
+                            .spinRandom(0.3F)
+                            .friction(0.7F)
+                            .scale(0.04f)
+                            .scaleRandom(0.01f)
+                    )
+                    .pos(pos)
+                    .velocity(dir)
+                    .spread(0.01)
+                    .speed(0.5)
+                    .emit();
+        }
     }
 
     public enum Appearance {
-        ICE,
-        FIRE,
-        LIGHT;
+        ICE(0x6fe8ff, 0xb3f0ff),
+        FIRE(0xff4422, 0xffaa44),
+        LIGHT(0xffffaa, 0xffffff);
+
+        private final int color;
+        private final int edgeColor;
+
+        Appearance(int color, int edgeColor) {
+            this.color = color;
+            this.edgeColor = edgeColor;
+        }
+
+        public int getColor() {
+            return color;
+        }
+
+        public int getEdgeColor() {
+            return edgeColor;
+        }
 
         public Appearance next() {
             return Appearance.values()[(this.ordinal() + 1) % Appearance.values().length];
