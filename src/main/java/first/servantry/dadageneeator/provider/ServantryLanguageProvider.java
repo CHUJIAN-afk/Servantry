@@ -89,6 +89,11 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .en("Ethereal Stellar Core Staff").zh("缥缈星核法杖")
                 .servant().en("Ethereal Stellar Core").zh("缥缈星核")
                 .tooltip(1).en("Summon up to 9 Ethereal Stellar Cores").zh("最多召唤9个缥缈星核");
+        entry(ItemRegister.SurveyDroneRemote)
+                .en("Survey Drone Remote").zh("矿勘无人机遥控器")
+                .servant().en("Survey Drone").zh("矿勘无人机")
+                .tooltip(1).en("Deploys a drone that highlights nearby ores").zh("部署高亮附近矿石的无人机")
+                .tooltip(2).en("Floats above your head and scans in silence").zh("静静悬浮于头顶并持续扫描");
         // ================= 属性 =================
         entry(AttributeRegister.ServantMaxCount.value().getDescriptionId())
                 .en("Max Servants")

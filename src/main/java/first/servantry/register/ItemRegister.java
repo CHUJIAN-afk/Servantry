@@ -206,6 +206,14 @@ public class ItemRegister {
                     .buildItem()
     );
 
+    public static final DeferredItem<Item> SurveyDroneRemote = Register.register("survey_drone_remote", () ->
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.OreScout)
+                    .sound(SoundRegister.UseServantWeapon)
+                    .summonPre((player, servant) -> player.getData(AttachmentRegister.EntityData).getSameSize(servant) < 1)
+                    .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1.0f)))
+                    .buildItem()
+    );
+
     // ===================== 材料 =====================
 
     public static final DeferredItem<Item> BlackLens = Register.register("black_lens", () ->

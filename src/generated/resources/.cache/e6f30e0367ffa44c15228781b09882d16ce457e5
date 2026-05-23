@@ -1,4 +1,4 @@
-// 1.21.1	2026-05-23T12:57:03.0540727	Item Models: servantry
+// 1.21.1	2026-05-23T21:56:38.7226489	Item Models: servantry
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 14d9431b09bcb8ed8fbc47dad92e32f9bf33c4f3 assets/servantry/models/item/black_lens.json
 8e6344b0bcd3d3339e14a985ce707d72a02f32cc assets/servantry/models/item/blade_staff.json
@@ -20,5 +20,6 @@ ba1f28a328a4e9e41446a0a2d44f6c13dac07f24 assets/servantry/models/item/optic_staf
 a741780070dc548c49da231eb5960f6984df9a66 assets/servantry/models/item/stardust_cell_staff.json
 65cf99610c9cb69dc7888c02ecc1fb0030a6232f assets/servantry/models/item/stardust_dragon_staff.json
 fc85c4b0542a6c73088ae615248411c1c4b65365 assets/servantry/models/item/summoner_emblem.json
+75c26fe45aa01e14741954f8e79b3d8025015ff7 assets/servantry/models/item/survey_drone_remote.json
 efdbf40b0d7ab4fe5b19b9ac565caf03ed858cfb assets/servantry/models/item/tempest_staff.json
 15c8f22cc643d21501adcfe2badf319b0b3b5039 assets/servantry/models/item/terraprism.json

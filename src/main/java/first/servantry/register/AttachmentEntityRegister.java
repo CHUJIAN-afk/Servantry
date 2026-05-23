@@ -39,6 +39,8 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EtherealStellarCore>> EtherealStellarCore = register("ethereal_stellar_core", EtherealStellarCore::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<OreScout>> OreScout = register("survey_drone", first.servantry.common.servant.OreScout::new);
+
     // ===================== 射弹类型 =====================
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustProjectile>> StardustProjectile = register("stardust_projectile", StardustProjectile::new);
