@@ -45,13 +45,8 @@ public class InvincibleData {
             target.hurt(damageSource, damage);
             target.invulnerableTime = invulnerableTime;
             if (invincibleTime > 0) {
-                if (uuid != null) {
-                    if (type == Type.PARTIAL) {
-                        partialInvincibleFrames.put(uuid, new AtomicInteger(invincibleTime));
-                    }
-                    if (type == Type.Global) {
-                        globalInvincibleFrames.set(invincibleTime);
-                    }
+                if (type == Type.PARTIAL && uuid != null) {
+                    partialInvincibleFrames.put(uuid, new AtomicInteger(invincibleTime));
                 } else {
                     globalInvincibleFrames.set(invincibleTime);
                 }

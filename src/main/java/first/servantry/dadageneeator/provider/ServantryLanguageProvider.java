@@ -112,6 +112,12 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("servant.servantry.deadly_sphere")
                 .en("Deadly Sphere")
                 .zh("致命球");
+        entry("item.servantry.eye_of_eternal_night_staff")
+                .en("Eye of Eternal Night Staff")
+                .zh("永夜法杖");
+        entry("servant.servantry.eye_of_eternal_night")
+                .en("Eye of Eternal Night")
+                .zh("永夜之眼");
         entry(AttributeRegister.ServantMaxCount.value().getDescriptionId())
                 .en("Max Servants")
                 .zh("仆从栏");

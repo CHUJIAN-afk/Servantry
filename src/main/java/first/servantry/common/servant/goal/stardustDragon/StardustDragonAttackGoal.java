@@ -30,5 +30,4 @@ public class StardustDragonAttackGoal extends ServantGoal<StardustDragon> {
         Vec3 targetPos = target.getBoundingBox().getCenter();
         servant.spiralToward(targetPos, 0.25);
     }
-
 }

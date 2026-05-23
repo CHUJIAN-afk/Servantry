@@ -190,6 +190,21 @@ public class ItemRegister {
                     .buildItem()
     );
 
+    /**
+     * 永夜法杖 - 召唤永夜之眼仆从
+     */
+    public static final DeferredItem<Item> EyeOfEternalNightStaff = Register.register("eye_of_eternal_night_staff", () ->
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.EyeOfEternalNight)
+                    .sound(SoundRegister.UseServantWeapon)
+                    .summonPost(servant -> {
+                        Player owner = servant.getOwner();
+                        PathNode idle = servant.getInterpolatedIdleState(1.0f);
+                        Vec3 center = owner.getBoundingBox().getCenter();
+                        servant.init(new PathNode(new Vec3(center.x(), idle.pos().y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
+                    })
+                    .buildItem()
+    );
+
     // ===================== 材料 =====================
 
     public static final DeferredItem<Item> BlackLens = Register.register("black_lens", () ->

@@ -4,10 +4,7 @@ import first.servantry.Servantry;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.register.ServantryRegistries;
-import first.servantry.common.projectile.DemonFlameProjectile;
-import first.servantry.common.projectile.LaserProjectile;
-import first.servantry.common.projectile.SharkDragonProjectile;
-import first.servantry.common.projectile.StardustProjectile;
+import first.servantry.common.projectile.*;
 import first.servantry.common.servant.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -40,6 +37,8 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DeadlySphere>> DeadlySphere = register("deadly_sphere", DeadlySphere::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EyeOfEternalNight>> EyeOfEternalNight = register("eye_of_eternal_night", EyeOfEternalNight::new);
+
     // ===================== 射弹类型 =====================
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustProjectile>> StardustProjectile = register("stardust_projectile", StardustProjectile::new);
@@ -49,6 +48,8 @@ public class AttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DemonFlameProjectile>> DemonFlameProjectile = register("demon_flame_projectile", DemonFlameProjectile::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SharkDragonProjectile>> SharkDragonProjectile = register("shark_dragon_projectile", SharkDragonProjectile::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EternalNightLaserProjectile>> EternalNightLaserProjectile = register("eternal_night_laser_projectile", EternalNightLaserProjectile::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));
