@@ -53,8 +53,8 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     }
 
     @Override
-    public void onBlockCollision(CollisionContext context) {
-        //setVelocity(IBlockCollision.bounceVelocity(getVelocity(), context, 0.1, 0.001));
+    public boolean canCollideWithBlocks() {
+        return !isExecutingPath();
     }
 
     @Override

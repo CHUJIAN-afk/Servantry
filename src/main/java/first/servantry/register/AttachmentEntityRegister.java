@@ -37,7 +37,7 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DeadlySphere>> DeadlySphere = register("deadly_sphere", DeadlySphere::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EyeOfEternalNight>> EyeOfEternalNight = register("eye_of_eternal_night", EyeOfEternalNight::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EtherealStellarCore>> EtherealStellarCore = register("ethereal_stellar_core", EtherealStellarCore::new);
 
     // ===================== 射弹类型 =====================
 
@@ -49,7 +49,7 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SharkDragonProjectile>> SharkDragonProjectile = register("shark_dragon_projectile", SharkDragonProjectile::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EternalNightLaserProjectile>> EternalNightLaserProjectile = register("eternal_night_laser_projectile", EternalNightLaserProjectile::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ShatteredStellarCoreProjectile>> EternalNightLaserProjectile = register("eternal_night_laser_projectile", ShatteredStellarCoreProjectile::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));

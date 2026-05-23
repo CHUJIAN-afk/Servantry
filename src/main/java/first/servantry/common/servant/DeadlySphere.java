@@ -79,6 +79,11 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
     }
 
     @Override
+    public boolean canCollideWithBlocks() {
+        return !isExecutingPath();
+    }
+
+    @Override
     public void onBlockCollision(CollisionContext context) {
         setVelocity(IBlockCollision.bounceVelocity(getVelocity(), context, 0.98, 0.01));
     }

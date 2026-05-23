@@ -1,14 +1,10 @@
 package first.servantry.common.servant;
 
 import first.servantry.api.PathNode;
-import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.Servant;
-import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.particle.GenericParticleBuilder;
-import first.servantry.common.projectile.EternalNightLaserProjectile;
-import first.servantry.common.servant.goal.eyeofeternalnight.EyeOfEternalNightAttackGoal;
+import first.servantry.common.projectile.ShatteredStellarCoreProjectile;
 import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.utils.ParticleHelper;
@@ -17,11 +13,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * 永夜之眼 - 环绕玩家旋转的激光仆从。
@@ -30,30 +22,13 @@ import java.util.List;
  * 通过激光射线对路径上所有敌人造成伤害。
  * </p>
  */
-public class EyeOfEternalNight extends Servant implements ICollideAttack<EyeOfEternalNight> {
+public class EtherealStellarCore extends Servant {
 
     private int preShootCooldown = 0;
     private int shootCooldown = 0;
 
-    public EyeOfEternalNight() {
+    public EtherealStellarCore() {
         super();
-    }
-
-    @Override
-    public void registerGoals(ServantGoalSelector goalSelector) {
-        goalSelector.addGoal(0, new EyeOfEternalNightAttackGoal(this));
-    }
-
-    @Override
-    public @NotNull AABB getHitbox() {
-        return new AABB(-0.16, -0.16, -0.16, 0.16, 0.16, 0.16);
-    }
-
-    @Override
-    public void onCollisionAttack(List<HitContext> hitContexts) {
-        for (HitContext hitContext : hitContexts) {
-            InvincibleData.criteriaAttack(hitContext.entity(), getUuid(), 2, getDamageSource(), getDamage() * 0.2f, InvincibleData.Type.Global);
-        }
     }
 
     @Override
@@ -63,6 +38,11 @@ public class EyeOfEternalNight extends Servant implements ICollideAttack<EyeOfEt
             if (shootCooldown > 0) {
                 shootCooldown--;
             }
+            LivingEntity target = getTarget();
+            if (getShootCooldown() <= 0 && isTarget(target)) {
+                shootTarget(target);
+            }
+            currentPathNode = getInterpolatedIdleState(1f);
         }
         super.tick();
     }
@@ -85,10 +65,9 @@ public class EyeOfEternalNight extends Servant implements ICollideAttack<EyeOfEt
         for (int i = 0; i < count; i++) {
             Vec3 start = getPos();
             Vec3 direction = start.offsetRandom(random, 2f).subtract(start).normalize();
-            EternalNightLaserProjectile projectile = new EternalNightLaserProjectile(getDamageSource(), start.add(direction.scale(-0.75)), direction.scale(0.5f));
+            ShatteredStellarCoreProjectile projectile = new ShatteredStellarCoreProjectile(getDamageSource(), start.add(direction.scale(-0.75)), direction.scale(0.5f));
             projectile.setChaseTarget(target);
             projectile.join(owner);
-            // 喷射粒子 - 星尘调色
             ParticleHelper.create(owner.level())
                     .generic(GenericParticleBuilder.create()
                             .color(0x7926ff)
@@ -121,12 +100,12 @@ public class EyeOfEternalNight extends Servant implements ICollideAttack<EyeOfEt
 
     @Override
     public float getDamage() {
-        return 4.0f;
+        return 3.0f;
     }
 
     @Override
     public float getKnockback() {
-        return 0.1f;
+        return 0.3f;
     }
 
     @Override
@@ -136,7 +115,7 @@ public class EyeOfEternalNight extends Servant implements ICollideAttack<EyeOfEt
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return AttachmentEntityRegister.EyeOfEternalNight.get();
+        return AttachmentEntityRegister.EtherealStellarCore.get();
     }
 
     /**
@@ -146,7 +125,7 @@ public class EyeOfEternalNight extends Servant implements ICollideAttack<EyeOfEt
         Player owner = getOwner();
         int total = Math.max(1, owner.getData(AttachmentRegister.EntityData).getSameSize(this));
         int order = getOrder();
-        float angle = (owner.tickCount) * 0.02f + (order * Mth.TWO_PI / total);
+        float angle = (owner.tickCount + partialTick) * 0.02f + (order * Mth.TWO_PI / total);
         float radius = 1.5f;
 
         double px = Mth.lerp(partialTick, owner.xo, owner.getX());

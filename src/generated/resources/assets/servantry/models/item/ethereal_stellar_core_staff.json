@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "servantry:item/eye_of_eternal_night_staff"
+    "layer0": "servantry:item/ethereal_stellar_core_staff"
   }
 }

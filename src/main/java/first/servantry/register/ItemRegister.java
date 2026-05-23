@@ -191,11 +191,12 @@ public class ItemRegister {
     );
 
     /**
-     * 永夜法杖 - 召唤永夜之眼仆从
+     * 缥缈星核法杖 - 召唤缥缈星核仆从
      */
-    public static final DeferredItem<Item> EyeOfEternalNightStaff = Register.register("eye_of_eternal_night_staff", () ->
-            new IServantWeapon.Builder<>(AttachmentEntityRegister.EyeOfEternalNight)
+    public static final DeferredItem<Item> EtherealStellarCoreStaff = Register.register("ethereal_stellar_core_staff", () ->
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.EtherealStellarCore)
                     .sound(SoundRegister.UseServantWeapon)
+                    .summonPre((player, etherealStellarCore) -> player.getData(AttachmentRegister.EntityData).getSameSize(etherealStellarCore) < 9)
                     .summonPost(servant -> {
                         Player owner = servant.getOwner();
                         PathNode idle = servant.getInterpolatedIdleState(1.0f);

@@ -171,6 +171,11 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
     }
 
     @Override
+    public boolean canCollideWithBlocks() {
+        return !isExecutingPath();
+    }
+
+    @Override
     public void onBlockCollision(CollisionContext context) {
         setVelocity(IBlockCollision.bounceVelocity(getVelocity(), context, 0.25, 0.001));
     }

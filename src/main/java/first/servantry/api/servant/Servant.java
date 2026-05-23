@@ -36,7 +36,8 @@ public abstract class Servant extends AttachmentEntity {
     /**
      * 注册AI目标
      */
-    public abstract void registerGoals(ServantGoalSelector goalSelector);
+    public void registerGoals(ServantGoalSelector goalSelector) {
+    }
 
     /**
      * 获取占用栏位数

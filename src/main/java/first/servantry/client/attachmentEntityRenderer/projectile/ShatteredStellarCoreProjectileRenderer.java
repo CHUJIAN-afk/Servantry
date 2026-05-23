@@ -3,14 +3,14 @@ package first.servantry.client.attachmentEntityRenderer.projectile;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.DropletTrailConfig;
-import first.servantry.common.projectile.EternalNightLaserProjectile;
+import first.servantry.common.projectile.ShatteredStellarCoreProjectile;
 
-public class EternalNightLaserProjectileRenderer extends AbstractAttachmentEntityRenderer<EternalNightLaserProjectile> {
+public class ShatteredStellarCoreProjectileRenderer extends AbstractAttachmentEntityRenderer<ShatteredStellarCoreProjectile> {
 
     @Override
-    protected RenderContext<EternalNightLaserProjectile> createContext(EternalNightLaserProjectile laser) {
-        return RenderContext.<EternalNightLaserProjectile>builder()
-                .trail(new DropletTrailConfig<EternalNightLaserProjectile>()
+    protected RenderContext<ShatteredStellarCoreProjectile> createContext(ShatteredStellarCoreProjectile laser) {
+        return RenderContext.<ShatteredStellarCoreProjectile>builder()
+                .trail(new DropletTrailConfig<ShatteredStellarCoreProjectile>()
                         .timer(laser.getTrailDuration())
                         .colorRGB(0x7926ff)
                         .historyLength(2)

@@ -4,9 +4,9 @@ import com.mojang.datafixers.util.Either;
 import first.servantry.Servantry;
 import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
 import first.servantry.api.client.renderType.TrailShaders;
-import first.servantry.client.attachmentEntityRenderer.projectile.EternalNightLaserProjectileRenderer;
 import first.servantry.client.attachmentEntityRenderer.projectile.LaserProjectileRenderer;
 import first.servantry.client.attachmentEntityRenderer.projectile.SharkDragonProjectileRenderer;
+import first.servantry.client.attachmentEntityRenderer.projectile.ShatteredStellarCoreProjectileRenderer;
 import first.servantry.client.attachmentEntityRenderer.projectile.StardustProjectileRenderer;
 import first.servantry.client.attachmentEntityRenderer.servant.*;
 import first.servantry.client.tooltip.ScabbardTooltipComponent;
@@ -44,13 +44,13 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.Sharknado.get(), new SharknadoRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.InfiniteShadow.get(), new InfiniteShadowRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.DeadlySphere.get(), new DeadlySphereRenderer());
-        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.EyeOfEternalNight.get(), new EyeOfEternalNightRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.EtherealStellarCore.get(), new EyeOfEternalNightRenderer());
 
 
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustProjectile.get(), new StardustProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.LaserProjectile.get(), new LaserProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.SharkDragonProjectile.get(), new SharkDragonProjectileRenderer());
-        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.EternalNightLaserProjectile.get(), new EternalNightLaserProjectileRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.EternalNightLaserProjectile.get(), new ShatteredStellarCoreProjectileRenderer());
     }
 
     @SubscribeEvent
