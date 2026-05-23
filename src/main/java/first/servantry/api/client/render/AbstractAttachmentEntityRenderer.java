@@ -62,7 +62,7 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
 
     // ===================== 模型渲染 =====================
 
-    private void renderEntityModel(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode node, RenderContext<T> config) {
+    protected void renderEntityModel(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode node, RenderContext<T> config) {
         ModelConfig<T> model = config.model;
         poseStack.pushPose();
 

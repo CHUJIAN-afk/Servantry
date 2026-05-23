@@ -46,7 +46,7 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
             if (shootCooldown > 0) {
                 shootCooldown--;
             }
-            setDesiredRotation(getCurrentPathNode().yaw() + (10 + (float) (getVelocity().length()) * 50), getPitch(), getRoll());
+            setDesiredRotation(getCurrentPathNode().yaw() + (20 + (float) (getVelocity().length()) * 50), getPitch(), getRoll());
             // 产生粒子
             ParticleHelper.create(owner.level())
                     .generic(GenericParticleBuilder.create()

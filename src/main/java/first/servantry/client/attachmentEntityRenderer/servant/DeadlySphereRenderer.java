@@ -36,6 +36,6 @@ public class DeadlySphereRenderer extends AbstractAttachmentEntityRenderer<Deadl
 
     @Override
     protected void renderEntity(DeadlySphere servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DeadlySphere> config) {
-        ModelRenderer.renderModel(ModelRegister.TwinsCursedFlame, poseStack, bufferSource);
+        ModelRenderer.renderModel(ModelRegister.TWINS_CURSED_FLAME, poseStack, bufferSource);
     }
 }

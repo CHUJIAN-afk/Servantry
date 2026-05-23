@@ -23,12 +23,17 @@ public class SharknadoAttackGoal extends ServantGoal<Sharknado> {
     }
 
     @Override
+    public void start() {
+        wanderTarget = Vec3.ZERO;
+    }
+
+    @Override
     public void tick() {
         LivingEntity target = servant.getTarget();
         Player owner = servant.getOwner();
 
         // 计算环绕位置
-        if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025) {
+        if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.01) {
             wanderTarget = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), (float) target.getBoundingBox().getSize() * 6);
             wanderTarget.add(0, target.getBoundingBox().getSize() * 12, 0);
             double height = target.position().y() + target.getBoundingBox().getYsize() / 2;
@@ -50,5 +55,4 @@ public class SharknadoAttackGoal extends ServantGoal<Sharknado> {
             servant.setShootCooldown(10 + owner.getRandom().nextIntBetweenInclusive(-1, 1));
         }
     }
-
 }

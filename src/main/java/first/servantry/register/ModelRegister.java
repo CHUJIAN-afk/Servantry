@@ -21,60 +21,27 @@ public class ModelRegister {
 
     private static final List<ModelResourceLocation> MODELS = new ArrayList<>();
 
-    /**
-     * 附魔飞刀模型
-     */
-    public static final ModelResourceLocation ENCHANTED_THROWING_KNIVES = standalone("servant/enchanted_throwing_knives"),
+    public static final ModelResourceLocation ENCHANTED_THROWING_KNIVES = standalone("enchanted_throwing_knives");
+    public static final ModelResourceLocation STARDUST_CELL = standalone("stardust_cell");
+    public static final ModelResourceLocation TERRAPRISM = standalone("terraprism");
+    public static final ModelResourceLocation STARDUST_DRAGON_HEAD = standalone("stardust_dragon_head");
+    public static final ModelResourceLocation STARDUST_DRAGON_BODY1 = standalone("stardust_dragon_body1");
+    public static final ModelResourceLocation STARDUST_DRAGON_BODY2 = standalone("stardust_dragon_body2");
+    public static final ModelResourceLocation STARDUST_DRAGON_BODY3 = standalone("stardust_dragon_body3");
+    public static final ModelResourceLocation TWINS_LASER = standalone("twins_laser");
+    public static final ModelResourceLocation TWINS_CURSED_FLAME = standalone("twins_cursed_flame");
+    public static final ModelResourceLocation SHARKNADO = standalone("sharknado");
+    public static final ModelResourceLocation SHARK_OPEN = standalone("shark_open");
+    public static final ModelResourceLocation SHARK_CLOSE = standalone("shark_close");
 
-    /**
-     * 星尘细胞模型
-     */
-    STARDUST_CELL = standalone("servant/stardust_cell"),
-
-    /**
-     * 泰拉棱镜模型
-     */
-    TERRAPRISM = standalone("servant/terraprism"),
-
-    /**
-     * 星尘龙头部模型
-     */
-    STARDUST_DRAGON_HEAD = standalone("servant/stardust_dragon_head"),
-
-    /**
-     * 星尘龙身体1模型
-     */
-    STARDUST_DRAGON_BODY1 = standalone("servant/stardust_dragon_body1"),
-
-    /**
-     * 星尘龙身体2模型
-     */
-    STARDUST_DRAGON_BODY2 = standalone("servant/stardust_dragon_body2"),
-
-    /**
-     * 星尘龙尾部模型
-     */
-    STARDUST_DRAGON_BODY3 = standalone("servant/stardust_dragon_body3"),
-
-    /**
-     * 激光眼模型
-     */
-    TwinsLaser = standalone("servant/twins_laser"),
-
-    /**
-     * 魔焰眼模型
-     */
-    TwinsCursedFlame = standalone("servant/twins_cursed_flame");
+    private static ModelResourceLocation standalone(String path) {
+        ModelResourceLocation location = ModelResourceLocation.standalone(Servantry.rl("servant/" + path));
+        MODELS.add(location);
+        return location;
+    }
 
     @SubscribeEvent
     public static void registerAdditional(ModelEvent.RegisterAdditional event) {
         MODELS.forEach(event::register);
     }
-
-    private static ModelResourceLocation standalone(String path) {
-        ModelResourceLocation location = ModelResourceLocation.standalone(Servantry.rl(path));
-        MODELS.add(location);
-        return location;
-    }
-
 }
