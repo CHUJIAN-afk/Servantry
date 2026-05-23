@@ -214,6 +214,14 @@ public class ItemRegister {
                     .buildItem()
     );
 
+    public static final DeferredItem<Item> FairyBell = Register.register("fairy_bell", () ->
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.ScavengerFairy)
+                    .sound(SoundRegister.UseServantWeapon)
+                    .summonPre((player, servant) -> player.getData(AttachmentRegister.EntityData).getSameSize(servant) < 1)
+                    .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1.0f)))
+                    .buildItem(new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(1))
+    );
+
     // ===================== 材料 =====================
 
     public static final DeferredItem<Item> BlackLens = Register.register("black_lens", () ->

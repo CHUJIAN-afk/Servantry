@@ -94,6 +94,11 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .servant().en("Survey Drone").zh("矿勘无人机")
                 .tooltip(1).en("Deploys a drone that highlights nearby ores").zh("部署高亮附近矿石的无人机")
                 .tooltip(2).en("Floats above your head and scans in silence").zh("静静悬浮于头顶并持续扫描");
+        entry(ItemRegister.FairyBell)
+                .en("Fairy Bell").zh("妖精铃铛")
+                .servant().en("Scavenger Fairy").zh("拾荒妖精")
+                .tooltip(1).en("Summons a fairy that carries nearby dropped items back to your feet").zh("召唤一只将附近掉落物搬回脚边的妖精")
+                .tooltip(2).en("Costs no servant slots, but only one may follow you").zh("不占用仆从栏位，但同一时间只能跟随一只");
         // ================= 属性 =================
         entry(AttributeRegister.ServantMaxCount.value().getDescriptionId())
                 .en("Max Servants")

@@ -83,6 +83,7 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.DeadlySphere.get(), new DeadlySphereRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.EtherealStellarCore.get(), new EyeOfEternalNightRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.OreScout.get(), new OreScoutServantRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ScavengerFairy.get(), new ScavengerFairyRenderer());
 
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustProjectile.get(), new StardustProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.LaserProjectile.get(), new LaserProjectileRenderer());
