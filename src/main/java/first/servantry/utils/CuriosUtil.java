@@ -1,16 +1,13 @@
 package first.servantry.utils;
 
 import first.servantry.common.item.CurioItem;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class CuriosUtil {
 
@@ -23,8 +20,18 @@ public class CuriosUtil {
         });
     }
 
-    public static final List<CurioItem> CuriosItemList = BuiltInRegistries.ITEM.stream()
-            .filter(item -> item instanceof CurioItem)
-            .map(item -> (CurioItem) item)
-            .toList();
+    public static List<CurioItem> getCuriosItemList(LivingEntity livingEntity) {
+        ICuriosItemHandler handler = CuriosApi.getCuriosInventory(livingEntity).orElse(null);
+        List<CurioItem> list = new ArrayList<>();
+        if (handler != null) {
+            IItemHandlerModifiable curios = handler.getEquippedCurios();
+            int slots = curios.getSlots();
+            for (int i = 0; i < slots; i++) {
+                if (curios.getStackInSlot(i).getItem() instanceof CurioItem curioItem) {
+                    list.add(curioItem);
+                }
+            }
+        }
+        return list;
+    }
 }

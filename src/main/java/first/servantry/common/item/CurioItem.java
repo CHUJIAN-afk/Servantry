@@ -3,35 +3,37 @@ package first.servantry.common.item;
 import com.google.common.collect.Multimap;
 import first.servantry.Servantry;
 import first.servantry.api.event.ServantIncomingDamageEvent;
+import first.servantry.api.servant.Servant;
+import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.utils.CuriosUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import org.jetbrains.annotations.NotNull;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
+import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class CurioItem extends Item implements ICurioItem {
 
-    private final CurioDamageCallback damageCallback;
-
-    protected CurioItem(Properties properties) {
-        this(new Builder());
-    }
+    private final ServantDamageCallback servantDamageCallback;
+    private final PreDamageCallback preDamageCallback;
+    private final PostDamageCallback postDamageCallback;
 
     protected CurioItem(Builder builder) {
         super(builder.properties);
@@ -44,16 +46,67 @@ public class CurioItem extends Item implements ICurioItem {
         this.canSync = builder.canSync;
         this.writeSyncData = builder.writeSyncData;
         this.readSyncData = builder.readSyncData;
-        this.damageCallback = builder.damageCallback;
+        this.servantDamageCallback = builder.servantDamageCallback;
+        this.preDamageCallback = builder.preDamageCallback;
+        this.postDamageCallback = builder.postDamageCallback;
     }
 
     @SubscribeEvent
     public static void onServantIncomingDamageEvent(ServantIncomingDamageEvent event) {
-        CuriosUtil.CuriosItemList.forEach(curioItem -> {
-            if (curioItem.getDamageCallback() != null) {
-                curioItem.getDamageCallback().post(event);
+        Servant servant = event.getSource().getServant();
+        if (servant != null) {
+            Player owner = servant.getOwner();
+            if (!owner.level().isClientSide()) {
+                List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
+                for (CurioItem curioItem : curiosItemList) {
+                    if (curioItem.servantDamageCallback != null) {
+                        float result = curioItem.servantDamageCallback.apply(servant, owner, event.getEntity(), event.getAmount());
+                        if (result != event.getAmount()) {
+                            event.setAmount(result);
+                        }
+                    }
+                }
             }
-        });
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
+        if (event.getSource() instanceof ServantDamageSource servantDamageSource) {
+            Servant servant = servantDamageSource.getServant();
+            if (servant != null) {
+                Player owner = servant.getOwner();
+                if (!owner.level().isClientSide()) {
+                    List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
+                    for (CurioItem curioItem : curiosItemList) {
+                        if (curioItem.servantDamageCallback != null) {
+                            float result = curioItem.servantDamageCallback.apply(servant, owner, event.getEntity(), event.getNewDamage());
+                            if (result != event.getNewDamage()) {
+                                event.setNewDamage(result);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLivingDamageEventPost(LivingDamageEvent.Post event) {
+        if (event.getSource() instanceof ServantDamageSource servantDamageSource) {
+            Servant servant = servantDamageSource.getServant();
+            if (servant != null) {
+                Player owner = servant.getOwner();
+                if (!owner.level().isClientSide()) {
+                    List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
+                    for (CurioItem curioItem : curiosItemList) {
+                        if (curioItem.postDamageCallback != null) {
+                            curioItem.postDamageCallback.accept(servant, owner, event.getEntity());
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private final ICurio.SoundInfo equipSound;
@@ -66,53 +119,23 @@ public class CurioItem extends Item implements ICurioItem {
     private final BiFunction<SlotContext, ItemStack, CompoundTag> writeSyncData;
     private final TriConsumer<SlotContext, CompoundTag, ItemStack> readSyncData;
 
-    @SubscribeEvent
-    public static void onServantIncomingDamageEvent(LivingDamageEvent.Pre event) {
-        CuriosUtil.CuriosItemList.forEach(curioItem -> {
-            if (curioItem.getDamageCallback() != null) {
-                curioItem.getDamageCallback().post(event);
-            }
-        });
-    }
-
-    @SubscribeEvent
-    public static void onServantIncomingDamageEvent(LivingDamageEvent.Post event) {
-        CuriosUtil.CuriosItemList.forEach(curioItem -> {
-            if (curioItem.getDamageCallback() != null) {
-                curioItem.getDamageCallback().post(event);
-            }
-        });
-    }
-
     public static Builder builder() {
         return new Builder();
     }
 
-    public CurioDamageCallback getDamageCallback() {
-        return damageCallback;
+    @FunctionalInterface
+    public interface ServantDamageCallback {
+        float apply(Servant servant, Player owner, LivingEntity target, float damage);
     }
 
-    public interface CurioDamageCallback {
+    @FunctionalInterface
+    public interface PreDamageCallback {
+        float apply(Servant servant, Player player, LivingEntity target, float damage);
+    }
 
-        private void post(LivingEvent event) {
-            switch (event) {
-                case ServantIncomingDamageEvent ignored -> onServantIncomingDamage(ignored);
-                case LivingDamageEvent.Pre ignored -> onLivingDamageEventPre(ignored);
-                case LivingDamageEvent.Post ignored -> onLivingDamageEventPost(ignored);
-                default -> {
-                }
-            }
-        }
-
-        default void onServantIncomingDamage(ServantIncomingDamageEvent event) {
-        }
-
-        default void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
-        }
-
-        default void onLivingDamageEventPost(LivingDamageEvent.Post event) {
-
-        }
+    @FunctionalInterface
+    public interface PostDamageCallback {
+        void accept(Servant servant, Player owner, LivingEntity target);
     }
 
     @NotNull
@@ -178,7 +201,7 @@ public class CurioItem extends Item implements ICurioItem {
     }
 
     public static class Builder {
-        private Properties properties;
+        private final Properties properties;
         private ICurio.SoundInfo equipSound;
         private boolean canEquipFromUse = false;
         private ICurio.DropRule dropRule;
@@ -188,10 +211,12 @@ public class CurioItem extends Item implements ICurioItem {
         private BiFunction<SlotContext, ItemStack, Boolean> canSync;
         private BiFunction<SlotContext, ItemStack, CompoundTag> writeSyncData;
         private TriConsumer<SlotContext, CompoundTag, ItemStack> readSyncData;
-        private CurioDamageCallback damageCallback;
+        private ServantDamageCallback servantDamageCallback;
+        private PreDamageCallback preDamageCallback;
+        private PostDamageCallback postDamageCallback;
 
         private Builder() {
-            this.properties = properties;
+            this.properties = new Properties().stacksTo(1);
         }
 
         public Builder equipSound(ICurio.SoundInfo equipSound) {
@@ -239,18 +264,27 @@ public class CurioItem extends Item implements ICurioItem {
             return this;
         }
 
-        public Builder damageCallback(CurioDamageCallback damageCallback) {
-            this.damageCallback = damageCallback;
+        public Builder onServantDamage(ServantDamageCallback callback) {
+            this.servantDamageCallback = callback;
+            return this;
+        }
+
+        public Builder onPreDamage(PreDamageCallback callback) {
+            this.preDamageCallback = callback;
+            return this;
+        }
+
+        public Builder onPostDamage(PostDamageCallback callback) {
+            this.postDamageCallback = callback;
+            return this;
+        }
+
+        public Builder properties(Consumer<Item.Properties> customizer) {
+            customizer.accept(this.properties);
             return this;
         }
 
         public CurioItem build() {
-            this.properties = new Item.Properties().stacksTo(1).rarity(Rarity.RARE);
-            return new CurioItem(this);
-        }
-
-        public CurioItem build(Properties properties) {
-            this.properties = properties;
             return new CurioItem(this);
         }
     }
