@@ -1,4 +1,4 @@
-package first.servantry.common.event;
+package first.servantry.client.renderType;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;

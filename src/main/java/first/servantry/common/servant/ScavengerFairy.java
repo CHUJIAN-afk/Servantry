@@ -92,6 +92,21 @@ public class ScavengerFairy extends Servant {
         this.targetEntity = targetEntity;
     }
 
+    public Entity findNearestNewTargetEntity() {
+        Player owner = getOwner();
+        return owner.level().getEntitiesOfClass(Entity.class, owner.getBoundingBox().inflate(10.0)).stream()
+                .filter(entity -> entity != targetEntity)
+                .filter(this::isValidTarget)
+                .min(Comparator.comparingDouble(entity -> {
+                    double distanceToSqr = entity.distanceToSqr(getPos());
+                    if (entity instanceof ExperienceOrb) {
+                        distanceToSqr += 100;
+                    }
+                    return distanceToSqr;
+                }))
+                .orElse(null);
+    }
+
     public Entity findNearestTargetEntity() {
         Player owner = getOwner();
         return owner.level().getEntitiesOfClass(Entity.class, owner.getBoundingBox().inflate(10.0)).stream()

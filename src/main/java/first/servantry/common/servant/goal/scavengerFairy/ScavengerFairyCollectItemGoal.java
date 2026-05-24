@@ -7,6 +7,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
@@ -43,19 +44,27 @@ public class ScavengerFairyCollectItemGoal extends ServantGoal<ScavengerFairy> {
     public void tick() {
         Entity entity = servant.getTargetEntity();
         if (entity.distanceToSqr(servant.getPos()) <= 0.5) {
-
-            servant.deliver(entity);
-            servant.setTargetEntity(null);
+            if (entity instanceof ItemEntity) {
+                servant.deliver(entity);
+            }
+            if (entity instanceof ExperienceOrb experienceOrb) {
+                Player owner = servant.getOwner();
+                owner.takeXpDelay = 0;
+                experienceOrb.playerTouch(owner);
+            }
+            servant.setTargetEntity(servant.findNearestNewTargetEntity());
+            return;
         }
         if (!servant.isExecutingPath()) {
             PathNode start = servant.getCurrentPathNode();
             Vec3 targetPos = entity.getBoundingBox().getCenter();
             Vec3 direction = targetPos.subtract(start.pos()).normalize();
+            targetPos.add(direction.scale(0.5));
             float targetYaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
             float targetPitch = (float) Math.toDegrees(Math.asin(-direction.y));
             PathNode end = new PathNode(targetPos, targetYaw, targetPitch, start.roll());
             List<PathNode> path = new ArrayList<>();
-            int tick = 4;
+            int tick = 6;
             for (int i = 0; i < tick; i++) {
                 float partialTick = (float) i / tick;
                 path.add(start.lerp(end, partialTick));

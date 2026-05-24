@@ -11,6 +11,7 @@ import first.servantry.client.attachmentEntityRenderer.projectile.SharkDragonPro
 import first.servantry.client.attachmentEntityRenderer.projectile.ShatteredStellarCoreProjectileRenderer;
 import first.servantry.client.attachmentEntityRenderer.projectile.StardustProjectileRenderer;
 import first.servantry.client.attachmentEntityRenderer.servant.*;
+import first.servantry.client.renderType.OreScoutHighlightRenderType;
 import first.servantry.client.tooltip.ScabbardTooltipComponent;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.particle.provider.GenericParticleProvider;

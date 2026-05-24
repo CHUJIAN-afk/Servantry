@@ -33,22 +33,6 @@ public class ItemRegister {
 
     // ===================== 仆从武器 =====================
 
-    public static final DeferredItem<Item> InfiniteScabbard = Register.register("infinite_scabbard", () ->
-            new IServantWeapon.Builder<>(AttachmentEntityRegister.InfiniteShadow)
-                    .sound(SoundRegister.UseTerraprism)
-                    .summonPre((player, infiniteShadow) -> {
-                        ItemStack mainHandItem = player.getMainHandItem();
-                        ScabbardContainer container = mainHandItem.getComponents().getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
-                        if (!container.isEmpty()) {
-                            infiniteShadow.setItemStack(container.itemStack());
-                            return true;
-                        }
-                        return false;
-                    })
-                    .summonPost(infiniteShadow -> infiniteShadow.init(infiniteShadow.getInterpolatedIdleState(1)))
-                    .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1).component(DataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
-    );
-
     /** 泰拉棱镜 - 召唤泰拉棱镜仆从 */
     public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.TerraPrism)
@@ -188,6 +172,22 @@ public class ItemRegister {
                         servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
                     })
                     .buildItem()
+    );
+
+    public static final DeferredItem<Item> InfiniteScabbard = Register.register("infinite_scabbard", () ->
+            new IServantWeapon.Builder<>(AttachmentEntityRegister.InfiniteShadow)
+                    .sound(SoundRegister.UseTerraprism)
+                    .summonPre((player, infiniteShadow) -> {
+                        ItemStack mainHandItem = player.getMainHandItem();
+                        ScabbardContainer container = mainHandItem.getComponents().getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                        if (!container.isEmpty()) {
+                            infiniteShadow.setItemStack(container.itemStack());
+                            return true;
+                        }
+                        return false;
+                    })
+                    .summonPost(infiniteShadow -> infiniteShadow.init(infiniteShadow.getInterpolatedIdleState(1)))
+                    .buildItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1).component(DataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
     );
 
     /**

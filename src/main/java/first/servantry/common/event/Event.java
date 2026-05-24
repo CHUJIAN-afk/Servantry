@@ -35,6 +35,7 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -180,6 +181,27 @@ public class Event {
             event.getTable().addPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(0.05f))
                     .add(LootItem.lootTableItem(ItemRegister.InfiniteScabbard.get()))
+                    .build());
+        }
+        if (event.getName().equals(ResourceLocation.withDefaultNamespace("entities/allay"))) {
+            event.getTable().addPool(LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1f))
+                    .add(LootItem.lootTableItem(ItemRegister.TerraPrism.get())
+                            .when(LootItemRandomChanceCondition.randomChance(0.01f)))
+                    .build());
+        }
+        if (event.getName().equals(ResourceLocation.withDefaultNamespace("entities/evoker"))) {
+            event.getTable().addPool(LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1f))
+                    .add(LootItem.lootTableItem(ItemRegister.SummonerEmblem.get())
+                            .when(LootItemRandomChanceCondition.randomChance(0.1f)))
+                    .build());
+        }
+        if (event.getName().equals(ResourceLocation.withDefaultNamespace("entities/zombie"))) {
+            event.getTable().addPool(LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1f))
+                    .add(LootItem.lootTableItem(ItemRegister.BlackLens.get())
+                            .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                     .build());
         }
     }
