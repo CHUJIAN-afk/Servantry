@@ -59,7 +59,7 @@ public class Event {
         EntityData data = player.getData(AttachmentRegister.EntityData);
         List<Servant> servants = data.getServants();
         while (!servants.isEmpty() && !data.canSummon(player, 0)) {
-            Servant toRemove = servants.getLast();
+            Servant toRemove = servants.getFirst();
             data.remove(toRemove.getUuid());
             servants = data.getServants();
         }

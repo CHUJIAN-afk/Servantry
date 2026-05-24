@@ -57,25 +57,25 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(ItemRegister.TerraPrism)
                 .en("Terraprism").zh("泰拉棱镜")
                 .servant().en("Terraprism").zh("泰拉棱镜")
-                .tooltip(1).en("'A flawless blade once hailed as the 'Prism of the Earth'").zh("曾被冠以'大地棱彩'美名的无暇之剑");
+                .tooltip().en("'A flawless blade once hailed as the 'Prism of the Earth'").zh("曾被冠以'大地棱彩'美名的无暇之剑");
         entry(ItemRegister.InfiniteScabbard)
                 .en("Infinite Scabbard").zh("无限剑鞘")
                 .servant().en("Infinite Shadow").zh("无限之影")
-                .tooltip(1).en("'A scabbard that stores a blade of infinite potential'").zh("蕴含无限可能之'剑'的剑鞘")
-                .tooltip(2).en("Right-click an item to store, right-click an empty slot to retrieve").zh("右键物品存入，右键空格子取出");
+                .tooltip().en("'A scabbard that stores a blade of infinite potential'").zh("蕴含无限可能之'剑'的剑鞘")
+                .tooltip().en("Right-click an item to store, right-click an empty slot to retrieve").zh("右键物品存入，右键空格子取出");
         entry(ItemRegister.BladeStaff)
                 .en("Blade Staff").zh("刃杖")
                 .servant().en("Enchanted Throwing Knives").zh("附魔飞刀")
-                .tooltip(1).en("Ignores 2.5 points of enemy Defense").zh("忽略敌人 2.5 防御力")
-                .tooltip(2).en("'Don't let their small size fool you'").zh("'别被它们小小的个头给骗了'");
+                .tooltip().en("Ignores 2.5 points of enemy Defense").zh("忽略敌人 2.5 防御力")
+                .tooltip().en("'Don't let their small size fool you'").zh("'别被它们小小的个头给骗了'");
         entry(ItemRegister.StardustCellStaff)
                 .en("Stardust Cell Staff").zh("星尘细胞法杖")
                 .servant().en("Stardust Cell").zh("星尘细胞")
-                .tooltip(1).en("'Cultivate the most beautiful cellular infection'").zh("'培养最美丽的细胞感染'");
+                .tooltip().en("'Cultivate the most beautiful cellular infection'").zh("'培养最美丽的细胞感染'");
         entry(ItemRegister.StardustDragonStaff)
                 .en("Stardust Dragon Staff").zh("星尘之龙法杖")
                 .servant().en("Stardust Dragon").zh("星尘之龙")
-                .tooltip(1).en("'When you have a dragon, who needs a swarm?'").zh("'有了一条巨龙后，谁还需要一群仆从呢？'");
+                .tooltip().en("'When you have a dragon, who needs a swarm?'").zh("'有了一条巨龙后，谁还需要一群仆从呢？'");
         entry(ItemRegister.OpticStaff)
                 .en("Optic Staff").zh("魔眼法杖")
                 .servant().en("Twins").zh("双子魔眼");
@@ -88,17 +88,15 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(ItemRegister.EtherealStellarCoreStaff)
                 .en("Ethereal Stellar Core Staff").zh("缥缈星核法杖")
                 .servant().en("Ethereal Stellar Core").zh("缥缈星核")
-                .tooltip(1).en("Summon up to 9 Ethereal Stellar Cores").zh("最多召唤9个缥缈星核");
+                .tooltip().en("Summons up to 9 Ethereal Stellar Cores").zh("最多召唤9个缥缈星核");
         entry(ItemRegister.SurveyDroneRemote)
                 .en("Survey Drone Remote").zh("矿勘无人机遥控器")
                 .servant().en("Survey Drone").zh("矿勘无人机")
-                .tooltip(1).en("Deploys a drone that highlights nearby ores").zh("部署高亮附近矿石的无人机")
-                .tooltip(2).en("Floats above your head and scans in silence").zh("静静悬浮于头顶并持续扫描");
+                .tooltip().en("Summons up to 1 Survey Drone").zh("最多召唤1架矿勘无人机");
         entry(ItemRegister.FairyBell)
                 .en("Fairy Bell").zh("妖精铃铛")
                 .servant().en("Scavenger Fairy").zh("拾荒妖精")
-                .tooltip(1).en("Summons a fairy that carries nearby dropped items back to your feet").zh("召唤一只将附近掉落物搬回脚边的妖精")
-                .tooltip(2).en("Costs no servant slots, but only one may follow you").zh("不占用仆从栏位，但同一时间只能跟随一只");
+                .tooltip().en("Summons up to 1 Scavenger Fairy").zh("最多召唤1只拾荒妖精");
         // ================= 属性 =================
         entry(AttributeRegister.ServantMaxCount.value().getDescriptionId())
                 .en("Max Servants")
@@ -254,6 +252,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
         private final DeferredItem<Item> originItem;
         private final ServantryLanguageProvider provider;
         private String key;
+        private int index = 0;
 
         LangEntry(String key, @Nullable DeferredItem<Item> originItem, ServantryLanguageProvider provider) {
             this.key = key;
@@ -289,12 +288,12 @@ public class ServantryLanguageProvider extends LanguageProvider {
             return this;
         }
 
-        public LangEntry tooltip(int index) {
+        public LangEntry tooltip() {
             if (originItem == null) {
                 throw new IllegalStateException("tooltip() can only be called on an entry created from a DeferredItem");
             }
             ResourceLocation id = originItem.getId();
-            this.key = "item." + id.getNamespace() + "." + id.getPath() + ".tooltip." + index;
+            this.key = "item." + id.getNamespace() + "." + id.getPath() + ".tooltip." + ++index;
             return this;
         }
     }
