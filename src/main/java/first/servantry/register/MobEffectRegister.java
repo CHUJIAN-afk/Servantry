@@ -16,6 +16,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
 import net.neoforged.bus.api.IEventBus;
@@ -36,16 +37,17 @@ public class MobEffectRegister {
     /**
      * 着魔
      */
-    public static final DeferredHolder<MobEffect, MobEffect> Obsession = Register.register("obsession", () ->
-            builder(MobEffectCategory.BENEFICIAL, 0xb565ff)
+    public static final DeferredHolder<MobEffect, MobEffect> Obsession =
+            Register.register("obsession", () -> builder(MobEffectCategory.BENEFICIAL, 0xb565ff)
                     .addAttributeModifier(AttributeRegister.ServantMaxCount, Servantry.rl("obsession"), 1, AttributeModifier.Operation.ADD_VALUE)
-                    .build());
+                    .build()
+            );
 
     /**
      * 细胞寄生
      */
-    public static final DeferredHolder<MobEffect, MobEffect> CellParasitism = Register.register("cell_parasitism", () ->
-            builder(MobEffectCategory.BENEFICIAL, 0x8AE0FF)
+    public static final DeferredHolder<MobEffect, MobEffect> CellParasitism =
+            Register.register("cell_parasitism", () -> builder(MobEffectCategory.BENEFICIAL, 0x8AE0FF)
                     .shouldApplyEffectTickThisTick((duration, amplifier) -> duration % 20 == 0)
                     .applyEffectTick((entity, amplifier) ->
                             InvincibleData.criteriaAttack(
@@ -57,7 +59,8 @@ public class MobEffectRegister {
                                     InvincibleData.Type.Global
                             )
                     )
-                    .build());
+                    .build()
+            );
 
     /**
      * 诅咒焰
@@ -77,6 +80,97 @@ public class MobEffectRegister {
                     })
                     .build()
             );
+
+    public static final DeferredHolder<MobEffect, MobEffect> SoulMight =
+            Register.register("soul_might", () -> builder(MobEffectCategory.BENEFICIAL, 0x9B6BFF)
+                    .addAttributeModifier(
+                            AttributeRegister.ServantDamage,
+                            Servantry.rl("soul_might"),
+                            0.08,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                    )
+                    .build()
+            );
+
+    public static final DeferredHolder<MobEffect, MobEffect> SoulDefense =
+            Register.register("soul_defense", () -> builder(MobEffectCategory.BENEFICIAL, 0x88A8FF)
+                    .addAttributeModifier(
+                            Attributes.ARMOR,
+                            Servantry.rl("soul_defense"),
+                            2,
+                            AttributeModifier.Operation.ADD_VALUE
+                    )
+                    .build()
+            );
+
+    public static final DeferredHolder<MobEffect, MobEffect> SoulRecovery =
+            Register.register("soul_recovery", () -> builder(MobEffectCategory.BENEFICIAL, 0x83FFB1)
+                    .shouldApplyEffectTickThisTick((duration, amplifier) -> true)
+                    .applyEffectTick((entity, amplifier) -> {
+                        if (entity.tickCount % 20 == 0) {
+                            entity.heal(0.5f);
+                        }
+                    })
+                    .build());
+
+    public static final DeferredHolder<MobEffect, MobEffect> HallowedMight =
+            Register.register("hallowed_might", () -> builder(MobEffectCategory.BENEFICIAL, 0xFFD875)
+                    .addAttributeModifier(
+                            AttributeRegister.ServantDamage,
+                            Servantry.rl("hallowed_might"),
+                            0.16,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                    )
+                    .build());
+
+    public static final DeferredHolder<MobEffect, MobEffect> HallowedGrace =
+            Register.register("hallowed_grace", () -> builder(MobEffectCategory.BENEFICIAL, 0xFFF4B0)
+                    .addAttributeModifier(
+                            Attributes.ARMOR,
+                            Servantry.rl("hallowed_grace"),
+                            4,
+                            AttributeModifier.Operation.ADD_VALUE
+                    )
+                    .build());
+
+    public static final DeferredHolder<MobEffect, MobEffect> HallowedRadiance =
+            Register.register("hallowed_radiance", () -> builder(MobEffectCategory.BENEFICIAL, 0xFFFFAA)
+                    .shouldApplyEffectTickThisTick((duration, amplifier) -> true)
+                    .applyEffectTick((entity, amplifier) -> {
+                        if (entity.tickCount % 20 == 0) {
+                            entity.heal(1.0f);
+                        }
+                    })
+                    .build());
+
+    public static final DeferredHolder<MobEffect, MobEffect> PhantasmalMight =
+            Register.register("phantasmal_might", () -> builder(MobEffectCategory.BENEFICIAL, 0xD48CFF)
+                    .addAttributeModifier(
+                            AttributeRegister.ServantDamage,
+                            Servantry.rl("phantasmal_might"), 0.32,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_BASE
+                    )
+                    .build());
+
+    public static final DeferredHolder<MobEffect, MobEffect> PhantasmalBulwark =
+            Register.register("phantasmal_bulwark", () -> builder(MobEffectCategory.BENEFICIAL, 0xB58CFF)
+                    .addAttributeModifier(
+                            Attributes.ARMOR,
+                            Servantry.rl("phantasmal_bulwark"),
+                            8,
+                            AttributeModifier.Operation.ADD_VALUE
+                    )
+                    .build());
+
+    public static final DeferredHolder<MobEffect, MobEffect> PhantasmalRebirth =
+            Register.register("phantasmal_rebirth", () -> builder(MobEffectCategory.BENEFICIAL, 0xFF8CDE)
+                    .shouldApplyEffectTickThisTick((duration, amplifier) -> true)
+                    .applyEffectTick((entity, amplifier) -> {
+                        if (entity.tickCount % 20 == 0) {
+                            entity.heal(2.0f);
+                        }
+                    })
+                    .build());
 
     // ===================== Builder =====================
 
@@ -275,7 +369,7 @@ public class MobEffectRegister {
          * 构建MobEffect实例
          */
         public MobEffect build() {
-            return new MobEffect(category, color) {
+            MobEffect effect = new MobEffect(category, color) {
                 @Override
                 public int getBlendDurationTicks() {
                     return blendDurationTicks;
@@ -347,7 +441,7 @@ public class MobEffectRegister {
                 }
 
                 @Override
-                public net.minecraft.core.particles.@NotNull ParticleOptions createParticleOptions(@NotNull MobEffectInstance effect) {
+                public @NotNull ParticleOptions createParticleOptions(@NotNull MobEffectInstance effect) {
                     if (particleFactory != null) {
                         return particleFactory.apply(effect);
                     }
@@ -359,17 +453,14 @@ public class MobEffectRegister {
                     return requiredFeatures;
                 }
 
-                @Override
-                public void createModifiers(int amplifier, @NotNull BiConsumer<Holder<Attribute>, AttributeModifier> output) {
-                    super.createModifiers(amplifier, output);
-                    for (AttributeModifierEntry entry : attributeModifiers) {
-                        output.accept(entry.attribute, new AttributeModifier(entry.id, entry.amount * (amplifier + 1), entry.operation));
-                    }
-                    for (AttributeCurveEntry entry : attributeCurveModifiers) {
-                        output.accept(entry.attribute, new AttributeModifier(entry.id, entry.curve.apply(amplifier), entry.operation));
-                    }
-                }
             };
+            for (AttributeModifierEntry entry : attributeModifiers) {
+                effect.addAttributeModifier(entry.attribute, entry.id, entry.amount, entry.operation);
+            }
+            for (AttributeCurveEntry entry : attributeCurveModifiers) {
+                effect.addAttributeModifier(entry.attribute, entry.id, entry.operation, entry.curve);
+            }
+            return effect;
         }
     }
 
@@ -378,10 +469,14 @@ public class MobEffectRegister {
     /**
      * 属性修改器条目
      */
-    private record AttributeModifierEntry(Holder<Attribute> attribute, ResourceLocation id, double amount, AttributeModifier.Operation operation) {}
+    private record AttributeModifierEntry(Holder<Attribute> attribute, ResourceLocation id, double amount, AttributeModifier.Operation operation) {
+    }
 
-    /** 曲线属性修改器条目 */
-    private record AttributeCurveEntry(Holder<Attribute> attribute, ResourceLocation id, AttributeModifier.Operation operation, Int2DoubleFunction curve) {}
+    /**
+     * 曲线属性修改器条目
+     */
+    private record AttributeCurveEntry(Holder<Attribute> attribute, ResourceLocation id, AttributeModifier.Operation operation, Int2DoubleFunction curve) {
+    }
 
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);

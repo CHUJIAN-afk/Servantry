@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -32,12 +33,20 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.event.entity.living.EffectParticleModificationEvent;
 
 import java.io.IOException;
 import java.util.List;
 
 @EventBusSubscriber(modid = Servantry.MODID, value = Dist.CLIENT)
 public class ClientEvent {
+
+    @SubscribeEvent
+    public static void onEffectParticleModificationEvent(EffectParticleModificationEvent event) {
+        MobEffectInstance effect = event.getEffect();
+
+    }
+
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void renderOreScoutHighlights(RenderLevelStageEvent event) {

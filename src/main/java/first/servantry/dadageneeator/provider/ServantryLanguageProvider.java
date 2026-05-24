@@ -141,6 +141,29 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(ItemRegister.SquiresShield)
                 .en("Squire's Shield")
                 .zh("侍卫护盾");
+        entry(ItemRegister.SoulRelief)
+                .en("Soul Relief")
+                .zh("灵魂浮雕")
+                .tooltip().en("Servant attacks grant a random soul boon").zh("仆从攻击会使你获得一个随机灵魂增益")
+                .tooltip().en("Soul Might: +8% Servant Damage").zh("灵魂力量：+8% 仆从伤害")
+                .tooltip().en("Soul Defense: +2 Armor").zh("灵魂防御：+2 护甲")
+                .tooltip().en("Soul Recovery: +0.5 HP/s Regeneration").zh("灵魂恢复：+0.5 HP/s 生命再生");
+        entry(ItemRegister.HallowedRune)
+                .en("Hallowed Rune")
+                .zh("神圣符文")
+                .tooltip().en("Servant attacks grant a random hallowed boon").zh("仆从攻击会使你获得一个随机神圣增益")
+                .tooltip().en("Does not stack with lower-tier soul accessories").zh("该效果不会与其下位合成材料叠加")
+                .tooltip().en("Hallowed Might: +16% Servant Damage").zh("神圣之力：+16% 仆从伤害")
+                .tooltip().en("Hallowed Grace: +4 Armor").zh("神圣之佑：+4 护甲")
+                .tooltip().en("Hallowed Radiance: +1 HP/s Regeneration").zh("神圣之辉：+1 HP/s 生命再生");
+        entry(ItemRegister.PhantasmalRelic)
+                .en("Phantasmal Relic")
+                .zh("幻魂神物")
+                .tooltip().en("Servant attacks grant a random phantasmal boon").zh("仆从攻击会使你获得一个随机幻魂增益")
+                .tooltip().en("Does not stack with lower-tier soul accessories").zh("该效果不会与其下位合成材料叠加")
+                .tooltip().en("Phantasmal Might: +32% Servant Damage").zh("幻魂之力：+32% 仆从伤害")
+                .tooltip().en("Phantasmal Bulwark: +8 Armor").zh("幻魂坚盾：+8 护甲")
+                .tooltip().en("Phantasmal Rebirth: +2 HP/s Regeneration").zh("幻魂还生：+2 HP/s 生命再生");
         // ===================== 护甲 =====================
         entry(ItemRegister.HallowedHelmet)
                 .en("Hallowed Helmet")
@@ -175,6 +198,33 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("effect.servantry.cursed_flame")
                 .en("Cursed Flame")
                 .zh("诅咒焰");
+        entry("effect.servantry.soul_might")
+                .en("Soul Might")
+                .zh("灵魂力量");
+        entry("effect.servantry.soul_defense")
+                .en("Soul Defense")
+                .zh("灵魂防御");
+        entry("effect.servantry.soul_recovery")
+                .en("Soul Recovery")
+                .zh("灵魂恢复");
+        entry("effect.servantry.hallowed_might")
+                .en("Hallowed Might")
+                .zh("神圣之力");
+        entry("effect.servantry.hallowed_grace")
+                .en("Hallowed Grace")
+                .zh("神圣之佑");
+        entry("effect.servantry.hallowed_radiance")
+                .en("Hallowed Radiance")
+                .zh("神圣之辉");
+        entry("effect.servantry.phantasmal_might")
+                .en("Phantasmal Might")
+                .zh("幻魂之力");
+        entry("effect.servantry.phantasmal_bulwark")
+                .en("Phantasmal Bulwark")
+                .zh("幻魂坚盾");
+        entry("effect.servantry.phantasmal_rebirth")
+                .en("Phantasmal Rebirth")
+                .zh("幻魂还生");
         // 长效和强效药水
         entry("item.minecraft.potion.effect.obsession")
                 .en("Potion of Obsession")

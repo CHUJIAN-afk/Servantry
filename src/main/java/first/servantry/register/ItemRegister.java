@@ -375,6 +375,30 @@ public class ItemRegister {
             .build()
     );
 
+    /**
+     * 领域：饰品 / 灵魂增益
+     */
+    public static final DeferredItem<Item> SoulRelief = Register.register("soul_relief", () -> new CurioItem.Builder(new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(1))
+            .canEquipFromUse(true)
+            .build()
+    );
+
+    /**
+     * 领域：饰品 / 神圣灵魂增益
+     */
+    public static final DeferredItem<Item> HallowedRune = Register.register("hallowed_rune", () -> new CurioItem.Builder(new Item.Properties().rarity(Rarity.RARE).stacksTo(1))
+            .canEquipFromUse(true)
+            .build()
+    );
+
+    /**
+     * 领域：饰品 / 幻魂灵魂增益
+     */
+    public static final DeferredItem<Item> PhantasmalRelic = Register.register("phantasmal_relic", () -> new CurioItem.Builder(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
+            .canEquipFromUse(true)
+            .build()
+    );
+
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
     }
