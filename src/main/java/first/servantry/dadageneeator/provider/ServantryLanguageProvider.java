@@ -164,6 +164,38 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .tooltip().en("Phantasmal Might: +32% Servant Damage").zh("幻魂之力：+32% 仆从伤害")
                 .tooltip().en("Phantasmal Bulwark: +8 Armor").zh("幻魂坚盾：+8 护甲")
                 .tooltip().en("Phantasmal Rebirth: +2 HP/s Regeneration").zh("幻魂还生：+2 HP/s 生命再生");
+        entry(ItemRegister.PygmyRing)
+                .en("Pygmy Ring")
+                .zh("灼烧指环")
+                .tooltip().en("Servant attacks inflict Cursed Flame on enemies").zh("仆从攻击敌人时施加诅咒焰");
+        entry(ItemRegister.StormeyePendant)
+                .en("Stormeye Pendant")
+                .zh("暴风眼挂坠")
+                .tooltip().en("Servant attacks have a 10% chance to critically strike").zh("仆从攻击时有 10% 概率造成暴击")
+                .tooltip().en("Critical hits deal double damage and briefly slow enemies").zh("暴击造成双倍伤害，并短暂减速敌人");
+        entry(ItemRegister.HuntSoulEmblem)
+                .en("Hunt Soul Emblem")
+                .zh("猎魂徽记")
+                .tooltip().en("Servant attack damage x1.2").zh("仆从攻击伤害x1.2")
+                .tooltip().en("You take 15% more damage").zh("你受到的伤害增加 15%");
+        entry(ItemRegister.WarBanner)
+                .en("War Banner")
+                .zh("战争旗帜")
+                .tooltip().en("Servants deal up to 30% more damage to enemies near you").zh("仆从对你附近的敌人最多造成 30% 额外伤害")
+                .tooltip().en("The closer the target, the higher the bonus; fades to 0 at 8 blocks").zh("目标越近额外伤害越高，距离 8 格时加成衰减为 0");
+        entry(ItemRegister.CurseOfFrailty)
+                .en("Curse of Frailty")
+                .zh("虚弱诅咒")
+                .tooltip().en("Servant hits have a 25% chance to weaken and slow enemies").zh("仆从攻击时有 25% 概率使敌人虚弱并缓慢")
+                .tooltip().en("Inflicts Weakness II for 6s and Slowness I for 4s").zh("施加 6 秒虚弱 II 与 4 秒缓慢 I");
+        entry(ItemRegister.StardustFragment)
+                .en("Stardust Fragment")
+                .zh("星尘碎片")
+                .tooltip().en("Servant hits have a 5% chance to release a Stardust Cell").zh("仆从攻击时有 5% 概率释放星尘细胞");
+        entry(ItemRegister.ThreatAnalyzer)
+                .en("Threat Analyzer")
+                .zh("威胁分析仪")
+                .tooltip().en("Increases servants' target detection radius by 15%").zh("仆从的索敌半径增加 15%");
         // ===================== 护甲 =====================
         entry(ItemRegister.HallowedHelmet)
                 .en("Hallowed Helmet")

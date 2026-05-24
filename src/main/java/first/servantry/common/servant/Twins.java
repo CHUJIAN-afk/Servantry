@@ -94,6 +94,10 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
         super.tick();
     }
 
+    public int getTargetDistance() {
+        return 12;
+    }
+
     @Override
     public void writeAdditional(RegistryFriendlyByteBuf buf) {
         buf.writeBoolean(isLaserEye);

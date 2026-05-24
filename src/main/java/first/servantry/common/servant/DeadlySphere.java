@@ -105,6 +105,10 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
         super.tick();
     }
 
+    public int getTargetDistance() {
+        return 14;
+    }
+
     @Override
     public void writeAdditional(RegistryFriendlyByteBuf buf) {
         buf.writeInt(trailTimer);

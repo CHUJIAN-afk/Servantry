@@ -13,12 +13,10 @@ import first.servantry.utils.ArmorSetUtil;
 import first.servantry.utils.AttributeUtils;
 import first.servantry.utils.CuriosUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -52,7 +50,6 @@ import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -120,8 +117,12 @@ public class Event {
     @SubscribeEvent
     public static void onServantIncomingDamage(ServantIncomingDamageEvent event) {
         Player owner = event.getSource().getServant().getOwner();
-        if (!owner.level().isClientSide() && ArmorSetUtil.hasFullSet(owner, ArmorMaterialRegister.HallowedArmorMaterial)) {
-            LivingEntity target = event.getEntity();
+        if (owner.level().isClientSide()) return;
+
+        LivingEntity target = event.getEntity();
+
+        // 圣神圣套装发光效果
+        if (ArmorSetUtil.hasFullSet(owner, ArmorMaterialRegister.HallowedArmorMaterial)) {
             MobEffectInstance instance = target.getEffect(MobEffects.GLOWING);
             if (instance == null) {
                 target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 59));
@@ -226,34 +227,6 @@ public class Event {
                         cell.setExtraShootCooldown(14);
                         cell.shootAtTarget(target);
                     }
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLivingDamageEventPostFromCurios(LivingDamageEvent.Post event) {
-        DamageSource damageSource = event.getSource();
-        if (damageSource instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                Player owner = servant.getOwner();
-                List<Holder<MobEffect>> effects = new ArrayList<>();
-                if (CuriosUtil.isEquipped(owner, ItemRegister.PhantasmalRelic.get())) {
-                    effects.add(MobEffectRegister.PhantasmalMight);
-                    effects.add(MobEffectRegister.PhantasmalBulwark);
-                    effects.add(MobEffectRegister.PhantasmalRebirth);
-                } else if (CuriosUtil.isEquipped(owner, ItemRegister.HallowedRune.get())) {
-                    effects.add(MobEffectRegister.HallowedMight);
-                    effects.add(MobEffectRegister.HallowedGrace);
-                    effects.add(MobEffectRegister.HallowedRadiance);
-                } else if (CuriosUtil.isEquipped(owner, ItemRegister.SoulRelief.get())) {
-                    effects.add(MobEffectRegister.SoulMight);
-                    effects.add(MobEffectRegister.SoulDefense);
-                    effects.add(MobEffectRegister.SoulRecovery);
-                }
-                if (!effects.isEmpty()) {
-                    owner.addEffect(new MobEffectInstance(effects.get(owner.getRandom().nextInt(effects.size())), 60));
                 }
             }
         }

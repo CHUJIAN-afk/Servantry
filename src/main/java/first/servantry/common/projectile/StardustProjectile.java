@@ -52,11 +52,15 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
 
     @Override
     public boolean isValidCollisionTarget(StardustProjectile entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
+        DamageSource source = entity.getDamageSource();
+        if (source instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
             if (servant != null) {
                 return servant.isTarget(target);
             }
+        }
+        if (source != null) {
+            return target == chaseTarget;
         }
         return false;
     }
@@ -92,12 +96,14 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
     }
 
     private void tickFlying() {
-        if (life >= 10 && chaseTarget != null && chaseTarget.isAlive()) {
-            Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
-            applyForce(targetCenter.subtract(getPos()).normalize().scale(0.3));
-            setTrailTimer(getTrailDuration());
-        } else {
-            setRemove();
+        if (life >= 10) {
+            if (chaseTarget != null && chaseTarget.isAlive()) {
+                Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
+                applyForce(targetCenter.subtract(getPos()).normalize().scale(0.3));
+                setTrailTimer(getTrailDuration());
+            } else {
+                setRemove();
+            }
         }
     }
 

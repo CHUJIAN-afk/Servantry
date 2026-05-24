@@ -5,13 +5,23 @@ import first.servantry.Servantry;
 import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.item.IServantWeapon;
+import first.servantry.api.servant.Servant;
+import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.item.CurioItem;
+import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.StardustDragon;
 import first.servantry.common.servant.Twins;
+import first.servantry.utils.CuriosUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -20,11 +30,14 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemRegister {
@@ -290,7 +303,7 @@ public class ItemRegister {
                 builder.put(AttributeRegister.ServantKnockback, new AttributeModifier(id, 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
                 return builder.build();
             })
-            .build()
+            .build(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
 
     /** 矮人项链 - 仆从栏+1 */
@@ -374,33 +387,251 @@ public class ItemRegister {
             })
             .build()
     );
-
-    /**
+    public static final DeferredItem<Item> ThreatAnalyzer = Register.register("threat_analyzer", () -> CurioItem.builder()
+            .canEquipFromUse(true)
+            .build(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
+    );    /**
      * 领域：饰品 / 灵魂增益
      */
-    public static final DeferredItem<Item> SoulRelief = Register.register("soul_relief", () -> new CurioItem.Builder(new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(1))
+    public static final DeferredItem<Item> SoulRelief = Register.register("soul_relief", () -> CurioItem.builder()
             .canEquipFromUse(true)
-            .build()
+            .damageCallback(new CurioItem.CurioDamageCallback() {
+                @Override
+                public void onLivingDamageEventPost(LivingDamageEvent.Post event) {
+                    DamageSource source = event.getSource();
+                    if (source instanceof ServantDamageSource servantDamageSource) {
+                        Servant servant = servantDamageSource.getServant();
+                        if (servant != null) {
+                            Player owner = servant.getOwner();
+                            if (!owner.level().isClientSide() && CuriosUtil.isEquipped(owner, ItemRegister.SoulRelief.get())) {
+                                if (!CuriosUtil.isEquipped(owner, ItemRegister.HallowedRune.get())) {
+                                    if (!CuriosUtil.isEquipped(owner, ItemRegister.PhantasmalRelic.get())) {
+                                        List<Holder<MobEffect>> effects = new ArrayList<>();
+                                        effects.add(MobEffectRegister.SoulMight);
+                                        effects.add(MobEffectRegister.SoulDefense);
+                                        effects.add(MobEffectRegister.SoulRecovery);
+                                        owner.addEffect(new MobEffectInstance(effects.get(owner.getRandom().nextInt(effects.size())), 60));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+            .build(new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(1))
     );
 
     /**
      * 领域：饰品 / 神圣灵魂增益
      */
-    public static final DeferredItem<Item> HallowedRune = Register.register("hallowed_rune", () -> new CurioItem.Builder(new Item.Properties().rarity(Rarity.RARE).stacksTo(1))
+    public static final DeferredItem<Item> HallowedRune = Register.register("hallowed_rune", () -> CurioItem.builder()
             .canEquipFromUse(true)
-            .build()
+            .damageCallback(new CurioItem.CurioDamageCallback() {
+                @Override
+                public void onLivingDamageEventPost(LivingDamageEvent.Post event) {
+                    DamageSource source = event.getSource();
+                    if (source instanceof ServantDamageSource servantDamageSource) {
+                        Servant servant = servantDamageSource.getServant();
+                        if (servant != null) {
+                            Player owner = servant.getOwner();
+                            if (!owner.level().isClientSide() && CuriosUtil.isEquipped(owner, ItemRegister.HallowedRune.get())) {
+                                if (!CuriosUtil.isEquipped(owner, ItemRegister.PhantasmalRelic.get())) {
+                                    List<Holder<MobEffect>> effects = new ArrayList<>();
+                                    effects.add(MobEffectRegister.HallowedMight);
+                                    effects.add(MobEffectRegister.HallowedGrace);
+                                    effects.add(MobEffectRegister.HallowedRadiance);
+                                    owner.addEffect(new MobEffectInstance(effects.get(owner.getRandom().nextInt(effects.size())), 60));
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+            .build(new Item.Properties().rarity(Rarity.RARE).stacksTo(1))
     );
 
     /**
      * 领域：饰品 / 幻魂灵魂增益
      */
-    public static final DeferredItem<Item> PhantasmalRelic = Register.register("phantasmal_relic", () -> new CurioItem.Builder(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
+    public static final DeferredItem<Item> PhantasmalRelic = Register.register("phantasmal_relic", () -> CurioItem.builder()
             .canEquipFromUse(true)
-            .build()
+            .damageCallback(new CurioItem.CurioDamageCallback() {
+                @Override
+                public void onLivingDamageEventPost(LivingDamageEvent.Post event) {
+                    DamageSource source = event.getSource();
+                    if (source instanceof ServantDamageSource servantDamageSource) {
+                        Servant servant = servantDamageSource.getServant();
+                        if (servant != null) {
+                            Player owner = servant.getOwner();
+                            if (!owner.level().isClientSide() && CuriosUtil.isEquipped(owner, ItemRegister.PhantasmalRelic.get())) {
+                                List<Holder<MobEffect>> effects = new ArrayList<>();
+                                effects.add(MobEffectRegister.PhantasmalMight);
+                                effects.add(MobEffectRegister.PhantasmalBulwark);
+                                effects.add(MobEffectRegister.PhantasmalRebirth);
+                                owner.addEffect(new MobEffectInstance(effects.get(owner.getRandom().nextInt(effects.size())), 60));
+                            }
+                        }
+                    }
+                }
+            })
+            .build(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
     );
+
+    // ===================== 条件触发饰品 =====================
+
+    /**
+     * 灼烧指环 - 仆从攻击时给目标施加诅咒焰
+     */
+    public static final DeferredItem<Item> PygmyRing = Register.register("pygmy_ring", () -> CurioItem.builder()
+            .canEquipFromUse(true)
+            .damageCallback(new CurioItem.CurioDamageCallback() {
+                @Override
+                public void onLivingDamageEventPost(LivingDamageEvent.Post event) {
+                    DamageSource source = event.getSource();
+                    if (source instanceof ServantDamageSource servantDamageSource) {
+                        Servant servant = servantDamageSource.getServant();
+                        if (servant != null) {
+                            Player owner = servant.getOwner();
+                            if (!owner.level().isClientSide() && CuriosUtil.isEquipped(owner, ItemRegister.PygmyRing.get())) {
+                                event.getEntity().addEffect(new MobEffectInstance(MobEffectRegister.CursedFlame, 80, 0));
+                            }
+                        }
+                    }
+                }
+            })
+            .build(new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(1))
+    );
+
+    /**
+     * 暴风眼挂坠 - 仆从攻击时10%暴击(200%伤害+减速)
+     */
+    public static final DeferredItem<Item> StormeyePendant = Register.register("stormeye_pendant", () -> CurioItem.builder()
+            .canEquipFromUse(true)
+            .damageCallback(new CurioItem.CurioDamageCallback() {
+                @Override
+                public void onServantIncomingDamage(ServantIncomingDamageEvent event) {
+                    Servant servant = event.getSource().getServant();
+                    if (servant != null) {
+                        Player owner = servant.getOwner();
+                        if (!owner.level().isClientSide() && CuriosUtil.isEquipped(owner, ItemRegister.StormeyePendant.get()) && owner.getRandom().nextFloat() < 0.1f) {
+                            event.getEntity().addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 2));
+                            event.setAmount(event.getAmount() * 2.0f);
+                        }
+                    }
+                }
+            })
+            .build(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
+    );
+
+    /**
+     * 猎魂徽记 - 常驻+20%召唤伤害(独立乘区)，自身额外受伤15%
+     */
+    public static final DeferredItem<Item> HuntSoulEmblem = Register.register("hunt_soul_emblem", () -> CurioItem.builder()
+            .canEquipFromUse(true)
+            .damageCallback(new CurioItem.CurioDamageCallback() {
+                @Override
+                public void onServantIncomingDamage(ServantIncomingDamageEvent event) {
+                    Servant servant = event.getSource().getServant();
+                    if (servant != null) {
+                        Player owner = servant.getOwner();
+                        if ((!owner.level().isClientSide() && CuriosUtil.isEquipped(owner, ItemRegister.HuntSoulEmblem.get()))) {
+                            event.setAmount(event.getAmount() * 1.2f);
+                        }
+                    }
+                }
+
+                @Override
+                public void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
+                    if (event.getEntity() instanceof Player player && !player.level().isClientSide() && CuriosUtil.isEquipped(player, ItemRegister.HuntSoulEmblem.get())) {
+                        event.setNewDamage(event.getNewDamage() * 1.15f);
+                    }
+                }
+            })
+            .build(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
+    );
+
+    /**
+     * 战争旗帜 - 距离增伤：目标越近伤害越高，8格内最高+30%
+     */
+    public static final DeferredItem<Item> WarBanner = Register.register("war_banner", () -> CurioItem.builder()
+            .canEquipFromUse(true)
+            .damageCallback(new CurioItem.CurioDamageCallback() {
+                @Override
+                public void onServantIncomingDamage(ServantIncomingDamageEvent event) {
+                    Servant servant = event.getSource().getServant();
+                    if (servant != null) {
+                        Player owner = servant.getOwner();
+                        if ((!owner.level().isClientSide() && CuriosUtil.isEquipped(owner, ItemRegister.WarBanner.get()))) {
+                            double distance = owner.position().distanceTo(event.getEntity().position());
+                            if (distance < 8.0) {
+                                float bonus = (float) (0.30 * (1.0 - distance / 8.0));
+                                event.setAmount(event.getAmount() * (1.0f + bonus));
+                            }
+                        }
+                    }
+                }
+            })
+            .build(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
+    );
+
+    /**
+     * 虚弱诅咒 - 仆从攻击时25%概率给目标施加虚弱+缓慢
+     */
+    public static final DeferredItem<Item> CurseOfFrailty = Register.register("curse_of_frailty", () -> CurioItem.builder()
+            .canEquipFromUse(true)
+            .damageCallback(new CurioItem.CurioDamageCallback() {
+                @Override
+                public void onLivingDamageEventPost(LivingDamageEvent.Post event) {
+                    DamageSource source = event.getSource();
+                    if (source instanceof ServantDamageSource servantDamageSource) {
+                        Servant servant = servantDamageSource.getServant();
+                        if (servant != null) {
+                            Player owner = servant.getOwner();
+                            if ((!owner.level().isClientSide() && CuriosUtil.isEquipped(owner, ItemRegister.CurseOfFrailty.get()) && owner.getRandom().nextFloat() < 0.25f)) {
+                                LivingEntity target = event.getEntity();
+                                target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 120, 1));
+                                target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 0));
+                            }
+                        }
+                    }
+                }
+            })
+            .build(new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(1))
+    );
+
+    /**
+     * 星尘碎片 - 仆从攻击时5%概率产生星尘细胞射弹
+     */
+    public static final DeferredItem<Item> StardustFragment = Register.register("stardust_fragment", () -> CurioItem.builder()
+            .canEquipFromUse(true)
+            .damageCallback(new CurioItem.CurioDamageCallback() {
+                @Override
+                public void onLivingDamageEventPost(LivingDamageEvent.Post event) {
+                    DamageSource source = event.getSource();
+                    if (source instanceof ServantDamageSource servantDamageSource) {
+                        Servant servant = servantDamageSource.getServant();
+                        if (servant != null) {
+                            Player owner = servant.getOwner();
+                            if (!owner.level().isClientSide() && CuriosUtil.isEquipped(owner, ItemRegister.StardustFragment.get()) && owner.getRandom().nextFloat() < 0.05f) {
+                                Level level = owner.level();
+                                // 创建并发射星细胞射弹
+                                DamageSource damageSource = DamageRegister.getDamageSource(DamageRegister.Servant, level);
+                                Vec3 startPos = servant.getPos();
+                                StardustProjectile projectile = new StardustProjectile(damageSource, startPos);
+                                projectile.setVelocity(startPos.offsetRandom(owner.getRandom(), 1).subtract(startPos).normalize().scale(0.25f));
+                                projectile.setChaseTarget(event.getEntity());
+                                projectile.join(owner);
+                            }
+                        }
+                    }
+                }
+            })
+            .build(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
+    );
+
+
 
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
     }
-
 }

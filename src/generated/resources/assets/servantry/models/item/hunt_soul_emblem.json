@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "servantry:item/hunt_soul_emblem"
+  }
+}

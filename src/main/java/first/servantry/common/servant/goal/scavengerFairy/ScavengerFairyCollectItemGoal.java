@@ -53,7 +53,6 @@ public class ScavengerFairyCollectItemGoal extends ServantGoal<ScavengerFairy> {
                 experienceOrb.playerTouch(owner);
             }
             servant.setTargetEntity(servant.findNearestNewTargetEntity());
-            servant.setPath(List.of());
             return;
         }
         if (!servant.isExecutingPath()) {

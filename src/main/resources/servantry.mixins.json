@@ -9,7 +9,8 @@
     "servantry.ClientEventMixin",
     "servantry.CombatRulesMixin",
     "servantry.DamageSourcesMixin",
-    "servantry.MobEffectInstanceAccessor"
+    "servantry.MobEffectInstanceAccessor",
+    "servantry.ServantMixin"
   ],
   "injectors": {
     "defaultRequire": 1
