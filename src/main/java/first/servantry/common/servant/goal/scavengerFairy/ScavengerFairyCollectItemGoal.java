@@ -43,7 +43,7 @@ public class ScavengerFairyCollectItemGoal extends ServantGoal<ScavengerFairy> {
     @Override
     public void tick() {
         Entity entity = servant.getTargetEntity();
-        if (entity.distanceToSqr(servant.getPos()) <= 0.5) {
+        if (entity.distanceToSqr(servant.getPos()) <= 1) {
             if (entity instanceof ItemEntity) {
                 servant.deliver(entity);
             }
@@ -53,13 +53,13 @@ public class ScavengerFairyCollectItemGoal extends ServantGoal<ScavengerFairy> {
                 experienceOrb.playerTouch(owner);
             }
             servant.setTargetEntity(servant.findNearestNewTargetEntity());
+            servant.setPath(List.of());
             return;
         }
         if (!servant.isExecutingPath()) {
             PathNode start = servant.getCurrentPathNode();
             Vec3 targetPos = entity.getBoundingBox().getCenter();
             Vec3 direction = targetPos.subtract(start.pos()).normalize();
-            targetPos.add(direction.scale(0.5));
             float targetYaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
             float targetPitch = (float) Math.toDegrees(Math.asin(-direction.y));
             PathNode end = new PathNode(targetPos, targetYaw, targetPitch, start.roll());

@@ -95,8 +95,8 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                         .offset(0.025)
                         .velocity(targetPos.subtract(servant.getPos()))
                         .count(4)
-                        .speed(1)
-                        .spread(0.25)
+                        .speed(1.25)
+                        .spread(0.15)
                         .emit();
             } else {
                 emited = false;
