@@ -47,6 +47,12 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("item.servantry.tooltip.remove_all")
                 .en("Sneak + Use to dismiss all servants of this type")
                 .zh("潜行右键以遣散该类型仆从");
+        entry("item.servantry.tooltip.code_wip")
+                .en("[WIP - Code not yet implemented]")
+                .zh("[未完成 - 代码尚未实现]");
+        entry("item.servantry.tooltip.art_wip")
+                .en("[WIP - Art not yet implemented]")
+                .zh("[未完成 - 美术尚未实现]");
         entry("death.attack.servantry.servant")
                 .en("%1$s was torn apart by a servant")
                 .zh("%1$s 被仆从撕碎");

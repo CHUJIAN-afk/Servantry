@@ -97,6 +97,8 @@
   "item.servantry.terraprism.tooltip.1": "'A flawless blade once hailed as the 'Prism of the Earth'",
   "item.servantry.threat_analyzer": "Threat Analyzer",
   "item.servantry.threat_analyzer.tooltip.1": "Increases servants' target detection radius by 15%",
+  "item.servantry.tooltip.art_wip": "[WIP - Art not yet implemented]",
+  "item.servantry.tooltip.code_wip": "[WIP - Code not yet implemented]",
   "item.servantry.tooltip.damage": " Summon Damage",
   "item.servantry.tooltip.knockback": " Knockback",
   "item.servantry.tooltip.remove_all": "Sneak + Use to dismiss all servants of this type",

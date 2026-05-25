@@ -450,6 +450,7 @@ public class ItemRegister {
             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
             .build()
     );
+
     /**
      * 灼烧指环 - 仆从攻击时给目标施加诅咒焰
      */

@@ -17,12 +17,14 @@ import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.particle.provider.GenericParticleProvider;
 import first.servantry.common.servant.OreScout;
 import first.servantry.register.*;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
@@ -32,12 +34,25 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 import java.io.IOException;
 import java.util.List;
 
 @EventBusSubscriber(modid = Servantry.MODID, value = Dist.CLIENT)
 public class ClientEvent {
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void tooltip(ItemTooltipEvent event) {
+        ItemStack itemStack = event.getItemStack();
+        List<Component> toolTip = event.getToolTip();
+        if (itemStack.is(TagRegister.CODE_WIP)) {
+            toolTip.add(Component.translatable("item.servantry.tooltip.code_wip").withStyle(ChatFormatting.RED));
+        }
+        if (itemStack.is(TagRegister.ART_WIP)) {
+            toolTip.add(Component.translatable("item.servantry.tooltip.art_wip").withStyle(ChatFormatting.RED));
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void renderOreScoutHighlights(RenderLevelStageEvent event) {

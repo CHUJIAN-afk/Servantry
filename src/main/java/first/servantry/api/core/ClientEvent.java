@@ -133,5 +133,4 @@ public class ClientEvent {
             ArmorSetUtil.addSetBonusTooltip(player, hallowedArmorMaterial, toolTip);
         }
     }
-
 }

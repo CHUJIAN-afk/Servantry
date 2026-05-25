@@ -2,6 +2,7 @@ package first.servantry.dadageneeator.provider;
 
 import first.servantry.Servantry;
 import first.servantry.common.item.CurioItem;
+import first.servantry.register.TagRegister;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -17,6 +18,8 @@ import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.concurrent.CompletableFuture;
 
+import static first.servantry.register.ItemRegister.*;
+
 public class ServantryItemTagsProvider extends ItemTagsProvider {
 
     public ServantryItemTagsProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, CompletableFuture<TagLookup<Block>> blockTags, ExistingFileHelper existingFileHelper) {
@@ -31,6 +34,22 @@ public class ServantryItemTagsProvider extends ItemTagsProvider {
                         .filter(item -> item instanceof CurioItem)
                         .toArray(Item[]::new)
                 );
+        tag(TagRegister.ART_WIP)
+                .add(DeadlySphereStaff.value())
+                .add(InfiniteScabbard.value())
+                .add(EtherealStellarCoreStaff.value())
+                .add(SurveyDroneRemote.value())
+                .add(FairyBell.value())
+                .add(ThreatAnalyzer.value())
+                .add(PhantasmalRelic.value())
+                .add(HallowedRune.value())
+                .add(SoulRelief.value())
+                .add(PygmyRing.value())
+                .add(StormeyePendant.value())
+                .add(HuntSoulEmblem.value())
+                .add(WarBanner.value())
+                .add(CurseOfFrailty.value())
+                .add(StardustFragment.value());
     }
 
 }
