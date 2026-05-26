@@ -6,8 +6,8 @@
     64
   ],
   "textures": {
-    "1": "servantry:item/twins_cursed_flame",
-    "particle": "servantry:item/twins_cursed_flame"
+    "1": "servantry:item/entity/twins_cursed_flame",
+    "particle": "servantry:item/entity/twins_cursed_flame"
   },
   "elements": [
     {

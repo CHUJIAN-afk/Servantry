@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "servantry:item/survey_drone_remote"
+    "layer0": "servantry:item/stick"
   }
 }

@@ -3,8 +3,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"4": "servantry:item/stardust_dragon_body2",
-		"particle": "servantry:item/stardust_dragon_body2"
+		"4": "servantry:item/entity/stardust_dragon_body2",
+		"particle": "servantry:item/entity/stardust_dragon_body2"
 	},
 	"elements": [
 		{

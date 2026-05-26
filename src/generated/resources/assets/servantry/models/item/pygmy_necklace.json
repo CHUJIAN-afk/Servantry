@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "servantry:item/pygmy_necklace"
+    "layer0": "servantry:item/stick"
   }
 }

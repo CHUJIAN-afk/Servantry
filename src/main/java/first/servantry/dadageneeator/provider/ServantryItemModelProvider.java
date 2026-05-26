@@ -31,6 +31,18 @@ public class ServantryItemModelProvider extends ItemModelProvider {
     }
 
     @Override
+    public @NotNull ItemModelBuilder handheldItem(ResourceLocation item) {
+        ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(item.getNamespace(), "item/" + item.getPath());
+        boolean exists = this.existingFileHelper.exists(texture, ModelProvider.TEXTURE);
+        if (!exists) {
+            texture = ResourceLocation.fromNamespaceAndPath(item.getNamespace(), "item/stick");
+        }
+        return this.getBuilder(item.toString())
+                .parent(new ModelFile.UncheckedModelFile("item/handheld"))
+                .texture("layer0", texture);
+    }
+
+    @Override
     public @NotNull ItemModelBuilder basicItem(ResourceLocation item) {
         ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(item.getNamespace(), "item/" + item.getPath());
         boolean exists = this.existingFileHelper.exists(texture, ModelProvider.TEXTURE);

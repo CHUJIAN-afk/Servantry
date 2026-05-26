@@ -6,7 +6,7 @@
     32
   ],
   "textures": {
-    "3": "servantry:item/shark"
+    "3": "servantry:item/entity/shark"
   },
   "elements": [
     {

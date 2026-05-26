@@ -3,7 +3,7 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
 	"textures": {
-		"5": "servantry:item/stardust_cell"
+		"5": "servantry:item/entity/stardust_cell"
 	},
 	"elements": [
 		{
