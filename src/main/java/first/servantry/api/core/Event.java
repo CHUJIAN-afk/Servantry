@@ -33,6 +33,7 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,17 +64,31 @@ public class Event {
         LivingEntity living = event.getEntity();
         if (living instanceof Player player) {
             Map<ArmorSet, Boolean> cache = ArmorSet.CACHE.get(event.getEntity().getUUID());
+            Map<ArmorSet, Boolean> lookup = new HashMap<>();
             if (cache != null && !cache.isEmpty()) {
+                lookup.putAll(cache);
                 cache.clear();
             }
-            if (!player.level().isClientSide()) {
-                List<ArmorSet> list = ServantryRegistries.ARMOR_SETS.stream().toList();
-                for (ArmorSet armorSet : list) {
+            List<ArmorSet> list = ServantryRegistries.ARMOR_SETS.stream().toList();
+            for (ArmorSet armorSet : list) {
+                boolean full = armorSet.full(player);
+                if (full) {
+                    if ((!lookup.containsKey(armorSet) || !lookup.get(armorSet))) {
+                        //首次生效时调用
+                        armorSet.onStart().accept(player);
+                    }
+                } else {
+                    if (lookup.containsKey(armorSet) && lookup.get(armorSet)) {
+                        //失效时调用
+                        armorSet.onRemove().accept(player);
+                    }
+                }
+                if (!player.level().isClientSide()) {
                     Collection<Map.Entry<Holder<Attribute>, AttributeModifier>> entries = armorSet.modifiers().entries();
                     for (Map.Entry<Holder<Attribute>, AttributeModifier> entry : entries) {
                         Holder<Attribute> key = entry.getKey();
                         AttributeModifier value = entry.getValue();
-                        AttributeUtils.condition(player, key, value.id(), value.amount(), value.operation(), armorSet.full(player));
+                        AttributeUtils.condition(player, key, value.id(), value.amount(), value.operation(), full);
                     }
                 }
             }

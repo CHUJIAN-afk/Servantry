@@ -13,7 +13,18 @@ import net.neoforged.neoforge.registries.DeferredItem;
 
 import java.util.*;
 
-public record ArmorSet(ResourceLocation id, List<DeferredItem<Item>> items, Multimap<Holder<Attribute>, AttributeModifier> modifiers) {
+public record ArmorSet(
+        ResourceLocation id,
+        List<DeferredItem<Item>> items,
+        Multimap<Holder<Attribute>, AttributeModifier> modifiers,
+        onTrigger onStart,
+        onTrigger onRemove
+) {
+
+    @FunctionalInterface
+    public interface onTrigger {
+        void accept(Player player);
+    }
 
     public static final Map<UUID, Map<ArmorSet, Boolean>> CACHE = new HashMap<>();
 
@@ -54,6 +65,10 @@ public record ArmorSet(ResourceLocation id, List<DeferredItem<Item>> items, Mult
         private final ResourceLocation id;
         private final List<DeferredItem<Item>> items = new java.util.ArrayList<>();
         private final ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> modifiers = ImmutableMultimap.builder();
+        private onTrigger onStart = player -> {
+        };
+        private onTrigger onRemove = player -> {
+        };
 
         private Builder(ResourceLocation id) {
             this.id = id;
@@ -69,8 +84,18 @@ public record ArmorSet(ResourceLocation id, List<DeferredItem<Item>> items, Mult
             return this;
         }
 
+        public Builder onStart(onTrigger onStart) {
+            this.onStart = onStart;
+            return this;
+        }
+
+        public Builder oRemove(onTrigger oRemove) {
+            this.onRemove = oRemove;
+            return this;
+        }
+
         public ArmorSet build() {
-            return new ArmorSet(id, List.copyOf(items), modifiers.build());
+            return new ArmorSet(id, List.copyOf(items), modifiers.build(), onStart, onRemove);
         }
     }
 }

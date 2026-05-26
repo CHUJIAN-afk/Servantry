@@ -34,6 +34,21 @@ public class ArmorMaterialRegister {
             0.0F
     ));
 
+    public static final Holder<ArmorMaterial> ObsidianArmorMaterial = Register.register("obsidian", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 4);
+                map.put(ArmorItem.Type.CHESTPLATE, 6);
+                map.put(ArmorItem.Type.LEGGINGS, 5);
+                map.put(ArmorItem.Type.BOOTS, 3);
+            }),
+            5,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            () -> Ingredient.of(Items.OBSIDIAN, Items.CRYING_OBSIDIAN),
+            List.of(new ArmorMaterial.Layer(Servantry.rl("obsidian"))),
+            0.0F,
+            0.0F
+    ));
+
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
     }

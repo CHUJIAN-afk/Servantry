@@ -1,4 +1,4 @@
-// 1.21.1	2026-05-24T22:55:36.3689797	Item Models: servantry
+// 1.21.1	2026-05-26T20:25:55.3459228	Item Models: servantry
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 14d9431b09bcb8ed8fbc47dad92e32f9bf33c4f3 assets/servantry/models/item/black_lens.json
 8e6344b0bcd3d3339e14a985ce707d72a02f32cc assets/servantry/models/item/blade_staff.json
@@ -9,6 +9,7 @@ c8da49f0fd8ba0680c7b652f0f1a44522fbb39fd assets/servantry/models/item/ethereal_s
 94b0d2c7d1fac32c67bd362adfa4389c9f452117 assets/servantry/models/item/hallowed_boots.json
 5f05f8a6731cb06dd3edc861def73aeeed5bca30 assets/servantry/models/item/hallowed_chestplate.json
 2c356bb2f4afbcb5583194524f9a52ca36a124cf assets/servantry/models/item/hallowed_helmet.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/hallowed_ingot.json
 11647c9e666a6b9aa68a0ae3f43122fdf844cbf4 assets/servantry/models/item/hallowed_leggings.json
 ae3b4026162f5c6b5f934006ff516804cce135d1 assets/servantry/models/item/hallowed_rune.json
 67155e2663d25ff0a7099f7974e39fc1aa3233f1 assets/servantry/models/item/hercules_beetle.json
@@ -17,6 +18,10 @@ cea208bf9d779d07c2255c3502769ec0ceaca5e0 assets/servantry/models/item/hunt_soul_
 e52c1be32d3dbb25348849e3b386749de9b09694 assets/servantry/models/item/infinite_scabbard.json
 27453db8a210e9975f578f4d7faf6a0dc3d184e3 assets/servantry/models/item/monks_belt.json
 cd35e7ca8216678ea8d40290aa5ea6479fedc66c assets/servantry/models/item/necromantic_scroll.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/obsidian_boots.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/obsidian_chestplate.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/obsidian_helmet.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/obsidian_leggings.json
 ba1f28a328a4e9e41446a0a2d44f6c13dac07f24 assets/servantry/models/item/optic_staff.json
 7d8103fe588a78e65d52cc81838281e269707c88 assets/servantry/models/item/papyrus_scarab.json
 b3b27e103b021f0f238fa6c70a5291999166a9bd assets/servantry/models/item/phantasmal_relic.json

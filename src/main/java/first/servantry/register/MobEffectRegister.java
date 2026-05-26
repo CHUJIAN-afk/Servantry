@@ -47,7 +47,7 @@ public class MobEffectRegister {
      * 细胞寄生
      */
     public static final DeferredHolder<MobEffect, MobEffect> CellParasitism =
-            Register.register("cell_parasitism", () -> builder(MobEffectCategory.BENEFICIAL, 0x8AE0FF)
+            Register.register("cell_parasitism", () -> builder(MobEffectCategory.HARMFUL, 0x8AE0FF)
                     .shouldApplyEffectTickThisTick((duration, amplifier) -> duration % 20 == 0)
                     .applyEffectTick((entity, amplifier) ->
                             InvincibleData.criteriaAttack(

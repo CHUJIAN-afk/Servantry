@@ -30,14 +30,14 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .en("Servantry")
                 .zh("仆从学");
         entry("item.servantry.tooltip.set_bonus_title")
-                .en("Set Bonus:")
-                .zh("套装效果:");
+                .en("Set Rewards:")
+                .zh("套装奖励:");
         entry("item.servantry.tooltip.damage")
-                .en(" Summon Damage")
-                .zh(" 召唤伤害");
+                .en("Summon Damage")
+                .zh("召唤伤害");
         entry("item.servantry.tooltip.knockback")
-                .en(" Knockback")
-                .zh(" 击退强度");
+                .en("Knockback")
+                .zh("击退强度");
         entry("item.servantry.tooltip.summon")
                 .en("Summons %s to fight for you")
                 .zh("召唤 %s 为你而战");
@@ -82,6 +82,9 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .en("Stardust Dragon Staff").zh("星尘之龙法杖")
                 .servant().en("Stardust Dragon").zh("星尘之龙")
                 .tooltip().en("'When you have a dragon, who needs a swarm?'").zh("'有了一条巨龙后，谁还需要一群仆从呢？'");
+        entry(ItemRegister.BlackLens)
+                .en("Black Lens")
+                .zh("黑色晶状体");
         entry(ItemRegister.OpticStaff)
                 .en("Optic Staff").zh("魔眼法杖")
                 .servant().en("Twins").zh("双子魔眼");
@@ -132,9 +135,6 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(ItemRegister.HerculesBeetle)
                 .en("Hercules Beetle")
                 .zh("大力士甲虫");
-        entry(ItemRegister.BlackLens)
-                .en("Black Lens")
-                .zh("黑色晶状体");
         entry(ItemRegister.SummonerEmblem)
                 .en("Summoner Emblem")
                 .zh("召唤师徽章");
@@ -204,6 +204,9 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .zh("威胁分析仪")
                 .tooltip().en("Increases servants' target detection radius by 15%").zh("仆从的索敌半径增加 15%");
         // ===================== 护甲 =====================
+        entry(ItemRegister.HallowedIngot)
+                .en("Hallowed Ingot")
+                .zh("神圣锭");
         entry(ItemRegister.HallowedHelmet)
                 .en("Hallowed Helmet")
                 .zh("神圣兜帽");
@@ -219,6 +222,20 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("servantry.servantry.hallowed.set.1")
                 .en("Servants grant I-frames on attack")
                 .zh("仆从攻击使敌人高亮");
+        // ===================== 黑曜石护甲 =====================
+        entry(ItemRegister.ObsidianHelmet)
+                .en("Obsidian Helmet")
+                .zh("黑曜石逃犯帽");
+        entry(ItemRegister.ObsidianChestplate)
+                .en("Obsidian Chestplate")
+                .zh("黑曜石风衣");
+        entry(ItemRegister.ObsidianLeggings)
+                .en("Obsidian Leggings")
+                .zh("黑曜石裤");
+        entry(ItemRegister.ObsidianBoots)
+                .en("Obsidian Boots")
+                .zh("黑曜石靴");
+        // ===================== 药水效果 =====================
         entry("effect.servantry.obsession")
                 .en("Obsession")
                 .zh("着魔");

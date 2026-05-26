@@ -236,6 +236,10 @@ public class ItemRegister {
             new Item(new Item.Properties())
     );
 
+    public static final DeferredItem<Item> HallowedIngot = Register.register("hallowed_ingot", () ->
+            new Item(new Item.Properties())
+    );
+
     // ===================== 套装物品 =====================
 
     public static final DeferredItem<Item> HallowedHelmet =
@@ -272,6 +276,40 @@ public class ItemRegister {
                     new Item.Properties()
                             .durability(ArmorItem.Type.BOOTS.getDurability(6))
                             .rarity(Rarity.UNCOMMON)
+            ));
+
+    // ===================== 黑曜石套装 =====================
+
+    public static final DeferredItem<Item> ObsidianHelmet =
+            Register.register("obsidian_helmet", () -> new ArmorItem(
+                    ArmorMaterialRegister.ObsidianArmorMaterial,
+                    ArmorItem.Type.HELMET,
+                    new Item.Properties()
+                            .durability(ArmorItem.Type.HELMET.getDurability(15))
+            ));
+
+    public static final DeferredItem<Item> ObsidianChestplate =
+            Register.register("obsidian_chestplate", () -> new ArmorItem(
+                    ArmorMaterialRegister.ObsidianArmorMaterial,
+                    ArmorItem.Type.CHESTPLATE,
+                    new Item.Properties()
+                            .durability(ArmorItem.Type.CHESTPLATE.getDurability(15))
+            ));
+
+    public static final DeferredItem<Item> ObsidianLeggings =
+            Register.register("obsidian_leggings", () -> new ArmorItem(
+                    ArmorMaterialRegister.ObsidianArmorMaterial,
+                    ArmorItem.Type.LEGGINGS,
+                    new Item.Properties()
+                            .durability(ArmorItem.Type.LEGGINGS.getDurability(15))
+            ));
+
+    public static final DeferredItem<Item> ObsidianBoots =
+            Register.register("obsidian_boots", () -> new ArmorItem(
+                    ArmorMaterialRegister.ObsidianArmorMaterial,
+                    ArmorItem.Type.BOOTS,
+                    new Item.Properties()
+                            .durability(ArmorItem.Type.BOOTS.getDurability(15))
             ));
 
     // ===================== 饰品 =====================

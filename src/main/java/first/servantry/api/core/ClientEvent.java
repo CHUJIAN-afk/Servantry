@@ -34,6 +34,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -56,9 +57,6 @@ public class ClientEvent {
 
     private static final Map<Item, List<MutableComponent>> Cache = new HashMap<>();
 
-    private static final Map<Item, List<ArmorSet>> ArmorSetCache = new HashMap<>();
-    private static final Map<Item, List<MutableComponent>> SetTooltipCache = new HashMap<>();
-
     @SubscribeEvent
     public static void tooltip(ItemTooltipEvent event) {
         Player player = event.getEntity();
@@ -79,7 +77,7 @@ public class ClientEvent {
                 if (damage > 0) {
                     AttributeInstance attribute = player.getAttribute(AttributeRegister.ServantDamage);
                     damage = attribute != null ? (float) (damage * attribute.getValue()) : damage;
-                    String damageStr = String.format("%.1f", damage);
+                    String damageStr = String.format("%.1f ", damage);
                     toolTip.add(Component.literal(damageStr).withStyle(ChatFormatting.BLUE)
                             .append(Component.translatable("item.servantry.tooltip.damage").withStyle(ChatFormatting.GRAY)));
                 }
@@ -88,7 +86,7 @@ public class ClientEvent {
                 if (knockback > 0) {
                     AttributeInstance attribute = player.getAttribute(AttributeRegister.ServantKnockback);
                     knockback = attribute != null ? (float) (knockback * attribute.getValue()) : knockback;
-                    String kbStr = String.format("%.1f", knockback);
+                    String kbStr = String.format("%.1f ", knockback);
                     toolTip.add(Component.literal(kbStr).withStyle(ChatFormatting.BLUE)
                             .append(Component.translatable("item.servantry.tooltip.knockback").withStyle(ChatFormatting.GRAY)));
                 }
@@ -136,56 +134,64 @@ public class ClientEvent {
         Item item = event.getItemStack().getItem();
         Player player = event.getEntity();
         List<Component> toolTip = event.getToolTip();
-        List<ArmorSet> armorSets = ArmorSetCache.computeIfAbsent(item, k -> {
-            List<ArmorSet> list = ServantryRegistries.ARMOR_SETS.stream().toList();
-            List<ArmorSet> target = new ArrayList<>();
-            for (ArmorSet armorSet : list) {
-                List<DeferredItem<Item>> items = armorSet.items();
-                for (DeferredItem<Item> itemDeferredItem : items) {
-                    if (item == itemDeferredItem.get()) {
-                        target.add(armorSet);
-                    }
-                }
-            }
-            return target;
-        });
-        for (ArmorSet armorSet : armorSets) {
-            ResourceLocation id = armorSet.id();
-            boolean full = player != null && armorSet.full(player);
-            ChatFormatting descColor = full ? ChatFormatting.DARK_AQUA : ChatFormatting.DARK_GRAY;
-            List<MutableComponent> cachedLore = SetTooltipCache.computeIfAbsent(item, k -> {
-                List<MutableComponent> lines = new ArrayList<>();
-                lines.add(Component.empty());
-                List<DeferredItem<Item>> items = armorSet.items();
-                MutableComponent set = Component.empty();
-                for (DeferredItem<Item> itemDeferredItem : items) {
-                    if (items.getFirst() == itemDeferredItem) {
-                        set.append(Component.literal("[ "));
-                    }
-                    set.append(itemDeferredItem.get().getDescription()).append(Component.literal(" "));
-                    if (items.getLast() == itemDeferredItem) {
-                        set.append(Component.literal("]"));
-                    }
-                }
-                set.append(Component.translatable("item.servantry.tooltip.set_bonus_title"));
-                lines.add(set);
-                Collection<Map.Entry<Holder<Attribute>, AttributeModifier>> entries = armorSet.modifiers().entries();
-                for (Map.Entry<Holder<Attribute>, AttributeModifier> entry : entries) {
-                    Attribute attr = entry.getKey().value();
-                    AttributeModifier modifier = entry.getValue();
-                    lines.add(attr.toComponent(modifier, TooltipFlag.NORMAL));
-                }
-                String baseKey = Servantry.MODID + "." + id.getNamespace() + "." + id.getPath() + "." + "set" + ".";
-                int index = 1;
-                while (I18n.exists(baseKey + index)) {
-                    lines.add(Component.translatable(baseKey + index));
-                    index++;
-                }
-                return lines;
-            });
-            for (MutableComponent component : cachedLore) {
-                toolTip.add(component.withStyle(descColor));
+        List<Item> armors = new ArrayList<>();
+        if (player != null) {
+            Iterable<ItemStack> armorSlots = player.getArmorSlots();
+            for (ItemStack armorSlot : armorSlots) {
+                armors.add(armorSlot.getItem());
             }
         }
+        List<ArmorSet> armorSets = getArmorSets(item);
+        for (ArmorSet armorSet : armorSets) {
+            ResourceLocation id = armorSet.id();
+            List<MutableComponent> lines = new ArrayList<>();
+            lines.add(Component.empty());
+            List<DeferredItem<Item>> items = armorSet.items();
+            MutableComponent set = Component.empty();
+            boolean full = player != null && armorSet.full(player);
+            ChatFormatting descColor = full ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY;
+            for (DeferredItem<Item> itemDeferredItem : items) {
+                if (items.getFirst() == itemDeferredItem) {
+                    set.append(Component.literal("[ ").withStyle(descColor));
+                }
+                Item piece = itemDeferredItem.get();
+                ChatFormatting format = armors.contains(piece) ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY;
+                set.append(piece.getDescription().copy().withStyle(format)).append(Component.literal(" "));
+                if (items.getLast() == itemDeferredItem) {
+                    set.append(Component.literal("] ").withStyle(descColor));
+                }
+            }
+            set.append(Component.translatable("item.servantry.tooltip.set_bonus_title").withStyle(descColor));
+            lines.add(set);
+            Collection<Map.Entry<Holder<Attribute>, AttributeModifier>> entries = armorSet.modifiers().entries();
+            descColor = full ? ChatFormatting.BLUE : ChatFormatting.DARK_GRAY;
+            for (Map.Entry<Holder<Attribute>, AttributeModifier> entry : entries) {
+                Attribute attr = entry.getKey().value();
+                AttributeModifier modifier = entry.getValue();
+                lines.add(attr.toComponent(modifier, TooltipFlag.NORMAL).withStyle(descColor));
+            }
+            String baseKey = Servantry.MODID + "." + id.getNamespace() + "." + id.getPath() + "." + "set" + ".";
+            int index = 1;
+            while (I18n.exists(baseKey + index)) {
+                lines.add(Component.translatable(baseKey + index).withStyle(descColor));
+                index++;
+            }
+            toolTip.addAll(lines);
+        }
+    }
+
+    private static @NotNull List<ArmorSet> getArmorSets(Item item) {
+        List<ArmorSet> list = ServantryRegistries.ARMOR_SETS.stream().toList();
+        List<ArmorSet> target = new ArrayList<>();
+        for (ArmorSet armorSet : list) {
+            List<DeferredItem<Item>> items = armorSet.items();
+            for (DeferredItem<Item> itemDeferredItem : items) {
+                if (item == itemDeferredItem.get()) {
+                    target.add(armorSet);
+                    break;
+                }
+            }
+        }
+        return target;
     }
 }
