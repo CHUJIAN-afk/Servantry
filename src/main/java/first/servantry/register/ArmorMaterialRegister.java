@@ -21,21 +21,20 @@ public class ArmorMaterialRegister {
 
     public static final Holder<ArmorMaterial> HallowedArmorMaterial = Register.register("hallowed", () -> new ArmorMaterial(
             Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.BOOTS, 1);      // 鞋子 1点护甲
-                map.put(ArmorItem.Type.LEGGINGS, 2);   // 护腿 2点护甲
-                map.put(ArmorItem.Type.CHESTPLATE, 3); // 胸甲 3点护甲
-                map.put(ArmorItem.Type.HELMET, 1);     // 头部 1点护甲 (总计 7 点)
+                map.put(ArmorItem.Type.HELMET, 1);
+                map.put(ArmorItem.Type.CHESTPLATE, 3);
+                map.put(ArmorItem.Type.LEGGINGS, 2);
+                map.put(ArmorItem.Type.BOOTS, 1);
             }),
-            35, // 极高的附魔能力 (金头盔是25，35属于极强)
-            SoundEvents.ARMOR_EQUIP_LEATHER, // 穿戴音效
-            () -> Ingredient.of(Items.GOLD_INGOT), // 皮革修复
-            List.of(new ArmorMaterial.Layer(Servantry.rl("hallowed"))), // 对应贴图路径 textures/models/armor/hallowed_layer_1.png 和 hallowed_layer_2.png
-            0.0F, // 韧性
-            0.0F  // 击退抗性
+            35,
+            SoundEvents.ARMOR_EQUIP_LEATHER,
+            () -> Ingredient.of(Items.GOLD_INGOT),
+            List.of(new ArmorMaterial.Layer(Servantry.rl("hallowed"))),
+            0.0F,
+            0.0F
     ));
 
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
     }
-
 }

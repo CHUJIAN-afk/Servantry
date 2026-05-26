@@ -1,6 +1,6 @@
 package first.servantry.common.servant.goal.deadlysphere;
 
-import first.servantry.api.PathNode;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.DeadlySphere;
 import net.minecraft.world.entity.player.Player;

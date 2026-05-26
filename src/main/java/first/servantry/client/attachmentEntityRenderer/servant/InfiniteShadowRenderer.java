@@ -1,13 +1,13 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
 import first.servantry.api.client.render.renderConfig.TrailConfig;
+import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.InfiniteShadow;
 import first.servantry.utils.RenderUtil;
 import net.minecraft.client.Minecraft;

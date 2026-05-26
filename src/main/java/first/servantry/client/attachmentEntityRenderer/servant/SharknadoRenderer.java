@@ -2,12 +2,12 @@ package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import first.servantry.api.PathNode;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.AlphaBufferSource;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
+import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.Sharknado;
 import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;

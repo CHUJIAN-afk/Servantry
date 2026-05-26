@@ -1,4 +1,4 @@
-package first.servantry.mixin.servantry;
+package first.servantry.mixin;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import org.spongepowered.asm.mixin.Mixin;

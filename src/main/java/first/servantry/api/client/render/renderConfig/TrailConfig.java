@@ -2,9 +2,9 @@ package first.servantry.api.client.render.renderConfig;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import first.servantry.api.PathNode;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.api.entity.PathNode;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;

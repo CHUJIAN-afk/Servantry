@@ -1,6 +1,6 @@
 package first.servantry.common.servant.goal.twins;
 
-import first.servantry.api.PathNode;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.Twins;
 import net.minecraft.world.entity.player.Player;

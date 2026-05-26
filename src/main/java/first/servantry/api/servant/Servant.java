@@ -1,8 +1,8 @@
 package first.servantry.api.servant;
 
-import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.DamageRegister;

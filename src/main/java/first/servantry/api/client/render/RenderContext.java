@@ -1,9 +1,9 @@
 package first.servantry.api.client.render;
 
-import first.servantry.api.PathNode;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.TrailConfig;
 import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.api.entity.PathNode;
 
 /**
  * 渲染上下文，封装附件实体渲染所需的所有参数和配置。

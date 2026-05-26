@@ -1,4 +1,4 @@
-package first.servantry.api;
+package first.servantry.api.entity;
 
 import java.util.List;
 

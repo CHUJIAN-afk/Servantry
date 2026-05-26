@@ -1,8 +1,8 @@
 package first.servantry.common.servant.goal.terraprism;
 
-import first.servantry.api.PathNode;
-import first.servantry.api.PlannedPath;
 import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.entity.PathNode;
+import first.servantry.api.entity.PlannedPath;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.Terraprism;

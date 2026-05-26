@@ -1,9 +1,9 @@
 package first.servantry.common.projectile;
 
-import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;

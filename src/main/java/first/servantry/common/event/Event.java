@@ -7,10 +7,7 @@ import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.servant.StardustCell;
-import first.servantry.mixin.servantry.MobEffectInstanceAccessor;
 import first.servantry.register.*;
-import first.servantry.utils.ArmorSetUtil;
-import first.servantry.utils.AttributeUtils;
 import first.servantry.utils.CuriosUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.resources.ResourceLocation;
@@ -45,7 +42,6 @@ import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
@@ -116,29 +112,15 @@ public class Event {
 
     @SubscribeEvent
     public static void onServantIncomingDamage(ServantIncomingDamageEvent event) {
-        Player owner = event.getSource().getServant().getOwner();
-        if (owner.level().isClientSide()) return;
-
-        LivingEntity target = event.getEntity();
-
-        // 圣神圣套装发光效果
-        if (ArmorSetUtil.hasFullSet(owner, ArmorMaterialRegister.HallowedArmorMaterial)) {
-            MobEffectInstance instance = target.getEffect(MobEffects.GLOWING);
-            if (instance == null) {
-                target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 59));
-            } else {
-                MobEffectInstanceAccessor accessor = (MobEffectInstanceAccessor) instance;
-                accessor.setDuration(59);
+        Servant servant = event.getSource().getServant();
+        if (servant != null) {
+            Player owner = servant.getOwner();
+            if (!owner.level().isClientSide()) {
+                LivingEntity target = event.getEntity();
+                if (ArmorSetRegister.Hallowed.value().full(owner)) {
+                    target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
+                }
             }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLivingEquipmentChange(LivingEquipmentChangeEvent event) {
-        LivingEntity living = event.getEntity();
-        if (living instanceof Player player && !player.level().isClientSide()) {
-            AttributeUtils.condition(player, AttributeRegister.ServantMaxCount, Servantry.rl("hallowed_set_servant_max_count"), 2, AttributeModifier.Operation.ADD_VALUE, ArmorSetUtil.hasFullSet(player, ArmorMaterialRegister.HallowedArmorMaterial));
-            AttributeUtils.condition(player, AttributeRegister.ServantDamage, Servantry.rl("hallowed_set_servant_damage"), 0.15, AttributeModifier.Operation.ADD_VALUE, ArmorSetUtil.hasFullSet(player, ArmorMaterialRegister.HallowedArmorMaterial));
         }
     }
 

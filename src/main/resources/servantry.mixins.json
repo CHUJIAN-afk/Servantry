@@ -4,13 +4,13 @@
   "package": "first.servantry.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "api.CommonHooksMixin",
-    "api.LivingEntityMixin",
-    "servantry.ClientEventMixin",
-    "servantry.CombatRulesMixin",
-    "servantry.DamageSourcesMixin",
-    "servantry.MobEffectInstanceAccessor",
-    "servantry.ServantMixin"
+    "ClientEventMixin",
+    "CombatRulesMixin",
+    "CommonHooksMixin",
+    "DamageSourcesMixin",
+    "LivingEntityMixin",
+    "MobEffectInstanceAccessor",
+    "ServantMixin"
   ],
   "injectors": {
     "defaultRequire": 1

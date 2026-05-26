@@ -15,6 +15,7 @@ public class AttributeRegister {
     public static final Holder<Attribute> ServantMaxCount = register("servant_max_count", 1, 0, 1000);
     public static final Holder<Attribute> ServantDamage = register("servant_damage", 1, 0, 1000);
     public static final Holder<Attribute> ServantKnockback = register("servant_knockback", 1, 0, 1000);
+    public static final Holder<Attribute> ServantArmorPierce = register("servant_armor_pierce", 1, 0, 1000);
 
     private static Holder<Attribute> register(String name, double defaultValue, double min, double max) {
         return Register.register(name, () -> new RangedAttribute(Servantry.rl(name).toString(), defaultValue, min, max).setSyncable(true));

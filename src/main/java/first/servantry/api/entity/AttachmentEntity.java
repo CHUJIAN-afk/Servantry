@@ -1,7 +1,5 @@
 package first.servantry.api.entity;
 
-import first.servantry.api.PathNode;
-import first.servantry.api.PlannedPath;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;

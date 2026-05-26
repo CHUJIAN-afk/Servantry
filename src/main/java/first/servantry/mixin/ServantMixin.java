@@ -1,4 +1,4 @@
-package first.servantry.mixin.servantry;
+package first.servantry.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import first.servantry.api.servant.Servant;

@@ -1,7 +1,7 @@
 package first.servantry.common.servant;
 
-import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttachmentEntityRegister;
 import net.minecraft.core.BlockPos;

@@ -2,11 +2,11 @@ package first.servantry.api.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import first.servantry.api.PathNode;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.TrailConfig;
 import first.servantry.api.client.renderType.TrailRenderType;
 import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.api.entity.PathNode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.player.Player;

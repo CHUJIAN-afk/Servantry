@@ -1,4 +1,4 @@
-package first.servantry.mixin.servantry;
+package first.servantry.mixin;
 
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.servant.InfiniteShadow;

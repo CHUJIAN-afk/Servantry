@@ -2,9 +2,9 @@ package first.servantry.register;
 
 import com.google.common.collect.ImmutableMultimap;
 import first.servantry.Servantry;
-import first.servantry.api.PathNode;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.item.CurioItem;

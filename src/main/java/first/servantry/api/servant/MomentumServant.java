@@ -1,7 +1,7 @@
 package first.servantry.api.servant;
 
-import first.servantry.api.PathNode;
-import first.servantry.api.PlannedPath;
+import first.servantry.api.entity.PathNode;
+import first.servantry.api.entity.PlannedPath;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 

@@ -1,7 +1,7 @@
 package first.servantry.api.projectile;
 
-import first.servantry.api.PathNode;
 import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.register.AttachmentRegister;

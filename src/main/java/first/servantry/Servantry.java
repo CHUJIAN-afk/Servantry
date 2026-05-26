@@ -22,6 +22,7 @@ public class Servantry {
         ParticleRegister.register(eventBus);
         PotionRegister.register(eventBus);
         SoundRegister.register(eventBus);
+        ArmorSetRegister.register(eventBus);
     }
 
     public static ResourceLocation rl(String path) {

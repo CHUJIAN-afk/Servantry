@@ -1,6 +1,6 @@
 package first.servantry.api.projectile;
 
-import first.servantry.api.PathNode;
+import first.servantry.api.entity.PathNode;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 

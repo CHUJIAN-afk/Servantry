@@ -2,15 +2,14 @@ package first.servantry.api.core;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
+import first.servantry.api.armorSet.ArmorSet;
 import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.register.ServantryRegistries;
-import first.servantry.register.ArmorMaterialRegister;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
-import first.servantry.utils.ArmorSetUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -21,23 +20,22 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.registries.DeferredItem;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @EventBusSubscriber(modid = Servantry.MODID, value = Dist.CLIENT)
 public class ClientEvent {
@@ -57,6 +55,9 @@ public class ClientEvent {
     }
 
     private static final Map<Item, List<MutableComponent>> Cache = new HashMap<>();
+
+    private static final Map<Item, List<ArmorSet>> ArmorSetCache = new HashMap<>();
+    private static final Map<Item, List<MutableComponent>> SetTooltipCache = new HashMap<>();
 
     @SubscribeEvent
     public static void tooltip(ItemTooltipEvent event) {
@@ -128,9 +129,63 @@ public class ClientEvent {
                 }
             }
         }
-        Holder<ArmorMaterial> hallowedArmorMaterial = ArmorMaterialRegister.HallowedArmorMaterial;
-        if (itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getMaterial().equals(hallowedArmorMaterial)) {
-            ArmorSetUtil.addSetBonusTooltip(player, hallowedArmorMaterial, toolTip);
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void armorSetTooltip(ItemTooltipEvent event) {
+        Item item = event.getItemStack().getItem();
+        Player player = event.getEntity();
+        List<Component> toolTip = event.getToolTip();
+        List<ArmorSet> armorSets = ArmorSetCache.computeIfAbsent(item, k -> {
+            List<ArmorSet> list = ServantryRegistries.ARMOR_SETS.stream().toList();
+            List<ArmorSet> target = new ArrayList<>();
+            for (ArmorSet armorSet : list) {
+                List<DeferredItem<Item>> items = armorSet.items();
+                for (DeferredItem<Item> itemDeferredItem : items) {
+                    if (item == itemDeferredItem.get()) {
+                        target.add(armorSet);
+                    }
+                }
+            }
+            return target;
+        });
+        for (ArmorSet armorSet : armorSets) {
+            ResourceLocation id = armorSet.id();
+            boolean full = player != null && armorSet.full(player);
+            ChatFormatting descColor = full ? ChatFormatting.DARK_AQUA : ChatFormatting.DARK_GRAY;
+            List<MutableComponent> cachedLore = SetTooltipCache.computeIfAbsent(item, k -> {
+                List<MutableComponent> lines = new ArrayList<>();
+                lines.add(Component.empty());
+                List<DeferredItem<Item>> items = armorSet.items();
+                MutableComponent set = Component.empty();
+                for (DeferredItem<Item> itemDeferredItem : items) {
+                    if (items.getFirst() == itemDeferredItem) {
+                        set.append(Component.literal("[ "));
+                    }
+                    set.append(itemDeferredItem.get().getDescription()).append(Component.literal(" "));
+                    if (items.getLast() == itemDeferredItem) {
+                        set.append(Component.literal("]"));
+                    }
+                }
+                set.append(Component.translatable("item.servantry.tooltip.set_bonus_title"));
+                lines.add(set);
+                Collection<Map.Entry<Holder<Attribute>, AttributeModifier>> entries = armorSet.modifiers().entries();
+                for (Map.Entry<Holder<Attribute>, AttributeModifier> entry : entries) {
+                    Attribute attr = entry.getKey().value();
+                    AttributeModifier modifier = entry.getValue();
+                    lines.add(attr.toComponent(modifier, TooltipFlag.NORMAL));
+                }
+                String baseKey = Servantry.MODID + "." + id.getNamespace() + "." + id.getPath() + "." + "set" + ".";
+                int index = 1;
+                while (I18n.exists(baseKey + index)) {
+                    lines.add(Component.translatable(baseKey + index));
+                    index++;
+                }
+                return lines;
+            });
+            for (MutableComponent component : cachedLore) {
+                toolTip.add(component.withStyle(descColor));
+            }
         }
     }
 }

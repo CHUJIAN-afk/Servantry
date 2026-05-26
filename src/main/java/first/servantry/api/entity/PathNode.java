@@ -1,4 +1,4 @@
-package first.servantry.api;
+package first.servantry.api.entity;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;

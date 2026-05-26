@@ -1,8 +1,8 @@
 package first.servantry.common.servant.goal.enchantedThrowingKnives;
 
-import first.servantry.api.PathNode;
-import first.servantry.api.PlannedPath;
 import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.entity.PathNode;
+import first.servantry.api.entity.PlannedPath;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.EnchantedThrowingKnives;
 import first.servantry.register.AttachmentRegister;

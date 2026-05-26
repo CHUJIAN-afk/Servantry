@@ -113,6 +113,9 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(AttributeRegister.ServantKnockback.value().getDescriptionId())
                 .en("Servant Knockback")
                 .zh("仆从击退");
+        entry(AttributeRegister.ServantArmorPierce.value().getDescriptionId())
+                .en("Servant Armor Pierce")
+                .zh("仆从护甲穿透");
         // ===================== 饰品 =====================
         entry("curios.curios.accessories")
                 .en("Accessories")
@@ -181,9 +184,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .tooltip().en("Critical hits deal double damage and briefly slow enemies").zh("暴击造成双倍伤害，并短暂减速敌人");
         entry(ItemRegister.HuntSoulEmblem)
                 .en("Hunt Soul Emblem")
-                .zh("猎魂徽记")
-                .tooltip().en("Servant attack damage x1.2").zh("仆从攻击伤害x1.2")
-                .tooltip().en("You take 15% more damage").zh("你受到的伤害增加 15%");
+                .zh("猎魂徽记");
         entry(ItemRegister.WarBanner)
                 .en("War Banner")
                 .zh("战争旗帜")
@@ -215,16 +216,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(ItemRegister.HallowedBoots)
                 .en("Hallowed Boots")
                 .zh("神圣战靴");
-        entry("item.servantry.hallowed.set.1")
-                .en("+2 Servant Slots")
-                .zh("+2 仆从栏");
-        entry("item.servantry.hallowed.set.2")
-                .en("+15% Servant Damage")
-                .zh("+15% 仆从伤害");
-        entry("item.servantry.hallowed.set.3")
-                .en("+4 Servant Armor Penetration")
-                .zh("+4 仆从护甲穿透");
-        entry("item.servantry.hallowed.set.4")
+        entry("servantry.servantry.hallowed.set.1")
                 .en("Servants grant I-frames on attack")
                 .zh("仆从攻击使敌人高亮");
         entry("effect.servantry.obsession")

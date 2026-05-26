@@ -1,6 +1,6 @@
 package first.servantry.common.servant.goal.scavengerFairy;
 
-import first.servantry.api.PathNode;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.ScavengerFairy;
 import net.minecraft.core.NonNullList;
