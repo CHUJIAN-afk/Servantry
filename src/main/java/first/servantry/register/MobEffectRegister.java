@@ -47,7 +47,7 @@ public class MobEffectRegister {
      */
     public static final DeferredHolder<MobEffect, MobEffect> CellParasitism =
             Register.register("cell_parasitism", () -> builder(MobEffectCategory.HARMFUL, 0x8AE0FF)
-                    .addAttributeModifier(AttributeRegister.HealthRegen, Servantry.rl("cell_parasitism"), amplifier -> -(amplifier + 1) * 1, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(AttributeRegister.HealthRegen, Servantry.rl("cell_parasitism"), amplifier -> -(amplifier + 1) * 2, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -98,7 +98,7 @@ public class MobEffectRegister {
 
     public static final DeferredHolder<MobEffect, MobEffect> HallowedRadiance =
             Register.register("hallowed_radiance", () -> builder(MobEffectCategory.BENEFICIAL, 0xFFFFAA)
-                    .addAttributeModifier(AttributeRegister.HealthRegen, Servantry.rl("soul_recovery"), 0.1, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(AttributeRegister.HealthRegen, Servantry.rl("hallowed_radiance"), 0.1, AttributeModifier.Operation.ADD_VALUE)
                     .build());
 
     public static final DeferredHolder<MobEffect, MobEffect> PhantasmalMight =
@@ -113,7 +113,7 @@ public class MobEffectRegister {
 
     public static final DeferredHolder<MobEffect, MobEffect> PhantasmalRebirth =
             Register.register("phantasmal_rebirth", () -> builder(MobEffectCategory.BENEFICIAL, 0xFF8CDE)
-                    .addAttributeModifier(AttributeRegister.HealthRegen, Servantry.rl("soul_recovery"), 0.2, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(AttributeRegister.HealthRegen, Servantry.rl("phantasmal_rebirth"), 0.2, AttributeModifier.Operation.ADD_VALUE)
                     .build());
 
 

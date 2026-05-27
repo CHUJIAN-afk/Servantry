@@ -179,25 +179,18 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(ItemRegister.EclipseRing)
                 .en("Eclipse Ring")
                 .zh("蚀日尊戒")
-                .tooltip().en("Contains the power of the solar eclipse").zh("蕴含着日蚀之阴的力量");
-        entry(ItemRegister.StormeyePendant)
-                .en("Stormeye Pendant")
-                .zh("暴风眼挂坠")
-                .tooltip().en("Servant attacks have a 10% chance to critically strike").zh("仆从攻击时有 10% 概率造成暴击")
-                .tooltip().en("Critical hits deal double damage and briefly slow enemies").zh("暴击造成双倍伤害，并短暂减速敌人");
+                .tooltip().en("Contains the power of the solar eclipse").zh("'蕴含着日蚀之阴的力量'");
+        entry(ItemRegister.PrimordialShadowflame)
+                .en("Primordial Shadowflame")
+                .zh("始源暗影焰")
+                .tooltip().en("Servants inflict shadowflame on attack").zh("仆从攻击施加暗影焰");
+        entry(ItemRegister.Kaleidoscope)
+                .en("Kaleidoscope")
+                .zh("万花筒")
+                .tooltip().en("Servant attacks have a 10% chance to critically strike").zh("仆从攻击时有 10% 概率造成暴击");
         entry(ItemRegister.HuntSoulEmblem)
                 .en("Hunt Soul Emblem")
                 .zh("猎魂徽记");
-        entry(ItemRegister.WarBanner)
-                .en("War Banner")
-                .zh("战争旗帜")
-                .tooltip().en("Servants deal up to 30% more damage to enemies near you").zh("仆从对你附近的敌人最多造成 30% 额外伤害")
-                .tooltip().en("The closer the target, the higher the bonus; fades to 0 at 8 blocks").zh("目标越近额外伤害越高，距离 8 格时加成衰减为 0");
-        entry(ItemRegister.CurseOfFrailty)
-                .en("Curse of Frailty")
-                .zh("虚弱诅咒")
-                .tooltip().en("Servant hits have a 25% chance to weaken and slow enemies").zh("仆从攻击时有 25% 概率使敌人虚弱并缓慢")
-                .tooltip().en("Inflicts Weakness II for 6s and Slowness I for 4s").zh("施加 6 秒虚弱 II 与 4 秒缓慢 I");
         entry(ItemRegister.StardustFragment)
                 .en("Stardust Fragment")
                 .zh("星尘碎片")

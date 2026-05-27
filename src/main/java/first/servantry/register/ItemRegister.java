@@ -19,7 +19,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -499,18 +498,13 @@ public class ItemRegister {
     public static final DeferredItem<Item> EclipseRing = Register.register("eclipse_ring", () -> CurioItem.builder()
             .canEquipFromUse(true)
             .attributeModifiers((slotContext, id, stack) -> {
-                Level level = slotContext.entity().level();
                 ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                 builder.put(AttributeRegister.ServantDamage, new AttributeModifier(id, 0.12, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
                 builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 2, AttributeModifier.Operation.ADD_VALUE));
                 builder.put(AttributeRegister.ServantKnockback, new AttributeModifier(id, 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
                 builder.put(Attributes.KNOCKBACK_RESISTANCE, new AttributeModifier(id, 1.0, AttributeModifier.Operation.ADD_VALUE));
-                if (level.isDay()) {
-                    builder.put(AttributeRegister.HealthRegen, new AttributeModifier(id, 0.25, AttributeModifier.Operation.ADD_VALUE));
-                } else {
-                    builder.put(AttributeRegister.HealthRegen, new AttributeModifier(id, 0.05, AttributeModifier.Operation.ADD_VALUE));
-                    builder.put(Attributes.ARMOR, new AttributeModifier(id, 6, AttributeModifier.Operation.ADD_VALUE));
-                }
+                builder.put(AttributeRegister.HealthRegen, new AttributeModifier(id, 0.1, AttributeModifier.Operation.ADD_VALUE));
+                builder.put(Attributes.ARMOR, new AttributeModifier(id, 3, AttributeModifier.Operation.ADD_VALUE));
                 return builder.build();
             })
             .properties(properties -> properties.rarity(Rarity.EPIC))
@@ -522,23 +516,24 @@ public class ItemRegister {
      */
     public static final DeferredItem<Item> PrimordialShadowflame = Register.register("primordial_shadowflame", () -> CurioItem.builder()
             .canEquipFromUse(true)
-            .attributeModifiers((slotContext, id, stack) -> ImmutableMultimap.of(
-                    AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE)
-            ))
-            .onPostDamage((servant, owner, target) -> target.addEffect(new MobEffectInstance(MobEffectRegister.Shadowflame, 80, 0)))
+            .attributeModifiers((slotContext, id, stack) -> {
+                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+                builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
+                return builder.build();
+            })
+            .onPostDamage((servant, owner, target) -> target.addEffect(new MobEffectInstance(MobEffectRegister.Shadowflame, 60, 0)))
             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
             .build()
     );
 
     /**
-     * 暴风眼挂坠 - 仆从攻击时10%暴击(200%伤害+减速)
+     * 万花筒
      */
-    public static final DeferredItem<Item> StormeyePendant = Register.register("stormeye_pendant", () -> CurioItem.builder()
+    public static final DeferredItem<Item> Kaleidoscope = Register.register("kaleidoscope", () -> CurioItem.builder()
             .canEquipFromUse(true)
             .onServantDamage((servant, owner, target, damage) -> {
                 if (owner.getRandom().nextFloat() < 0.1f) {
-                    target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 2));
-                    return damage * 2.0f;
+                    return damage * 1.5f;
                 }
                 return damage;
             })
@@ -547,7 +542,7 @@ public class ItemRegister {
     );
 
     /**
-     * 猎魂徽记 - 仆从伤害×1.25
+     * 猎魂徽记
      */
     public static final DeferredItem<Item> HuntSoulEmblem = Register.register("hunt_soul_emblem", () -> CurioItem.builder()
             .canEquipFromUse(true)
@@ -557,38 +552,6 @@ public class ItemRegister {
                 return builder.build();
             })
             .properties(properties -> properties.rarity(Rarity.EPIC))
-            .build()
-    );
-
-    /**
-     * 战争旗帜 - 距离增伤：目标越近伤害越高，8格内最高+30%
-     */
-    public static final DeferredItem<Item> WarBanner = Register.register("war_banner", () -> CurioItem.builder()
-            .canEquipFromUse(true)
-            .onServantDamage((servant, owner, target, damage) -> {
-                double distance = owner.position().distanceTo(target.position());
-                if (distance < 8.0) {
-                    float bonus = (float) (0.30 * (1.0 - distance / 8.0));
-                    return damage * (1.0f + bonus);
-                }
-                return damage;
-            })
-            .properties(properties -> properties.rarity(Rarity.EPIC))
-            .build()
-    );
-
-    /**
-     * 虚弱诅咒 - 仆从攻击时25%概率给目标施加虚弱+缓慢
-     */
-    public static final DeferredItem<Item> CurseOfFrailty = Register.register("curse_of_frailty", () -> CurioItem.builder()
-            .canEquipFromUse(true)
-            .onPostDamage((servant, owner, target) -> {
-                if (owner.getRandom().nextFloat() < 0.25f) {
-                    target.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 120, 1));
-                    target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 0));
-                }
-            })
-            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
             .build()
     );
 
