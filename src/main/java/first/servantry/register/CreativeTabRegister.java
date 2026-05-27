@@ -1,17 +1,23 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import first.servantry.client.creativeTab.AnimInfo;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.function.Consumer;
 
 
@@ -26,25 +32,53 @@ public class CreativeTabRegister {
                     .build()
             );
 
+    public static void renderBanners(final CreativeModeInventoryScreen screen, final GuiGraphics graphics, int mouseX, int mouseY, float scrollOffs) {
+        List<ItemRegister.TabSection> sections = ItemRegister.Register.sortedEntries();
+        LinkedHashMap<ItemRegister.TabSection, List<DeferredItem<Item>>> map = ItemRegister.Register.getMap();
+
+        int totalRows = 0;
+        for (ItemRegister.TabSection section : sections) {
+            totalRows += 1;
+            totalRows += (map.get(section).size() + 8) / 9;
+        }
+
+        int scrollRow = Math.round(scrollOffs * Math.max(0, totalRows - 5));
+        int left = screen.getGuiLeft() + 8;
+        int top = screen.getGuiTop() + 17;
+
+        int currentRow = 0;
+        for (ItemRegister.TabSection section : sections) {
+            int bannerRow = currentRow;
+            int itemRows = (map.get(section).size() + 8) / 9;
+            currentRow += 1 + itemRows;
+            ResourceLocation texture = section.texture();
+            if (texture == null) continue;
+
+            int visibleRow = bannerRow - scrollRow;
+            if (visibleRow < 0 || visibleRow >= 5) continue;
+            int bannerY = top + visibleRow * 18;
+            AnimInfo.blitAnimated(graphics, texture, left, bannerY, 162, mouseX, mouseY, true);
+        }
+    }
+
     public static void processItems(Consumer<ItemStack> displayItems, Consumer<ItemStack> searchItems) {
-        List<Item> list = BuiltInRegistries.ITEM.stream()
-                .filter(item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Servantry.MODID))
-                .toList();
-        Map<Class<?>, List<ItemStack>> classListMap = new HashMap<>();
-        for (Item item : list) {
-            classListMap.computeIfAbsent(item.getClass(), k -> new ArrayList<>()).add(item.getDefaultInstance());
-        }
-        Collection<List<ItemStack>> values = classListMap.values();
-        for (List<ItemStack> value : values) {
-            while (value.size() % 9 != 0) {
-                value.add(ItemStack.EMPTY);
+        LinkedHashMap<ItemRegister.TabSection, List<DeferredItem<Item>>> map = ItemRegister.Register.getMap();
+        List<ItemRegister.TabSection> sortedKeys = ItemRegister.Register.sortedEntries();
+        for (ItemRegister.TabSection key : sortedKeys) {
+            List<DeferredItem<Item>> items = map.get(key);
+            List<ItemStack> stacks = new ArrayList<>(items.stream()
+                    .map(item -> item.get().getDefaultInstance())
+                    .toList());
+            for (int i = 0; i < 9; i++) {
+                stacks.addFirst(ItemStack.EMPTY);
             }
-        }
-        for (List<ItemStack> value : values) {
-            for (ItemStack itemStack : value) {
-                displayItems.accept(itemStack);
-                if (!itemStack.isEmpty()) {
-                    searchItems.accept(itemStack);
+            while (stacks.size() % 9 != 0) {
+                stacks.add(ItemStack.EMPTY);
+            }
+            for (ItemStack stack : stacks) {
+                displayItems.accept(stack);
+                if (!stack.isEmpty()) {
+                    searchItems.accept(stack);
                 }
             }
         }

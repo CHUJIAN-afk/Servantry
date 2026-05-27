@@ -18,5 +18,8 @@
   },
   "overwrites": {
     "requireAnnotations": true
-  }
+  },
+  "client": [
+    "CreativeModeInventoryScreenMixin"
+  ]
 }

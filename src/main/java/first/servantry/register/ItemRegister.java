@@ -7,12 +7,14 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.common.dataComponent.ScabbardContainer;
+import first.servantry.common.item.AttributeArmorItem;
 import first.servantry.common.item.CurioItem;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.StardustDragon;
 import first.servantry.common.servant.Twins;
 import first.servantry.utils.CuriosUtil;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
@@ -33,16 +35,21 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class ItemRegister {
 
-    private static final DeferredRegister.Items Register = DeferredRegister.createItems(Servantry.MODID);
+    public static final Registers Register = Registers.create();
 
     // ===================== 仆从武器 =====================
 
-    /** 泰拉棱镜 - 召唤泰拉棱镜仆从 */
-    public static final DeferredItem<Item> TerraPrism = Register.register("terraprism", () ->
+    /**
+     * 泰拉棱镜 - 召唤泰拉棱镜仆从
+     */
+    public static final DeferredItem<Item> TerraPrism = Register.push(new TabSection(0, Servantry.rl("textures/item/banner/banner.png"))).register("terraprism", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.TerraPrism)
                     .sound(SoundRegister.UseTerraprism)
                     .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1)))
@@ -230,92 +237,88 @@ public class ItemRegister {
                     .buildItem(new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(1))
     );
 
-    // ===================== 材料 =====================
-
-    public static final DeferredItem<Item> BlackLens = Register.register("black_lens", () ->
-            new Item(new Item.Properties())
-    );
-
-    public static final DeferredItem<Item> HallowedIngot = Register.register("hallowed_ingot", () ->
-            new Item(new Item.Properties())
-    );
-
     // ===================== 套装物品 =====================
 
+    /**
+     * 神圣头盔 - +1 仆从栏，+7% 仆从伤害
+     */
     public static final DeferredItem<Item> HallowedHelmet =
-            Register.register("hallowed_helmet", () -> new ArmorItem(
-                    ArmorMaterialRegister.HallowedArmorMaterial,
-                    ArmorItem.Type.HELMET,
-                    new Item.Properties()
-                            .durability(ArmorItem.Type.HELMET.getDurability(6))
-                            .rarity(Rarity.UNCOMMON)
-            ));
+            Register.push(1).register("hallowed_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.07, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.UNCOMMON))
+                    .build()
+            );
 
+    /**
+     * 神圣胸甲 - +1 仆从栏，+7% 仆从伤害
+     */
     public static final DeferredItem<Item> HallowedChestplate =
-            Register.register("hallowed_chestplate", () -> new ArmorItem(
-                    ArmorMaterialRegister.HallowedArmorMaterial,
-                    ArmorItem.Type.CHESTPLATE,
-                    new Item.Properties()
-                            .durability(ArmorItem.Type.CHESTPLATE.getDurability(6))
-                            .rarity(Rarity.UNCOMMON)
-            ));
+            Register.register("hallowed_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.07, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.UNCOMMON))
+                    .build()
+            );
 
+    /** 神圣护腿 - +1 仆从栏，+7% 仆从伤害 */
     public static final DeferredItem<Item> HallowedLeggings =
-            Register.register("hallowed_leggings", () -> new ArmorItem(
-                    ArmorMaterialRegister.HallowedArmorMaterial,
-                    ArmorItem.Type.LEGGINGS,
-                    new Item.Properties()
-                            .durability(ArmorItem.Type.LEGGINGS.getDurability(6))
-                            .rarity(Rarity.UNCOMMON)
-            ));
+            Register.register("hallowed_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.LEGGINGS)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.07, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.UNCOMMON))
+                    .build()
+            );
 
+    /** 神圣靴子 - +7% 移动速度，+7% 仆从伤害 */
     public static final DeferredItem<Item> HallowedBoots =
-            Register.register("hallowed_boots", () -> new ArmorItem(
-                    ArmorMaterialRegister.HallowedArmorMaterial,
-                    ArmorItem.Type.BOOTS,
-                    new Item.Properties()
-                            .durability(ArmorItem.Type.BOOTS.getDurability(6))
-                            .rarity(Rarity.UNCOMMON)
-            ));
+            Register.register("hallowed_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.BOOTS)
+                    .modifier(AttributeRegister.ServantDamage, 0.07, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(Attributes.MOVEMENT_SPEED, 0.07, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.UNCOMMON))
+                    .build()
+            );
 
     // ===================== 黑曜石套装 =====================
 
+    /** 黑曜石头盔 - +8% 仆从伤害 */
     public static final DeferredItem<Item> ObsidianHelmet =
-            Register.register("obsidian_helmet", () -> new ArmorItem(
-                    ArmorMaterialRegister.ObsidianArmorMaterial,
-                    ArmorItem.Type.HELMET,
-                    new Item.Properties()
-                            .durability(ArmorItem.Type.HELMET.getDurability(15))
-            ));
+            Register.register("obsidian_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.HELMET)
+                    .modifier(AttributeRegister.ServantDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
 
+    /** 黑曜石胸甲 - +1 仆从栏 */
     public static final DeferredItem<Item> ObsidianChestplate =
-            Register.register("obsidian_chestplate", () -> new ArmorItem(
-                    ArmorMaterialRegister.ObsidianArmorMaterial,
-                    ArmorItem.Type.CHESTPLATE,
-                    new Item.Properties()
-                            .durability(ArmorItem.Type.CHESTPLATE.getDurability(15))
-            ));
+            Register.register("obsidian_chestplate", () -> AttributeArmorItem.builder(
+                            ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .build()
+            );
 
+    /** 黑曜石护腿 - +8% 仆从伤害 */
     public static final DeferredItem<Item> ObsidianLeggings =
-            Register.register("obsidian_leggings", () -> new ArmorItem(
-                    ArmorMaterialRegister.ObsidianArmorMaterial,
-                    ArmorItem.Type.LEGGINGS,
-                    new Item.Properties()
-                            .durability(ArmorItem.Type.LEGGINGS.getDurability(15))
-            ));
+            Register.register("obsidian_leggings", () -> AttributeArmorItem.builder(
+                            ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.LEGGINGS)
+                    .modifier(AttributeRegister.ServantDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
 
+    /** 黑曜石靴子 - +8% 移动速度 */
     public static final DeferredItem<Item> ObsidianBoots =
-            Register.register("obsidian_boots", () -> new ArmorItem(
-                    ArmorMaterialRegister.ObsidianArmorMaterial,
-                    ArmorItem.Type.BOOTS,
-                    new Item.Properties()
-                            .durability(ArmorItem.Type.BOOTS.getDurability(15))
-            ));
+            Register.register("obsidian_boots", () -> AttributeArmorItem.builder(
+                            ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.BOOTS)
+                    .modifier(Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
+
 
     // ===================== 饰品 =====================
 
-    /** 死灵卷轴 - 仆从栏+1，仆从伤害+10% */
-    public static final DeferredItem<Item> NecromanticScroll = Register.register("necromantic_scroll", () -> CurioItem.builder()
+    /**
+     * 死灵卷轴 - 仆从栏+1，仆从伤害+10%
+     */
+    public static final DeferredItem<Item> NecromanticScroll = Register.push(2).register("necromantic_scroll", () -> CurioItem.builder()
             .canEquipFromUse(true)
             .attributeModifiers((slotContext, id, stack) -> {
                 ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
@@ -471,6 +474,7 @@ public class ItemRegister {
             .properties(properties -> properties.rarity(Rarity.RARE))
             .build()
     );
+
     /**
      * 灵魂浮雕 - 仆从攻击后随机获得灵魂增益（下位互斥）
      */
@@ -581,7 +585,63 @@ public class ItemRegister {
             .build()
     );
 
+    // ===================== 材料 =====================
+
+    public static final DeferredItem<Item> BlackLens = Register.push(3).register("black_lens", () ->
+            new Item(new Item.Properties())
+    );
+
+    public static final DeferredItem<Item> HallowedIngot = Register.register("hallowed_ingot", () ->
+            new Item(new Item.Properties())
+    );
+
     public static void register(IEventBus eventBus) {
-        Register.register(eventBus);
+        Register.Register.register(eventBus);
     }
+
+    public static class Registers {
+
+        private final DeferredRegister.Items Register;
+        private final LinkedHashMap<TabSection, List<DeferredItem<Item>>> map = new LinkedHashMap<>();
+        private TabSection tabSection = null;
+
+        private Registers(String modid) {
+            this.Register = DeferredRegister.createItems(modid);
+        }
+
+        private static Registers create() {
+            return new Registers(Servantry.MODID);
+        }
+
+        public Registers push(TabSection tabSection) {
+            this.tabSection = tabSection;
+            return this;
+        }
+
+        public Registers push(int order) {
+            this.tabSection = new TabSection(order, Servantry.rl("textures/item/banner/default_banner.png"));
+            return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        private <I extends Item> DeferredItem<I> register(String name, Supplier<? extends I> sup) {
+            DeferredItem<I> register = Register.register(name, sup);
+            map.computeIfAbsent(tabSection, k -> new ArrayList<>()).add((DeferredItem<Item>) register);
+            return register;
+        }
+
+        public List<ItemRegister.TabSection> sortedEntries() {
+            List<ItemRegister.TabSection> sortedKeys = new ArrayList<>(map.keySet());
+            sortedKeys.sort(Comparator.comparingInt(ItemRegister.TabSection::integer));
+            return sortedKeys;
+        }
+
+        public LinkedHashMap<TabSection, List<DeferredItem<Item>>> getMap() {
+            return map;
+        }
+    }
+
+    public record TabSection(Integer integer, ResourceLocation texture) {
+    }
+
 }
