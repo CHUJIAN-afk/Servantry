@@ -64,6 +64,66 @@ public class ArmorMaterialRegister {
             0.0F
     ));
 
+    public static final Holder<ArmorMaterial> ChlorophyteArmorMaterial = Register.register("chlorophyte", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 1);
+                map.put(ArmorItem.Type.CHESTPLATE, 6);
+                map.put(ArmorItem.Type.LEGGINGS, 5);
+                map.put(ArmorItem.Type.BOOTS, 3);
+            }),
+            10,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            () -> Ingredient.EMPTY,
+            List.of(new ArmorMaterial.Layer(Servantry.rl("chlorophyte"))),
+            0.0F,
+            0.0F
+    ));
+
+    public static final Holder<ArmorMaterial> SpookyArmorMaterial = Register.register("spooky", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 3);
+                map.put(ArmorItem.Type.CHESTPLATE, 4);
+                map.put(ArmorItem.Type.LEGGINGS, 4);
+                map.put(ArmorItem.Type.BOOTS, 2);
+            }),
+            10,
+            SoundEvents.ARMOR_EQUIP_LEATHER,
+            () -> Ingredient.EMPTY,
+            List.of(new ArmorMaterial.Layer(Servantry.rl("spooky"))),
+            0.0F,
+            0.0F
+    ));
+
+    public static final Holder<ArmorMaterial> TikiArmorMaterial = Register.register("tiki", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 2);
+                map.put(ArmorItem.Type.CHESTPLATE, 6);
+                map.put(ArmorItem.Type.LEGGINGS, 4);
+                map.put(ArmorItem.Type.BOOTS, 3);
+            }),
+            15,
+            SoundEvents.ARMOR_EQUIP_LEATHER,
+            () -> Ingredient.EMPTY,
+            List.of(new ArmorMaterial.Layer(Servantry.rl("tiki"))),
+            0.0F,
+            0.0F
+    ));
+
+    public static final Holder<ArmorMaterial> StardustArmorMaterial = Register.register("stardust", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 4);
+                map.put(ArmorItem.Type.CHESTPLATE, 6);
+                map.put(ArmorItem.Type.LEGGINGS, 4);
+                map.put(ArmorItem.Type.BOOTS, 3);
+            }),
+            25,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            () -> Ingredient.EMPTY,
+            List.of(new ArmorMaterial.Layer(Servantry.rl("stardust"))),
+            0.0F,
+            0.0F
+    ));
+
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
     }

@@ -242,10 +242,49 @@ public class ItemRegister {
     // ===================== 套装物品 =====================
 
     /**
+     * 黑曜石头盔 - +8% 仆从伤害
+     */
+    public static final DeferredItem<Item> ObsidianHelmet =
+            Register.push(1).register("obsidian_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.HELMET)
+                    .modifier(AttributeRegister.ServantDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
+
+    /**
+     * 黑曜石胸甲 - +1 仆从栏
+     */
+    public static final DeferredItem<Item> ObsidianChestplate =
+            Register.register("obsidian_chestplate", () -> AttributeArmorItem.builder(
+                            ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .build()
+            );
+
+    /**
+     * 黑曜石护腿 - +8% 仆从伤害
+     */
+    public static final DeferredItem<Item> ObsidianLeggings =
+            Register.register("obsidian_leggings", () -> AttributeArmorItem.builder(
+                            ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.LEGGINGS)
+                    .modifier(AttributeRegister.ServantDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
+
+    /**
+     * 黑曜石靴子 - +8% 移动速度
+     */
+    public static final DeferredItem<Item> ObsidianBoots =
+            Register.register("obsidian_boots", () -> AttributeArmorItem.builder(
+                            ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.BOOTS)
+                    .modifier(Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
+
+    /**
      * 神圣头盔 - +1 仆从栏，+7% 仆从伤害
      */
     public static final DeferredItem<Item> HallowedHelmet =
-            Register.push(1).register("hallowed_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET)
+            Register.register("hallowed_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET)
                     .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                     .modifier(AttributeRegister.ServantDamage, 0.07, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -281,36 +320,135 @@ public class ItemRegister {
                     .build()
             );
 
-    // ===================== 黑曜石套装 =====================
+    // ===================== 叶绿套装 =====================
 
-    /** 黑曜石头盔 - +8% 仆从伤害 */
-    public static final DeferredItem<Item> ObsidianHelmet =
-            Register.register("obsidian_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.HELMET)
-                    .modifier(AttributeRegister.ServantDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                    .build()
-            );
-
-    /** 黑曜石胸甲 - +1 仆从栏 */
-    public static final DeferredItem<Item> ObsidianChestplate =
-            Register.register("obsidian_chestplate", () -> AttributeArmorItem.builder(
-                            ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.CHESTPLATE)
+    /**
+     * 叶绿面具 - +1 召唤栏，+10% 仆从伤害
+     */
+    public static final DeferredItem<Item> ChlorophyteHelmet =
+            Register.register("chlorophyte_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.HELMET)
                     .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.UNCOMMON))
                     .build()
             );
 
-    /** 黑曜石护腿 - +8% 仆从伤害 */
-    public static final DeferredItem<Item> ObsidianLeggings =
-            Register.register("obsidian_leggings", () -> AttributeArmorItem.builder(
-                            ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.LEGGINGS)
-                    .modifier(AttributeRegister.ServantDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+    /**
+     * 叶绿板甲 - +6% 仆从伤害
+     */
+    public static final DeferredItem<Item> ChlorophyteChestplate =
+            Register.register("chlorophyte_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                    .modifier(AttributeRegister.ServantDamage, 0.19, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.UNCOMMON))
                     .build()
             );
 
-    /** 黑曜石靴子 - +8% 移动速度 */
-    public static final DeferredItem<Item> ObsidianBoots =
-            Register.register("obsidian_boots", () -> AttributeArmorItem.builder(
-                            ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.BOOTS)
-                    .modifier(Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+    /**
+     * 叶绿护胫 - +4% 仆从伤害
+     */
+    public static final DeferredItem<Item> ChlorophyteLeggings =
+            Register.register("chlorophyte_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.LEGGINGS)
+                    .modifier(AttributeRegister.ServantDamage, 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.UNCOMMON))
+                    .build()
+            );
+
+    /**
+     * 叶绿战靴 - +2% 仆从伤害
+     */
+    public static final DeferredItem<Item> ChlorophyteBoots =
+            Register.register("chlorophyte_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.BOOTS)
+                    .modifier(Attributes.MOVEMENT_SPEED, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.UNCOMMON))
+                    .build()
+            );
+
+    // ===================== 阴森套装 =====================
+
+    /**
+     * 阴森头盔 - +11% 仆从伤害
+     */
+    public static final DeferredItem<Item> SpookyHelmet =
+            Register.register("spooky_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.HELMET)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    /**
+     * 阴森胸甲 - +11% 仆从伤害
+     */
+    public static final DeferredItem<Item> SpookyChestplate =
+            Register.register("spooky_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                    .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    /**
+     * 阴森护腿 - +8% 仆从伤害，+1 召唤栏
+     */
+    public static final DeferredItem<Item> SpookyLeggings =
+            Register.register("spooky_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.LEGGINGS)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    /**
+     * 阴森战靴 - +4% 仆从伤害
+     */
+    public static final DeferredItem<Item> SpookyBoots =
+            Register.register("spooky_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.BOOTS)
+                    .modifier(Attributes.MOVEMENT_SPEED, 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    // ===================== 提基套装 =====================
+
+    /**
+     * 提基面具 - +1 召唤栏，+10% 仆从伤害
+     */
+    public static final DeferredItem<Item> TikiHelmet =
+            Register.register("tiki_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.HELMET)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    /**
+     * 提基胸甲 - +10% 仆从伤害
+     */
+    public static final DeferredItem<Item> TikiChestplate =
+            Register.register("tiki_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    /**
+     * 提基护腿 - +7% 仆从伤害
+     */
+    public static final DeferredItem<Item> TikiLeggings =
+            Register.register("tiki_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.LEGGINGS)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    /**
+     * 提基战靴 - +3% 仆从伤害
+     */
+    public static final DeferredItem<Item> TikiBoots =
+            Register.register("tiki_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.BOOTS)
+                    .modifier(AttributeRegister.ServantDamage, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.RARE))
                     .build()
             );
 
@@ -357,6 +495,52 @@ public class ItemRegister {
             Register.register("valhalla_knight_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.BOOTS)
                     .modifier(Attributes.MOVEMENT_SPEED, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    // ===================== 星尘套装 =====================
+
+    /**
+     * 星尘头盔 - +1 召唤栏，+16% 仆从伤害
+     */
+    public static final DeferredItem<Item> StardustHelmet =
+            Register.register("stardust_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.HELMET)
+                    .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.22, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.EPIC))
+                    .build()
+            );
+
+    /**
+     * 星尘板甲 - +22% 仆从伤害
+     */
+    public static final DeferredItem<Item> StardustChestplate =
+            Register.register("stardust_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                    .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.37, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.EPIC))
+                    .build()
+            );
+
+    /**
+     * 星尘护腿 - +15% 仆从伤害
+     */
+    public static final DeferredItem<Item> StardustLeggings =
+            Register.register("stardust_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.LEGGINGS)
+                    .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.37, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.EPIC))
+                    .build()
+            );
+
+    /**
+     * 星尘战靴 - +7% 仆从伤害
+     */
+    public static final DeferredItem<Item> StardustBoots =
+            Register.register("stardust_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.BOOTS)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.22, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.EPIC))
                     .build()
             );
 

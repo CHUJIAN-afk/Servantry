@@ -47,6 +47,46 @@ public class ArmorSetRegister {
                     .build()
             );
 
+    public static final Holder<ArmorSet> Chlorophyte =
+            Register.register("chlorophyte", () -> ArmorSet.builder(Servantry.rl("chlorophyte"))
+                    .piece(ItemRegister.ChlorophyteHelmet)
+                    .piece(ItemRegister.ChlorophyteChestplate)
+                    .piece(ItemRegister.ChlorophyteLeggings)
+                    .piece(ItemRegister.ChlorophyteBoots)
+                    .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                    .build()
+            );
+
+    public static final Holder<ArmorSet> Spooky =
+            Register.register("spooky", () -> ArmorSet.builder(Servantry.rl("spooky"))
+                    .piece(ItemRegister.SpookyHelmet)
+                    .piece(ItemRegister.SpookyChestplate)
+                    .piece(ItemRegister.SpookyLeggings)
+                    .piece(ItemRegister.SpookyBoots)
+                    .modifier(AttributeRegister.ServantDamage, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
+
+    public static final Holder<ArmorSet> Tiki =
+            Register.register("tiki", () -> ArmorSet.builder(Servantry.rl("tiki"))
+                    .piece(ItemRegister.TikiHelmet)
+                    .piece(ItemRegister.TikiChestplate)
+                    .piece(ItemRegister.TikiLeggings)
+                    .piece(ItemRegister.TikiBoots)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
+
+    public static final Holder<ArmorSet> Stardust =
+            Register.register("stardust", () -> ArmorSet.builder(Servantry.rl("stardust"))
+                    .piece(ItemRegister.StardustHelmet)
+                    .piece(ItemRegister.StardustChestplate)
+                    .piece(ItemRegister.StardustLeggings)
+                    .piece(ItemRegister.StardustBoots)
+                    .build()
+            );
+
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
     }

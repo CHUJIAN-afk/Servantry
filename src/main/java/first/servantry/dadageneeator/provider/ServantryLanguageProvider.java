@@ -244,6 +244,64 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(ItemRegister.ValhallaKnightBoots)
                 .en("Valhalla Knight Boots")
                 .zh("英灵殿骑士战靴");
+        // ===================== 叶绿护甲 =====================
+        entry(ItemRegister.ChlorophyteHelmet)
+                .en("Chlorophyte Mask")
+                .zh("叶绿面具");
+        entry(ItemRegister.ChlorophyteChestplate)
+                .en("Chlorophyte Breastplate")
+                .zh("叶绿板甲");
+        entry(ItemRegister.ChlorophyteLeggings)
+                .en("Chlorophyte Leggings")
+                .zh("叶绿护胫");
+        entry(ItemRegister.ChlorophyteBoots)
+                .en("Chlorophyte Boots")
+                .zh("叶绿战靴");
+        entry("servantry.servantry.chlorophyte.set.1")
+                .en("Summons a powerful leaf crystal to shoot at nearby enemies")
+                .zh("召唤强大的叶状水晶来射击附近的敌人");
+        // ===================== 阴森护甲 =====================
+        entry(ItemRegister.SpookyHelmet)
+                .en("Spooky Helmet")
+                .zh("阴森头盔");
+        entry(ItemRegister.SpookyChestplate)
+                .en("Spooky Chestplate")
+                .zh("阴森胸甲");
+        entry(ItemRegister.SpookyLeggings)
+                .en("Spooky Leggings")
+                .zh("阴森护腿");
+        entry(ItemRegister.SpookyBoots)
+                .en("Spooky Boots")
+                .zh("阴森战靴");
+        // ===================== 提基护甲 =====================
+        entry(ItemRegister.TikiHelmet)
+                .en("Tiki Mask")
+                .zh("提基面具");
+        entry(ItemRegister.TikiChestplate)
+                .en("Tiki Chestplate")
+                .zh("提基胸甲");
+        entry(ItemRegister.TikiLeggings)
+                .en("Tiki Leggings")
+                .zh("提基护腿");
+        entry(ItemRegister.TikiBoots)
+                .en("Tiki Boots")
+                .zh("提基战靴");
+        // ===================== 星尘护甲 =====================
+        entry(ItemRegister.StardustHelmet)
+                .en("Stardust Helmet")
+                .zh("星尘头盔");
+        entry(ItemRegister.StardustChestplate)
+                .en("Stardust Chestplate")
+                .zh("星尘板甲");
+        entry(ItemRegister.StardustLeggings)
+                .en("Stardust Leggings")
+                .zh("星尘护腿");
+        entry(ItemRegister.StardustBoots)
+                .en("Stardust Boots")
+                .zh("星尘战靴");
+        entry("servantry.servantry.stardust.set.1")
+                .en("A stardust guardian will protect you from nearby enemies")
+                .zh("星尘守卫将保护你不受附近敌人的伤害");
         // ===================== 药水效果 =====================
         entry("effect.servantry.obsession")
                 .en("Obsession")
