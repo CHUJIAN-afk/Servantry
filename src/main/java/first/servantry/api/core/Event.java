@@ -139,6 +139,10 @@ public class Event {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void addAttribute(EntityAttributeModificationEvent event) {
+        List<EntityType<? extends LivingEntity>> types = event.getTypes();
+        for (EntityType<? extends LivingEntity> type : types) {
+            event.add(type, AttributeRegister.HealthRegen);
+        }
         event.add(EntityType.PLAYER, AttributeRegister.ServantMaxCount);
         event.add(EntityType.PLAYER, AttributeRegister.ServantDamage);
         event.add(EntityType.PLAYER, AttributeRegister.ServantKnockback);

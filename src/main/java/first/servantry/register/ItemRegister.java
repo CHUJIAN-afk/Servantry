@@ -494,11 +494,38 @@ public class ItemRegister {
     );
 
     /**
-     * 灼烧指环 - 仆从攻击时给目标施加诅咒焰
+     * 蚀日尊戒
      */
-    public static final DeferredItem<Item> PygmyRing = Register.register("pygmy_ring", () -> CurioItem.builder()
+    public static final DeferredItem<Item> EclipseRing = Register.register("eclipse_ring", () -> CurioItem.builder()
             .canEquipFromUse(true)
-            .onPostDamage((servant, owner, target) -> target.addEffect(new MobEffectInstance(MobEffectRegister.CursedFlame, 80, 0)))
+            .attributeModifiers((slotContext, id, stack) -> {
+                Level level = slotContext.entity().level();
+                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+                builder.put(AttributeRegister.ServantDamage, new AttributeModifier(id, 0.12, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 2, AttributeModifier.Operation.ADD_VALUE));
+                builder.put(AttributeRegister.ServantKnockback, new AttributeModifier(id, 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                builder.put(Attributes.KNOCKBACK_RESISTANCE, new AttributeModifier(id, 1.0, AttributeModifier.Operation.ADD_VALUE));
+                if (level.isDay()) {
+                    builder.put(AttributeRegister.HealthRegen, new AttributeModifier(id, 0.25, AttributeModifier.Operation.ADD_VALUE));
+                } else {
+                    builder.put(AttributeRegister.HealthRegen, new AttributeModifier(id, 0.05, AttributeModifier.Operation.ADD_VALUE));
+                    builder.put(Attributes.ARMOR, new AttributeModifier(id, 6, AttributeModifier.Operation.ADD_VALUE));
+                }
+                return builder.build();
+            })
+            .properties(properties -> properties.rarity(Rarity.EPIC))
+            .build()
+    );
+
+    /**
+     * 始源暗影焰
+     */
+    public static final DeferredItem<Item> PrimordialShadowflame = Register.register("primordial_shadowflame", () -> CurioItem.builder()
+            .canEquipFromUse(true)
+            .attributeModifiers((slotContext, id, stack) -> ImmutableMultimap.of(
+                    AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE)
+            ))
+            .onPostDamage((servant, owner, target) -> target.addEffect(new MobEffectInstance(MobEffectRegister.Shadowflame, 80, 0)))
             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
             .build()
     );

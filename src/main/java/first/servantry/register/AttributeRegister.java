@@ -12,6 +12,7 @@ public class AttributeRegister {
 
     private static final DeferredRegister<Attribute> Register = DeferredRegister.create(Registries.ATTRIBUTE, Servantry.MODID);
 
+    public static final Holder<Attribute> HealthRegen = register("health_regen", 0, -1000, 1000);
     public static final Holder<Attribute> ServantMaxCount = register("servant_max_count", 1, 0, 1000);
     public static final Holder<Attribute> ServantDamage = register("servant_damage", 1, 0, 1000);
     public static final Holder<Attribute> ServantKnockback = register("servant_knockback", 1, 0, 1000);
@@ -24,5 +25,4 @@ public class AttributeRegister {
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
     }
-
 }

@@ -2,6 +2,7 @@ package first.servantry.register;
 
 import first.servantry.Servantry;
 import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.common.attachment.HealthRegenData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.servant.TargetCache;
 import net.neoforged.bus.api.IEventBus;
@@ -24,6 +25,9 @@ public class AttachmentRegister {
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<InvincibleData>> InvincibleData =
             Register.register("invincible_data", () -> AttachmentType.builder(InvincibleData::new).build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<HealthRegenData>> HealthRegenData =
+            Register.register("health_regen_data", () -> AttachmentType.builder(HealthRegenData::new).build());
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<TargetCache>> TargetCache =
             Register.register("target_cache", () -> AttachmentType.builder(TargetCache::new).build());

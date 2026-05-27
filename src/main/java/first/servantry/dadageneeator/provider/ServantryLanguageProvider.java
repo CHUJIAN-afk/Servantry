@@ -119,6 +119,9 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(AttributeRegister.ServantArmorPierce.value().getDescriptionId())
                 .en("Servant Armor Pierce")
                 .zh("仆从护甲穿透");
+        entry(AttributeRegister.HealthRegen.value().getDescriptionId())
+                .en("Health Regen")
+                .zh("生命再生");
         // ===================== 饰品 =====================
         entry("curios.curios.accessories")
                 .en("Accessories")
@@ -156,7 +159,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .tooltip().en("Servant attacks grant a random soul boon").zh("仆从攻击会使你获得一个随机灵魂增益")
                 .tooltip().en("Soul Might: +8% Servant Damage").zh("灵魂力量：+8% 仆从伤害")
                 .tooltip().en("Soul Defense: +2 Armor").zh("灵魂防御：+2 护甲")
-                .tooltip().en("Soul Recovery: +0.5 HP/s Regeneration").zh("灵魂恢复：+0.5 HP/s 生命再生");
+                .tooltip().en("Soul Recovery: +0.05 Regeneration").zh("灵魂恢复：+0.05 生命再生");
         entry(ItemRegister.HallowedRune)
                 .en("Hallowed Rune")
                 .zh("神圣符文")
@@ -164,7 +167,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .tooltip().en("Does not stack with lower-tier soul accessories").zh("该效果不会与其下位合成材料叠加")
                 .tooltip().en("Hallowed Might: +16% Servant Damage").zh("神圣之力：+16% 仆从伤害")
                 .tooltip().en("Hallowed Grace: +4 Armor").zh("神圣之佑：+4 护甲")
-                .tooltip().en("Hallowed Radiance: +1 HP/s Regeneration").zh("神圣之辉：+1 HP/s 生命再生");
+                .tooltip().en("Hallowed Radiance: +0.1 Regeneration").zh("神圣之辉：+0.1 生命再生");
         entry(ItemRegister.PhantasmalRelic)
                 .en("Phantasmal Relic")
                 .zh("幻魂神物")
@@ -172,11 +175,11 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .tooltip().en("Does not stack with lower-tier soul accessories").zh("该效果不会与其下位合成材料叠加")
                 .tooltip().en("Phantasmal Might: +32% Servant Damage").zh("幻魂之力：+32% 仆从伤害")
                 .tooltip().en("Phantasmal Bulwark: +8 Armor").zh("幻魂坚盾：+8 护甲")
-                .tooltip().en("Phantasmal Rebirth: +2 HP/s Regeneration").zh("幻魂还生：+2 HP/s 生命再生");
-        entry(ItemRegister.PygmyRing)
-                .en("Pygmy Ring")
-                .zh("灼烧指环")
-                .tooltip().en("Servant attacks inflict Cursed Flame on enemies").zh("仆从攻击敌人时施加诅咒焰");
+                .tooltip().en("Phantasmal Rebirth: +0.2 Regeneration").zh("幻魂还生：+0.2 生命再生");
+        entry(ItemRegister.EclipseRing)
+                .en("Eclipse Ring")
+                .zh("蚀日尊戒")
+                .tooltip().en("Contains the power of the solar eclipse").zh("蕴含着日蚀之阴的力量");
         entry(ItemRegister.StormeyePendant)
                 .en("Stormeye Pendant")
                 .zh("暴风眼挂坠")
@@ -272,6 +275,10 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("effect.servantry.phantasmal_rebirth")
                 .en("Phantasmal Rebirth")
                 .zh("幻魂还生");
+        entry("effect.servantry.shadowflame")
+                .en("Shadowflame")
+                .zh("暗影焰");
+
         // 长效和强效药水
         entry("item.minecraft.potion.effect.obsession")
                 .en("Potion of Obsession")

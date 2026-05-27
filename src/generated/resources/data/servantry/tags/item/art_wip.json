@@ -11,8 +11,6 @@
     "servantry:ethereal_stellar_core_staff",
     "servantry:survey_drone_remote",
     "servantry:fairy_bell",
-    "servantry:black_lens",
-    "servantry:hallowed_ingot",
     "servantry:obsidian_helmet",
     "servantry:obsidian_chestplate",
     "servantry:obsidian_leggings",
@@ -30,11 +28,13 @@
     "servantry:phantasmal_relic",
     "servantry:hallowed_rune",
     "servantry:soul_relief",
-    "servantry:pygmy_ring",
+    "servantry:eclipse_ring",
     "servantry:stormeye_pendant",
     "servantry:hunt_soul_emblem",
     "servantry:war_banner",
     "servantry:curse_of_frailty",
-    "servantry:stardust_fragment"
+    "servantry:stardust_fragment",
+    "servantry:black_lens",
+    "servantry:hallowed_ingot"
   ]
 }
