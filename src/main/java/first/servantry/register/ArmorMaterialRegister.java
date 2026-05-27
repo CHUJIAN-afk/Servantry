@@ -49,6 +49,21 @@ public class ArmorMaterialRegister {
             0.0F
     ));
 
+    public static final Holder<ArmorMaterial> ValhallaKnightArmorMaterial = Register.register("valhalla_knight", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 7);
+                map.put(ArmorItem.Type.CHESTPLATE, 8);
+                map.put(ArmorItem.Type.LEGGINGS, 6);
+                map.put(ArmorItem.Type.BOOTS, 4);
+            }),
+            20,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            () -> Ingredient.EMPTY,
+            List.of(new ArmorMaterial.Layer(Servantry.rl("valhalla_knight"))),
+            0.0F,
+            0.0F
+    ));
+
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
     }

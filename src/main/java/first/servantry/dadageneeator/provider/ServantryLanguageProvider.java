@@ -231,6 +231,19 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(ItemRegister.ObsidianBoots)
                 .en("Obsidian Boots")
                 .zh("黑曜石靴");
+        // ===================== 英灵殿骑士护甲 =====================
+        entry(ItemRegister.ValhallaKnightHelmet)
+                .en("Valhalla Knight Helmet")
+                .zh("英灵殿骑士头盔");
+        entry(ItemRegister.ValhallaKnightChestplate)
+                .en("Valhalla Knight Chestplate")
+                .zh("英灵殿骑士胸甲");
+        entry(ItemRegister.ValhallaKnightLeggings)
+                .en("Valhalla Knight Leggings")
+                .zh("英灵殿骑士护腿");
+        entry(ItemRegister.ValhallaKnightBoots)
+                .en("Valhalla Knight Boots")
+                .zh("英灵殿骑士战靴");
         // ===================== 药水效果 =====================
         entry("effect.servantry.obsession")
                 .en("Obsession")

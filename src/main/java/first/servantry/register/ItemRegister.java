@@ -6,6 +6,7 @@ import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.item.IServantWeapon;
+import first.servantry.client.creativeTab.AnimInfo;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.item.AttributeArmorItem;
 import first.servantry.common.item.CurioItem;
@@ -48,12 +49,14 @@ public class ItemRegister {
     /**
      * 泰拉棱镜 - 召唤泰拉棱镜仆从
      */
-    public static final DeferredItem<Item> TerraPrism = Register.push(new TabSection(0, Servantry.rl("textures/item/banner/banner.png"))).register("terraprism", () ->
-            new IServantWeapon.Builder<>(AttachmentEntityRegister.TerraPrism)
-                    .sound(SoundRegister.UseTerraprism)
-                    .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1)))
-                    .buildItem()
-    );
+    public static final DeferredItem<Item> TerraPrism =
+            Register.push(new TabSection(0, Servantry.rl("textures/item/banner/banner.png"), new AnimInfo(18, 3, 8)))
+                    .register("terraprism", () ->
+                            new IServantWeapon.Builder<>(AttachmentEntityRegister.TerraPrism)
+                                    .sound(SoundRegister.UseTerraprism)
+                                    .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1)))
+                                    .buildItem()
+                    );
 
     /** 刃杖 - 召唤附魔飞刀群 */
     public static final DeferredItem<Item> BladeStaff = Register.register("blade_staff", () ->
@@ -311,6 +314,51 @@ public class ItemRegister {
                     .build()
             );
 
+    // ===================== 英灵殿骑士套装 =====================
+
+    /**
+     * 英灵殿骑士头盔 - +1 召唤栏，+10% 仆从伤害，+10% 原版伤害
+     */
+    public static final DeferredItem<Item> ValhallaKnightHelmet =
+            Register.register("valhalla_knight_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.HELMET)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(Attributes.ATTACK_DAMAGE, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    /**
+     * 英灵殿骑士胸甲 - +30% 仆从伤害，+0.4 生命再生
+     */
+    public static final DeferredItem<Item> ValhallaKnightChestplate =
+            Register.register("valhalla_knight_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                    .modifier(AttributeRegister.ServantDamage, 0.30, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(AttributeRegister.HealthRegen, 0.4, AttributeModifier.Operation.ADD_VALUE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    /**
+     * 英灵殿骑士护腿 - +20% 仆从伤害，+20% 原版伤害
+     */
+    public static final DeferredItem<Item> ValhallaKnightLeggings =
+            Register.register("valhalla_knight_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.LEGGINGS)
+                    .modifier(AttributeRegister.ServantDamage, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(Attributes.ATTACK_DAMAGE, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
+
+    /**
+     * 英灵殿骑士战靴 - +20% 移动速度
+     */
+    public static final DeferredItem<Item> ValhallaKnightBoots =
+            Register.register("valhalla_knight_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.BOOTS)
+                    .modifier(Attributes.MOVEMENT_SPEED, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .properties(p -> p.rarity(Rarity.RARE))
+                    .build()
+            );
 
     // ===================== 饰品 =====================
 
@@ -609,7 +657,7 @@ public class ItemRegister {
         }
 
         public Registers push(int order) {
-            this.tabSection = new TabSection(order, Servantry.rl("textures/item/banner/default_banner.png"));
+            this.tabSection = new TabSection(order, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
             return this;
         }
 
@@ -631,7 +679,7 @@ public class ItemRegister {
         }
     }
 
-    public record TabSection(Integer integer, ResourceLocation texture) {
+    public record TabSection(Integer integer, ResourceLocation texture, AnimInfo animInfo) {
     }
 
 }

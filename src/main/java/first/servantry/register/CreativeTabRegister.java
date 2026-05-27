@@ -52,12 +52,11 @@ public class CreativeTabRegister {
             int itemRows = (map.get(section).size() + 8) / 9;
             currentRow += 1 + itemRows;
             ResourceLocation texture = section.texture();
-            if (texture == null) continue;
-
+            AnimInfo animInfo = section.animInfo();
             int visibleRow = bannerRow - scrollRow;
             if (visibleRow < 0 || visibleRow >= 5) continue;
             int bannerY = top + visibleRow * 18;
-            AnimInfo.blitAnimated(graphics, texture, left, bannerY, 162, mouseX, mouseY, true);
+            AnimInfo.blitAnimated(graphics, texture, animInfo, left, bannerY, 162, mouseX, mouseY, true);
         }
     }
 
