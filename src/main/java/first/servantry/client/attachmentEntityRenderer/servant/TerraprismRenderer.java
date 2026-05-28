@@ -36,8 +36,8 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
                         .diamondSize(0.15f)
                         .colorFunction((terraprism, progress, timeShift) -> {
                             EntityData data = terraprism.getOwner().getData(AttachmentRegister.EntityData);
-                            int order = data.getOrder(terraprism);
-                            int total = Math.max(1, data.getSameSize(terraprism));
+                            int order = terraprism.getOrder();
+                            int total = Math.max(1, terraprism.getSameSize());
                             float hue = (((float) order / total) + timeShift) % 1.0f;
                             return Mth.hsvToRgb(hue, 0.65f, Mth.lerp(progress, 1f, 0.4f));
                         })
@@ -53,10 +53,8 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
     @Override
     protected void renderEntity(Terraprism terraprism, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Terraprism> config) {
         Player owner = terraprism.getOwner();
-        EntityData data = owner.getData(AttachmentRegister.EntityData);
-        int order = data.getOrder(terraprism);
-        int total = Math.max(1, data.getSameSize(terraprism));
-
+        int order = terraprism.getOrder();
+        int total = Math.max(1, terraprism.getSameSize());
         float hueShift = ((float) order / total + owner.tickCount * 0.015f) % 1.0f;
         float breathFactor = 0.5f + 0.5f * Mth.sin(hueShift * Mth.TWO_PI);
         int mColorRGB = Mth.hsvToRgb(hueShift, 0.75f - 0.35f * breathFactor, 1.0f);

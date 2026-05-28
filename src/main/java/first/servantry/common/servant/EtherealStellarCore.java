@@ -6,7 +6,6 @@ import first.servantry.api.servant.Servant;
 import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.ShatteredStellarCoreProjectile;
 import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.AttachmentRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
@@ -123,7 +122,7 @@ public class EtherealStellarCore extends Servant {
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
         Player owner = getOwner();
-        int total = Math.max(1, owner.getData(AttachmentRegister.EntityData).getSameSize(this));
+        int total = Math.max(1, getSameSize());
         int order = getOrder();
         float angle = (owner.tickCount + partialTick) * 0.02f + (order * Mth.TWO_PI / total);
         float radius = 1.5f;

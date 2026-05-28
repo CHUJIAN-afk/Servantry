@@ -1,12 +1,9 @@
 package first.servantry.common.servant.goal.terraprism;
 
-import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.entity.PlannedPath;
-import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.Terraprism;
-import first.servantry.register.AttachmentRegister;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -69,28 +66,6 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
     @Override
     public boolean canUse() {
         return servant.getTarget() != null && servant.getOwner().getRandom().nextDouble() < 0.1;
-    }
-
-    /**
-     * 判断当前仆从是否可以进入攻击状态。
-     * <p>
-     * 选择优先级最高的空闲泰拉棱镜仆从执行攻击。
-     * </p>
-     */
-    public boolean canTransitionToAttack(Player owner) {
-        EntityData data = owner.getData(AttachmentRegister.EntityData);
-        int maxOrder = -1;
-        Servant chosen = null;
-        for (Servant s : data.getServants()) {
-            if (s instanceof Terraprism ts && ts.idle) {
-                int order = data.getOrder(s);
-                if (order > maxOrder) {
-                    maxOrder = order;
-                    chosen = s;
-                }
-            }
-        }
-        return chosen == servant;
     }
 
     @Override

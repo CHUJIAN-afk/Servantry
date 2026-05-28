@@ -54,7 +54,7 @@ public class EnchantedThrowingKnivesAttackGoal extends ServantGoal<EnchantedThro
         EnchantedThrowingKnives chosen = null;
         for (var s : data.getServants()) {
             if (s instanceof EnchantedThrowingKnives knives && !knives.attacking) {
-                int order = data.getOrder(s);
+                int order = s.getOrder();
                 if (order > maxOrder) {
                     maxOrder = order;
                     chosen = knives;

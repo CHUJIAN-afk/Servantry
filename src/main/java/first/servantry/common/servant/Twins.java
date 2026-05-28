@@ -10,7 +10,6 @@ import first.servantry.common.servant.goal.twins.TwinsCursedFlameAttackGoal;
 import first.servantry.common.servant.goal.twins.TwinsIdleGoal;
 import first.servantry.common.servant.goal.twins.TwinsLaserAttackGoal;
 import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.AttachmentRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -88,7 +87,7 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
-            if (owner.getData(AttachmentRegister.EntityData).getSameSize(this) % 2 != 0) {
+            if (getSameSize() % 2 != 0) {
                 setRemove();
             }
             if (trailTimer > 0) {

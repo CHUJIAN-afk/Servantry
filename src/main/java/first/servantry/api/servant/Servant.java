@@ -1,7 +1,9 @@
 package first.servantry.api.servant;
 
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.register.AttachmentRegister;
@@ -14,6 +16,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Targeting;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 仆从实体抽象基类，代表由玩家拥有、AI驱动、自主行动的战斗单位。
@@ -105,11 +110,45 @@ public abstract class Servant extends AttachmentEntity {
         );
     }
 
+
     // ===================== 排序 =====================
 
-    /** 获取在所有者仆从列表中的顺序索引 */
+    /**
+     * 获取目标仆从在其 AttachmentEntityType 分组中的未移除顺序
+     */
     public int getOrder() {
-        return getOwner().getData(AttachmentRegister.EntityData).getOrder(this);
+        AttachmentEntityType<?> entityType = getType();
+        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = owner.getData(AttachmentRegister.EntityData).getGroups().get(EntityData.Type.Servant);
+        List<AttachmentEntity> list = inner != null ? inner.get(entityType) : null;
+        if (list != null) {
+            int order = 0;
+            for (AttachmentEntity attachmentEntity : list) {
+                if (attachmentEntity == this) {
+                    return order;
+                }
+                if (!attachmentEntity.isRemove()) {
+                    order++;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * 获取目标仆从在其 AttachmentEntityType 分组中的未移除数量
+     */
+    public int getSameSize() {
+        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = owner.getData(AttachmentRegister.EntityData).getGroups().get(EntityData.Type.Servant);
+        List<AttachmentEntity> list = inner != null ? inner.get(getType()) : null;
+        int count = 0;
+        if (list != null) {
+            for (AttachmentEntity attachmentEntity : list) {
+                if (!attachmentEntity.isRemove()) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     // ===================== 目标访问器 =====================

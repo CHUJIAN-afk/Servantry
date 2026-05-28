@@ -9,7 +9,6 @@ import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.enchantedThrowingKnives.EnchantedThrowingKnivesAttackGoal;
 import first.servantry.common.servant.goal.enchantedThrowingKnives.EnchantedThrowingKnivesIdleGoal;
 import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.AttachmentRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -150,7 +149,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
         Player owner = getOwner();
-        int total = Math.max(1, owner.getData(AttachmentRegister.EntityData).getSameSize(this));
+        int total = Math.max(1, getSameSize());
         int order = getOrder();
         float angle = (owner.tickCount + partialTick) * 0.05f + (order * Mth.TWO_PI / total);
         float radius = 1.2f + (total > 4 ? (total - 4) * 0.025f : 0f);

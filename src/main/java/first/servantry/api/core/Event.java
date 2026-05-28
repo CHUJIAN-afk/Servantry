@@ -6,7 +6,6 @@ import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ServantryRegistries;
-import first.servantry.api.servant.Servant;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import first.servantry.utils.AttributeUtils;
@@ -98,22 +97,10 @@ public class Event {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void entityDataTick(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
-        // 更新目标缓存（仅服务端）
         if (!player.level().isClientSide()) {
             player.getData(AttachmentRegister.TargetCache).update(player);
         }
-        EntityData data = player.getData(AttachmentRegister.EntityData);
-        List<Servant> servants = data.getServants();
-        if (!servants.isEmpty() && !data.canSummon(player, 0)) {
-            servants.getFirst().setRemove();
-        }
-        // 统一tick所有实体
-        data.tickAll(player);
-        // 同步数据
-        if (!player.level().isClientSide() && (!data.getEntities().isEmpty() || data.isChanged())) {
-            data.setChanged(false);
-            player.syncData(AttachmentRegister.EntityData);
-        }
+        player.getData(AttachmentRegister.EntityData).update(player);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

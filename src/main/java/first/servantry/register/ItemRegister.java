@@ -217,7 +217,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> EtherealStellarCoreStaff = Register.register("ethereal_stellar_core_staff", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.EtherealStellarCore)
                     .sound(SoundRegister.UseServantWeapon)
-                    .summonPre((player, etherealStellarCore) -> player.getData(AttachmentRegister.EntityData).getSameSize(etherealStellarCore) < 9)
+                    .summonPre((player, etherealStellarCore) -> etherealStellarCore.getSameSize() < 9)
                     .summonPost(servant -> {
                         Player owner = servant.getOwner();
                         PathNode idle = servant.getInterpolatedIdleState(1.0f);
@@ -230,7 +230,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> SurveyDroneRemote = Register.register("survey_drone_remote", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.OreScout)
                     .sound(SoundRegister.UseServantWeapon)
-                    .summonPre((player, servant) -> player.getData(AttachmentRegister.EntityData).getSameSize(servant) < 1)
+                    .summonPre((player, servant) -> servant.getSameSize() < 1)
                     .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1.0f)))
                     .buildItem()
     );
@@ -238,7 +238,7 @@ public class ItemRegister {
     public static final DeferredItem<Item> FairyBell = Register.register("fairy_bell", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.ScavengerFairy)
                     .sound(SoundRegister.UseServantWeapon)
-                    .summonPre((player, servant) -> player.getData(AttachmentRegister.EntityData).getSameSize(servant) < 1)
+                    .summonPre((player, servant) -> servant.getSameSize() < 1)
                     .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1.0f)))
                     .buildItem(new Item.Properties().rarity(Rarity.UNCOMMON).stacksTo(1))
     );

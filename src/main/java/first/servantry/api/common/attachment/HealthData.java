@@ -21,30 +21,28 @@ public class HealthData {
     public static void healthRegenTick(EntityTickEvent.Post event) {
         if (event.getEntity() instanceof LivingEntity living && !living.level().isClientSide()) {
             AttributeInstance instance = living.getAttribute(AttributeRegister.HealthRegen);
-            if (instance != null) {
+            if (instance != null && instance.getValue() != 0) {
                 float amount = living.getData(AttachmentRegister.HealthData).getAmount();
-                if (amount != 0) {
-                    amount += (float) (instance.getValue() / 20);
-                    if (living.tickCount % 10 == 0) {
-                        if (amount > 1) {
-                            float heal = amount - 1;
-                            living.heal(heal);
-                            amount -= heal;
-                        } else if (amount < -1) {
-                            float damage = -1 - amount;
-                            InvincibleData.criteriaAttack(
-                                    living,
-                                    null,
-                                    0,
-                                    DamageRegister.getDamageSource(DamageTypes.GENERIC, living.level()),
-                                    damage,
-                                    InvincibleData.Type.Global
-                            );
-                            amount += damage;
-                        }
+                amount += (float) (instance.getValue() / 20);
+                if (living.tickCount % 10 == 0) {
+                    if (amount > 1) {
+                        float heal = amount - 1;
+                        living.heal(heal);
+                        amount -= heal;
+                    } else if (amount < -1) {
+                        float damage = -1 - amount;
+                        InvincibleData.criteriaAttack(
+                                living,
+                                null,
+                                0,
+                                DamageRegister.getDamageSource(DamageTypes.GENERIC, living.level()),
+                                damage,
+                                InvincibleData.Type.Global
+                        );
+                        amount += damage;
                     }
-                    living.getData(AttachmentRegister.HealthData).setAmount(amount);
                 }
+                living.getData(AttachmentRegister.HealthData).setAmount(amount);
             }
         }
     }

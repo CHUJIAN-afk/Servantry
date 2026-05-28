@@ -5,6 +5,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.api.servant.Servant;
+import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -16,291 +17,299 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 统一的附件实体数据附件。
  * <p>
- * 存储玩家所有的附件实体（仆从和射弹），提供统一的管理和同步功能。
- * 所有修改操作均通过延迟队列处理，在 tickAll 开始时统一应用，避免并发修改异常。
+ * 使用 Type → AttachmentEntityType 两级分组存储实体。
+ * 移除通过 setRemove() 标记完成，添加通过延迟队列在 tick 后统一处理。
  * </p>
  */
 public class EntityData implements AttachmentSyncHandler<EntityData> {
 
-    /** 所有附件实体列表 */
-    private final List<AttachmentEntity> entities = new ArrayList<>();
+    private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> groups = new HashMap<>();
+    private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> pendingAdd = new HashMap<>();
 
-    /**
-     * 待添加实体队列
-     */
-    private final List<AttachmentEntity> pendingAdd = new ArrayList<>();
-
-    /** 待移除实体队列 */
-    private final List<AttachmentEntity> pendingRemove = new ArrayList<>();
-
-    /** 数据变更标记 */
     private boolean changed = false;
 
-    // ===================== 实体管理 =====================
+    // ===================== 分组操作 =====================
 
     /**
-     * 获取所有附件实体。
-     *
-     * @return 实体列表（只读）
+     * 将实体放入对应 Type 和 AttachmentEntityType 的待添加队列
      */
+    public void add(Type type, AttachmentEntity entity) {
+        pendingAdd
+                .computeIfAbsent(type, k -> new HashMap<>())
+                .computeIfAbsent(entity.getType(), k -> new ArrayList<>())
+                .add(entity);
+    }
+
+    /**
+     * 添加射弹（延迟添加到 Projectile 分组）
+     */
+    public void addProjectile(Projectile projectile) {
+        add(Type.Projectile, projectile);
+        changed = true;
+    }
+
+    /** 收集所有分组中的实体为扁平列表 */
     public List<AttachmentEntity> getEntities() {
-        return Collections.unmodifiableList(entities);
+        List<AttachmentEntity> result = new ArrayList<>();
+        for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : groups.values()) {
+            for (List<AttachmentEntity> list : inner.values()) {
+                result.addAll(list);
+            }
+        }
+        return result;
     }
 
-    /**
-     * 获取所有仆从。
-     *
-     * @return 仆从列表
-     */
+    // ===================== 扁平视图 =====================
+
+    /** 收集所有 Servant 类型分组中的仆从 */
     public List<Servant> getServants() {
-        return entities.stream()
-                .filter(e -> e instanceof Servant)
-                .map(e -> (Servant) e)
-                .collect(Collectors.toList());
+        List<Servant> result = new ArrayList<>();
+        collectFromGroup(Type.Servant, Servant.class, result);
+        return result;
     }
 
     /**
-     * 获取所有射弹。
-     *
-     * @return 射弹列表
+     * 收集所有 ArmorSetServant 类型分组中的仆从
      */
+    public List<Servant> getArmorSetServants() {
+        List<Servant> result = new ArrayList<>();
+        collectFromGroup(Type.ArmorSetServant, Servant.class, result);
+        return result;
+    }
+
+    /** 收集所有 Projectile 类型分组中的射弹 */
     public List<Projectile> getProjectiles() {
-        return entities.stream()
-                .filter(e -> e instanceof Projectile)
-                .map(e -> (Projectile) e)
-                .collect(Collectors.toList());
+        List<Projectile> result = new ArrayList<>();
+        collectFromGroup(Type.Projectile, Projectile.class, result);
+        return result;
+    }
+
+    /**
+     * 从指定 Type 分组中收集指定子类型的实体
+     */
+    private <T> void collectFromGroup(Type type, Class<T> clazz, List<T> result) {
+        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = groups.get(type);
+        if (inner == null) return;
+        for (List<AttachmentEntity> list : inner.values()) {
+            for (AttachmentEntity e : list) {
+                if (clazz.isInstance(e)) result.add(clazz.cast(e));
+            }
+        }
+    }
+
+    /**
+     * 获取当前未标记移除的仆从已占用栏位数
+     */
+    public int getUsedSlots() {
+        int slots = 0;
+        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = groups.get(Type.Servant);
+        if (inner != null) {
+            for (List<AttachmentEntity> list : inner.values()) {
+                for (AttachmentEntity attachmentEntity : list) {
+                    if (attachmentEntity instanceof Servant servant && !servant.isRemove()) {
+                        slots += servant.getSlotCost();
+                    }
+                }
+            }
+        }
+        return slots;
     }
 
     // ===================== 仆从管理 =====================
 
-    /**
-     * 获取当前已占用的仆从栏位数。
-     */
-    public int getUsedSlots() {
-        return entities.stream()
-                .filter(e -> e instanceof Servant)
-                .mapToInt(e -> ((Servant) e).getSlotCost())
-                .sum();
-    }
-
-    /**
-     * 检查是否可以召唤指定栏位消耗的仆从。
-     */
+    /** 检查是否有足够栏位召唤指定消耗的仆从 */
     public boolean canSummon(Player player, int slotCost) {
         return getMaxServantSize(player) - getUsedSlots() >= slotCost;
     }
 
-    /**
-     * 召唤仆从。
-     *
-     * @param player  玩家
-     * @param servant 仆从实例
-     * @return 是否成功
-     */
+    /** 召唤仆从（延迟添加到 Servant 分组） */
     public boolean summonServant(Player player, Servant servant) {
         if (canSummon(player, servant.getSlotCost())) {
-            pendingAdd.add(servant);
+            add(Type.Servant, servant);
             changed = true;
             return true;
         }
         return false;
     }
 
-    /**
-     * 移除指定类型的仆从。
-     *
-     * @param type 仆从类型
-     */
+    /** 标记指定 AttachmentEntityType 的所有仆从为待移除 */
     public void removeServant(AttachmentEntityType<?> type) {
-        for (AttachmentEntity entity : entities) {
-            if (entity instanceof Servant servant && servant.getType() == type) {
-                pendingRemove.add(servant);
-                changed = true;
-            }
+        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = groups.get(Type.Servant);
+        List<AttachmentEntity> list = inner != null ? inner.get(type) : null;
+        if (list != null && !list.isEmpty()) {
+            for (AttachmentEntity e : list) e.setRemove();
+            changed = true;
         }
     }
 
-    /**
-     * 获取仆从最大数量。
-     *
-     * @param player 玩家
-     * @return 最大数量
-     */
+    /** 获取玩家仆从最大栏位数（来自属性） */
     public int getMaxServantSize(Player player) {
-        AttributeInstance attribute = player.getAttribute(AttributeRegister.ServantMaxCount);
-        if (attribute != null) {
-            return (int) attribute.getValue();
-        }
-        return 0;
+        AttributeInstance attr = player.getAttribute(AttributeRegister.ServantMaxCount);
+        return attr != null ? (int) attr.getValue() : 0;
     }
 
-    /**
-     * 获取仆从在同类中的顺序。
-     *
-     * @param target 目标仆从
-     * @return 顺序索引
-     */
-    public int getOrder(Servant target) {
-        int order = 0;
-        for (AttachmentEntity entity : entities) {
-            if (entity instanceof Servant s) {
-                if (s == target) return order;
-                if (s.getType().equals(target.getType())) order++;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * 获取同类仆从数量。
-     *
-     * @param target 目标仆从
-     * @return 数量
-     */
-    public int getSameSize(Servant target) {
-        int count = 0;
-        for (AttachmentEntity entity : entities) {
-            if (entity instanceof Servant s && s.getType().equals(target.getType())) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    // ===================== 射弹管理 =====================
-
-    /**
-     * 添加射弹。
-     *
-     * @param projectile 射弹实例
-     */
-    public void addProjectile(Projectile projectile) {
-        pendingAdd.add(projectile);
-        changed = true;
-    }
-
-    /**
-     * 通过UUID移除实体。
-     *
-     * @param uuid 实体UUID
-     */
+    /** 通过 UUID 在所有分组中查找并标记实体为待移除 */
     public void remove(UUID uuid) {
-        for (AttachmentEntity entity : entities) {
-            if (entity.getUuid().equals(uuid)) {
-                pendingRemove.add(entity);
-                changed = true;
-                return;
+        for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : groups.values()) {
+            for (List<AttachmentEntity> list : inner.values()) {
+                for (AttachmentEntity e : list) {
+                    if (e.getUuid().equals(uuid)) {
+                        e.setRemove();
+                        changed = true;
+                        return;
+                    }
+                }
             }
         }
+    }
+
+    // ===================== 通用移除 =====================
+
+    /**
+     * 每tick调用：处理溢出、tick实体、清理标记、添加队列、同步网络
+     */
+    public void update(Player player) {
+        // 检查仆从栏位溢出，标记多余仆从
+        if (!player.level().isClientSide()) {
+            while (!canSummon(player, 0)) {
+                List<Servant> servants = getServants();
+                if (!servants.isEmpty()) {
+                    servants.getFirst().setRemove();
+                    break;
+                }
+            }
+        }
+
+        // tick所有未标记移除的实体
+        for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : groups.values()) {
+            for (List<AttachmentEntity> list : inner.values()) {
+                for (AttachmentEntity entity : list) {
+                    if (!entity.isRemove()) {
+                        entity.setOwner(player);
+                        entity.tick();
+                    }
+                }
+            }
+        }
+
+        // 清理所有分组中标记移除的实体
+        for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : groups.values()) {
+            Iterator<Map.Entry<AttachmentEntityType<?>, List<AttachmentEntity>>> typeIt = inner.entrySet().iterator();
+            while (typeIt.hasNext()) {
+                List<AttachmentEntity> list = typeIt.next().getValue();
+                list.removeIf(entity -> {
+                    if (entity.isRemove()) {
+                        entity.onRemove();
+                        changed = true;
+                        return true;
+                    }
+                    return false;
+                });
+                if (list.isEmpty()) typeIt.remove();
+            }
+        }
+
+        // 将待添加队列合并到主分组
+        if (!pendingAdd.isEmpty()) {
+            for (Map.Entry<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> typeEntry : pendingAdd.entrySet()) {
+                Type type = typeEntry.getKey();
+                Map<AttachmentEntityType<?>, List<AttachmentEntity>> targetInner = groups.computeIfAbsent(type, k -> new HashMap<>());
+                for (Map.Entry<AttachmentEntityType<?>, List<AttachmentEntity>> entityEntry : typeEntry.getValue().entrySet()) {
+                    targetInner.computeIfAbsent(entityEntry.getKey(), k -> new ArrayList<>()).addAll(entityEntry.getValue());
+                }
+            }
+            pendingAdd.clear();
+            changed = true;
+        }
+
+        // 同步数据到客户端
+        if (!player.level().isClientSide() && (!groups.isEmpty() || changed)) {
+            changed = false;
+            player.syncData(AttachmentRegister.EntityData);
+        }
+    }
+
+    public Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> getGroups() {
+        return groups;
     }
 
     // ===================== Tick 更新 =====================
 
-    /**
-     * 更新所有实体。
-     *
-     * @param player 所有者玩家
-     */
-    public void tickAll(Player player) {
-        // 清理标记移除的实体
-        for (AttachmentEntity entity : entities) {
-            if (entity.isRemove()) {
-                pendingRemove.add(entity);
-                changed = true;
+    @Override
+    public void write(RegistryFriendlyByteBuf buf, EntityData data, boolean isSelf) {
+        // 写入 Type → AttachmentEntityType → 实体列表的三层结构
+        buf.writeVarInt(data.groups.size());
+        for (Map.Entry<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> typeEntry : data.groups.entrySet()) {
+            buf.writeEnum(typeEntry.getKey());
+            Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = typeEntry.getValue();
+            buf.writeVarInt(inner.size());
+            for (Map.Entry<AttachmentEntityType<?>, List<AttachmentEntity>> entityEntry : inner.entrySet()) {
+                ResourceLocation typeId = ServantryRegistries.ATTACHMENT_ENTITY_TYPES.getKey(entityEntry.getKey());
+                assert typeId != null;
+                buf.writeResourceLocation(typeId);
+                List<AttachmentEntity> list = entityEntry.getValue();
+                buf.writeVarInt(list.size());
+                for (AttachmentEntity entity : list) {
+                    buf.writeUUID(entity.getUuid());
+                    entity.writeBase(buf);
+                }
             }
         }
-        // 处理待移除的实体
-        if (!pendingRemove.isEmpty()) {
-            for (AttachmentEntity entity : pendingRemove) {
-                entity.onRemove();
-            }
-            entities.removeAll(pendingRemove);
-            pendingRemove.clear();
-            changed = true;
-        }
-        // 处理待添加的实体
-        if (!pendingAdd.isEmpty()) {
-            entities.addAll(pendingAdd);
-            pendingAdd.clear();
-            changed = true;
-        }
-        // tick所有存活实体
-        for (AttachmentEntity entity : entities) {
-            entity.setOwner(player);
-            entity.tick();
-        }
-    }
-
-    // ===================== 变更标记 =====================
-
-    /**
-     * 检查数据是否变更。
-     *
-     * @return 是否变更
-     */
-    public boolean isChanged() {
-        return changed;
-    }
-
-    /**
-     * 设置数据变更标记。
-     *
-     * @param changed 是否变更
-     */
-    public void setChanged(boolean changed) {
-        this.changed = changed;
     }
 
     // ===================== 网络同步 =====================
-
-    @Override
-    public void write(RegistryFriendlyByteBuf buf, EntityData data, boolean isSelf) {
-        buf.writeVarInt(data.entities.size());
-        for (AttachmentEntity entity : data.entities) {
-            ResourceLocation location = ServantryRegistries.ATTACHMENT_ENTITY_TYPES.getKey(entity.getType());
-            assert location != null;
-            buf.writeResourceLocation(location);
-            buf.writeUUID(entity.getUuid());
-            entity.writeBase(buf);
-        }
-    }
 
     @Override
     public EntityData read(@NotNull IAttachmentHolder holder, @NotNull RegistryFriendlyByteBuf buf, @Nullable EntityData oldData) {
         EntityData data = oldData != null ? oldData : new EntityData();
 
         // 保留现有实体的缓存引用
-        Map<UUID, AttachmentEntity> existingEntities = new HashMap<>();
-        for (AttachmentEntity e : data.entities) {
-            existingEntities.put(e.getUuid(), e);
+        Map<UUID, AttachmentEntity> existing = new HashMap<>();
+        for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : data.groups.values()) {
+            for (List<AttachmentEntity> list : inner.values()) {
+                for (AttachmentEntity e : list) existing.put(e.getUuid(), e);
+            }
         }
 
-        data.entities.clear();
+        // 清空分组和待添加队列
+        data.groups.clear();
         data.pendingAdd.clear();
-        data.pendingRemove.clear();
-        int size = buf.readVarInt();
 
-        for (int i = 0; i < size; i++) {
-            ResourceLocation typeId = buf.readResourceLocation();
-            UUID uuid = buf.readUUID();
-
-            AttachmentEntity entity = existingEntities.get(uuid);
-            if (entity == null) {
-                AttachmentEntityType<?> type = ServantryRegistries.ATTACHMENT_ENTITY_TYPES.get(typeId);
-                assert type != null;
-                entity = type.factory().get();
-                entity.setUuid(uuid);
+        // 读取 Type → AttachmentEntityType → 实体列表的三层结构
+        int typeCount = buf.readVarInt();
+        for (int i = 0; i < typeCount; i++) {
+            Type type = buf.readEnum(Type.class);
+            Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = data.groups.computeIfAbsent(type, k -> new HashMap<>());
+            int entityCount = buf.readVarInt();
+            for (int j = 0; j < entityCount; j++) {
+                ResourceLocation typeId = buf.readResourceLocation();
+                AttachmentEntityType<?> entityType = ServantryRegistries.ATTACHMENT_ENTITY_TYPES.get(typeId);
+                assert entityType != null;
+                List<AttachmentEntity> list = inner.computeIfAbsent(entityType, k -> new ArrayList<>());
+                int listSize = buf.readVarInt();
+                for (int k = 0; k < listSize; k++) {
+                    UUID uuid = buf.readUUID();
+                    AttachmentEntity entity = existing.get(uuid);
+                    if (entity == null) {
+                        entity = entityType.factory().get();
+                        entity.setUuid(uuid);
+                    }
+                    entity.readBase(buf);
+                    list.add(entity);
+                }
             }
-            entity.readBase(buf);
-            data.entities.add(entity);
         }
 
         return data;
     }
 
+    public enum Type {
+        Servant,
+        Projectile,
+        ArmorSetServant
+    }
 }
