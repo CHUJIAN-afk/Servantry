@@ -98,8 +98,7 @@ public class ItemRegister {
                                 .filter(e -> e instanceof StardustDragon)
                                 .map(e -> (StardustDragon) e)
                                 .toList();
-
-                        if (existing.size() == 1) {
+                        if (existing.isEmpty()) {
                             // 首次召唤：设置索引0，额外召唤2个体节
                             stardustDragon.setSegmentIndex(0);
                             stardustDragon.setTotalSegments(3);
@@ -146,19 +145,24 @@ public class ItemRegister {
     public static final DeferredItem<Item> OpticStaff = Register.register("optic_staff", () ->
             new IServantWeapon.Builder<>(AttachmentEntityRegister.Twins)
                     .sound(SoundRegister.UseTerraprism)
-                    .summonCount(2)
-                    .summonPre((player, twins) -> {
-                        long count = player.getData(AttachmentRegister.EntityData).getEntities().stream()
-                                .filter(attachmentEntity -> attachmentEntity instanceof Twins)
-                                .count();
-                        twins.setLaserEye(count % 2 == 0);
-                        return true;
-                    })
                     .summonPost(servant -> {
                         Player owner = servant.getOwner();
                         RandomSource random = owner.getRandom();
                         random.setSeed(owner.level().getGameTime());
-                        servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
+                        PathNode pathNode = new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0);
+                        servant.init(pathNode);
+                        EntityData data = owner.getData(AttachmentRegister.EntityData);
+                        long count = data.getEntities().stream()
+                                .filter(attachmentEntity -> attachmentEntity instanceof Twins)
+                                .count();
+                        if (true) {
+                            Twins twins = AttachmentEntityRegister.Twins.get().factory().get();
+                            twins.setOwner(owner);
+                            twins.setLaserEye(false);
+                            if (data.summonServant(owner, twins)) {
+                                twins.init(pathNode);
+                            }
+                        }
                     })
                     .buildItem()
     );

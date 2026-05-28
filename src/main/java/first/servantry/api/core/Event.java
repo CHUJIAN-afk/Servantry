@@ -47,7 +47,7 @@ public class Event {
             EntityData data = player.getData(AttachmentRegister.EntityData);
             List<Projectile> projectiles = data.getProjectiles();
             for (Projectile projectile : projectiles) {
-                data.removeProjectile(projectile);
+                projectile.setRemove();
             }
         }
     }
@@ -104,15 +104,13 @@ public class Event {
         }
         EntityData data = player.getData(AttachmentRegister.EntityData);
         List<Servant> servants = data.getServants();
-        while (!servants.isEmpty() && !data.canSummon(player, 0)) {
-            Servant toRemove = servants.getFirst();
-            data.remove(toRemove.getUuid());
-            servants = data.getServants();
+        if (!servants.isEmpty() && !data.canSummon(player, 0)) {
+            servants.getFirst().setRemove();
         }
         // 统一tick所有实体
         data.tickAll(player);
         // 同步数据
-        if (!player.level().isClientSide() && (!servants.isEmpty() || !data.getProjectiles().isEmpty() || data.isChanged())) {
+        if (!player.level().isClientSide() && (!data.getEntities().isEmpty() || data.isChanged())) {
             data.setChanged(false);
             player.syncData(AttachmentRegister.EntityData);
         }

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
  * 统一的附件实体数据附件。
  * <p>
  * 存储玩家所有的附件实体（仆从和射弹），提供统一的管理和同步功能。
+ * 所有修改操作均通过延迟队列处理，在 tickAll 开始时统一应用，避免并发修改异常。
  * </p>
  */
 public class EntityData implements AttachmentSyncHandler<EntityData> {
@@ -29,17 +30,16 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     /** 所有附件实体列表 */
     private final List<AttachmentEntity> entities = new ArrayList<>();
 
-    /** 待添加实体队列（延迟处理，避免并发修改） */
+    /**
+     * 待添加实体队列
+     */
     private final List<AttachmentEntity> pendingAdd = new ArrayList<>();
 
-    /** 待移除实体队列（延迟处理，避免并发修改） */
+    /** 待移除实体队列 */
     private final List<AttachmentEntity> pendingRemove = new ArrayList<>();
 
     /** 数据变更标记 */
     private boolean changed = false;
-
-    /** 是否正在 tick 中 */
-    private boolean ticking = false;
 
     // ===================== 实体管理 =====================
 
@@ -104,11 +104,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      */
     public boolean summonServant(Player player, Servant servant) {
         if (canSummon(player, servant.getSlotCost())) {
-            if (ticking) {
-                pendingAdd.add(servant);
-            } else {
-                entities.add(servant);
-            }
+            pendingAdd.add(servant);
             changed = true;
             return true;
         }
@@ -121,21 +117,10 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      * @param type 仆从类型
      */
     public void removeServant(AttachmentEntityType<?> type) {
-        List<Servant> targets = new ArrayList<>();
         for (AttachmentEntity entity : entities) {
             if (entity instanceof Servant servant && servant.getType() == type) {
-                targets.add(servant);
-            }
-        }
-        if (!targets.isEmpty()) {
-            changed = true;
-            for (Servant target : targets) {
-                if (ticking) {
-                    pendingRemove.add(target);
-                } else {
-                    target.onRemove();
-                    entities.remove(target);
-                }
+                pendingRemove.add(servant);
+                changed = true;
             }
         }
     }
@@ -195,26 +180,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      * @param projectile 射弹实例
      */
     public void addProjectile(Projectile projectile) {
-        if (ticking) {
-            pendingAdd.add(projectile);
-        } else {
-            entities.add(projectile);
-        }
-        changed = true;
-    }
-
-    /**
-     * 移除射弹。
-     *
-     * @param projectile 射弹实例
-     */
-    public void removeProjectile(Projectile projectile) {
-        if (ticking) {
-            pendingRemove.add(projectile);
-        } else {
-            projectile.onRemove();
-            entities.remove(projectile);
-        }
+        pendingAdd.add(projectile);
         changed = true;
     }
 
@@ -224,44 +190,12 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      * @param uuid 实体UUID
      */
     public void remove(UUID uuid) {
-        AttachmentEntity target = null;
         for (AttachmentEntity entity : entities) {
             if (entity.getUuid().equals(uuid)) {
-                target = entity;
-                break;
+                pendingRemove.add(entity);
+                changed = true;
+                return;
             }
-        }
-        if (target != null) {
-            if (ticking) {
-                pendingRemove.add(target);
-            } else {
-                target.onRemove();
-                entities.remove(target);
-            }
-            changed = true;
-        }
-    }
-
-    /**
-     * 清理所有标记为移除的射弹。
-     */
-    public void cleanupMarked() {
-        boolean removed = false;
-        Iterator<AttachmentEntity> iterator = entities.iterator();
-        while (iterator.hasNext()) {
-            AttachmentEntity entity = iterator.next();
-            if (entity.isRemove()) {
-                if (ticking) {
-                    pendingRemove.add(entity);
-                } else {
-                    entity.onRemove();
-                    iterator.remove();
-                }
-                removed = true;
-            }
-        }
-        if (removed) {
-            changed = true;
         }
     }
 
@@ -273,6 +207,13 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      * @param player 所有者玩家
      */
     public void tickAll(Player player) {
+        // 清理标记移除的实体
+        for (AttachmentEntity entity : entities) {
+            if (entity.isRemove()) {
+                pendingRemove.add(entity);
+                changed = true;
+            }
+        }
         // 处理待移除的实体
         if (!pendingRemove.isEmpty()) {
             for (AttachmentEntity entity : pendingRemove) {
@@ -282,24 +223,16 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
             pendingRemove.clear();
             changed = true;
         }
-
         // 处理待添加的实体
         if (!pendingAdd.isEmpty()) {
             entities.addAll(pendingAdd);
             pendingAdd.clear();
             changed = true;
         }
-
-        // 清理标记移除的射弹
-        cleanupMarked();
-        ticking = true;
-        try {
-            for (AttachmentEntity entity : entities) {
-                entity.setOwner(player);
-                entity.tick();
-            }
-        } finally {
-            ticking = false;
+        // tick所有存活实体
+        for (AttachmentEntity entity : entities) {
+            entity.setOwner(player);
+            entity.tick();
         }
     }
 
@@ -348,6 +281,8 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         }
 
         data.entities.clear();
+        data.pendingAdd.clear();
+        data.pendingRemove.clear();
         int size = buf.readVarInt();
 
         for (int i = 0; i < size; i++) {
@@ -366,10 +301,6 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         }
 
         return data;
-    }
-
-    public List<AttachmentEntity> getPendingAdd() {
-        return pendingAdd;
     }
 
 }
