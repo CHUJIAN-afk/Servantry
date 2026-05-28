@@ -130,20 +130,9 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     public boolean summonServant(Player player, Servant servant) {
         if (canSummon(player, servant.getSlotCost())) {
             add(Type.Servant, servant);
-            changed = true;
             return true;
         }
         return false;
-    }
-
-    /** 标记指定 AttachmentEntityType 的所有仆从为待移除 */
-    public void removeServant(AttachmentEntityType<?> type) {
-        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = groups.get(Type.Servant);
-        List<AttachmentEntity> list = inner != null ? inner.get(type) : null;
-        if (list != null && !list.isEmpty()) {
-            for (AttachmentEntity e : list) e.setRemove();
-            changed = true;
-        }
     }
 
     /** 获取玩家仆从最大栏位数（来自属性） */
@@ -209,7 +198,9 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                     }
                     return false;
                 });
-                if (list.isEmpty()) typeIt.remove();
+                if (list.isEmpty()) {
+                    typeIt.remove();
+                }
             }
         }
 

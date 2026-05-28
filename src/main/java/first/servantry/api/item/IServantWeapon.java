@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -82,7 +83,16 @@ public interface IServantWeapon<T extends Servant> {
 
     /** 移除玩家拥有的此类型仆从。 */
     default void remove(Player player) {
-        player.getData(AttachmentRegister.EntityData).removeServant(getType());
+        EntityData entityData = player.getData(AttachmentRegister.EntityData);
+        AttachmentEntityType<?> type = getType();
+        List<Servant> servants = entityData.getServants();
+        if (!servants.isEmpty()) {
+            for (Servant servant : servants) {
+                if (servant.getType() == type) {
+                    servant.setRemove();
+                }
+            }
+        }
     }
 
     // ===================== 构建器 =====================
