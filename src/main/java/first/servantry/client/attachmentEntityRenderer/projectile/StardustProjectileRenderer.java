@@ -10,7 +10,6 @@ import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.Sheets;
 
 /**
  * 星细胞射弹渲染器。
@@ -42,7 +41,7 @@ public class StardustProjectileRenderer extends AbstractAttachmentEntityRenderer
 
     @Override
     protected void renderEntity(StardustProjectile projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustProjectile> config) {
-        ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource, Sheets.translucentItemSheet());
+        ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 
 }

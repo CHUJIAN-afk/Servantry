@@ -12,7 +12,6 @@ import first.servantry.common.servant.StardustCell;
 import first.servantry.register.ModelRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.Sheets;
 
 /**
  * 星尘细胞渲染器。
@@ -61,7 +60,7 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
                     .offset(0.25)
                     .emit();
         }
-        ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource, Sheets.translucentItemSheet());
+        ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 
 }

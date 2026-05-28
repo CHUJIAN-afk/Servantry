@@ -119,7 +119,7 @@ dependencies {
     compileOnly "curse.maven:irisshaders-455508:6661598"
     compileOnly "curse.maven:jade-324717:7545219"
 
-    compileOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:19.25.0.323")
 }
 
