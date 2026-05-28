@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import first.servantry.Servantry;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -64,7 +63,7 @@ public class AttributeArmorItem extends ArmorItem {
         }
 
         public Builder modifier(Holder<Attribute> attribute, double value, AttributeModifier.Operation operation) {
-            return modifier(attribute, new AttributeModifier(ResourceLocation.fromNamespaceAndPath(Servantry.MODID, "armor_" + type.getName()), value, operation));
+            return modifier(attribute, new AttributeModifier(Servantry.rl("armor_" + type.getName()), value, operation));
         }
 
         public Builder properties(Consumer<Properties> customizer) {

@@ -42,6 +42,7 @@ public class RenderUtil {
 
             TextureAtlasSprite sprite = quads.getFirst().getSprite();
             SpriteContents contents = sprite.contents();
+
             int width = contents.width();
             int height = contents.height();
             if (width <= 0 || height <= 0) return 0xFFFFFF;
