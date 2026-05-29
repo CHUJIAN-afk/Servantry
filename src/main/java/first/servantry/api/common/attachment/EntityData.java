@@ -73,11 +73,11 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     }
 
     /**
-     * 收集所有 ArmorSetServant 类型分组中的仆从
+     * 收集所有 ExtraServant 类型分组中的仆从
      */
-    public List<Servant> getArmorSetServants() {
+    public List<Servant> getExtraServants() {
         List<Servant> result = new ArrayList<>();
-        collectFromGroup(Type.ArmorSetServant, Servant.class, result);
+        collectFromGroup(Type.ExtraServant, Servant.class, result);
         return result;
     }
 
@@ -301,6 +301,6 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     public enum Type {
         Servant,
         Projectile,
-        ArmorSetServant
+        ExtraServant
     }
 }

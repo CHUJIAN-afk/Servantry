@@ -17,8 +17,7 @@ import software.bernie.geckolib.loading.math.MolangQueries;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoRenderer;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Geo 外挂渲染器（单例），独立于 GeckoLib 的 Entity/Item/BlockEntity 渲染体系。
@@ -60,6 +59,10 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
      * 当前帧动画进度 [0,1]，渲染后自动重置为 0
      */
     private float progress = 0f;
+    /**
+     * 本帧需要隐藏的骨骼名集合，渲染后自动清空
+     */
+    private final Set<String> hiddenBones = new HashSet<>();
 
     private GeoSideloader(GeoAttachmentModel geoModel) {
         this.geoModel = geoModel;
@@ -88,6 +91,15 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
     public void setAnimation(String animationName, float progress) {
         this.currentAnimationName = animationName;
         this.progress = progress;
+    }
+
+    /**
+     * 隐藏指定骨骼（包含其子骨骼）。必须在 {@link #render} 之前调用，每帧结束后自动恢复。
+     *
+     * @param boneName .geo.json 中定义的骨骼名称
+     */
+    public void hideBone(String... boneName) {
+        this.hiddenBones.addAll(Arrays.asList(boneName));
     }
 
     /**
@@ -122,6 +134,11 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
         GeoModel<DummyGeoAnimatable> model = getGeoModel();
         model.handleAnimations(animatable, 0, animationState, partialTick);
 
+        // 应用骨骼可见性
+        for (String boneName1 : hiddenBones) {
+            getGeoModel().getBone(boneName1).ifPresent(bone -> bone.setHidden(true));
+        }
+
         // 绘制模型
         BakedGeoModel bakedModel = getGeoModel().getBakedModel(getGeoModel().getModelResource(getAnimatable(), this));
         GeoRenderer.super.actuallyRender(poseStack, animatable, bakedModel, renderType, bufferSource, buffer, false, partialTick, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
@@ -130,8 +147,12 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
 
         // 清理
         MolangQueries.clearActor();
+        for (String boneName : hiddenBones) {
+            getGeoModel().getBone(boneName).ifPresent(bone -> bone.setHidden(false));
+        }
         this.currentAnimationName = null;
         this.progress = 0;
+        this.hiddenBones.clear();
     }
 
     // ===================== GeoRenderer 接口实现 =====================

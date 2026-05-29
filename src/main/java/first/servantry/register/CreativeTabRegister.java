@@ -33,11 +33,11 @@ public class CreativeTabRegister {
             );
 
     public static void renderBanners(final CreativeModeInventoryScreen screen, final GuiGraphics graphics, int mouseX, int mouseY, float scrollOffs) {
-        List<ItemRegister.TabSection> sections = ItemRegister.Register.sortedEntries();
-        LinkedHashMap<ItemRegister.TabSection, List<DeferredItem<Item>>> map = ItemRegister.Register.getMap();
+        List<ItemRegister.TabGroup> sections = ItemRegister.Register.sortedEntries();
+        LinkedHashMap<ItemRegister.TabGroup, List<DeferredItem<Item>>> map = ItemRegister.Register.getMap();
 
         int totalRows = 0;
-        for (ItemRegister.TabSection section : sections) {
+        for (ItemRegister.TabGroup section : sections) {
             totalRows += 1;
             totalRows += (map.get(section).size() + 8) / 9;
         }
@@ -47,7 +47,7 @@ public class CreativeTabRegister {
         int top = screen.getGuiTop() + 17;
 
         int currentRow = 0;
-        for (ItemRegister.TabSection section : sections) {
+        for (ItemRegister.TabGroup section : sections) {
             int bannerRow = currentRow;
             int itemRows = (map.get(section).size() + 8) / 9;
             currentRow += 1 + itemRows;
@@ -61,9 +61,9 @@ public class CreativeTabRegister {
     }
 
     public static void processItems(Consumer<ItemStack> displayItems, Consumer<ItemStack> searchItems) {
-        LinkedHashMap<ItemRegister.TabSection, List<DeferredItem<Item>>> map = ItemRegister.Register.getMap();
-        List<ItemRegister.TabSection> sortedKeys = ItemRegister.Register.sortedEntries();
-        for (ItemRegister.TabSection key : sortedKeys) {
+        LinkedHashMap<ItemRegister.TabGroup, List<DeferredItem<Item>>> map = ItemRegister.Register.getMap();
+        List<ItemRegister.TabGroup> sortedKeys = ItemRegister.Register.sortedEntries();
+        for (ItemRegister.TabGroup key : sortedKeys) {
             List<DeferredItem<Item>> items = map.get(key);
             List<ItemStack> stacks = new ArrayList<>(items.stream()
                     .map(item -> item.get().getDefaultInstance())

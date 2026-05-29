@@ -7,7 +7,6 @@ import first.servantry.register.AttachmentRegister;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -108,6 +107,7 @@ public interface IServantWeapon<T extends Servant> {
         private Consumer<T> summonPost = servant -> {
         };
         private Consumer<Player> onRemove = null;
+        private Consumer<Item.Properties> properties = null;
         private int summonCount = 1;
 
         public Builder(@NotNull Supplier<AttachmentEntityType<T>> typeSupplier) {
@@ -148,13 +148,18 @@ public interface IServantWeapon<T extends Servant> {
             return this;
         }
 
-        /** 构建武器物品。 */
-        public Item buildItem() {
-            return new ServantWeaponItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1));
+        public Builder<T> properties(Consumer<Item.Properties> properties) {
+            this.properties = properties;
+            return this;
         }
 
-        public Item buildItem(Item.Properties properties) {
-            return new ServantWeaponItem(properties);
+        /** 构建武器物品。 */
+        public Item build() {
+            Item.Properties proper = new Item.Properties().stacksTo(1);
+            if (properties != null) {
+                properties.accept(proper);
+            }
+            return new ServantWeaponItem(proper);
         }
 
         private class ServantWeaponItem extends Item implements IServantWeapon<T> {
