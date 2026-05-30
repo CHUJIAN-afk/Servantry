@@ -9,6 +9,7 @@ import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.terraprism.TerraprismAttackGoal;
 import first.servantry.common.servant.goal.terraprism.TerraprismIdleGoal;
+import first.servantry.common.servant.goal.terraprism.TerraprismPrepGoal;
 import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -27,8 +28,8 @@ import java.util.Set;
 
 public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
-    public boolean idle = true;
     public boolean attacking = false;
+    private boolean hasTarget = false;
     public int trailTimer = 0;
     public float idleBlend = 0f;
     public float idleBlendO = 0f;
@@ -41,7 +42,8 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     @Override
     public void registerGoals(ServantGoalSelector goalSelector) {
         goalSelector.addGoal(0, new TerraprismAttackGoal(this));
-        goalSelector.addGoal(1, new TerraprismIdleGoal(this));
+        goalSelector.addGoal(1, new TerraprismPrepGoal(this));
+        goalSelector.addGoal(2, new TerraprismIdleGoal(this));
     }
 
     @Override
@@ -92,7 +94,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     public void tick() {
         if (owner.level().isClientSide()) {
             idleBlendO = idleBlend;
-            if (attacking) {
+            if (hasTarget) {
                 trailTimer = 12;
                 idleBlend = Math.max(0.0f, idleBlend - 0.25f);
             } else {
@@ -105,14 +107,14 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
     @Override
     public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeBoolean(idle);
         buf.writeBoolean(attacking);
+        buf.writeBoolean(!(getGoalSelector().getCurrentGoal() instanceof TerraprismIdleGoal));
     }
 
     @Override
     public void readAdditional(RegistryFriendlyByteBuf buf) {
-        this.idle = buf.readBoolean();
         this.attacking = buf.readBoolean();
+        this.hasTarget = buf.readBoolean();
     }
 
     public PathNode getInterpolatedIdleState(float partialTick) {
@@ -147,11 +149,14 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     /**
      * 获取当前速度向量
      */
-    public Vec3 getCurrentVelocity(Vec3 currentPos) {
+    public Vec3 getCurrentVelocity() {
+        Vec3 currentPos = getPos();
         ArrayList<PathNode> history = getHistoryNodes();
         if (history.size() > 1) {
-            Vec3 rawVel = currentPos.subtract(history.get(1).pos());
-            if (rawVel.lengthSqr() > 1e-5) return rawVel.normalize();
+            Vec3 rawVel = currentPos.subtract(history.getFirst().pos());
+            if (rawVel.lengthSqr() > 1e-5) {
+                return rawVel.normalize();
+            }
         }
         return Vec3.directionFromRotation(getPitch(), getYaw()).normalize();
     }
@@ -160,11 +165,27 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
      * 获取当前法线向量（基于旋转）
      */
     public Vec3 getCurrentNormal() {
-        Quaternionf q = new Quaternionf().rotateY((float) Math.toRadians(-getYaw()))
+        Quaternionf q = new Quaternionf()
+                .rotateY((float) Math.toRadians(-getYaw()))
                 .rotateX((float) Math.toRadians(getPitch()))
                 .rotateZ((float) Math.toRadians(getRoll()));
         Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
         return new Vec3(upV.x(), upV.y(), upV.z()).normalize();
+    }
+
+    /**
+     * 计算贝塞尔曲线上的点（De Casteljau算法，支持任意数量控制点）
+     */
+    public Vec3 calculateBezierPoint(float delta, Vec3... P) {
+        if (P.length == 0) return Vec3.ZERO;
+        if (P.length == 1) return P[0];
+        Vec3[] pts = P.clone();
+        for (int k = P.length - 1; k > 0; k--) {
+            for (int i = 0; i < k; i++) {
+                pts[i] = pts[i].lerp(pts[i + 1], delta);
+            }
+        }
+        return pts[0];
     }
 
     /**
@@ -196,5 +217,4 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     public AttachmentEntityType<? extends Servant> getType() {
         return AttachmentEntityRegister.TerraPrism.get();
     }
-
 }

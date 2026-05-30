@@ -8,288 +8,106 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * 泰拉棱镜仆从的攻击目标类。
- * <p>
- * 攻击流程采用状态机驱动，包含四个阶段：
- * <ol>
- *   <li>PREP - 准备阶段：仆从上升到准备位置并调整朝向</li>
- *   <li>FIRST_STRIKE - 首次攻击：直线冲刺攻击目标</li>
- *   <li>CONTINUOUS - 连续攻击：交替执行椭圆斩击和沙漏斩击</li>
- *   <li>CHAIN - 连锁攻击：目标切换时的快速衔接攻击</li>
- * </ol>
- * </p>
- * <p>
- * 核心特性：
- * <ul>
- *   <li>攻击周期固定为 14 tick，确保节奏一致性</li>
- *   <li>持续位置修正：只要存在合法目标就实时调整轨迹</li>
- *   <li>伤害控制：动作执行到一半时清空已攻击列表，确保每个目标每轮攻击仅受一次伤害</li>
- * </ul>
- * </p>
+ * 泰拉棱镜仆从的攻击状态机。
  */
 public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
+
+    private boolean firstStrike = true;
+    private Vec3 lastTargetPos = Vec3.ZERO;
 
     public TerraprismAttackGoal(Terraprism servant) {
         super(servant);
     }
 
-    // ===================== 状态定义 =====================
-
-    /** 攻击阶段枚举 */
-    enum Phase { PREP, FIRST_STRIKE, CONTINUOUS, CHAIN }
-
-    /** 当前攻击阶段 */
-    private Phase phase;
-
-    /** 上一次记录的目标位置，用于位置修正计算 */
-    private Vec3 lastTargetPos;
-
-    /** 准备阶段的目标位置 */
-    private Vec3 prepPos;
-
-    /** 准备阶段的等待计数器 */
-    private int prepTick;
-
-    /** 上一次是否为椭圆斩击模式，用于交替切换 */
-    private boolean lastWasEllipse = true;
-
-    // ===================== 目标条件判断 =====================
-
     @Override
     public boolean canUse() {
-        return servant.getTarget() != null && servant.getOwner().getRandom().nextDouble() < 0.1;
+        return servant.isTarget(servant.getTarget()) && servant.attacking;
     }
-
-    @Override
-    public boolean canContinueToUse() {
-        if (!servant.isTarget(servant.getTarget())) return false;
-        if (servant.isExecutingPath()) return true;
-        Player owner = servant.getOwner();
-        return owner == null || servant.getPos().distanceToSqr(owner.position()) <= 4096.0;
-    }
-
-    @Override
-    public boolean isInterruptable() {
-        return !servant.isExecutingPath();
-    }
-
-    // ===================== 状态生命周期 =====================
 
     @Override
     public void start() {
-        servant.attacking = true;
-        servant.idle = false;
-        phase = Phase.PREP;
-        prepPos = servant.getPos().add(0, 2, 0);
-        prepTick = 0;
-        lastTargetPos = null;
+        firstStrike = true;
+        lastTargetPos = servant.getTarget().getBoundingBox().getCenter();
     }
-
-    @Override
-    public void stop() {
-        servant.attacking = false;
-        servant.hitTargets.clear();
-        phase = null;
-    }
-
-    // ===================== 主 Tick 循环 =====================
 
     @Override
     public void tick() {
-        LivingEntity target = servant.getTarget();
-
-        // 目标切换检测：在非准备和非连锁阶段时触发连锁攻击
-        if (servant.isTargetChange() && phase != Phase.PREP && phase != Phase.CHAIN && target != null) {
-            transitionToChain(target);
-            return;
+        PlannedPath currentPath = servant.getCurrentPath();
+        if (currentPath != null && currentPath.getCurrentIndex() == (currentPath.getNodes().size() / 3)) {
+            servant.hitTargets.clear();
         }
-
-        // 状态机调度
-        switch (phase) {
-            case PREP -> tickPrep(target);
-            case FIRST_STRIKE -> tickFirstStrike(target);
-            case CONTINUOUS -> tickContinuous(target);
-            case CHAIN -> tickChain(target);
+        applyPositionCorrection();
+        if (servant.isTargetChange()) {
+            planChainStrike();
         }
-    }
-
-    // ===================== 准备阶段 (PREP) =====================
-
-    /**
-     * 准备阶段：仆从上升到准备位置并调整朝向目标。
-     * <p>
-     * 当仆从到达准备位置并稳定 5 tick 后，进入首次攻击阶段。
-     * </p>
-     */
-    private void tickPrep(LivingEntity target) {
-        if (target == null) return;
-
-        // 计算平滑过渡位置和朝向
-        Vec3 nextPos = servant.getPos().lerp(prepPos, 0.2f);
-        float nextYaw = servant.getYaw();
-        float nextPitch = servant.getPitch();
-        float nextRoll = servant.getRoll();
-
-        Vec3 toTarget = target.getEyePosition().subtract(servant.getPos());
-        if (toTarget.lengthSqr() > 1e-4) {
-            Vec3 bladeNormal = toTarget.cross(new Vec3(0, 1, 0)).normalize();
-            PathNode prepNode = servant.getEulerNode(servant.getPos(), toTarget, bladeNormal);
-            nextYaw = Mth.rotLerp(0.3f, servant.getYaw(), prepNode.yaw());
-            nextPitch = Mth.rotLerp(0.3f, servant.getPitch(), prepNode.pitch());
-            nextRoll = Mth.rotLerp(0.3f, servant.getRoll(), prepNode.roll());
-        }
-
-        servant.setPath(Collections.singletonList(new PathNode(nextPos, nextYaw, nextPitch, nextRoll)));
-
-        // 检测是否到达准备位置
-        if (servant.getPos().distanceToSqr(prepPos) < 0.5) {
-            prepTick++;
-            if (prepTick > 4) {
-                transitionToFirstStrike(target);
+        if (!servant.isExecutingPath()) {
+            if (firstStrike) {
+                firstStrike = false;
+                planFirstStrike();
+            } else {
+                if (servant.getOwner().getRandom().nextDouble() < 0.8) {
+                    planEllipseSlash();
+                } else {
+                    planHourglassSlash();
+                }
             }
         }
     }
 
-    // ===================== 首次攻击阶段 (FIRST_STRIKE) =====================
-
     /**
-     * 进入首次攻击阶段：规划直线冲刺攻击路径。
+     * 规划直线攻击路径。
      */
-    private void transitionToFirstStrike(LivingEntity target) {
-        phase = Phase.FIRST_STRIKE;
-        servant.hitTargets.clear();
-
+    private void planFirstStrike() {
+        LivingEntity target = servant.getTarget();
         Vec3 start = servant.getPos();
-        Vec3 end = target.position().add(0, target.getBbHeight() / 2, 0);
-        Vec3 moveDir = end.subtract(start);
-        if (moveDir.lengthSqr() < 1e-4) moveDir = new Vec3(0, 0, 1);
-
-        Vec3 planeNormal = moveDir.cross(new Vec3(0, 1, 0)).normalize();
-        if (planeNormal.lengthSqr() < 1e-4) planeNormal = new Vec3(1, 0, 0);
-
-        // 生成 6 tick 的加速冲刺路径
+        Vec3 end = target.getBoundingBox().getCenter();
+        Vec3 direction = end.subtract(start);
+        if (direction.lengthSqr() < 1e-4) {
+            direction = new Vec3(0, 0, 1);
+        }
+        end = end.add(direction.normalize().scale(2));
+        Vec3 planeNormal = direction.cross(new Vec3(0, 1, 0)).normalize();
+        if (planeNormal.lengthSqr() < 1e-4) {
+            planeNormal = new Vec3(1, 0, 0);
+        }
         List<PathNode> nodes = new ArrayList<>();
         for (int i = 1; i <= 6; i++) {
-            float t = ((float) i / 6) * ((float) i / 6);
-            Vec3 p = start.lerp(end, t);
-            nodes.add(servant.getEulerNode(p, moveDir, planeNormal));
+            float delta = (float) i / 6;
+            delta = delta * delta;
+            nodes.add(servant.getEulerNode(start.lerp(end, delta), direction, planeNormal));
         }
         servant.setPath(nodes);
     }
 
     /**
-     * 首次攻击阶段 Tick：路径完成后进入连续攻击阶段。
-     */
-    private void tickFirstStrike(LivingEntity target) {
-        applyPositionCorrection(target);
-        applyDamageControl(6);
-
-        if (!servant.isExecutingPath() && target != null) {
-            transitionToContinuous(target);
-        }
-    }
-
-    // ===================== 连续攻击阶段 (CONTINUOUS) =====================
-
-    /**
-     * 进入连续攻击阶段：初始化循环计数并规划首次斩击。
-     */
-    private void transitionToContinuous(LivingEntity target) {
-        phase = Phase.CONTINUOUS;
-        planSlashAttack(target);
-    }
-
-    /**
-     * 连续攻击阶段 Tick：执行位置修正、伤害控制，并在路径完成后规划下一轮攻击。
-     */
-    private void tickContinuous(LivingEntity target) {
-        applyPositionCorrection(target);
-        applyDamageControl(14);
-
-        if (!servant.isExecutingPath() && target != null) {
-            float chance = lastWasEllipse ? 0.25f : 0.75f;
-            if (target.getRandom().nextFloat() < chance) {
-                lastWasEllipse = !lastWasEllipse;
-            }
-            planSlashAttack(target);
-        }
-    }
-
-    /**
-     * 规划斩击攻击：根据当前模式选择椭圆斩击或沙漏斩击。
-     */
-    private void planSlashAttack(LivingEntity target) {
-        if (target == null) return;
-        servant.hitTargets.clear();
-        lastTargetPos = target.position().add(0, target.getBbHeight() / 2.0, 0);
-
-        if (lastWasEllipse) {
-            planEllipseSlash(target);
-        } else {
-            planHourglassSlash(target);
-        }
-    }
-
-    // ===================== 椭圆斩击规划 =====================
-
-    /**
      * 规划椭圆斩击攻击路径。
-     * <p>
-     * 路径由两部分组成：
-     * <ul>
-     *   <li>前 6 tick：贝塞尔曲线平滑过渡进入椭圆轨迹</li>
-     *   <li>后 8 tick：沿椭圆轨迹环绕目标</li>
-     * </ul>
-     * 总计 14 tick 的攻击周期。
-     * </p>
      */
-    private void planEllipseSlash(LivingEntity target) {
+    private void planEllipseSlash() {
         Player owner = servant.getOwner();
-        int duration = 14;      // 固定攻击周期
-        int blendTicks = 6;     // 混合过渡时长
+        int duration = 14;
+        int blendTicks = 6;
         Vec3 currentPos = servant.getPos();
         Vec3 T = lastTargetPos;
 
-        // 生成随机椭圆参数
+        // 椭圆几何参数
         float randAngle = owner.getRandom().nextFloat() * Mth.TWO_PI;
-        float randRadius = 4;
         float randY = 0.5f + owner.getRandom().nextFloat() * 2.5f;
-        Vec3 farPoint = T.add(Math.cos(randAngle) * randRadius, randY, Math.sin(randAngle) * randRadius);
-
-        // 计算椭圆几何参数
-        Vec3 diff = farPoint.subtract(T);
-        Vec3 major = diff.scale(0.5);
+        Vec3 farPoint = T.add(Math.cos(randAngle) * 4, randY, Math.sin(randAngle) * 4);
+        Vec3 major = farPoint.subtract(T).scale(0.5);
         Vec3 center = T.add(major);
         Vec3 majorDir = major.normalize();
-
-        Vec3 randomUp = new Vec3(owner.getRandom().nextDouble() - 0.5, owner.getRandom().nextDouble() - 0.5, owner.getRandom().nextDouble() - 0.5).normalize();
-        Vec3 minorDir = majorDir.cross(randomUp).normalize();
+        Vec3 minorDir = majorDir.cross(new Vec3(owner.getRandom().nextDouble() - 0.5, owner.getRandom().nextDouble() - 0.5, owner.getRandom().nextDouble() - 0.5).normalize()).normalize();
         if (minorDir.lengthSqr() < 1e-5) minorDir = new Vec3(0, 1, 0);
-        double minorRadius = major.length() * 0.75;
-        Vec3 minor = minorDir.scale(minorRadius);
+        Vec3 minor = minorDir.scale(major.length() * 0.75);
 
-        // 获取当前运动状态
-        Vec3 currentVel = servant.getCurrentVelocity(currentPos);
+        // 当前运动状态
         Vec3 currentTip = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
         Vec3 currentNormal = servant.getCurrentNormal();
-
-        // 计算贝塞尔过渡控制点
-        float biasedTBlend = ((float) blendTicks / duration) - 0.08f * Mth.sin(((float) blendTicks / duration) * Mth.TWO_PI);
-        float thetaBlend = biasedTBlend * Mth.TWO_PI;
-        Vec3 P3 = center.add(major.scale(Math.cos(thetaBlend))).add(minor.scale(Math.sin(thetaBlend)));
-        Vec3 E_prime = major.scale(-Math.sin(thetaBlend)).add(minor.scale(Math.cos(thetaBlend))).normalize();
-        double R = currentPos.distanceTo(P3) * 0.4;
-        Vec3 P0 = currentPos;
-        Vec3 P1 = currentPos.add(currentVel.scale(R));
-        Vec3 P2 = P3.subtract(E_prime.scale(R));
 
         List<PathNode> nodes = new ArrayList<>();
         for (int i = 1; i <= duration; i++) {
@@ -297,146 +115,91 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
             float biasedT = progress - 0.08f * Mth.sin(progress * Mth.TWO_PI);
             float theta = biasedT * Mth.TWO_PI;
 
-            Vec3 targetP = servant.calculateEllipsePoint(center, major, minor, theta);
-            Vec3 targetTrueTangent = servant.calculateEllipseTangent(major, minor, theta);
-            Vec3 targetTip = targetP.subtract(center).normalize();
-            Vec3 targetNormal = targetTip.cross(targetTrueTangent).normalize();
-            if (targetNormal.lengthSqr() < 1e-5) targetNormal = majorDir.cross(targetTip).normalize();
+            Vec3 ellipseP = servant.calculateEllipsePoint(center, major, minor, theta);
+            Vec3 tangent = servant.calculateEllipseTangent(major, minor, theta);
+            Vec3 tipDir = ellipseP.subtract(center).normalize();
+            Vec3 normal = tipDir.cross(tangent).normalize();
+            if (normal.lengthSqr() < 1e-5) normal = majorDir.cross(tipDir).normalize();
 
             if (i <= blendTicks) {
-                // 混合阶段：贝塞尔曲线平滑过渡
-                float localT = (float) i / blendTicks;
-                float smoothT = localT * localT * (3.0f - 2.0f * localT);
-                Vec3 p = servant.calculateBezierPoint(P0, P1, P2, P3, localT);
-                Vec3 tipDir = servant.slerpVector(currentTip, targetTip, smoothT);
-                Vec3 planeNormal = servant.slerpVector(currentNormal, targetNormal, smoothT);
-                nodes.add(servant.getEulerNode(p, tipDir, planeNormal));
+                // 前半段：从自身位置平滑过渡到椭圆轨迹
+                float delta = (float) i / blendTicks;
+                float smooth = delta * delta * (3.0f - 2.0f * delta);
+                Vec3 p = currentPos.lerp(ellipseP, smooth);
+                Vec3 bTip = currentTip.lerp(tipDir, smooth);
+                Vec3 bNormal = currentNormal.lerp(normal, smooth);
+                nodes.add(servant.getEulerNode(p, bTip, bNormal));
             } else {
-                // 纯椭圆阶段
-                nodes.add(servant.getEulerNode(targetP, targetTip, targetNormal));
+                nodes.add(servant.getEulerNode(ellipseP, tipDir, normal));
             }
         }
         servant.setPath(nodes);
     }
 
-    // ===================== 沙漏斩击规划 =====================
-
     /**
-     * 规划沙漏斩击攻击路径。
-     * <p>
-     * 路径分为三部分：
-     * <ul>
-     *   <li>准备阶段 (4 tick)：贝塞尔曲线移动到攻击准备位置</li>
-     *   <li>攻击阶段 (4 tick)：直线加速冲向目标</li>
-     *   <li>撤退阶段 (8 tick)：平滑过渡到下一个攻击方向</li>
-     * </ul>
-     * 总计 16 tick 的攻击周期。
-     * </p>
+     * 规划刺击路径。
      */
-    private void planHourglassSlash(LivingEntity target) {
+    private void planHourglassSlash() {
+        LivingEntity target = servant.getTarget();
         Vec3 startPos = servant.getPos();
-        Vec3 T = target.getBoundingBox().getCenter();
+        // 目标头顶4格、半径4格的圆上，选择离startPos最近的位置
+        Vec3 center = new Vec3(target.getX(), target.getY() + 3, target.getZ());
+        Vec3 toStart = startPos.subtract(center);
+        double angle = Math.atan2(toStart.z, toStart.x);
+        Vec3 attackPrepPos = center.add(Math.cos(angle) * 4, 0, Math.sin(angle) * 4);
+        Vec3 endPos = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), 0.5f);
 
         // 计算攻击方向
-        Vec3 toTarget = T.subtract(startPos);
-        if (toTarget.lengthSqr() < 1e-5) toTarget = new Vec3(0, -1, 0);
-        Vec3 attackDir = toTarget.normalize();
-        if (attackDir.y > -0.2) {
-            attackDir = new Vec3(attackDir.x, Math.min(-0.5, attackDir.y - 0.5), attackDir.z).normalize();
+        Vec3 attackDir = endPos.subtract(attackPrepPos);
+        if (attackDir.lengthSqr() < 1e-5) {
+            attackDir = new Vec3(0, -1, 0);
         }
-
-        // 计算关键位置
-        double dist = Math.max(7.0, startPos.distanceTo(T));
-        Vec3 prepPos = T.subtract(attackDir.scale(dist));
-        Vec3 hitPos = T.add(attackDir);
-
-        // 计算下一个攻击方向（旋转 80 度）
-        Vector3f v = new Vector3f((float) attackDir.x, (float) attackDir.y, (float) attackDir.z);
-        new Quaternionf().rotateY((float) (Math.PI * 0.8)).transform(v);
-        Vec3 nextAttackDir = new Vec3(v.x(), v.y(), v.z()).normalize();
-        Vec3 nextPrepPos = T.subtract(nextAttackDir.scale(dist));
+        endPos = endPos.add(attackDir.normalize().scale(3));
 
         // 获取当前运动状态
-        Vec3 currentVel = servant.getCurrentVelocity(startPos);
+        Vec3 currentVel = servant.getCurrentVelocity();
         Vec3 currentTip = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
         Vec3 currentNormal = servant.getCurrentNormal();
 
         Vec3 planeNormal = attackDir.cross(new Vec3(0, 1, 0)).normalize();
-        if (planeNormal.lengthSqr() < 1e-4) planeNormal = new Vec3(1, 0, 0);
+        if (planeNormal.lengthSqr() < 1e-4) {
+            planeNormal = new Vec3(1, 0, 0);
+        }
 
-        int prepTicks = 3;
-        int attackTicks = 5;
-        int retreatTicks = 6;
-
-        // 贝塞尔准备阶段控制点
-        double R = startPos.distanceTo(prepPos) * 0.4;
-        Vec3 P0 = startPos;
-        Vec3 P1 = startPos.add(currentVel.scale(R));
-        Vec3 P2 = prepPos.subtract(attackDir.scale(R));
+        int prepTicks = 7;
+        int attackTicks = 7;
 
         List<PathNode> nodes = new ArrayList<>();
 
-        // 准备阶段 (4 tick)
         for (int i = 1; i <= prepTicks; i++) {
-            float localT = (float) i / prepTicks;
-            float smoothT = localT * localT * (3.0f - 2.0f * localT);
-            Vec3 p = servant.calculateBezierPoint(P0, P1, P2, prepPos, localT);
-            Vec3 tipDir = servant.slerpVector(currentTip, attackDir, smoothT);
-            Vec3 bNormal = servant.slerpVector(currentNormal, planeNormal, smoothT);
-            nodes.add(servant.getEulerNode(p, tipDir, bNormal));
+            float delta = (float) i / prepTicks;
+            Vec3 point = servant.calculateBezierPoint(delta, startPos, startPos.add(currentVel), attackPrepPos);
+            Vec3 tipDir = currentTip.lerp(attackDir, delta);
+            Vec3 bNormal = currentNormal.lerp(planeNormal, delta);
+            nodes.add(servant.getEulerNode(point, tipDir, bNormal));
         }
 
-        // 攻击阶段 (4 tick)
         for (int i = 1; i <= attackTicks; i++) {
-            float t = ((float) i / attackTicks) * ((float) i / attackTicks);
-            Vec3 p = prepPos.lerp(hitPos, t);
-            nodes.add(servant.getEulerNode(p, attackDir, planeNormal));
-        }
-
-        // 撤退阶段 (8 tick)
-        Vec3 nextPlaneNormal = nextAttackDir.cross(new Vec3(0, 1, 0)).normalize();
-        if (nextPlaneNormal.lengthSqr() < 1e-4) nextPlaneNormal = new Vec3(1, 0, 0);
-        for (int i = 1; i <= retreatTicks; i++) {
-            float t = (float) i / retreatTicks;
-            float easeOut = t * (2.0f - t);
-            Vec3 p = hitPos.lerp(nextPrepPos, easeOut);
-            Vec3 tipDir = servant.slerpVector(attackDir, nextAttackDir, easeOut);
-            Vec3 bNormal = servant.slerpVector(planeNormal, nextPlaneNormal, easeOut);
-            nodes.add(servant.getEulerNode(p, tipDir, bNormal));
+            float delta = (float) i / attackTicks;
+            delta = delta * delta * delta;
+            Vec3 point = attackPrepPos.lerp(endPos, delta);
+            nodes.add(servant.getEulerNode(point, attackDir, planeNormal));
         }
         servant.setPath(nodes);
     }
 
-    // ===================== 连锁攻击阶段 (CHAIN) =====================
-
-    /**
-     * 进入连锁攻击阶段：目标切换时的快速衔接攻击。
-     */
-    private void transitionToChain(LivingEntity target) {
-        phase = Phase.CHAIN;
-        servant.hitTargets.clear();
-        planChainStrike(target);
-    }
-
     /**
      * 规划连锁攻击路径。
-     * <p>
-     * 根据当前朝向与目标方向的夹角选择攻击模式：
-     * <ul>
-     *   <li>夹角小于阈值：直刺模式（快速直线攻击）</li>
-     *   <li>夹角大于阈值：横扫模式（弧形攻击）</li>
-     * </ul>
-     * </p>
      */
-    private void planChainStrike(LivingEntity target) {
-        if (target == null) return;
-        lastTargetPos = target.position().add(0, target.getBbHeight() / 2.0, 0);
+    private void planChainStrike() {
+        lastTargetPos = servant.getTarget().getBoundingBox().getCenter();
         double thrustAngleThreshold = 0.9;
-        int thrustAttackTicks = 14;
-        int sweepAttackTicks = 14;
+        int thrustAttackTicks = 10;
+        int sweepAttackTicks = 10;
         double curvePullOutward = 0.35;
 
         Vec3 startPos = servant.getPos();
+
         Vec3 T = lastTargetPos;
 
         Vec3 fwd = T.subtract(startPos);
@@ -451,7 +214,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
         // 获取当前运动状态
         double speed;
-        Vec3 currentVel = servant.getCurrentVelocity(startPos);
+        Vec3 currentVel = servant.getCurrentVelocity();
         ArrayList<PathNode> history = servant.getHistoryNodes();
         if (history.size() > 1) {
             speed = startPos.subtract(history.get(1).pos()).length();
@@ -513,32 +276,12 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
     }
 
     /**
-     * 连锁攻击阶段 Tick：路径完成后进入连续攻击阶段。
+     * 位置修正机制使,仆从轨迹能够实时追踪移动中的目标。
      */
-    private void tickChain(LivingEntity target) {
-        applyPositionCorrection(target);
-        applyDamageControl(servant.getCurrentPath().getNodes().size());
-
-        if (!servant.isExecutingPath() && target != null) {
-            transitionToContinuous(target);
-        }
-    }
-
-    // ===================== 通用辅助方法 =====================
-
-    /**
-     * 位置修正机制：只要存在合法攻击目标，就持续调整路径节点位置。
-     * <p>
-     * 根据目标当前位置与上次记录位置的偏移，按距离权重修正剩余路径节点，
-     * 使仆从轨迹能够实时追踪移动中的目标。
-     * </p>
-     */
-    private void applyPositionCorrection(LivingEntity target) {
-        if (target == null || lastTargetPos == null || !servant.isExecutingPath()) return;
-
-        Vec3 currentTargetCenter = target.position().add(0, target.getBbHeight() / 2.0, 0);
+    private void applyPositionCorrection() {
+        LivingEntity target = servant.getTarget();
+        Vec3 currentTargetCenter = target.getBoundingBox().getCenter();
         Vec3 offset = currentTargetCenter.subtract(lastTargetPos);
-
         if (offset.lengthSqr() > 1e-5) {
             PlannedPath path = servant.getCurrentPath();
             if (path != null) {
@@ -555,26 +298,4 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         }
         lastTargetPos = currentTargetCenter;
     }
-
-    /**
-     * 伤害控制机制：在动作计划执行到一半时清空已攻击列表。
-     * <p>
-     * 确保每次攻击周期对每个目标仅造成一次伤害，同时避免伤害丢失。
-     * 当路径执行到一半时清空列表，后半段可以再次攻击已攻击过的目标，
-     * 但同一半段内不会重复攻击。
-     * </p>
-     *
-     * @param totalDuration 该攻击周期的总时长（tick 数）
-     */
-    private void applyDamageControl(int totalDuration) {
-        PlannedPath path = servant.getCurrentPath();
-        if (path == null) return;
-
-        int currentIndex = path.getCurrentIndex();
-        // 当执行到一半时清空已攻击列表
-        if (currentIndex == totalDuration / 2) {
-            servant.hitTargets.clear();
-        }
-    }
-
 }

@@ -17,24 +17,12 @@ public class TerraprismIdleGoal extends ServantGoal<Terraprism> {
     }
 
     @Override
-    public boolean canContinueToUse() {
-        return true;
-    }
-
-    @Override
     public void start() {
-        servant.idle = true;
         servant.attacking = false;
-    }
-
-    @Override
-    public void stop() {
-        servant.idle = false;
     }
 
     @Override
     public void tick() {
         servant.setPath(Collections.singletonList(servant.getCurrentPathNode().lerp(servant.getInterpolatedIdleState(1), 0.35f)));
     }
-
 }

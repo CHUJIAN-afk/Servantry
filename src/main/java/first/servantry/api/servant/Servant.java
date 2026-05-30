@@ -156,7 +156,9 @@ public abstract class Servant extends AttachmentEntity {
     public LivingEntity getTarget() { return target; }
 
     public void setTarget(LivingEntity target) {
-        if (this.target != target) setTargetChange(true);
+        if (this.target != null && this.target != target) {
+            setTargetChange(true);
+        }
         this.target = target;
     }
 
