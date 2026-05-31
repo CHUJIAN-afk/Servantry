@@ -2,7 +2,10 @@ package first.servantry.register;
 
 import first.servantry.Servantry;
 import first.servantry.api.armorSet.ArmorSet;
+import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.register.ServantryRegistries;
+import first.servantry.common.servant.ChlorophyteCrystal;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -54,6 +57,11 @@ public class ArmorSetRegister {
                     .piece(ItemRegister.ChlorophyteLeggings)
                     .piece(ItemRegister.ChlorophyteBoots)
                     .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                    .onStart(player -> {
+                        ChlorophyteCrystal crystal = new ChlorophyteCrystal();
+                        player.getData(AttachmentRegister.EntityData).add(EntityData.Type.ExtraServant, crystal);
+                    })
+                    .onRemove(player -> player.getData(AttachmentRegister.EntityData).getExtraServants().stream().filter(servant -> servant.getType() == AttachmentEntityRegister.ChlorophyteCrystal.get()).forEach(AttachmentEntity::setRemove))
                     .build()
             );
 
@@ -64,6 +72,7 @@ public class ArmorSetRegister {
                     .piece(ItemRegister.SpookyLeggings)
                     .piece(ItemRegister.SpookyBoots)
                     .modifier(AttributeRegister.ServantDamage, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(AttributeRegister.ServantArmorPierce, 8, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -74,7 +83,7 @@ public class ArmorSetRegister {
                     .piece(ItemRegister.TikiLeggings)
                     .piece(ItemRegister.TikiBoots)
                     .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                    .modifier(AttributeRegister.ServantDamage, 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(AttributeRegister.ServantSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 

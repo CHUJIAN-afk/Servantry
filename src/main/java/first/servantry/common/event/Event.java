@@ -6,6 +6,7 @@ import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.dataComponent.ScabbardContainer;
+import first.servantry.common.servant.ChlorophyteCrystal;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.register.*;
 import first.servantry.utils.CuriosUtil;
@@ -163,23 +164,32 @@ public class Event {
     }
 
     @SubscribeEvent
-    public static void onLivingDamageEventPostFromStardustCell(LivingDamageEvent.Post event) {
+    public static void onLivingDamageEventPostFromServant(LivingDamageEvent.Post event) {
         DamageSource damageSource = event.getSource();
-        if (damageSource instanceof ServantDamageSource servantDamageSource) {
-            if (servantDamageSource.getServant() instanceof StardustCell) {
-                return;
+        LivingEntity target = event.getEntity();
+        if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player && target.isAlive()) {
+            EntityData entityData = player.getData(AttachmentRegister.EntityData);
+            if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof ChlorophyteCrystal)) {
+                entityData.getExtraServants().stream()
+                        .filter(servant -> servant instanceof ChlorophyteCrystal)
+                        .map(servant -> (ChlorophyteCrystal) servant)
+                        .forEach(crystal -> {
+                            if (crystal.getExtraShootCooldown() <= 0) {
+                                crystal.setExtraShootCooldown(16);
+                                crystal.shootTarget(target);
+                            }
+                        });
             }
-        }
-        if (damageSource.getEntity() instanceof Player player && !player.level().isClientSide()) {
-            LivingEntity target = event.getEntity();
-            if (target.isAlive()) {
-                EntityData entityData = player.getData(AttachmentRegister.EntityData);
-                for (Servant servant : entityData.getServants()) {
-                    if (servant instanceof StardustCell cell && cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
-                        cell.setExtraShootCooldown(14);
-                        cell.shootAtTarget(target);
-                    }
-                }
+            if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof StardustCell)) {
+                entityData.getServants().stream()
+                        .filter(servant -> servant instanceof StardustCell)
+                        .map(servant -> (StardustCell) servant)
+                        .forEach(cell -> {
+                            if (cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
+                                cell.setExtraShootCooldown(14);
+                                cell.shootAtTarget(target);
+                            }
+                        });
             }
         }
     }

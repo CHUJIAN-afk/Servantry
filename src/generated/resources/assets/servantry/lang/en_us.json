@@ -106,7 +106,6 @@
   "item.servantry.terraprism": "Terraprism",
   "item.servantry.terraprism.tooltip.1": "'A flawless blade once hailed as the 'Prism of the Earth'",
   "item.servantry.threat_analyzer": "Threat Analyzer",
-  "item.servantry.threat_analyzer.tooltip.1": "Increases servants' target detection radius by 15%",
   "item.servantry.tiki_boots": "Tiki Boots",
   "item.servantry.tiki_chestplate": "Tiki Chestplate",
   "item.servantry.tiki_helmet": "Tiki Mask",
@@ -148,5 +147,6 @@
   "servantry:servant_armor_pierce": "Servant Armor Pierce",
   "servantry:servant_damage": "Servant Damage",
   "servantry:servant_knockback": "Servant Knockback",
-  "servantry:servant_max_count": "Max Servants"
+  "servantry:servant_max_count": "Max Servants",
+  "servantry:servant_search_range": "Servant Search Range"
 }

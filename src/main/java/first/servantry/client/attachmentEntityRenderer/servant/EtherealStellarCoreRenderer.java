@@ -15,7 +15,7 @@ import net.minecraft.util.Mth;
 /**
  * 永夜之眼渲染器 - 环绕仆从本体 + 激光射线渲染。
  */
-public class EyeOfEternalNightRenderer extends AbstractAttachmentEntityRenderer<EtherealStellarCore> {
+public class EtherealStellarCoreRenderer extends AbstractAttachmentEntityRenderer<EtherealStellarCore> {
 
     @Override
     protected RenderContext<EtherealStellarCore> createContext(EtherealStellarCore servant) {

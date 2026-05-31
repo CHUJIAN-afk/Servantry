@@ -33,6 +33,7 @@ public class ModelRegister {
     public static final ModelResourceLocation SHARKNADO = standalone("sharknado");
     public static final ModelResourceLocation SHARK_OPEN = standalone("shark_open");
     public static final ModelResourceLocation SHARK_CLOSE = standalone("shark_close");
+    public static final ModelResourceLocation CHLOROPHYTE_CRYSTAL = standalone("chlorophyte_crystal");
 
     private static ModelResourceLocation standalone(String path) {
         ModelResourceLocation location = ModelResourceLocation.standalone(Servantry.rl("servant/" + path));

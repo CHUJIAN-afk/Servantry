@@ -29,7 +29,7 @@ import java.util.Set;
 public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
     public boolean attacking = false;
-    private boolean hasTarget = false;
+    private boolean blend = false;
     public int trailTimer = 0;
     public float idleBlend = 0f;
     public float idleBlendO = 0f;
@@ -94,11 +94,11 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     public void tick() {
         if (owner.level().isClientSide()) {
             idleBlendO = idleBlend;
-            if (hasTarget) {
-                trailTimer = 12;
+            if (blend) {
+                trailTimer = Math.min(trailTimer + 1, 12);
                 idleBlend = Math.max(0.0f, idleBlend - 0.25f);
             } else {
-                trailTimer--;
+                trailTimer = Math.max(trailTimer - 1, 0);
                 idleBlend = Math.min(1.0f, idleBlend + 0.1f);
             }
         }
@@ -114,7 +114,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     @Override
     public void readAdditional(RegistryFriendlyByteBuf buf) {
         this.attacking = buf.readBoolean();
-        this.hasTarget = buf.readBoolean();
+        this.blend = buf.readBoolean();
     }
 
     public PathNode getInterpolatedIdleState(float partialTick) {

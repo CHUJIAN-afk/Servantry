@@ -7,6 +7,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.register.AttachmentRegister;
+import first.servantry.register.AttributeRegister;
 import first.servantry.register.DamageRegister;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -14,6 +15,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Targeting;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.phys.Vec3;
 
@@ -67,8 +69,13 @@ public abstract class Servant extends AttachmentEntity {
 
     /** 在所有者周围搜索有效目标 */
     public LivingEntity searchTarget() {
+        int targetDistance = getTargetDistance();
+        AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantSearchRange);
+        if (instance != null) {
+            targetDistance *= instance.getValue();
+        }
         return TargetSelector.create(this)
-                .maxDistance(getTargetDistance())
+                .maxDistance(targetDistance)
                 .requireLineOfSight(requireLineOfSight())
                 .filter(this::isTarget)
                 .preferCloseTo(owner.getBoundingBox().getCenter())

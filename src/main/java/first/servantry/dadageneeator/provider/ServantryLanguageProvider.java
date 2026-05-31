@@ -119,6 +119,9 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry(AttributeRegister.ServantArmorPierce.value().getDescriptionId())
                 .en("Servant Armor Pierce")
                 .zh("仆从护甲穿透");
+        entry(AttributeRegister.ServantSearchRange.value().getDescriptionId())
+                .en("Servant Search Range")
+                .zh("仆从索敌范围");
         entry(AttributeRegister.HealthRegen.value().getDescriptionId())
                 .en("Health Regen")
                 .zh("生命再生");
@@ -197,8 +200,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .tooltip().en("Servant hits have a 5% chance to release a Stardust Cell").zh("仆从攻击时有 5% 概率释放星尘细胞");
         entry(ItemRegister.ThreatAnalyzer)
                 .en("Threat Analyzer")
-                .zh("威胁分析仪")
-                .tooltip().en("Increases servants' target detection radius by 15%").zh("仆从的索敌半径增加 15%");
+                .zh("威胁分析仪");
         // ===================== 护甲 =====================
         entry(ItemRegister.HallowedIngot)
                 .en("Hallowed Ingot")

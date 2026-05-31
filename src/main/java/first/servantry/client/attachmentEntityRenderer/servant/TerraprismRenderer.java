@@ -32,6 +32,7 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
                         .timer(timer)
                         .colorRGB(0xFFFFFF)
                         .historyLength(4)
+                        .segmentsPerNode(32)
                         .width(0.7075f)
                         .diamondSize(0.15f)
                         .colorFunction((terraprism, progress, timeShift) -> {

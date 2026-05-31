@@ -10,8 +10,7 @@
     "CreativeModeTabMixin",
     "DamageSourcesMixin",
     "LivingEntityMixin",
-    "MobEffectInstanceAccessor",
-    "ServantMixin"
+    "MobEffectInstanceAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

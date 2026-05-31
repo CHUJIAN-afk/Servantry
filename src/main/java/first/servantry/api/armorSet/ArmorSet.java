@@ -89,7 +89,7 @@ public record ArmorSet(
             return this;
         }
 
-        public Builder oRemove(onTrigger oRemove) {
+        public Builder onRemove(onTrigger oRemove) {
             this.onRemove = oRemove;
             return this;
         }

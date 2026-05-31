@@ -173,18 +173,6 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
             }
         }
 
-        // tick所有未标记移除的实体
-        for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : groups.values()) {
-            for (List<AttachmentEntity> list : inner.values()) {
-                for (AttachmentEntity entity : list) {
-                    if (!entity.isRemove()) {
-                        entity.setOwner(player);
-                        entity.tick();
-                    }
-                }
-            }
-        }
-
         // 清理所有分组中标记移除的实体
         for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : groups.values()) {
             Iterator<Map.Entry<AttachmentEntityType<?>, List<AttachmentEntity>>> typeIt = inner.entrySet().iterator();
@@ -200,6 +188,18 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                 });
                 if (list.isEmpty()) {
                     typeIt.remove();
+                }
+            }
+        }
+
+        // tick所有未标记移除的实体
+        for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : groups.values()) {
+            for (List<AttachmentEntity> list : inner.values()) {
+                for (AttachmentEntity entity : list) {
+                    if (!entity.isRemove()) {
+                        entity.setOwner(player);
+                        entity.tick();
+                    }
                 }
             }
         }

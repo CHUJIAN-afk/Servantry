@@ -39,9 +39,12 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EtherealStellarCore>> EtherealStellarCore = register("ethereal_stellar_core", EtherealStellarCore::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<OreScout>> OreScout = register("survey_drone", first.servantry.common.servant.OreScout::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<OreScout>> OreScout = register("survey_drone", OreScout::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ScavengerFairy>> ScavengerFairy = register("scavenger_fairy", first.servantry.common.servant.ScavengerFairy::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ScavengerFairy>> ScavengerFairy = register("scavenger_fairy", ScavengerFairy::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ChlorophyteCrystal>> ChlorophyteCrystal = register("chlorophyte_crystal", ChlorophyteCrystal::new);
+
 
     // ===================== 射弹类型 =====================
 
@@ -54,6 +57,8 @@ public class AttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SharkDragonProjectile>> SharkDragonProjectile = register("shark_dragon_projectile", SharkDragonProjectile::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ShatteredStellarCoreProjectile>> EternalNightLaserProjectile = register("eternal_night_laser_projectile", ShatteredStellarCoreProjectile::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ChlorophyteCrystalProjectile>> ChlorophyteCrystalProjectile = register("chlorophyte_crystal_projectile", ChlorophyteCrystalProjectile::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));

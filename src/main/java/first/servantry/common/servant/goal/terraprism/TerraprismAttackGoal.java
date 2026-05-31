@@ -50,7 +50,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
                 firstStrike = false;
                 planFirstStrike();
             } else {
-                if (servant.getOwner().getRandom().nextDouble() < 0.8) {
+                if (servant.getOwner().getRandom().nextDouble() < 0.5) {
                     planEllipseSlash();
                 } else {
                     planHourglassSlash();
@@ -242,7 +242,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
             for (int i = 1; i <= thrustAttackTicks; i++) {
                 float t = (float) i / thrustAttackTicks;
-                Vec3 p = servant.calculateBezierPoint(P0, P1, P2, P3, t);
+                Vec3 p = servant.calculateBezierPoint(t, P0, P1, P2, P3);
                 Vec3 tipDir = servant.slerpVector(currentTip, thrustDir, t);
                 Vec3 bNormal = servant.slerpVector(currentNormal, thrustNormal, t);
                 nodes.add(servant.getEulerNode(p, tipDir, bNormal));
@@ -264,7 +264,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
             for (int i = 1; i <= sweepAttackTicks; i++) {
                 float t = (float) i / sweepAttackTicks;
-                Vec3 p = servant.calculateBezierPoint(P0, P1, P2, P3, t);
+                Vec3 p = servant.calculateBezierPoint(t, P0, P1, P2, P3);
                 Vec3 pivot = startPos.add(chord.scale(0.5)).add(outward.scale(-dist * curvePullOutward * 0.5));
                 Vec3 targetTip = p.subtract(pivot).normalize();
                 Vec3 tipDir = servant.slerpVector(currentTip, targetTip, t);

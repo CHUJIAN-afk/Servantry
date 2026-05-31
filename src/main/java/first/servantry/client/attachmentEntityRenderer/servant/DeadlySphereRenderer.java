@@ -1,13 +1,10 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
-import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.DeadlySphere;
-import net.minecraft.client.renderer.MultiBufferSource;
 
 public class DeadlySphereRenderer extends AbstractAttachmentEntityRenderer<DeadlySphere> {
 
@@ -30,10 +27,5 @@ public class DeadlySphereRenderer extends AbstractAttachmentEntityRenderer<Deadl
                         .rotationOffset(180, 0, 0)
                 )
                 .build();
-    }
-
-    @Override
-    protected void renderEntity(DeadlySphere servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DeadlySphere> config) {
-
     }
 }

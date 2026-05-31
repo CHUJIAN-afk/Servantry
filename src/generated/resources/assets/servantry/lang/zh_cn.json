@@ -106,7 +106,6 @@
   "item.servantry.terraprism": "泰拉棱镜",
   "item.servantry.terraprism.tooltip.1": "曾被冠以'大地棱彩'美名的无暇之剑",
   "item.servantry.threat_analyzer": "威胁分析仪",
-  "item.servantry.threat_analyzer.tooltip.1": "仆从的索敌半径增加 15%",
   "item.servantry.tiki_boots": "提基战靴",
   "item.servantry.tiki_chestplate": "提基胸甲",
   "item.servantry.tiki_helmet": "提基面具",
@@ -148,5 +147,6 @@
   "servantry:servant_armor_pierce": "仆从护甲穿透",
   "servantry:servant_damage": "仆从伤害",
   "servantry:servant_knockback": "仆从击退",
-  "servantry:servant_max_count": "仆从栏"
+  "servantry:servant_max_count": "仆从栏",
+  "servantry:servant_search_range": "仆从索敌范围"
 }

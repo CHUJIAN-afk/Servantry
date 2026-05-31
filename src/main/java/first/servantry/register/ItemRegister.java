@@ -683,6 +683,11 @@ public class ItemRegister {
      */
     public static final DeferredItem<Item> ThreatAnalyzer = Register.register(ACCESSORY, "threat_analyzer", () -> CurioItem.builder()
             .canEquipFromUse(true)
+            .attributeModifiers((slotContext, id, stack) -> {
+                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+                builder.put(AttributeRegister.ServantSearchRange, new AttributeModifier(id, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                return builder.build();
+            })
             .properties(properties -> properties.rarity(Rarity.EPIC))
             .build()
     );
