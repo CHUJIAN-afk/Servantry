@@ -1,4 +1,4 @@
-// 1.21.1	2026-05-31T19:15:55.2753908	Item Models: servantry
+// 1.21.1	2026-06-01T12:48:12.6051902	Item Models: servantry
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/apprentices_scarf.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/black_lens.json
 92274edf230527c3b08498fc02e0c85e8786fbe3 assets/servantry/models/item/blade_staff.json
@@ -22,6 +22,7 @@ dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/huntresses
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/hunt_soul_emblem.json
 92274edf230527c3b08498fc02e0c85e8786fbe3 assets/servantry/models/item/infinite_scabbard.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/kaleidoscope.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/mithril_anvil.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/monks_belt.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/necromantic_scroll.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/obsidian_boots.json

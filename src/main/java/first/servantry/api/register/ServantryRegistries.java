@@ -14,7 +14,8 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 /**
  * 自定义注册表管理类。
  * <p>
- * 包含附件实体类型的自定义注册表。
+ * 包含附件实体类型和盔甲套装的自定义注册表。
+ * 秘银砧配方已迁移至原版配方系统，不再使用自定义注册表。
  * </p>
  */
 @EventBusSubscriber(modid = Servantry.MODID)

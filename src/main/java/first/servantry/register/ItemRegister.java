@@ -842,6 +842,12 @@ public class ItemRegister {
             .build()
     );
 
+    // ===================== 方块物品 =====================
+
+    public static final DeferredItem<Item> MithrilAnvilItem =
+            Register.register(MATERIAL, "mithril_anvil", () ->
+                    new BlockItem(BlockRegister.MITHRIL_ANVIL.get(), new Item.Properties()));
+
     // ===================== 材料 =====================
 
     public static final DeferredItem<Item> BlackLens = Register.register(MATERIAL, "black_lens", () ->

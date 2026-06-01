@@ -1,0 +1,20 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "minecraft:apple"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "minecraft:gold_block"
+      }
+    }
+  ],
+  "result": {
+    "id": "minecraft:enchanted_golden_apple"
+  }
+}

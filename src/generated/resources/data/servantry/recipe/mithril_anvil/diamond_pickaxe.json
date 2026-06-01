@@ -1,0 +1,20 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 3,
+      "ingredient": {
+        "item": "minecraft:diamond"
+      }
+    },
+    {
+      "count": 2,
+      "ingredient": {
+        "item": "minecraft:stick"
+      }
+    }
+  ],
+  "result": {
+    "id": "minecraft:diamond_pickaxe"
+  }
+}

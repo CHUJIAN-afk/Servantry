@@ -9,6 +9,7 @@ import first.servantry.api.client.renderType.TrailShaders;
 import first.servantry.client.attachmentEntityRenderer.projectile.*;
 import first.servantry.client.attachmentEntityRenderer.servant.*;
 import first.servantry.client.renderType.OreScoutHighlightRenderType;
+import first.servantry.client.screen.MithrilAnvilGui;
 import first.servantry.client.tooltip.ScabbardTooltipComponent;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.particle.provider.GenericParticleProvider;
@@ -105,6 +106,11 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.EternalNightLaserProjectile.get(), new ShatteredStellarCoreProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ChlorophyteCrystalProjectile.get(), new ChlorophyteCrystalProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ZenithProjectile.get(), new ZenithProjectileRenderer());
+    }
+
+    @SubscribeEvent
+    public static void registerMenuScreens(RegisterMenuScreensEvent event) {
+        event.register(MenuRegister.MITHRIL_ANVIL.get(), MithrilAnvilGui.MithrilAnvilScreen::new);
     }
 
     @SubscribeEvent

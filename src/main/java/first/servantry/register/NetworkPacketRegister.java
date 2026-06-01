@@ -1,23 +1,45 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.network.PacketDistributor;
+import first.servantry.api.mithrilAnvil.MithrilAnvilCraftingRecipe;
+import first.servantry.client.screen.MithrilAnvilGui;
+import first.servantry.common.menu.MithrilAnvilPlaceRecipeHandler;
+import first.servantry.network.MithrilAnvilPlaceRecipePayload;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.registration.HandlerThread;
 
-@EventBusSubscriber(modid = Servantry.MODID)
 public class NetworkPacketRegister {
 
-    @SubscribeEvent
-    public static void registerPayloadHandlers(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("1");
-  }
-
-    public static void playToServer(CustomPacketPayload payload) {
-        PacketDistributor.sendToServer(payload);
+    public static void register(IEventBus eventBus) {
+        eventBus.addListener(NetworkPacketRegister::registerPayloads);
     }
 
+    private static void registerPayloads(RegisterPayloadHandlersEvent event) {
+        event.registrar(Servantry.MODID)
+                .executesOn(HandlerThread.MAIN)
+                .playToServer(
+                        MithrilAnvilPlaceRecipePayload.TYPE,
+                        MithrilAnvilPlaceRecipePayload.STREAM_CODEC,
+                        NetworkPacketRegister::handlePlaceRecipe
+                );
+    }
+
+    private static void handlePlaceRecipe(MithrilAnvilPlaceRecipePayload payload, IPayloadContext context) {
+        if (!(context.player() instanceof ServerPlayer player)) return;
+        context.enqueueWork(() -> {
+            if (player.containerMenu instanceof MithrilAnvilGui.MithrilAnvilMenu menu && menu.containerId == payload.containerId()) {
+                player.getServer().getRecipeManager()
+                        .byKey(payload.recipeId())
+                        .ifPresent(holder -> {
+                            if (holder.value() instanceof MithrilAnvilCraftingRecipe) {
+                                MithrilAnvilPlaceRecipeHandler.handleRecipeClick(
+                                        player, menu, holder, payload.craftAll());
+                            }
+                        });
+            }
+        });
+    }
 }

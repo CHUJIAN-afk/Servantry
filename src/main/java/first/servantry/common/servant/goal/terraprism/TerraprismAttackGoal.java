@@ -77,8 +77,9 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
             planeNormal = new Vec3(1, 0, 0);
         }
         List<PathNode> nodes = new ArrayList<>();
-        for (int i = 1; i <= 7; i++) {
-            float delta = (float) i / 7;
+        int duration = 7;
+        for (int i = 1; i <= duration; i++) {
+            float delta = (float) i / duration;
             delta = delta * delta;
             nodes.add(servant.getEulerNode(start.lerp(end, delta), direction, planeNormal));
         }
@@ -159,6 +160,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
         for (int i = 1; i <= prepTicks; i++) {
             float delta = (float) i / prepTicks;
+            delta = delta * delta * (3f - 2f * delta);
             Vec3 point = servant.calculateBezierPoint(delta, startPos, startPos.add(currentVel), attackPrepPos);
             Vec3 tipDir = currentTip.lerp(attackDir, delta);
             nodes.add(servant.getEulerNode(point, tipDir, currentNormal));
@@ -166,7 +168,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
         for (int i = 1; i <= attackTicks; i++) {
             float delta = (float) i / attackTicks;
-            delta = delta * delta * delta;
+            delta = delta * delta * (3f - 2f * delta);
             Vec3 point = attackPrepPos.lerp(endPos, delta);
             nodes.add(servant.getEulerNode(point, attackDir, currentNormal));
         }

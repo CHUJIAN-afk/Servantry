@@ -1,4 +1,5 @@
 {
+  "container.servantry.mithril_anvil": "Mithril Anvil",
   "curios.curios.accessories": "Accessories",
   "death.attack.servantry.servant": "%1$s was torn apart by a servant",
   "death.attack.servantry.servant.player": "%1$s was torn apart by a servant whilst fighting %2$s",
@@ -142,6 +143,7 @@
   "servant.servantry.survey_drone": "Survey Drone",
   "servant.servantry.terraprism": "Terraprism",
   "servant.servantry.twins": "Twins",
+  "servantry.gui.materials": "Materials",
   "servantry.servantry.chlorophyte.set.1": "Summons a powerful leaf crystal to shoot at nearby enemies",
   "servantry.servantry.hallowed.set.1": "Servants grant I-frames on attack",
   "servantry.servantry.stardust.set.1": "A stardust guardian will protect you from nearby enemies",

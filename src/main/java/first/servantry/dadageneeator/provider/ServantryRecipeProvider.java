@@ -1,18 +1,35 @@
 package first.servantry.dadageneeator.provider;
 
+import first.servantry.Servantry;
+import first.servantry.api.mithrilAnvil.MithrilAnvilCraftingRecipe;
+import first.servantry.api.mithrilAnvil.MithrilAnvilRecipe;
 import first.servantry.register.ItemRegister;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class ServantryRecipeProvider extends RecipeProvider {
 
     public ServantryRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries);
+    }
+
+    private static MithrilAnvilRecipe.IngredientWithCount iwc(ItemLike item, int count) {
+        return new MithrilAnvilRecipe.IngredientWithCount(Ingredient.of(item), count);
+    }
+
+    @SafeVarargs
+    private static List<MithrilAnvilRecipe.IngredientWithCount> mithrilIngredients(MithrilAnvilRecipe.IngredientWithCount... iwcs) {
+        return List.of(iwcs);
     }
 
     @Override
@@ -120,5 +137,119 @@ public class ServantryRecipeProvider extends RecipeProvider {
                 .define('S', Items.STICK)
                 .unlockedBy("has_black_lens", has(ItemRegister.BlackLens.get()))
                 .save(output);
+        // ==================== 秘银砧配方 ====================
+        buildMithrilAnvilRecipes(output);
+    }
+
+    private void buildMithrilAnvilRecipes(RecipeOutput output) {
+        // 1 铁剑 ← 铁锭×2 + 木棍×1
+        mithril(output, "iron_sword",
+                mithrilIngredients(iwc(Items.IRON_INGOT, 2), iwc(Items.STICK, 1)),
+                Items.IRON_SWORD);
+
+        // 2 铁镐 ← 铁锭×3 + 木棍×2
+        mithril(output, "iron_pickaxe",
+                mithrilIngredients(iwc(Items.IRON_INGOT, 3), iwc(Items.STICK, 2)),
+                Items.IRON_PICKAXE);
+
+        // 3 铁斧 ← 铁锭×3 + 木棍×2
+        mithril(output, "iron_axe",
+                mithrilIngredients(iwc(Items.IRON_INGOT, 3), iwc(Items.STICK, 2)),
+                Items.IRON_AXE);
+
+        // 4 铁锹 ← 铁锭×1 + 木棍×2
+        mithril(output, "iron_shovel",
+                mithrilIngredients(iwc(Items.IRON_INGOT, 1), iwc(Items.STICK, 2)),
+                Items.IRON_SHOVEL);
+
+        // 5 铁胸甲 ← 铁锭×8
+        mithril(output, "iron_chestplate",
+                mithrilIngredients(iwc(Items.IRON_INGOT, 8)),
+                Items.IRON_CHESTPLATE);
+
+        // 6 铁护腿 ← 铁锭×7
+        mithril(output, "iron_leggings",
+                mithrilIngredients(iwc(Items.IRON_INGOT, 7)),
+                Items.IRON_LEGGINGS);
+
+        // 7 铁头盔 ← 铁锭×5
+        mithril(output, "iron_helmet",
+                mithrilIngredients(iwc(Items.IRON_INGOT, 5)),
+                Items.IRON_HELMET);
+
+        // 8 铁靴子 ← 铁锭×4
+        mithril(output, "iron_boots",
+                mithrilIngredients(iwc(Items.IRON_INGOT, 4)),
+                Items.IRON_BOOTS);
+
+        // 9 钻石剑 ← 钻石×2 + 木棍×1
+        mithril(output, "diamond_sword",
+                mithrilIngredients(iwc(Items.DIAMOND, 2), iwc(Items.STICK, 1)),
+                Items.DIAMOND_SWORD);
+
+        // 10 钻石镐 ← 钻石×3 + 木棍×2
+        mithril(output, "diamond_pickaxe",
+                mithrilIngredients(iwc(Items.DIAMOND, 3), iwc(Items.STICK, 2)),
+                Items.DIAMOND_PICKAXE);
+
+        // 11 钻石胸甲 ← 钻石×8
+        mithril(output, "diamond_chestplate",
+                mithrilIngredients(iwc(Items.DIAMOND, 8)),
+                Items.DIAMOND_CHESTPLATE);
+
+        // 12 钻石护腿 ← 钻石×7
+        mithril(output, "diamond_leggings",
+                mithrilIngredients(iwc(Items.DIAMOND, 7)),
+                Items.DIAMOND_LEGGINGS);
+
+        // 13 盾牌 ← 铁锭×1 + 木板×6
+        mithril(output, "shield",
+                mithrilIngredients(iwc(Items.IRON_INGOT, 1), iwc(Items.OAK_PLANKS, 6)),
+                Items.SHIELD);
+
+        // 14 弓 ← 木棍×3 + 线×3
+        mithril(output, "bow",
+                mithrilIngredients(iwc(Items.STICK, 3), iwc(Items.STRING, 3)),
+                Items.BOW);
+
+        // 15 铁马铠 ← 铁锭×8 + 皮革×1
+        mithril(output, "iron_horse_armor",
+                mithrilIngredients(iwc(Items.IRON_INGOT, 8), iwc(Items.LEATHER, 1)),
+                Items.IRON_HORSE_ARMOR);
+
+        // 16 钻石马铠 ← 钻石×8 + 金锭×1
+        mithril(output, "diamond_horse_armor",
+                mithrilIngredients(iwc(Items.DIAMOND, 8), iwc(Items.GOLD_INGOT, 1)),
+                Items.DIAMOND_HORSE_ARMOR);
+
+        // 17 金苹果 ← 苹果×1 + 金锭×8
+        mithril(output, "golden_apple",
+                mithrilIngredients(iwc(Items.APPLE, 1), iwc(Items.GOLD_INGOT, 8)),
+                Items.GOLDEN_APPLE);
+
+        // 18 附魔金苹果 ← 苹果×1 + 金块×8
+        mithril(output, "enchanted_golden_apple",
+                mithrilIngredients(iwc(Items.APPLE, 1), iwc(Items.GOLD_BLOCK, 8)),
+                Items.ENCHANTED_GOLDEN_APPLE);
+
+        // 19 望远镜 ← 紫水晶碎片×1 + 铜锭×2
+        mithril(output, "spyglass",
+                mithrilIngredients(iwc(Items.AMETHYST_SHARD, 1), iwc(Items.COPPER_INGOT, 2)),
+                Items.SPYGLASS);
+
+        // 20 末影之眼 ← 末影珍珠×1 + 烈焰粉×1
+        mithril(output, "ender_eye",
+                mithrilIngredients(iwc(Items.ENDER_PEARL, 1), iwc(Items.BLAZE_POWDER, 1)),
+                Items.ENDER_EYE);
+    }
+
+    private void mithril(RecipeOutput output, String name, List<MithrilAnvilRecipe.IngredientWithCount> ingredients, ItemLike result) {
+        ResourceLocation id = Servantry.rl("mithril_anvil/" + name);
+        MithrilAnvilRecipe recipe = new MithrilAnvilRecipe(ingredients, result.asItem().getDefaultInstance());
+        MithrilAnvilCraftingRecipe craftingRecipe = new MithrilAnvilCraftingRecipe(recipe);
+        AdvancementHolder advancement = output.advancement()
+                .addCriterion("has_result", has(result))
+                .build(id.withPrefix("recipes/"));
+        output.accept(id, craftingRecipe, advancement);
     }
 }

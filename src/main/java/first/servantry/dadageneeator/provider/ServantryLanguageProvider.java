@@ -59,6 +59,12 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("death.attack.servantry.servant.player")
                 .en("%1$s was torn apart by a servant whilst fighting %2$s")
                 .zh("%1$s 在与 %2$s 战斗时被仆从撕碎");
+        entry("servantry.gui.materials")
+                .en("Materials")
+                .zh("材料");
+        entry("container.servantry.mithril_anvil")
+                .en("Mithril Anvil")
+                .zh("秘银砧");
         // ================= 仆从武器 =================
         entry(ItemRegister.TerraPrism)
                 .en("Terraprism").zh("泰拉棱镜")

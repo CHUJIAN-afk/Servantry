@@ -23,6 +23,10 @@ public class Servantry {
         PotionRegister.register(eventBus);
         SoundRegister.register(eventBus);
         ArmorSetRegister.register(eventBus);
+        BlockRegister.register(eventBus);
+        MenuRegister.register(eventBus);
+        MithrilAnvilRecipeRegister.register(eventBus);
+        NetworkPacketRegister.register(eventBus);
     }
 
     public static ResourceLocation rl(String path) {

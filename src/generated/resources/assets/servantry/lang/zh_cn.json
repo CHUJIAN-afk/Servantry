@@ -1,4 +1,5 @@
 {
+  "container.servantry.mithril_anvil": "秘银砧",
   "curios.curios.accessories": "配饰",
   "death.attack.servantry.servant": "%1$s 被仆从撕碎",
   "death.attack.servantry.servant.player": "%1$s 在与 %2$s 战斗时被仆从撕碎",
@@ -142,6 +143,7 @@
   "servant.servantry.survey_drone": "矿勘无人机",
   "servant.servantry.terraprism": "泰拉棱镜",
   "servant.servantry.twins": "双子魔眼",
+  "servantry.gui.materials": "材料",
   "servantry.servantry.chlorophyte.set.1": "召唤强大的叶状水晶来射击附近的敌人",
   "servantry.servantry.hallowed.set.1": "仆从攻击使敌人高亮",
   "servantry.servantry.stardust.set.1": "星尘守卫将保护你不受附近敌人的伤害",

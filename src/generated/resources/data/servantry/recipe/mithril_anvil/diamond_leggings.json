@@ -1,0 +1,14 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 7,
+      "ingredient": {
+        "item": "minecraft:diamond"
+      }
+    }
+  ],
+  "result": {
+    "id": "minecraft:diamond_leggings"
+  }
+}
