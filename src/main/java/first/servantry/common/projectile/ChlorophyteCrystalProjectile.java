@@ -104,6 +104,6 @@ public class ChlorophyteCrystalProjectile extends Projectile implements ICollide
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
+        return new AABB(-0.08, -0.08, -0.2, 0.08, 0.08, 0.2);
     }
 }

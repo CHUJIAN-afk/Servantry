@@ -60,6 +60,8 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ChlorophyteCrystalProjectile>> ChlorophyteCrystalProjectile = register("chlorophyte_crystal_projectile", ChlorophyteCrystalProjectile::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ZenithProjectile>> ZenithProjectile = register("zenith_projectile", ZenithProjectile::new);
+
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));
     }

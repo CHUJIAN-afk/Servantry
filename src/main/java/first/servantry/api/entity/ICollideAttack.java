@@ -47,7 +47,7 @@ public interface ICollideAttack<T extends AttachmentEntity> {
      * 判断目标是否为有效的碰撞对象
      */
     default boolean isValidCollisionTarget(T entity, LivingEntity target) {
-        return target.isAlive() && target != entity.getOwner();
+        return target != null && target.isAlive() && target != entity.getOwner();
     }
 
     /**

@@ -52,7 +52,6 @@ public final class TargetSelector {
      * 创建目标选择器实例。
      *
      * @param servant 仆从实例
-     * @param cache   共享缓存
      * @return 目标选择器
      */
     public static TargetSelector create(Servant servant) {

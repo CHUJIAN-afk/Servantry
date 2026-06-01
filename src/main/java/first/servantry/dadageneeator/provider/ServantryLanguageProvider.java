@@ -221,6 +221,9 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .en("Servants grant I-frames on attack")
                 .zh("仆从攻击使敌人高亮");
         // ===================== 黑曜石护甲 =====================
+        entry(ItemRegister.FlinxFurCoat)
+                .en("Flinx Fur Coat")
+                .zh("小雪怪皮毛外套");
         entry(ItemRegister.ObsidianHelmet)
                 .en("Obsidian Helmet")
                 .zh("黑曜石逃犯帽");
@@ -304,6 +307,9 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("servantry.servantry.stardust.set.1")
                 .en("A stardust guardian will protect you from nearby enemies")
                 .zh("星尘守卫将保护你不受附近敌人的伤害");
+        entry(ItemRegister.Zenith)
+                .en("Zenith")
+                .zh("天顶剑");
         // ===================== 药水效果 =====================
         entry("effect.servantry.obsession")
                 .en("Obsession")

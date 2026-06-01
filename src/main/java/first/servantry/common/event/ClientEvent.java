@@ -104,6 +104,7 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.SharkDragonProjectile.get(), new SharkDragonProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.EternalNightLaserProjectile.get(), new ShatteredStellarCoreProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ChlorophyteCrystalProjectile.get(), new ChlorophyteCrystalProjectileRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ZenithProjectile.get(), new ZenithProjectileRenderer());
     }
 
     @SubscribeEvent

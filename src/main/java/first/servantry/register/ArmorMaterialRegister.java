@@ -19,17 +19,17 @@ public class ArmorMaterialRegister {
 
     private static final DeferredRegister<ArmorMaterial> Register = DeferredRegister.create(Registries.ARMOR_MATERIAL, Servantry.MODID);
 
-    public static final Holder<ArmorMaterial> HallowedArmorMaterial = Register.register("hallowed", () -> new ArmorMaterial(
+    public static final Holder<ArmorMaterial> Flinx = Register.register("flinx", () -> new ArmorMaterial(
             Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 1);
-                map.put(ArmorItem.Type.CHESTPLATE, 5);
-                map.put(ArmorItem.Type.LEGGINGS, 4);
-                map.put(ArmorItem.Type.BOOTS, 3);
+                map.put(ArmorItem.Type.HELMET, 0);
+                map.put(ArmorItem.Type.CHESTPLATE, 1);
+                map.put(ArmorItem.Type.LEGGINGS, 0);
+                map.put(ArmorItem.Type.BOOTS, 0);
             }),
-            35,
+            5,
             SoundEvents.ARMOR_EQUIP_LEATHER,
-            () -> Ingredient.of(Items.GOLD_INGOT),
-            List.of(new ArmorMaterial.Layer(Servantry.rl("hallowed"))),
+            () -> Ingredient.of(Items.LEATHER),
+            List.of(new ArmorMaterial.Layer(Servantry.rl("flinx"))),
             0.0F,
             0.0F
     ));
@@ -45,6 +45,21 @@ public class ArmorMaterialRegister {
             SoundEvents.ARMOR_EQUIP_IRON,
             () -> Ingredient.of(Items.OBSIDIAN, Items.CRYING_OBSIDIAN),
             List.of(new ArmorMaterial.Layer(Servantry.rl("obsidian"))),
+            0.0F,
+            0.0F
+    ));
+
+    public static final Holder<ArmorMaterial> HallowedArmorMaterial = Register.register("hallowed", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 1);
+                map.put(ArmorItem.Type.CHESTPLATE, 5);
+                map.put(ArmorItem.Type.LEGGINGS, 4);
+                map.put(ArmorItem.Type.BOOTS, 3);
+            }),
+            35,
+            SoundEvents.ARMOR_EQUIP_LEATHER,
+            () -> Ingredient.of(Items.GOLD_INGOT),
+            List.of(new ArmorMaterial.Layer(Servantry.rl("hallowed"))),
             0.0F,
             0.0F
     ));

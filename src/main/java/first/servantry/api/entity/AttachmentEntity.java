@@ -211,7 +211,10 @@ public abstract class AttachmentEntity {
         return historyNodes.get(1).lerp(currentPathNode, partialTick);
     }
 
-    // ===================== 网络序列化 =====================
+    public void setCurrentPathNode(PathNode currentPathNode) {
+        this.currentPathNode = currentPathNode;
+    }
+// ===================== 网络序列化 =====================
 
     /**
      * 写入实体的基础同步数据（位置与朝向），并调用子类的附加数据写入。

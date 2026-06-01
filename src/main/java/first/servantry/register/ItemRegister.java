@@ -10,6 +10,7 @@ import first.servantry.client.creativeTab.AnimInfo;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.item.AttributeArmorItem;
 import first.servantry.common.item.CurioItem;
+import first.servantry.common.item.Zenith;
 import first.servantry.common.projectile.StardustProjectile;
 import first.servantry.common.servant.StardustDragon;
 import first.servantry.common.servant.Twins;
@@ -24,10 +25,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
@@ -50,6 +48,12 @@ public class ItemRegister {
     public static final TabGroup ARMOR = new TabGroup(1, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
     public static final TabGroup ACCESSORY = new TabGroup(2, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
     public static final TabGroup MATERIAL = new TabGroup(3, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
+    public static final TabGroup SWORD = new TabGroup(4, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
+
+    public static final DeferredItem<Item> Zenith =
+            Register.register(SWORD, "zenith", () ->
+                    new Zenith(Tiers.NETHERITE, new Item.Properties().rarity(Rarity.EPIC).stacksTo(1))
+            );
 
     // ===================== 仆从武器 =====================
 
@@ -258,6 +262,17 @@ public class ItemRegister {
     );
 
     // ===================== 套装物品 =====================
+
+    /**
+     * 黑曜石胸甲 - +1 仆从栏
+     */
+    public static final DeferredItem<Item> FlinxFurCoat =
+            Register.register(ARMOR, "flinx_fur_coat", () -> AttributeArmorItem.builder(
+                            ArmorMaterialRegister.Flinx, ArmorItem.Type.CHESTPLATE)
+                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
 
     /**
      * 黑曜石头盔 - +8% 仆从伤害

@@ -23,24 +23,6 @@ import net.minecraft.world.item.ItemStack;
 public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<InfiniteShadow> {
 
     @Override
-    protected void renderEntity(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> config) {
-        ItemStack itemStack = infiniteShadow.getItemStack();
-        if (!itemStack.isEmpty()) {
-            ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-            itemRenderer.renderStatic(
-                    itemStack,
-                    ItemDisplayContext.FIXED,
-                    LightTexture.FULL_BRIGHT,
-                    OverlayTexture.NO_OVERLAY,
-                    poseStack,
-                    bufferSource,
-                    infiniteShadow.getOwner().level(),
-                    0
-            );
-        }
-    }
-
-    @Override
     protected RenderContext<InfiniteShadow> createContext(InfiniteShadow infiniteShadow) {
         int timer = infiniteShadow.attacking ? infiniteShadow.trailTimer : 0;
         ItemStack itemStack = infiniteShadow.getItemStack();
@@ -80,5 +62,23 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
                     .build();
         }
         return null;
+    }
+
+    @Override
+    protected void renderEntity(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> config) {
+        ItemStack itemStack = infiniteShadow.getItemStack();
+        if (!itemStack.isEmpty()) {
+            ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+            itemRenderer.renderStatic(
+                    itemStack,
+                    ItemDisplayContext.FIXED,
+                    LightTexture.FULL_BRIGHT,
+                    OverlayTexture.NO_OVERLAY,
+                    poseStack,
+                    bufferSource,
+                    infiniteShadow.getOwner().level(),
+                    0
+            );
+        }
     }
 }

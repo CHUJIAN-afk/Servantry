@@ -1,4 +1,4 @@
-// 1.21.1	2026-05-27T23:04:28.8267739	Item Models: servantry
+// 1.21.1	2026-05-31T19:15:55.2753908	Item Models: servantry
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/apprentices_scarf.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/black_lens.json
 92274edf230527c3b08498fc02e0c85e8786fbe3 assets/servantry/models/item/blade_staff.json
@@ -10,6 +10,7 @@ dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/chlorophyt
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/eclipse_ring.json
 92274edf230527c3b08498fc02e0c85e8786fbe3 assets/servantry/models/item/ethereal_stellar_core_staff.json
 92274edf230527c3b08498fc02e0c85e8786fbe3 assets/servantry/models/item/fairy_bell.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/flinx_fur_coat.json
 94b0d2c7d1fac32c67bd362adfa4389c9f452117 assets/servantry/models/item/hallowed_boots.json
 5f05f8a6731cb06dd3edc861def73aeeed5bca30 assets/servantry/models/item/hallowed_chestplate.json
 2c356bb2f4afbcb5583194524f9a52ca36a124cf assets/servantry/models/item/hallowed_helmet.json
@@ -58,3 +59,4 @@ dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/valhalla_k
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/valhalla_knight_chestplate.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/valhalla_knight_helmet.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/valhalla_knight_leggings.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/zenith.json
