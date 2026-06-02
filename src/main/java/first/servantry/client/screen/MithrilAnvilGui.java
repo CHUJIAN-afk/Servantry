@@ -3,18 +3,19 @@ package first.servantry.client.screen;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
 import first.servantry.api.mithrilAnvil.MithrilAnvilCraftingRecipe;
-import first.servantry.common.menu.MithrilAnvilPlaceRecipeHandler;
+import first.servantry.register.BlockRegister;
 import first.servantry.register.MenuRegister;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,7 +57,6 @@ public class MithrilAnvilGui {
             this.renderBackground(graphics, mouseX, mouseY, partialTick);
             super.render(graphics, mouseX, mouseY, partialTick);
             recipePanel.render(graphics, mouseX, mouseY, partialTick);
-            recipePanel.renderGhostRecipe(graphics, this.leftPos, this.topPos, partialTick);
             this.renderTooltip(graphics, mouseX, mouseY);
             recipePanel.renderTooltip(graphics, this.leftPos, this.topPos, mouseX, mouseY);
         }
@@ -70,8 +70,17 @@ public class MithrilAnvilGui {
             pose.pushPose();
             pose.translate(x + 37, y + 35, -100);
             pose.scale(3, 3, 3);
-            graphics.renderFakeItem(Items.ANVIL.getDefaultInstance(), 0, 0);
+            graphics.renderFakeItem(BlockRegister.MITHRIL_ANVIL.toStack(), 0, 0);
             pose.popPose();
+            // 材料不足时渲染红色背景
+            if (this.menu.selectedRecipe != null) {
+                var ingredients = this.menu.selectedRecipe.value().inner().ingredients();
+                for (int i = 0; i < ingredients.size() && i < MithrilAnvilMenu.INPUT_SLOTS; i++) {
+                    if (!ingredients.get(i).hasEnough(this.menu.player)) {
+                        graphics.fillGradient(x + 17 + i * 18, y + 17, x + 17 + i * 18 + 16, y + 17 + 16, 0x60FF0000, 0x60FF0000);
+                    }
+                }
+            }
         }
 
         @Override
@@ -103,7 +112,6 @@ public class MithrilAnvilGui {
             if (slotId >= 1 && slotId <= 5) return;
             // 输出槽（0）仅允许拿取结果
             super.slotClicked(slot, slotId, mouseButton, type);
-            recipePanel.slotClicked();
         }
     }
 
@@ -113,20 +121,14 @@ public class MithrilAnvilGui {
 
         static final int INPUT_SLOTS = 5;
 
-        private final ContainerLevelAccess access;
         private final Player player;
         private final TransientCraftingContainer inputContainer;
         private final ResultContainer resultContainer = new ResultContainer();
         private RecipeHolder<MithrilAnvilCraftingRecipe> selectedRecipe;
 
         public MithrilAnvilMenu(int containerId, Inventory playerInventory) {
-            this(containerId, playerInventory, ContainerLevelAccess.NULL);
-        }
-
-        public MithrilAnvilMenu(int containerId, Inventory playerInventory, ContainerLevelAccess access) {
             super(MenuRegister.MITHRIL_ANVIL.get(), containerId);
             this.player = playerInventory.player;
-            this.access = access;
             this.inputContainer = new TransientCraftingContainer(this, INPUT_SLOTS, 1);
 
             // 输出槽（索引 0）
@@ -160,13 +162,6 @@ public class MithrilAnvilGui {
             }
         }
 
-        @Override
-        public void slotsChanged(@NotNull Container container) {
-            if (container == inputContainer) {
-                updateResult();
-            }
-        }
-
         void updateResult() {
             if (selectedRecipe != null) {
                 resultContainer.setItem(0, selectedRecipe.value().inner().result().copy());
@@ -190,20 +185,6 @@ public class MithrilAnvilGui {
                 }
             }
             updateResult();
-        }
-
-        public void clearSelectedRecipe() {
-            inputContainer.clearContent();
-            this.selectedRecipe = null;
-            resultContainer.setItem(0, ItemStack.EMPTY);
-        }
-
-        public TransientCraftingContainer getInputContainer() {
-            return inputContainer;
-        }
-
-        public void placeRecipe(RecipeHolder<MithrilAnvilCraftingRecipe> holder, boolean craftAll, net.minecraft.server.level.ServerPlayer player) {
-            MithrilAnvilPlaceRecipeHandler.handleRecipeClick(player, this, holder, craftAll);
         }
 
         @Override
@@ -257,7 +238,7 @@ public class MithrilAnvilGui {
             }
 
             @Override
-            public ItemStack getItem() {
+            public @NotNull ItemStack getItem() {
                 // 只有可制作时才显示输出物品
                 if (selectedRecipe != null && selectedRecipe.value().inner().canCraft(player)) {
                     return super.getItem();
@@ -272,10 +253,10 @@ public class MithrilAnvilGui {
 
             @Override
             public void onTake(@NotNull Player player, @NotNull ItemStack stack) {
-                // 从玩家背包消耗材料
                 if (selectedRecipe != null) {
                     selectedRecipe.value().inner().consumeIngredients(player);
-                    // 消耗后重新检查可制作性
+                    // 播放锻造音效
+                    player.level().playSound(null, player.blockPosition(), SoundEvents.SMITHING_TABLE_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
                     updateResult();
                 }
             }

@@ -1,8 +1,3 @@
 {
-  "parent": "minecraft:block/anvil",
-  "textures": {
-    "top": "servantry:block/mithril_anvil_top",
-    "body": "servantry:block/mithril_anvil",
-    "particle": "servantry:block/mithril_anvil"
-  }
+  "parent": "minecraft:block/anvil"
 }

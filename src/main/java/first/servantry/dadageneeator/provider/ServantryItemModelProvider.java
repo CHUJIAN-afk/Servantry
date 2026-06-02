@@ -5,6 +5,7 @@ import first.servantry.api.item.IServantWeapon;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
@@ -23,6 +24,12 @@ public class ServantryItemModelProvider extends ItemModelProvider {
         BuiltInRegistries.ITEM.stream()
                 .filter(item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Servantry.MODID))
                 .forEach(item -> {
+                    // 方块物品使用方块模型父级
+                    if (item instanceof BlockItem) {
+                        withExistingParent(BuiltInRegistries.ITEM.getKey(item).getPath(),
+                                ResourceLocation.fromNamespaceAndPath(Servantry.MODID, "block/" + BuiltInRegistries.ITEM.getKey(item).getPath()));
+                        return;
+                    }
                     switch (item) {
                         case IServantWeapon<?> ignored -> handheldItem(item);
                         default -> basicItem(item);

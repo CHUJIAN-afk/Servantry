@@ -16,7 +16,7 @@ public class BlockRegister {
     public static final DeferredBlock<MithrilAnvilBlock> MITHRIL_ANVIL = BLOCKS.register("mithril_anvil",
             () -> new MithrilAnvilBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
-                    .strength(5.0F, 6.0F)
+                    .strength(5.0F, 1200.0F)
                     .sound(SoundType.ANVIL)
                     .requiresCorrectToolForDrops()));
 

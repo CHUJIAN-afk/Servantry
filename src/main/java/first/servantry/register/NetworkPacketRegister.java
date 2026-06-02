@@ -3,9 +3,9 @@ package first.servantry.register;
 import first.servantry.Servantry;
 import first.servantry.api.mithrilAnvil.MithrilAnvilCraftingRecipe;
 import first.servantry.client.screen.MithrilAnvilGui;
-import first.servantry.common.menu.MithrilAnvilPlaceRecipeHandler;
 import first.servantry.network.MithrilAnvilPlaceRecipePayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -27,6 +27,7 @@ public class NetworkPacketRegister {
                 );
     }
 
+    @SuppressWarnings("unchecked")
     private static void handlePlaceRecipe(MithrilAnvilPlaceRecipePayload payload, IPayloadContext context) {
         if (!(context.player() instanceof ServerPlayer player)) return;
         context.enqueueWork(() -> {
@@ -34,9 +35,8 @@ public class NetworkPacketRegister {
                 player.getServer().getRecipeManager()
                         .byKey(payload.recipeId())
                         .ifPresent(holder -> {
-                            if (holder.value() instanceof MithrilAnvilCraftingRecipe) {
-                                MithrilAnvilPlaceRecipeHandler.handleRecipeClick(
-                                        player, menu, holder, payload.craftAll());
+                            if (holder.value() instanceof MithrilAnvilCraftingRecipe && menu.stillValid(player)) {
+                                menu.setSelectedRecipe((RecipeHolder<MithrilAnvilCraftingRecipe>) holder);
                             }
                         });
             }

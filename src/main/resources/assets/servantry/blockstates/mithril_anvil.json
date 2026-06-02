@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "servantry:block/mithril_anvil"
+    },
+    "facing=south": {
+      "model": "servantry:block/mithril_anvil",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "servantry:block/mithril_anvil",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "servantry:block/mithril_anvil",
+      "y": 90
     }
   }
 }

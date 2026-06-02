@@ -10,11 +10,9 @@ import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -53,7 +51,6 @@ public class MithrilAnvilRecipePanel {
     private static final Component ONLY_CRAFTABLES = Component.translatable("gui.recipebook.toggleRecipes.craftable");
     private static final Component ALL_RECIPES = Component.translatable("gui.recipebook.toggleRecipes.all");
     private final MithrilAnvilRecipeButton[] recipeButtons = new MithrilAnvilRecipeButton[ITEMS_PER_PAGE];
-    private final GhostRecipe ghostRecipe = new GhostRecipe();
     private Minecraft minecraft;
     private MithrilAnvilGui.MithrilAnvilMenu menu;
     private int panelX, panelY;
@@ -234,21 +231,7 @@ public class MithrilAnvilRecipePanel {
         graphics.pose().popPose();
     }
 
-    public void renderGhostRecipe(GuiGraphics graphics, int leftPos, int topPos, float partialTick) {
-        ghostRecipe.render(graphics, minecraft, leftPos, topPos, true, partialTick);
-    }
-
     public void renderTooltip(GuiGraphics graphics, int leftPos, int topPos, int mouseX, int mouseY) {
-        // 幽灵配方提示
-        for (int i = 0; i < ghostRecipe.size(); i++) {
-            GhostRecipe.GhostIngredient ingredient = ghostRecipe.get(i);
-            int x = ingredient.x() + leftPos;
-            int y = ingredient.y() + topPos;
-            if (mouseX >= x && mouseY >= y && mouseX < x + 16 && mouseY < y + 16) {
-                graphics.renderComponentTooltip(minecraft.font, Screen.getTooltipFromItem(minecraft, ingredient.getItem()), mouseX, mouseY);
-            }
-        }
-
         // 配方按钮提示
         for (MithrilAnvilRecipeButton button : recipeButtons) {
             if (button.visible && button.isHovered() && button.getRecipe() != null) {
@@ -303,20 +286,8 @@ public class MithrilAnvilRecipePanel {
     private void selectRecipe(RecipeHolder<MithrilAnvilCraftingRecipe> holder, boolean craftAll) {
         // 设置客户端选中配方（填充输入槽显示物品）
         menu.setSelectedRecipe(holder);
-        setupGhostRecipe(holder);
         // 发送C2S包设置服务端选中配方
-        PacketDistributor.sendToServer(new MithrilAnvilPlaceRecipePayload(
-                menu.containerId, holder.id(), craftAll));
-    }
-
-    private void setupGhostRecipe(RecipeHolder<MithrilAnvilCraftingRecipe> holder) {
-        // 不需要幽灵配方 — 输入槽有真实物品供JEI查询，
-        // 输出槽可见性由 MithrilAnvilResultSlot.getItem() 控制
-        ghostRecipe.clear();
-    }
-
-    public void slotClicked() {
-        ghostRecipe.clear();
+        PacketDistributor.sendToServer(new MithrilAnvilPlaceRecipePayload(menu.containerId, holder.id(), craftAll));
     }
 
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
@@ -350,57 +321,5 @@ public class MithrilAnvilRecipePanel {
         boolean insidePanel = mouseX >= panelX && mouseX < panelX + PANEL_WIDTH
                 && mouseY >= panelY && mouseY < panelY + PANEL_HEIGHT;
         return outsideCrafting && !insidePanel;
-    }
-
-    // 与原版解耦的幽灵配方实现
-    public static class GhostRecipe {
-        private final NonNullList<GhostIngredient> ingredients = NonNullList.create();
-        private RecipeHolder<?> recipe;
-
-        public void addIngredient(Ingredient ingredient, int x, int y) {
-            this.ingredients.add(new GhostIngredient(ingredient, x, y));
-        }
-
-        public GhostIngredient get(int index) {
-            return ingredients.get(index);
-        }
-
-        public int size() {
-            return ingredients.size();
-        }
-
-        public void clear() {
-            this.recipe = null;
-            this.ingredients.clear();
-        }
-
-        public RecipeHolder<?> getRecipe() {
-            return recipe;
-        }
-
-        public void setRecipe(RecipeHolder<?> recipe) {
-            this.recipe = recipe;
-            this.ingredients.clear();
-        }
-
-        public void render(GuiGraphics graphics, Minecraft minecraft, int leftPos, int topPos, boolean isResult, float partialTick) {
-            if (recipe == null) return;
-            for (GhostIngredient ingredient : ingredients) {
-                ItemStack[] items = ingredient.ingredient.getItems();
-                if (items.length > 0) {
-                    int x = leftPos + ingredient.x;
-                    int y = topPos + ingredient.y;
-                    graphics.renderFakeItem(items[0], x, y);
-                    graphics.fillGradient(x, y, x + 16, y + 16, 0x40FFFFFF, 0x40FFFFFF);
-                }
-            }
-        }
-
-        public record GhostIngredient(Ingredient ingredient, int x, int y) {
-            public ItemStack getItem() {
-                ItemStack[] items = ingredient.getItems();
-                return items.length > 0 ? items[0] : ItemStack.EMPTY;
-            }
-        }
     }
 }

@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "servantry:item/stick"
-  }
+  "parent": "servantry:block/mithril_anvil"
 }
