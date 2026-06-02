@@ -38,9 +38,9 @@
     "servantry:stardust_leggings",
     "servantry:stardust_boots",
     "servantry:necromantic_scroll",
+    "servantry:hercules_beetle",
     "servantry:papyrus_scarab",
     "servantry:pygmy_necklace",
-    "servantry:hercules_beetle",
     "servantry:summoner_emblem",
     "servantry:apprentices_scarf",
     "servantry:huntresses_buckler",
@@ -56,7 +56,11 @@
     "servantry:hunt_soul_emblem",
     "servantry:stardust_fragment",
     "servantry:mithril_anvil",
+    "servantry:stardust",
+    "servantry:silk",
     "servantry:black_lens",
-    "servantry:hallowed_ingot"
+    "servantry:hallowed_ingot",
+    "servantry:chlorophyte_ingot",
+    "servantry:luminite_ingot"
   ]
 }

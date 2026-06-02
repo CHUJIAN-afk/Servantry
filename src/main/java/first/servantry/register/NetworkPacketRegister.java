@@ -1,8 +1,8 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import first.servantry.api.mithrilAnvil.MithrilAnvilCraftingRecipe;
 import first.servantry.client.screen.MithrilAnvilGui;
+import first.servantry.common.recipe.MithrilAnvilRecipe;
 import first.servantry.network.MithrilAnvilPlaceRecipePayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -35,8 +35,8 @@ public class NetworkPacketRegister {
                 player.getServer().getRecipeManager()
                         .byKey(payload.recipeId())
                         .ifPresent(holder -> {
-                            if (holder.value() instanceof MithrilAnvilCraftingRecipe && menu.stillValid(player)) {
-                                menu.setSelectedRecipe((RecipeHolder<MithrilAnvilCraftingRecipe>) holder);
+                            if (holder.value() instanceof MithrilAnvilRecipe && menu.stillValid(player)) {
+                                menu.setSelectedRecipe((RecipeHolder<MithrilAnvilRecipe>) holder);
                             }
                         });
             }

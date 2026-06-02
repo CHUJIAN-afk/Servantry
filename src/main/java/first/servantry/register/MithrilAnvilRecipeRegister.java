@@ -4,8 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import first.servantry.Servantry;
-import first.servantry.api.mithrilAnvil.MithrilAnvilCraftingRecipe;
-import first.servantry.api.mithrilAnvil.MithrilAnvilRecipe;
+import first.servantry.common.recipe.MithrilAnvilRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -24,8 +23,9 @@ import java.util.List;
 public class MithrilAnvilRecipeRegister {
 
     private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Servantry.MODID);
-    public static final DeferredHolder<RecipeType<?>, RecipeType<MithrilAnvilCraftingRecipe>> MITHRIL_ANVIL_TYPE =
+    public static final DeferredHolder<RecipeType<?>, RecipeType<MithrilAnvilRecipe>> MITHRIL_ANVIL_TYPE =
             RECIPE_TYPES.register("mithril_anvil", () -> RecipeType.simple(Servantry.rl("mithril_anvil")));
+
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, Servantry.MODID);
     public static final DeferredHolder<RecipeSerializer<?>, MithrilAnvilRecipeSerializer> MITHRIL_ANVIL_SERIALIZER =
             RECIPE_SERIALIZERS.register("mithril_anvil", MithrilAnvilRecipeSerializer::new);
@@ -35,56 +35,68 @@ public class MithrilAnvilRecipeRegister {
         RECIPE_SERIALIZERS.register(eventBus);
     }
 
-    public static class MithrilAnvilRecipeSerializer implements RecipeSerializer<MithrilAnvilCraftingRecipe> {
+    public static class MithrilAnvilRecipeSerializer implements RecipeSerializer<MithrilAnvilRecipe> {
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, MithrilAnvilCraftingRecipe> STREAM_CODEC = StreamCodec.of(
+        public static final StreamCodec<RegistryFriendlyByteBuf, MithrilAnvilRecipe> STREAM_CODEC = StreamCodec.of(
                 (buf, recipe) -> {
-                    buf.writeVarInt(recipe.inner().ingredients().size());
-                    for (MithrilAnvilRecipe.IngredientWithCount iwc : recipe.inner().ingredients()) {
-                        Ingredient.CONTENTS_STREAM_CODEC.encode(buf, iwc.ingredient());
-                        buf.writeVarInt(iwc.count());
+                    buf.writeVarInt(recipe.ingredients().size());
+                    for (int i = 0; i < recipe.ingredients().size(); i++) {
+                        Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.ingredients().get(i));
+                        buf.writeVarInt(recipe.counts().get(i));
                     }
-                    ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, recipe.inner().result());
+                    ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, recipe.result());
                 },
                 buf -> {
-                    int ingredientCount = buf.readVarInt();
-                    List<MithrilAnvilRecipe.IngredientWithCount> ingredients = new ArrayList<>();
-                    for (int i = 0; i < ingredientCount; i++) {
-                        Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
-                        int count = buf.readVarInt();
-                        ingredients.add(new MithrilAnvilRecipe.IngredientWithCount(ingredient, count));
+                    int size = buf.readVarInt();
+                    List<Ingredient> ingredients = new ArrayList<>();
+                    List<Integer> counts = new ArrayList<>();
+                    for (int i = 0; i < size; i++) {
+                        ingredients.add(Ingredient.CONTENTS_STREAM_CODEC.decode(buf));
+                        counts.add(buf.readVarInt());
                     }
                     ItemStack result = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
-                    return new MithrilAnvilCraftingRecipe(new MithrilAnvilRecipe(ingredients, result));
+                    return new MithrilAnvilRecipe(List.copyOf(ingredients), List.copyOf(counts), result);
                 }
         );
-        private static final MapCodec<MithrilAnvilCraftingRecipe> CODEC = RecordCodecBuilder.mapCodec(
+
+        private static final MapCodec<MithrilAnvilRecipe> CODEC = RecordCodecBuilder.mapCodec(
                 instance -> instance.group(
-                        IngredientWithCountCodec.CODEC.listOf().fieldOf("ingredients").forGetter(r -> r.inner().ingredients()),
-                        ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(r -> r.inner().result())
-                ).apply(instance, (ingredients, result) -> new MithrilAnvilCraftingRecipe(new MithrilAnvilRecipe(ingredients, result)))
+                        IngredientWithCount.CODEC.listOf().fieldOf("ingredients").forGetter(r -> {
+                            List<IngredientWithCount> list = new ArrayList<>();
+                            for (int i = 0; i < r.ingredients().size(); i++) {
+                                list.add(new IngredientWithCount(r.ingredients().get(i), r.counts().get(i)));
+                            }
+                            return list;
+                        }),
+                        ItemStack.SINGLE_ITEM_CODEC.fieldOf("result").forGetter(MithrilAnvilRecipe::result)
+                ).apply(instance, (iwcs, result) -> {
+                    List<Ingredient> ingredients = new ArrayList<>();
+                    List<Integer> counts = new ArrayList<>();
+                    for (IngredientWithCount iwc : iwcs) {
+                        ingredients.add(iwc.ingredient);
+                        counts.add(iwc.count);
+                    }
+                    return new MithrilAnvilRecipe(ingredients, counts, result);
+                })
         );
 
         @Override
-        public @NotNull MapCodec<MithrilAnvilCraftingRecipe> codec() {
+        public @NotNull MapCodec<MithrilAnvilRecipe> codec() {
             return CODEC;
         }
 
         @Override
-        public @NotNull StreamCodec<RegistryFriendlyByteBuf, MithrilAnvilCraftingRecipe> streamCodec() {
+        public @NotNull StreamCodec<RegistryFriendlyByteBuf, MithrilAnvilRecipe> streamCodec() {
             return STREAM_CODEC;
         }
     }
 
-    /**
-     * Codec for IngredientWithCount: { "ingredient": ..., "count": N }
-     */
-    private static class IngredientWithCountCodec {
-        static final Codec<MithrilAnvilRecipe.IngredientWithCount> CODEC = RecordCodecBuilder.create(
+    private record IngredientWithCount(Ingredient ingredient, int count) {
+        private static final Codec<IngredientWithCount> CODEC = RecordCodecBuilder.create(
                 instance -> instance.group(
-                        Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(MithrilAnvilRecipe.IngredientWithCount::ingredient),
-                        Codec.INT.fieldOf("count").forGetter(MithrilAnvilRecipe.IngredientWithCount::count)
-                ).apply(instance, MithrilAnvilRecipe.IngredientWithCount::new)
+                        Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(IngredientWithCount::ingredient),
+                        Codec.INT.fieldOf("count").forGetter(IngredientWithCount::count)
+                ).apply(instance, IngredientWithCount::new)
         );
     }
 }

@@ -1,7 +1,6 @@
 package first.servantry.client.screen;
 
-import first.servantry.api.mithrilAnvil.MithrilAnvilCraftingRecipe;
-import first.servantry.api.mithrilAnvil.MithrilAnvilRecipe;
+import first.servantry.common.recipe.MithrilAnvilRecipe;
 import first.servantry.network.MithrilAnvilPlaceRecipePayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -10,8 +9,10 @@ import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -44,12 +45,8 @@ public class MithrilAnvilRecipePanel {
     private static final int ROWS = 4;
     private static final int ITEMS_PER_PAGE = COLS * ROWS;
     private static final int BUTTON_SIZE = 25;
-    // 配方面板与右侧物品栏之间的固定间距
     private static final int GAP = 2;
 
-    private static final Component SEARCH_HINT = Component.translatable("gui.recipebook.search_hint");
-    private static final Component ONLY_CRAFTABLES = Component.translatable("gui.recipebook.toggleRecipes.craftable");
-    private static final Component ALL_RECIPES = Component.translatable("gui.recipebook.toggleRecipes.all");
     private final MithrilAnvilRecipeButton[] recipeButtons = new MithrilAnvilRecipeButton[ITEMS_PER_PAGE];
     private Minecraft minecraft;
     private MithrilAnvilGui.MithrilAnvilMenu menu;
@@ -57,17 +54,17 @@ public class MithrilAnvilRecipePanel {
     private EditBox searchBox;
     private StateSwitchingButton filterButton;
     private StateSwitchingButton forwardButton, backButton;
-    private List<RecipeHolder<MithrilAnvilCraftingRecipe>> allRecipes = new ArrayList<>();
-    private List<RecipeHolder<MithrilAnvilCraftingRecipe>> filteredRecipes = new ArrayList<>();
+    private List<RecipeHolder<MithrilAnvilRecipe>> allRecipes = new ArrayList<>();
+    private List<RecipeHolder<MithrilAnvilRecipe>> filteredRecipes = new ArrayList<>();
     private int currentPage;
     private int totalPages;
     private int timesInventoryChanged;
     private String lastSearch = "";
 
-    public void init(Minecraft minecraft, int screenWidth, int screenHeight, MithrilAnvilGui.MithrilAnvilMenu menu) {
+    public void init(Minecraft minecraft, Player player, int screenWidth, int screenHeight, MithrilAnvilGui.MithrilAnvilMenu menu) {
         this.minecraft = minecraft;
         this.menu = menu;
-        this.timesInventoryChanged = minecraft.player.getInventory().getTimesChanged();
+        this.timesInventoryChanged = player.getInventory().getTimesChanged();
 
         // 配方面板位置：计算 leftPos 后反推 panelX
         // leftPos = panelX + PANEL_WIDTH + GAP，居中后两边留白相等
@@ -82,10 +79,23 @@ public class MithrilAnvilRecipePanel {
         this.searchBox.setMaxLength(50);
         this.searchBox.setVisible(true);
         this.searchBox.setTextColor(0xFFFFFF);
-        this.searchBox.setHint(SEARCH_HINT);
+        this.searchBox.setHint(Component.translatable("gui.recipebook.search_hint"));
 
         // 可合成切换按钮
-        this.filterButton = new StateSwitchingButton(panelX + 110, panelY + 12, 26, 16, false);
+        this.filterButton = new StateSwitchingButton(panelX + 110, panelY + 12, 26, 16, false) {
+            @Override
+            public boolean isStateTriggered() {
+                CompoundTag tag = player.getPersistentData();
+                isStateTriggered = tag.getBoolean("mithril_anvil_recipe_panel");
+                return isStateTriggered;
+            }
+
+            @Override
+            public void setStateTriggered(boolean triggered) {
+                CompoundTag tag = player.getPersistentData();
+                tag.putBoolean("mithril_anvil_recipe_panel", !tag.getBoolean("mithril_anvil_recipe_panel"));
+            }
+        };
         this.filterButton.initTextureValues(FILTER_SPRITES);
         updateFilterTooltip();
 
@@ -107,14 +117,13 @@ public class MithrilAnvilRecipePanel {
         loadRecipes();
     }
 
+    @SuppressWarnings("unchecked")
     private void loadRecipes() {
         allRecipes = new ArrayList<>();
         if (minecraft.level != null) {
             for (RecipeHolder<?> holder : minecraft.level.getRecipeManager().getRecipes()) {
-                if (holder.value() instanceof MithrilAnvilCraftingRecipe) {
-                    @SuppressWarnings("unchecked")
-                    RecipeHolder<MithrilAnvilCraftingRecipe> typed = (RecipeHolder<MithrilAnvilCraftingRecipe>) holder;
-                    allRecipes.add(typed);
+                if (holder.value() instanceof MithrilAnvilRecipe) {
+                    allRecipes.add((RecipeHolder<MithrilAnvilRecipe>) holder);
                 }
             }
         }
@@ -134,7 +143,7 @@ public class MithrilAnvilRecipePanel {
         String search = searchBox != null ? searchBox.getValue().toLowerCase(Locale.ROOT) : "";
         filteredRecipes = new ArrayList<>();
 
-        for (RecipeHolder<MithrilAnvilCraftingRecipe> holder : allRecipes) {
+        for (RecipeHolder<MithrilAnvilRecipe> holder : allRecipes) {
             // 搜索过滤
             if (!search.isEmpty()) {
                 ItemStack result = holder.value().getResultItem(minecraft.level.registryAccess());
@@ -144,7 +153,7 @@ public class MithrilAnvilRecipePanel {
 
             // 可合成过滤
             if (filterButton.isStateTriggered()) {
-                if (!canCraft(holder.value().inner())) continue;
+                if (!canCraft(holder.value())) continue;
             }
 
             filteredRecipes.add(holder);
@@ -168,8 +177,8 @@ public class MithrilAnvilRecipePanel {
         for (int i = 0; i < ITEMS_PER_PAGE; i++) {
             int recipeIndex = startIndex + i;
             if (recipeIndex < filteredRecipes.size()) {
-                RecipeHolder<MithrilAnvilCraftingRecipe> holder = filteredRecipes.get(recipeIndex);
-                boolean craftable = canCraft(holder.value().inner());
+                RecipeHolder<MithrilAnvilRecipe> holder = filteredRecipes.get(recipeIndex);
+                boolean craftable = canCraft(holder.value());
                 recipeButtons[i].init(holder, craftable);
                 recipeButtons[i].visible = true;
             } else {
@@ -189,13 +198,11 @@ public class MithrilAnvilRecipePanel {
     }
 
     private void updateFilterTooltip() {
-        filterButton.setTooltip(filterButton.isStateTriggered()
-                ? Tooltip.create(ONLY_CRAFTABLES)
-                : Tooltip.create(ALL_RECIPES));
+        Tooltip tooltip = filterButton.isStateTriggered() ? Tooltip.create(Component.translatable("gui.recipebook.toggleRecipes.craftable")) : Tooltip.create(Component.translatable("gui.recipebook.toggleRecipes.all"));
+        filterButton.setTooltip(tooltip);
     }
 
     public int getScreenOffset(int screenWidth, int imageWidth) {
-        // 返回 leftPos = panelX + PANEL_WIDTH + GAP，间距始终固定
         return panelX + PANEL_WIDTH + GAP;
     }
 
@@ -260,7 +267,7 @@ public class MithrilAnvilRecipePanel {
         // 配方按钮
         for (MithrilAnvilRecipeButton recipeBtn : recipeButtons) {
             if (recipeBtn.visible && recipeBtn.mouseClicked(mouseX, mouseY, button)) {
-                RecipeHolder<MithrilAnvilCraftingRecipe> holder = recipeBtn.getRecipe();
+                RecipeHolder<MithrilAnvilRecipe> holder = recipeBtn.getRecipe();
                 if (holder != null) {
                     selectRecipe(holder, Screen.hasShiftDown());
                 }
@@ -283,7 +290,7 @@ public class MithrilAnvilRecipePanel {
         return false;
     }
 
-    private void selectRecipe(RecipeHolder<MithrilAnvilCraftingRecipe> holder, boolean craftAll) {
+    private void selectRecipe(RecipeHolder<MithrilAnvilRecipe> holder, boolean craftAll) {
         // 设置客户端选中配方（填充输入槽显示物品）
         menu.setSelectedRecipe(holder);
         // 发送C2S包设置服务端选中配方

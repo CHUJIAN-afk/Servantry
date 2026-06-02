@@ -1,0 +1,20 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 12,
+      "ingredient": {
+        "item": "minecraft:amethyst_shard"
+      }
+    },
+    {
+      "count": 12,
+      "ingredient": {
+        "item": "minecraft:iron_ingot"
+      }
+    }
+  ],
+  "result": {
+    "id": "servantry:blade_staff"
+  }
+}

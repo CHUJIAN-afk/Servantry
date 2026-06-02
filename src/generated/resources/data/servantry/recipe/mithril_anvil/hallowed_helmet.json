@@ -1,0 +1,14 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 12,
+      "ingredient": {
+        "item": "servantry:hallowed_ingot"
+      }
+    }
+  ],
+  "result": {
+    "id": "servantry:hallowed_helmet"
+  }
+}

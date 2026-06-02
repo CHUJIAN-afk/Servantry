@@ -1,5 +1,6 @@
 {
-  "container.servantry.mithril_anvil": "秘银砧",
+  "block.servantry.mithril_anvil": "秘银砧",
+  "container.servantry.mithril_anvil": "锻造",
   "curios.curios.accessories": "配饰",
   "death.attack.servantry.servant": "%1$s 被仆从撕碎",
   "death.attack.servantry.servant.player": "%1$s 在与 %2$s 战斗时被仆从撕碎",

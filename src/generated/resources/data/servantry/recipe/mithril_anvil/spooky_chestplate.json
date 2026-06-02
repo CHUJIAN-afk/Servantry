@@ -1,0 +1,20 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 300,
+      "ingredient": {
+        "item": "minecraft:warped_stem"
+      }
+    },
+    {
+      "count": 300,
+      "ingredient": {
+        "item": "minecraft:warped_wart_block"
+      }
+    }
+  ],
+  "result": {
+    "id": "servantry:spooky_chestplate"
+  }
+}

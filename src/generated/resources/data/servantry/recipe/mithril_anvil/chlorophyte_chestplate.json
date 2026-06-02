@@ -1,0 +1,14 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 24,
+      "ingredient": {
+        "item": "servantry:chlorophyte_ingot"
+      }
+    }
+  ],
+  "result": {
+    "id": "servantry:chlorophyte_chestplate"
+  }
+}

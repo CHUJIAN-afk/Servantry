@@ -1,0 +1,20 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 6,
+      "ingredient": {
+        "item": "servantry:silk"
+      }
+    },
+    {
+      "count": 6,
+      "ingredient": {
+        "item": "minecraft:leather"
+      }
+    }
+  ],
+  "result": {
+    "id": "servantry:flinx_fur_coat"
+  }
+}

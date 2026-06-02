@@ -1,5 +1,6 @@
 {
-  "container.servantry.mithril_anvil": "Mithril Anvil",
+  "block.servantry.mithril_anvil": "Mithril Anvil",
+  "container.servantry.mithril_anvil": "Forging",
   "curios.curios.accessories": "Accessories",
   "death.attack.servantry.servant": "%1$s was torn apart by a servant",
   "death.attack.servantry.servant.player": "%1$s was torn apart by a servant whilst fighting %2$s",

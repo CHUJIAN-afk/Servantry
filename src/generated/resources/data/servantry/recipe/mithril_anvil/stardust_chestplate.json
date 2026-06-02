@@ -1,0 +1,20 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 20,
+      "ingredient": {
+        "item": "servantry:stardust"
+      }
+    },
+    {
+      "count": 16,
+      "ingredient": {
+        "item": "servantry:luminite_ingot"
+      }
+    }
+  ],
+  "result": {
+    "id": "servantry:stardust_chestplate"
+  }
+}

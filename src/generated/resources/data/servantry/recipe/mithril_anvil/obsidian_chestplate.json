@@ -1,0 +1,20 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 10,
+      "ingredient": {
+        "item": "servantry:silk"
+      }
+    },
+    {
+      "count": 20,
+      "ingredient": {
+        "item": "minecraft:obsidian"
+      }
+    }
+  ],
+  "result": {
+    "id": "servantry:obsidian_chestplate"
+  }
+}

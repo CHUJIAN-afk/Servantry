@@ -63,6 +63,9 @@ public class ServantryLanguageProvider extends LanguageProvider {
                 .en("Materials")
                 .zh("材料");
         entry("container.servantry.mithril_anvil")
+                .en("Forging")
+                .zh("锻造");
+        entry("block.servantry.mithril_anvil")
                 .en("Mithril Anvil")
                 .zh("秘银砧");
         // ================= 仆从武器 =================
