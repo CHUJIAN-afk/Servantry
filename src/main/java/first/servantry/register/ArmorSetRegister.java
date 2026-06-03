@@ -16,6 +16,35 @@ public class ArmorSetRegister {
 
     private static final DeferredRegister<ArmorSet> Register = DeferredRegister.create(ServantryRegistries.ARMOR_SETS, Servantry.MODID);
 
+    public static final Holder<ArmorSet> Bee =
+            Register.register("bee", () -> ArmorSet.builder(Servantry.rl("bee"))
+                    .piece(ArmorRegister.BeeHeadgear)
+                    .piece(ArmorRegister.BeeChestplate)
+                    .piece(ArmorRegister.BeeLeggings)
+                    .piece(ArmorRegister.BeeBoots)
+                    .modifier(AttributeRegister.ServantDamage, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
+
+    public static final Holder<ArmorSet> Spider =
+            Register.register("spider", () -> ArmorSet.builder(Servantry.rl("spider"))
+                    .piece(ArmorRegister.SpiderMask)
+                    .piece(ArmorRegister.SpiderChestplate)
+                    .piece(ArmorRegister.SpiderLeggings)
+                    .piece(ArmorRegister.SpiderBoots)
+                    .modifier(AttributeRegister.ServantDamage, 0.12, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .build()
+            );
+
+    public static final Holder<ArmorSet> Forbidden =
+            Register.register("forbidden", () -> ArmorSet.builder(Servantry.rl("forbidden"))
+                    .piece(ArmorRegister.ForbiddenMask)
+                    .piece(ArmorRegister.ForbiddenRobe)
+                    .piece(ArmorRegister.ForbiddenLeggings)
+                    .piece(ArmorRegister.ForbiddenBoots)
+                    .build()
+            );
+
     public static final Holder<ArmorSet> Obsidian =
             Register.register("obsidian", () -> ArmorSet.builder(Servantry.rl("obsidian"))
                     .piece(ArmorRegister.ObsidianHelmet)

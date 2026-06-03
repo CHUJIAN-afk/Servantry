@@ -1,0 +1,14 @@
+{
+  "type": "servantry:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "servantry:bee_wax"
+      }
+    }
+  ],
+  "result": {
+    "id": "servantry:bee_headgear"
+  }
+}

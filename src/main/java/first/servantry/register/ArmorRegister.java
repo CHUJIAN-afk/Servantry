@@ -32,6 +32,76 @@ public class ArmorRegister {
                     .language("Flinx Fur Coat", "小雪怪皮毛外套")
                     .build();
     /**
+     * 英灵殿骑士头盔 - +1 召唤栏，+10% 仆从伤害，+10% 原版伤害
+     */
+    public static final DeferredItem<Item> ValhallaKnightHelmet =
+            Register.register(ARMOR, "valhalla_knight_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(Attributes.ATTACK_DAMAGE, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .build())
+                    .language("Valhalla Knight Helmet", "英灵殿骑士头盔")
+                    .build();    /**
+     * 蜜蜂头饰 - +4% 仆从伤害，+1 仆从栏
+     */
+    public static final DeferredItem<Item> BeeHeadgear =
+            Register.register(ARMOR, "bee_headgear", () -> AttributeArmorItem.builder(ArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantDamage, 0.04, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.BeeWax, 8)
+                            .result(ArmorRegister.BeeHeadgear)
+                            .save(output))
+                    .language("Bee Headgear", "蜜蜂头饰")
+                    .build();
+
+    public static void register() {
+    }    /**
+     * 蜜蜂胸甲 - +4% 仆从伤害，+1 仆从栏
+     */
+    public static final DeferredItem<Item> BeeChestplate =
+            Register.register(ARMOR, "bee_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                            .modifier(AttributeRegister.ServantDamage, 0.04, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.BeeWax, 12)
+                            .result(ArmorRegister.BeeChestplate)
+                            .save(output))
+                    .language("Bee Breastplate", "蜜蜂胸甲")
+                    .build();
+    /**
+     * 蜜蜂护胫 - +5% 仆从伤害
+     */
+    public static final DeferredItem<Item> BeeLeggings =
+            Register.register(ARMOR, "bee_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.LEGGINGS)
+                            .modifier(AttributeRegister.ServantDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.BeeWax, 10)
+                            .result(ArmorRegister.BeeLeggings)
+                            .save(output))
+                    .language("Bee Leggings", "蜜蜂护胫")
+                    .build();
+    /**
+     * 蜜蜂靴 - 套装奖励部分
+     */
+    public static final DeferredItem<Item> BeeBoots =
+            Register.register(ARMOR, "bee_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.BOOTS)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.BeeWax, 6)
+                            .result(ArmorRegister.BeeBoots)
+                            .save(output))
+                    .language("Bee Boots", "蜜蜂靴")
+                    .build();
+    /**
      * 黑曜石头盔 - +8% 仆从伤害
      */
     public static final DeferredItem<Item> ObsidianHelmet =
@@ -88,7 +158,127 @@ public class ArmorRegister {
                     .language("Obsidian Boots", "黑曜石靴")
                     .build();
     /**
-     * 神圣头盔 - +1 仆从栏，+7% 仆从伤害
+     * 蜘蛛面具 - +5% 仆从伤害，+1 仆从栏
+     */
+    public static final DeferredItem<Item> SpiderMask =
+            Register.register(ARMOR, "spider_mask", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.SpiderFang, 8)
+                            .result(ArmorRegister.SpiderMask)
+                            .save(output))
+                    .language("Spider Mask", "蜘蛛面具")
+                    .build();
+    /**
+     * 蜘蛛胸甲 - +5% 仆从伤害，+1 仆从栏
+     */
+    public static final DeferredItem<Item> SpiderChestplate =
+            Register.register(ARMOR, "spider_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                            .modifier(AttributeRegister.ServantDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.SpiderFang, 16)
+                            .result(ArmorRegister.SpiderChestplate)
+                            .save(output))
+                    .language("Spider Breastplate", "蜘蛛胸甲")
+                    .build();
+    /**
+     * 蜘蛛护胫 - +6% 仆从伤害，+1 仆从栏
+     */
+    public static final DeferredItem<Item> SpiderLeggings =
+            Register.register(ARMOR, "spider_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.LEGGINGS)
+                            .modifier(AttributeRegister.ServantDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.SpiderFang, 12)
+                            .result(ArmorRegister.SpiderLeggings)
+                            .save(output))
+                    .language("Spider Greaves", "蜘蛛护胫")
+                    .build();
+    /**
+     * 蜘蛛靴
+     */
+    public static final DeferredItem<Item> SpiderBoots =
+            Register.register(ARMOR, "spider_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.BOOTS)
+                            .modifier(AttributeRegister.ServantDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.SpiderFang, 8)
+                            .result(ArmorRegister.SpiderBoots)
+                            .save(output))
+                    .language("Spider Boots", "蜘蛛靴")
+                    .build();
+    /**
+     * 禁戒面具 - +15% 召唤伤害
+     */
+    public static final DeferredItem<Item> ForbiddenMask =
+            Register.register(ARMOR, "forbidden_mask", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantDamage, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.AdamantiteIngot, 10)
+                            .ingredient(ItemRegister.ForbiddenFragment, 1)
+                            .result(ArmorRegister.ForbiddenMask)
+                            .save(output))
+                    .language("Forbidden Mask", "禁戒面具")
+                    .build();
+    /**
+     * 禁戒长袍 - +10%召唤伤害，+1 仆从栏
+     */
+    public static final DeferredItem<Item> ForbiddenRobe =
+            Register.register(ARMOR, "forbidden_robe", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                            .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.AdamantiteIngot, 20)
+                            .ingredient(ItemRegister.ForbiddenFragment, 1)
+                            .result(ArmorRegister.ForbiddenRobe)
+                            .save(output))
+                    .language("Forbidden Robe", "禁戒长袍")
+                    .build();
+    /**
+     * 禁戒裤 - +1 仆从栏
+     */
+    public static final DeferredItem<Item> ForbiddenLeggings =
+            Register.register(ARMOR, "forbidden_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.LEGGINGS)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.AdamantiteIngot, 16)
+                            .ingredient(ItemRegister.ForbiddenFragment, 1)
+                            .result(ArmorRegister.ForbiddenLeggings)
+                            .save(output))
+                    .language("Forbidden Leggings", "禁戒裤")
+                    .build();
+    /**
+     * 禁戒靴
+     */
+    public static final DeferredItem<Item> ForbiddenBoots =
+            Register.register(ARMOR, "forbidden_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.BOOTS)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.AdamantiteIngot, 8)
+                            .ingredient(ItemRegister.ForbiddenFragment, 1)
+                            .result(ArmorRegister.ForbiddenBoots)
+                            .save(output))
+                    .language("Forbidden Boots", "禁戒战靴")
+                    .build();
+    /**
+     * 神圣头盔
      */
     public static final DeferredItem<Item> HallowedHelmet =
             Register.register(ARMOR, "hallowed_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET)
@@ -103,7 +293,7 @@ public class ArmorRegister {
                     .language("Hallowed Helmet", "神圣兜帽")
                     .build();
     /**
-     * 神圣胸甲 - +1 仆从栏，+7% 仆从伤害
+     * 神圣胸甲 - +14% 仆从伤害
      */
     public static final DeferredItem<Item> HallowedChestplate =
             Register.register(ARMOR, "hallowed_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.CHESTPLATE)
@@ -117,7 +307,7 @@ public class ArmorRegister {
                     .language("Hallowed Chestplate", "神圣板甲")
                     .build();
     /**
-     * 神圣护腿 - +1 仆从栏，+7% 仆从伤害
+     * 神圣护腿 - +7% 仆从伤害
      */
     public static final DeferredItem<Item> HallowedLeggings =
             Register.register(ARMOR, "hallowed_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.LEGGINGS)
@@ -131,18 +321,7 @@ public class ArmorRegister {
                     .language("Hallowed Leggings", "神圣护胫")
                     .build();
     /**
-     * 英灵殿骑士头盔 - +1 召唤栏，+10% 仆从伤害，+10% 原版伤害
-     */
-    public static final DeferredItem<Item> ValhallaKnightHelmet =
-            Register.register(ARMOR, "valhalla_knight_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.HELMET)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .modifier(Attributes.ATTACK_DAMAGE, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.RARE))
-                            .build())
-                    .language("Valhalla Knight Helmet", "英灵殿骑士头盔")
-                    .build();    /**
-     * 神圣靴子 - +7% 移动速度，+7% 仆从伤害
+     * 神圣靴子 - +8% 移动速度
      */
     public static final DeferredItem<Item> HallowedBoots =
             Register.register(ARMOR, "hallowed_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.BOOTS)
@@ -212,6 +391,7 @@ public class ArmorRegister {
                             .save(output))
                     .language("Chlorophyte Boots", "叶绿战靴")
                     .build();
+
     /**
      * 英灵殿骑士胸甲 - +30% 仆从伤害，+0.4 生命再生
      */
@@ -286,9 +466,6 @@ public class ArmorRegister {
                             .build())
                     .language("Tiki Boots", "提基战靴")
                     .build();
-
-    public static void register() {
-    }
     /**
      * 阴森头盔 - +11% 仆从伤害
      */

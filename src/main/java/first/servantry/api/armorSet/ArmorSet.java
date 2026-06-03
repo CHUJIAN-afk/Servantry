@@ -33,20 +33,21 @@ public record ArmorSet(
     }
 
     public boolean full(Player player) {
-        return CACHE.computeIfAbsent(player.getUUID(), k -> new HashMap<>()).computeIfAbsent(this, k -> {
-            Iterable<ItemStack> armorSlots = player.getArmorSlots();
-            List<Item> target = new ArrayList<>();
-            for (DeferredItem<Item> item : items) {
-                target.add(item.get());
-            }
-            for (ItemStack armor : armorSlots) {
-                target.remove(armor.getItem());
-                if (target.isEmpty()) {
-                    return true;
-                }
-            }
-            return false;
-        });
+        return CACHE.computeIfAbsent(player.getUUID(), k -> new HashMap<>())
+                    .computeIfAbsent(this, k -> {
+                        Iterable<ItemStack> armorSlots = player.getArmorSlots();
+                        List<Item> target = new ArrayList<>();
+                        for (DeferredItem<Item> item : items) {
+                            target.add(item.get());
+                        }
+                        for (ItemStack armor : armorSlots) {
+                            target.remove(armor.getItem());
+                            if (target.isEmpty()) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
     }
 
     @Override

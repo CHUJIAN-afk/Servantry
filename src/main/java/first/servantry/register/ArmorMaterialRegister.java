@@ -139,6 +139,51 @@ public class ArmorMaterialRegister {
             0.0F
     ));
 
+    public static final Holder<ArmorMaterial> BeeArmorMaterial = Register.register("bee", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 2);
+                map.put(ArmorItem.Type.CHESTPLATE, 2);
+                map.put(ArmorItem.Type.LEGGINGS, 2);
+                map.put(ArmorItem.Type.BOOTS, 1);
+            }),
+            5,
+            SoundEvents.ARMOR_EQUIP_LEATHER,
+            () -> Ingredient.of(Items.HONEYCOMB),
+            List.of(new ArmorMaterial.Layer(Servantry.rl("bee"))),
+            0.0F,
+            0.0F
+    ));
+
+    public static final Holder<ArmorMaterial> SpiderArmorMaterial = Register.register("spider", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 2);
+                map.put(ArmorItem.Type.CHESTPLATE, 3);
+                map.put(ArmorItem.Type.LEGGINGS, 3);
+                map.put(ArmorItem.Type.BOOTS, 2);
+            }),
+            10,
+            SoundEvents.ARMOR_EQUIP_LEATHER,
+            () -> Ingredient.EMPTY,
+            List.of(new ArmorMaterial.Layer(Servantry.rl("spider"))),
+            0.0F,
+            0.0F
+    ));
+
+    public static final Holder<ArmorMaterial> ForbiddenArmorMaterial = Register.register("forbidden", () -> new ArmorMaterial(
+            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                map.put(ArmorItem.Type.HELMET, 2);
+                map.put(ArmorItem.Type.CHESTPLATE, 4);
+                map.put(ArmorItem.Type.LEGGINGS, 3);
+                map.put(ArmorItem.Type.BOOTS, 2);
+            }),
+            15,
+            SoundEvents.ARMOR_EQUIP_IRON,
+            () -> Ingredient.EMPTY,
+            List.of(new ArmorMaterial.Layer(Servantry.rl("forbidden"))),
+            0.0F,
+            0.0F
+    ));
+
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
     }

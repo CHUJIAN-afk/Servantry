@@ -39,6 +39,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("servantry.servantry.hallowed.set.1", "Servants grant I-frames on attack", "仆从攻击使敌人高亮");
         entry("servantry.servantry.chlorophyte.set.1", "Summons a powerful leaf crystal to shoot at nearby enemies", "召唤强大的叶状水晶来射击附近的敌人");
         entry("servantry.servantry.stardust.set.1", "A stardust guardian will protect you from nearby enemies", "星尘守卫将保护你不受附近敌人的伤害");
+        entry("servantry.servantry.forbidden.set.1", "Allows you to summon an ancient storm to attract nearby enemies", "允许你召唤远古风暴吸引附近的敌人");
         // ===================== 药水效果 =====================
         entry("effect.servantry.obsession", "Obsession", "着魔");
         entry("effect.servantry.cell_parasitism", "Cell Parasitism", "细胞寄生");

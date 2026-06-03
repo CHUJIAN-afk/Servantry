@@ -1,5 +1,11 @@
-// 1.21.1	2026-06-02T22:54:01.7225884	Item Models: servantry
+// 1.21.1	2026-06-03T23:31:19.6439898	Item Models: servantry
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/adamantite_ingot.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/apprentices_scarf.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/bee_boots.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/bee_chestplate.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/bee_headgear.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/bee_leggings.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/bee_wax.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/black_lens.json
 92274edf230527c3b08498fc02e0c85e8786fbe3 assets/servantry/models/item/blade_staff.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/chlorophyte_boots.json
@@ -12,6 +18,11 @@ dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/eclipse_ri
 92274edf230527c3b08498fc02e0c85e8786fbe3 assets/servantry/models/item/ethereal_stellar_core_staff.json
 92274edf230527c3b08498fc02e0c85e8786fbe3 assets/servantry/models/item/fairy_bell.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/flinx_fur_coat.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/forbidden_boots.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/forbidden_fragment.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/forbidden_leggings.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/forbidden_mask.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/forbidden_robe.json
 94b0d2c7d1fac32c67bd362adfa4389c9f452117 assets/servantry/models/item/hallowed_boots.json
 5f05f8a6731cb06dd3edc861def73aeeed5bca30 assets/servantry/models/item/hallowed_chestplate.json
 2c356bb2f4afbcb5583194524f9a52ca36a124cf assets/servantry/models/item/hallowed_helmet.json
@@ -38,6 +49,11 @@ dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/primordial
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/pygmy_necklace.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/silk.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/soul_relief.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/spider_boots.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/spider_chestplate.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/spider_fang.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/spider_leggings.json
+dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/spider_mask.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/spooky_boots.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/spooky_chestplate.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/spooky_helmet.json
