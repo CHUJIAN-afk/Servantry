@@ -26,18 +26,12 @@ import org.jetbrains.annotations.NotNull;
 
 public class MithrilAnvilBlock extends FallingBlock {
 
+    public static final VoxelShape SOUTH_SHAPE = Shapes.or(box(4, 0, 2, 12, 2, 14), box(5, 2, 4, 11, 3, 12), box(6, 3, 6, 10, 6, 11), box(4, 6, 3, 12, 7, 13), box(4, 7, 2.5, 12, 7.5, 13.5), box(4, 7.5, 1, 12, 8, 15), box(3, 8, 0, 13, 10, 16));
+    public static final VoxelShape NORTH_SHAPE = Shapes.or(box(4, 0, 2, 12, 2, 14), box(5, 2, 4, 11, 3, 12), box(6, 3, 5, 10, 6, 10), box(4, 6, 3, 12, 7, 13), box(4, 7, 2.5, 12, 7.5, 13.5), box(4, 7.5, 1, 12, 8, 15), box(3, 8, 0, 13, 10, 16));
+    public static final VoxelShape EAST_SHAPE = Shapes.or(box(2, 0, 4, 14, 2, 12), box(4, 2, 5, 12, 3, 11), box(6, 3, 6, 11, 6, 10), box(3, 6, 4, 13, 7, 12), box(2.5, 7, 4, 13.5, 7.5, 12), box(1, 7.5, 4, 15, 8, 12), box(0, 8, 3, 16, 10, 13));
+    public static final VoxelShape WEST_SHAPE = Shapes.or(box(2, 0, 4, 14, 2, 12), box(4, 2, 5, 12, 3, 11), box(5, 3, 6, 10, 6, 10), box(3, 6, 4, 13, 7, 12), box(2.5, 7, 4, 13.5, 7.5, 12), box(1, 7.5, 4, 15, 8, 12), box(0, 8, 3, 16, 10, 13));
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final MapCodec<MithrilAnvilBlock> CODEC = simpleCodec(MithrilAnvilBlock::new);
-
-    private static final VoxelShape BASE = box(2, 0, 2, 14, 4, 14);
-    private static final VoxelShape X_LEG1 = box(3, 4, 4, 13, 5, 12);
-    private static final VoxelShape X_LEG2 = box(4, 5, 6, 12, 10, 10);
-    private static final VoxelShape X_TOP = box(0, 10, 3, 16, 16, 13);
-    private static final VoxelShape Z_LEG1 = box(4, 4, 3, 12, 5, 13);
-    private static final VoxelShape Z_LEG2 = box(6, 5, 4, 10, 10, 12);
-    private static final VoxelShape Z_TOP = box(3, 10, 0, 13, 16, 16);
-    private static final VoxelShape X_AXIS_AABB = Shapes.or(BASE, X_LEG1, X_LEG2, X_TOP);
-    private static final VoxelShape Z_AXIS_AABB = Shapes.or(BASE, Z_LEG1, Z_LEG2, Z_TOP);
 
     public MithrilAnvilBlock(Properties properties) {
         super(properties);
@@ -61,8 +55,13 @@ public class MithrilAnvilBlock extends FallingBlock {
 
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull CollisionContext context) {
-        Direction direction = state.getValue(FACING);
-        return direction.getAxis() == Direction.Axis.X ? X_AXIS_AABB : Z_AXIS_AABB;
+        return switch (state.getValue(FACING)) {
+            case NORTH -> NORTH_SHAPE;
+            case SOUTH -> SOUTH_SHAPE;
+            case EAST -> EAST_SHAPE;
+            case WEST -> WEST_SHAPE;
+            default -> Shapes.block();
+        };
     }
 
     @Override

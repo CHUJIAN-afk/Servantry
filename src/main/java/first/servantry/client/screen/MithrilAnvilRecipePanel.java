@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -126,6 +127,11 @@ public class MithrilAnvilRecipePanel {
                     allRecipes.add((RecipeHolder<MithrilAnvilRecipe>) holder);
                 }
             }
+            allRecipes.sort((a, b) -> {
+                String idA = BuiltInRegistries.ITEM.getKey(a.value().result().getItem()).getPath();
+                String idB = BuiltInRegistries.ITEM.getKey(b.value().result().getItem()).getPath();
+                return idA.compareTo(idB);
+            });
         }
         updateFilteredRecipes();
     }

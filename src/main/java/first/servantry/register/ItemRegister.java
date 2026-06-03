@@ -75,6 +75,20 @@ public class ItemRegister {
                             })
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
+                    .build();
+    /**
+     * 致命球法杖 - 召唤致命球仆从
+     */
+    public static final DeferredItem<Item> DeadlySphereStaff =
+            Register.register(SERVANT_WEAPON, "deadly_sphere_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.DeadlySphere)
+                            .sound(SoundRegister.UseServantWeapon)
+                            .summonPost(servant -> {
+                                Player owner = servant.getOwner();
+                                RandomSource random = owner.getRandom();
+                                servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
+                            })
+                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .build())
                     .build();    /**
      * 刃杖 - 召唤附魔飞刀群
      */
@@ -96,17 +110,32 @@ public class ItemRegister {
                             .save(output))
                     .build();
     /**
-     * 致命球法杖 - 召唤致命球仆从
+     * 无限剑鞘
      */
-    public static final DeferredItem<Item> DeadlySphereStaff =
-            Register.register(SERVANT_WEAPON, "deadly_sphere_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.DeadlySphere)
-                            .sound(SoundRegister.UseServantWeapon)
-                            .summonPost(servant -> {
-                                Player owner = servant.getOwner();
-                                RandomSource random = owner.getRandom();
-                                servant.init(new PathNode(owner.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
+    public static final DeferredItem<Item> InfiniteScabbard =
+            Register.register(SERVANT_WEAPON, "infinite_scabbard", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.InfiniteShadow)
+                            .sound(SoundRegister.UseTerraprism)
+                            .summonPre((player, infiniteShadow) -> {
+                                ItemStack mainHandItem = player.getMainHandItem();
+                                ScabbardContainer container = mainHandItem.getComponents().getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                                if (!container.isEmpty()) {
+                                    infiniteShadow.setItemStack(container.itemStack());
+                                    return true;
+                                }
+                                return false;
                             })
-                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .summonPost(infiniteShadow -> infiniteShadow.init(infiniteShadow.getInterpolatedIdleState(1)))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(DataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
+                            .build())
+                    .build();
+    /**
+     * 提基面具 - +1 召唤栏，+10% 仆从伤害
+     */
+    public static final DeferredItem<Item> TikiHelmet =
+            Register.register(ARMOR, "tiki_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .build();    /**
      * 星尘细胞杖 - 召唤星尘细胞仆从
@@ -127,22 +156,24 @@ public class ItemRegister {
                             .save(output))
                     .build();
     /**
-     * 无限剑鞘
+     * 英灵殿骑士头盔 - +1 召唤栏，+10% 仆从伤害，+10% 原版伤害
      */
-    public static final DeferredItem<Item> InfiniteScabbard =
-            Register.register(SERVANT_WEAPON, "infinite_scabbard", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.InfiniteShadow)
-                            .sound(SoundRegister.UseTerraprism)
-                            .summonPre((player, infiniteShadow) -> {
-                                ItemStack mainHandItem = player.getMainHandItem();
-                                ScabbardContainer container = mainHandItem.getComponents().getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
-                                if (!container.isEmpty()) {
-                                    infiniteShadow.setItemStack(container.itemStack());
-                                    return true;
-                                }
-                                return false;
-                            })
-                            .summonPost(infiniteShadow -> infiniteShadow.init(infiniteShadow.getInterpolatedIdleState(1)))
-                            .properties(properties -> properties.rarity(Rarity.EPIC).component(DataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
+    public static final DeferredItem<Item> ValhallaKnightHelmet =
+            Register.register(ARMOR, "valhalla_knight_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(Attributes.ATTACK_DAMAGE, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .build())
+                    .build();
+    /**
+     * 英灵殿骑士胸甲 - +30% 仆从伤害，+0.4 生命再生
+     */
+    public static final DeferredItem<Item> ValhallaKnightChestplate =
+            Register.register(ARMOR, "valhalla_knight_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                            .modifier(AttributeRegister.ServantDamage, 0.30, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.HealthRegen, 0.4, AttributeModifier.Operation.ADD_VALUE)
+                            .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .build();    /**
      * 星尘龙杖 - 召唤星尘龙（多体节仆从）
@@ -205,12 +236,21 @@ public class ItemRegister {
                             .save(output))
                     .build();
     /**
-     * 提基面具 - +1 召唤栏，+10% 仆从伤害
+     * 英灵殿骑士护腿 - +20% 仆从伤害，+20% 原版伤害
      */
-    public static final DeferredItem<Item> TikiHelmet =
-            Register.register(ARMOR, "tiki_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.HELMET)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+    public static final DeferredItem<Item> ValhallaKnightLeggings =
+            Register.register(ARMOR, "valhalla_knight_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.LEGGINGS)
+                            .modifier(AttributeRegister.ServantDamage, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(Attributes.ATTACK_DAMAGE, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .build())
+                    .build();
+    /**
+     * 英灵殿骑士战靴 - +20% 移动速度
+     */
+    public static final DeferredItem<Item> ValhallaKnightBoots =
+            Register.register(ARMOR, "valhalla_knight_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.BOOTS)
+                            .modifier(Attributes.MOVEMENT_SPEED, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .build();    /**
@@ -270,16 +310,35 @@ public class ItemRegister {
                             .build())
                     .build();
     /**
-     * 英灵殿骑士头盔 - +1 召唤栏，+10% 仆从伤害，+10% 原版伤害
+     * 死灵卷轴 - 仆从栏+1，仆从伤害+10%
      */
-    public static final DeferredItem<Item> ValhallaKnightHelmet =
-            Register.register(ARMOR, "valhalla_knight_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.HELMET)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .modifier(Attributes.ATTACK_DAMAGE, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.RARE))
+    public static final DeferredItem<Item> NecromanticScroll =
+            Register.register(ACCESSORY, "necromantic_scroll", () -> CurioItem.builder()
+                            .canEquipFromUse(true)
+                            .attributeModifiers((slotContext, id, stack) -> {
+                                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+                                builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
+                                builder.put(AttributeRegister.ServantDamage, new AttributeModifier(id, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                                return builder.build();
+                            })
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
-                    .build();    /**
+                    .build();
+    /**
+     * 大力士甲虫 - 仆从栏+1，仆从击退+50%
+     */
+    public static final DeferredItem<Item> HerculesBeetle =
+            Register.register(ACCESSORY, "hercules_beetle", () -> CurioItem.builder()
+                    .canEquipFromUse(true)
+                    .attributeModifiers((slotContext, id, stack) -> {
+                        ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+                        builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
+                        builder.put(AttributeRegister.ServantKnockback, new AttributeModifier(id, 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                        return builder.build();
+                    })
+                    .properties(properties -> properties.rarity(Rarity.RARE))
+                    .build()
+            ).build();    /**
      * 缥缈星核法杖 - 召唤缥缈星核仆从
      */
     public static final DeferredItem<Item> EtherealStellarCoreStaff =
@@ -300,13 +359,31 @@ public class ItemRegister {
                             .save(output))
                     .build();
     /**
-     * 英灵殿骑士胸甲 - +30% 仆从伤害，+0.4 生命再生
+     * 矮人项链 - 仆从栏+1
      */
-    public static final DeferredItem<Item> ValhallaKnightChestplate =
-            Register.register(ARMOR, "valhalla_knight_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.CHESTPLATE)
-                            .modifier(AttributeRegister.ServantDamage, 0.30, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .modifier(AttributeRegister.HealthRegen, 0.4, AttributeModifier.Operation.ADD_VALUE)
-                            .properties(p -> p.rarity(Rarity.RARE))
+    public static final DeferredItem<Item> PygmyNecklace =
+            Register.register(ACCESSORY, "pygmy_necklace", () -> CurioItem.builder()
+                            .canEquipFromUse(true)
+                            .attributeModifiers((slotContext, id, stack) -> {
+                                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+                                builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
+                                return builder.build();
+                            })
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .build();
+    /**
+     * 召唤师徽章 - 召唤伤害+15%
+     */
+    public static final DeferredItem<Item> SummonerEmblem =
+            Register.register(ACCESSORY, "summoner_emblem", () -> CurioItem.builder()
+                            .canEquipFromUse(true)
+                            .attributeModifiers((slotContext, id, stack) -> {
+                                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+                                builder.put(AttributeRegister.ServantDamage, new AttributeModifier(id, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                                return builder.build();
+                            })
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .build();    /**
      * 无人机
@@ -326,13 +403,33 @@ public class ItemRegister {
                             .save(output))
                     .build();
     /**
-     * 英灵殿骑士护腿 - +20% 仆从伤害，+20% 原版伤害
+     * 学徒围巾 - 仆从数量+1，召唤伤害+10%
      */
-    public static final DeferredItem<Item> ValhallaKnightLeggings =
-            Register.register(ARMOR, "valhalla_knight_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.LEGGINGS)
-                            .modifier(AttributeRegister.ServantDamage, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .modifier(Attributes.ATTACK_DAMAGE, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.RARE))
+    public static final DeferredItem<Item> ApprenticesScarf =
+            Register.register(ACCESSORY, "apprentices_scarf", () -> CurioItem.builder()
+                            .canEquipFromUse(true)
+                            .attributeModifiers((slotContext, id, stack) -> {
+                                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+                                builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
+                                builder.put(AttributeRegister.ServantDamage, new AttributeModifier(id, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+                                return builder.build();
+                            })
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .build();
+    /**
+     * 女猎人圆盾 - 护甲+2，仆从数量+1
+     */
+    public static final DeferredItem<Item> HuntressesBuckler =
+            Register.register(ACCESSORY, "huntresses_buckler", () -> CurioItem.builder()
+                            .canEquipFromUse(true)
+                            .attributeModifiers((slotContext, id, stack) -> {
+                                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
+                                builder.put(Attributes.ARMOR, new AttributeModifier(id, 2, AttributeModifier.Operation.ADD_VALUE));
+                                builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
+                                return builder.build();
+                            })
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .build();    public static final DeferredItem<Item> FairyBell =
             Register.register(SERVANT_WEAPON, "fairy_bell", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.ScavengerFairy)
@@ -350,189 +447,6 @@ public class ItemRegister {
 
     // ===================== 套装物品 =====================
     /**
-     * 英灵殿骑士战靴 - +20% 移动速度
-     */
-    public static final DeferredItem<Item> ValhallaKnightBoots =
-            Register.register(ARMOR, "valhalla_knight_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.BOOTS)
-                            .modifier(Attributes.MOVEMENT_SPEED, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.RARE))
-                            .build())
-                    .build();    /**
-     * 小雪怪
-     */
-    public static final DeferredItem<Item> FlinxFurCoat =
-            Register.register(ARMOR, "flinx_fur_coat", () -> AttributeArmorItem.builder(ArmorMaterialRegister.Flinx, ArmorItem.Type.CHESTPLATE)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.Silk, 6)
-                            .ingredient(Items.LEATHER, 6)
-                            .result(ItemRegister.FlinxFurCoat)
-                            .save(output))
-                    .build();
-    /**
-     * 死灵卷轴 - 仆从栏+1，仆从伤害+10%
-     */
-    public static final DeferredItem<Item> NecromanticScroll =
-            Register.register(ACCESSORY, "necromantic_scroll", () -> CurioItem.builder()
-                            .canEquipFromUse(true)
-                            .attributeModifiers((slotContext, id, stack) -> {
-                                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
-                                builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
-                                builder.put(AttributeRegister.ServantDamage, new AttributeModifier(id, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
-                                return builder.build();
-                            })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                            .build())
-                    .build();    /**
-     * 黑曜石头盔 - +8% 仆从伤害
-     */
-    public static final DeferredItem<Item> ObsidianHelmet =
-            Register.register(ARMOR, "obsidian_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.HELMET)
-                            .modifier(AttributeRegister.ServantDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.Silk, 10)
-                            .ingredient(Items.OBSIDIAN, 20)
-                            .result(ItemRegister.ObsidianHelmet)
-                            .save(output))
-                    .build();
-    /**
-     * 大力士甲虫 - 仆从栏+1，仆从击退+50%
-     */
-    public static final DeferredItem<Item> HerculesBeetle =
-            Register.register(ACCESSORY, "hercules_beetle", () -> CurioItem.builder()
-                    .canEquipFromUse(true)
-                    .attributeModifiers((slotContext, id, stack) -> {
-                        ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
-                        builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
-                        builder.put(AttributeRegister.ServantKnockback, new AttributeModifier(id, 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
-                        return builder.build();
-                    })
-                    .properties(properties -> properties.rarity(Rarity.RARE))
-                    .build()
-            ).build();    /**
-     * 黑曜石胸甲 - +1 仆从栏
-     */
-    public static final DeferredItem<Item> ObsidianChestplate =
-            Register.register(ARMOR, "obsidian_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.CHESTPLATE)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.Silk, 10)
-                            .ingredient(Items.OBSIDIAN, 20)
-                            .result(ItemRegister.ObsidianChestplate)
-                            .save(output))
-                    .build();
-    /**
-     * 矮人项链 - 仆从栏+1
-     */
-    public static final DeferredItem<Item> PygmyNecklace =
-            Register.register(ACCESSORY, "pygmy_necklace", () -> CurioItem.builder()
-                            .canEquipFromUse(true)
-                            .attributeModifiers((slotContext, id, stack) -> {
-                                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
-                                builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
-                                return builder.build();
-                            })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                            .build())
-                    .build();    /**
-     * 黑曜石护腿 - +8% 仆从伤害
-     */
-    public static final DeferredItem<Item> ObsidianLeggings =
-            Register.register(ARMOR, "obsidian_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.LEGGINGS)
-                            .modifier(AttributeRegister.ServantDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.Silk, 10)
-                            .ingredient(Items.OBSIDIAN, 20)
-                            .result(ItemRegister.ObsidianLeggings)
-                            .save(output))
-                    .build();
-    /**
-     * 召唤师徽章 - 召唤伤害+15%
-     */
-    public static final DeferredItem<Item> SummonerEmblem =
-            Register.register(ACCESSORY, "summoner_emblem", () -> CurioItem.builder()
-                            .canEquipFromUse(true)
-                            .attributeModifiers((slotContext, id, stack) -> {
-                                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
-                                builder.put(AttributeRegister.ServantDamage, new AttributeModifier(id, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
-                                return builder.build();
-                            })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                            .build())
-                    .build();    /**
-     * 黑曜石靴子 - +8% 移动速度
-     */
-    public static final DeferredItem<Item> ObsidianBoots =
-            Register.register(ARMOR, "obsidian_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.BOOTS)
-                            .modifier(Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.Silk, 10)
-                            .ingredient(Items.OBSIDIAN, 20)
-                            .result(ItemRegister.ObsidianBoots)
-                            .save(output))
-                    .build();
-    /**
-     * 学徒围巾 - 仆从数量+1，召唤伤害+10%
-     */
-    public static final DeferredItem<Item> ApprenticesScarf =
-            Register.register(ACCESSORY, "apprentices_scarf", () -> CurioItem.builder()
-                            .canEquipFromUse(true)
-                            .attributeModifiers((slotContext, id, stack) -> {
-                                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
-                                builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
-                                builder.put(AttributeRegister.ServantDamage, new AttributeModifier(id, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
-                                return builder.build();
-                            })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                            .build())
-                    .build();    /**
-     * 神圣头盔 - +1 仆从栏，+7% 仆从伤害
-     */
-    public static final DeferredItem<Item> HallowedHelmet =
-            Register.register(ARMOR, "hallowed_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.UNCOMMON))
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.HallowedIngot, 12)
-                            .result(ItemRegister.HallowedHelmet)
-                            .save(output))
-                    .build();
-    /**
-     * 女猎人圆盾 - 护甲+2，仆从数量+1
-     */
-    public static final DeferredItem<Item> HuntressesBuckler =
-            Register.register(ACCESSORY, "huntresses_buckler", () -> CurioItem.builder()
-                            .canEquipFromUse(true)
-                            .attributeModifiers((slotContext, id, stack) -> {
-                                ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
-                                builder.put(Attributes.ARMOR, new AttributeModifier(id, 2, AttributeModifier.Operation.ADD_VALUE));
-                                builder.put(AttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
-                                return builder.build();
-                            })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                            .build())
-                    .build();    /**
-     * 神圣胸甲 - +1 仆从栏，+7% 仆从伤害
-     */
-    public static final DeferredItem<Item> HallowedChestplate =
-            Register.register(ARMOR, "hallowed_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.CHESTPLATE)
-                            .modifier(AttributeRegister.ServantDamage, 0.14, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.UNCOMMON))
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.HallowedIngot, 24)
-                            .result(ItemRegister.HallowedChestplate)
-                            .save(output))
-                    .build();
-    /**
      * 武僧腰带 - 召唤伤害+10%，仆从击退+50%
      */
     public static final DeferredItem<Item> MonksBelt =
@@ -545,18 +459,6 @@ public class ItemRegister {
                                 return builder.build();
                             })
                             .build())
-                    .build();    /**
-     * 神圣护腿 - +1 仆从栏，+7% 仆从伤害
-     */
-    public static final DeferredItem<Item> HallowedLeggings =
-            Register.register(ARMOR, "hallowed_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.LEGGINGS)
-                            .modifier(AttributeRegister.ServantDamage, 0.07, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.UNCOMMON))
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.HallowedIngot, 12)
-                            .result(ItemRegister.HallowedLeggings)
-                            .save(output))
                     .build();
     /**
      * 侍卫护盾 - 护甲+2，召唤伤害+10%
@@ -573,20 +475,19 @@ public class ItemRegister {
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .build();    /**
-     * 神圣靴子 - +7% 移动速度，+7% 仆从伤害
+     * 小雪怪
      */
-    public static final DeferredItem<Item> HallowedBoots =
-            Register.register(ARMOR, "hallowed_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.BOOTS)
-                            .modifier(Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+    public static final DeferredItem<Item> FlinxFurCoat =
+            Register.register(ARMOR, "flinx_fur_coat", () -> AttributeArmorItem.builder(ArmorMaterialRegister.Flinx, ArmorItem.Type.CHESTPLATE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.HallowedIngot, 12)
-                            .result(ItemRegister.HallowedBoots)
+                            .ingredient(ItemRegister.Silk, 6)
+                            .ingredient(Items.LEATHER, 6)
+                            .result(ItemRegister.FlinxFurCoat)
                             .save(output))
                     .build();
-
-    // ===================== 叶绿套装 =====================
     /**
      * 威胁分析仪 - 加大仆从的索敌半径
      */
@@ -600,19 +501,6 @@ public class ItemRegister {
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
-                    .build();    /**
-     * 叶绿面具 - +1 召唤栏，+10% 仆从伤害
-     */
-    public static final DeferredItem<Item> ChlorophyteHelmet =
-            Register.register(ARMOR, "chlorophyte_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.HELMET)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.UNCOMMON))
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.ChlorophyteIngot, 12)
-                            .result(ItemRegister.ChlorophyteHelmet)
-                            .save(output))
                     .build();
     /**
      * 幻魂神物 - 仆从攻击后随机获得幻魂增益（上位）
@@ -630,16 +518,16 @@ public class ItemRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .build();    /**
-     * 叶绿板甲 - +6% 仆从伤害
+     * 黑曜石头盔 - +8% 仆从伤害
      */
-    public static final DeferredItem<Item> ChlorophyteChestplate =
-            Register.register(ARMOR, "chlorophyte_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.CHESTPLATE)
-                            .modifier(AttributeRegister.ServantDamage, 0.19, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+    public static final DeferredItem<Item> ObsidianHelmet =
+            Register.register(ARMOR, "obsidian_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.ChlorophyteIngot, 24)
-                            .result(ItemRegister.ChlorophyteChestplate)
+                            .ingredient(ItemRegister.Silk, 10)
+                            .ingredient(Items.OBSIDIAN, 20)
+                            .result(ItemRegister.ObsidianHelmet)
                             .save(output))
                     .build();
     /**
@@ -659,18 +547,6 @@ public class ItemRegister {
                             })
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
-                    .build();    /**
-     * 叶绿护胫 - +4% 仆从伤害
-     */
-    public static final DeferredItem<Item> ChlorophyteLeggings =
-            Register.register(ARMOR, "chlorophyte_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.LEGGINGS)
-                            .modifier(AttributeRegister.ServantDamage, 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.UNCOMMON))
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.ChlorophyteIngot, 12)
-                            .result(ItemRegister.ChlorophyteLeggings)
-                            .save(output))
                     .build();
     /**
      * 灵魂浮雕 - 仆从攻击后随机获得灵魂增益（下位互斥）
@@ -690,20 +566,18 @@ public class ItemRegister {
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .build();    /**
-     * 叶绿战靴 - +2% 仆从伤害
+     * 黑曜石胸甲 - +1 仆从栏
      */
-    public static final DeferredItem<Item> ChlorophyteBoots =
-            Register.register(ARMOR, "chlorophyte_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.BOOTS)
-                            .modifier(Attributes.MOVEMENT_SPEED, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+    public static final DeferredItem<Item> ObsidianChestplate =
+            Register.register(ARMOR, "obsidian_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(ItemRegister.ChlorophyteIngot, 12)
-                            .result(ItemRegister.ChlorophyteBoots)
+                            .ingredient(ItemRegister.Silk, 10)
+                            .ingredient(Items.OBSIDIAN, 20)
+                            .result(ItemRegister.ObsidianChestplate)
                             .save(output))
                     .build();
-
-    // ===================== 阴森套装 =====================
     /**
      * 蚀日尊戒
      */
@@ -722,20 +596,6 @@ public class ItemRegister {
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
-                    .build();    /**
-     * 阴森头盔 - +11% 仆从伤害
-     */
-    public static final DeferredItem<Item> SpookyHelmet =
-            Register.register(ARMOR, "spooky_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.HELMET)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.RARE))
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(Items.WARPED_STEM, 200)
-                            .ingredient(Items.WARPED_WART_BLOCK, 200)
-                            .result(ItemRegister.SpookyHelmet)
-                            .save(output))
                     .build();
     /**
      * 始源暗影焰
@@ -752,18 +612,16 @@ public class ItemRegister {
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .build();    /**
-     * 阴森胸甲 - +11% 仆从伤害
+     * 黑曜石护腿 - +8% 仆从伤害
      */
-    public static final DeferredItem<Item> SpookyChestplate =
-            Register.register(ARMOR, "spooky_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.CHESTPLATE)
-                            .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.RARE))
+    public static final DeferredItem<Item> ObsidianLeggings =
+            Register.register(ARMOR, "obsidian_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.LEGGINGS)
+                            .modifier(AttributeRegister.ServantDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(Items.WARPED_STEM, 300)
-                            .ingredient(Items.WARPED_WART_BLOCK, 300)
-                            .result(ItemRegister.SpookyChestplate)
+                            .ingredient(ItemRegister.Silk, 10)
+                            .ingredient(Items.OBSIDIAN, 20)
+                            .result(ItemRegister.ObsidianLeggings)
                             .save(output))
                     .build();
     /**
@@ -780,20 +638,6 @@ public class ItemRegister {
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
-                    .build();    /**
-     * 阴森护腿 - +8% 仆从伤害，+1 召唤栏
-     */
-    public static final DeferredItem<Item> SpookyLeggings =
-            Register.register(ARMOR, "spooky_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.LEGGINGS)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.RARE))
-                            .build())
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(Items.WARPED_STEM, 250)
-                            .ingredient(Items.WARPED_WART_BLOCK, 250)
-                            .result(ItemRegister.SpookyLeggings)
-                            .save(output))
                     .build();
     /**
      * 猎魂徽记
@@ -809,6 +653,190 @@ public class ItemRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .build();    /**
+     * 黑曜石靴子 - +8% 移动速度
+     */
+    public static final DeferredItem<Item> ObsidianBoots =
+            Register.register(ARMOR, "obsidian_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.BOOTS)
+                            .modifier(Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.Silk, 10)
+                            .ingredient(Items.OBSIDIAN, 20)
+                            .result(ItemRegister.ObsidianBoots)
+                            .save(output))
+                    .build();
+
+    public static void register(IEventBus eventBus) {
+        Register.register(eventBus);
+    }
+    /**
+     * 神圣头盔 - +1 仆从栏，+7% 仆从伤害
+     */
+    public static final DeferredItem<Item> HallowedHelmet =
+            Register.register(ARMOR, "hallowed_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.HallowedIngot, 12)
+                            .result(ItemRegister.HallowedHelmet)
+                            .save(output))
+                    .build();
+
+    /**
+     * 神圣胸甲 - +1 仆从栏，+7% 仆从伤害
+     */
+    public static final DeferredItem<Item> HallowedChestplate =
+            Register.register(ARMOR, "hallowed_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                            .modifier(AttributeRegister.ServantDamage, 0.14, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.HallowedIngot, 24)
+                            .result(ItemRegister.HallowedChestplate)
+                            .save(output))
+                    .build();
+
+
+    /**
+     * 神圣护腿 - +1 仆从栏，+7% 仆从伤害
+     */
+    public static final DeferredItem<Item> HallowedLeggings =
+            Register.register(ARMOR, "hallowed_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.LEGGINGS)
+                            .modifier(AttributeRegister.ServantDamage, 0.07, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.HallowedIngot, 12)
+                            .result(ItemRegister.HallowedLeggings)
+                            .save(output))
+                    .build();
+
+    /**
+     * 神圣靴子 - +7% 移动速度，+7% 仆从伤害
+     */
+    public static final DeferredItem<Item> HallowedBoots =
+            Register.register(ARMOR, "hallowed_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.BOOTS)
+                            .modifier(Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.HallowedIngot, 12)
+                            .result(ItemRegister.HallowedBoots)
+                            .save(output))
+                    .build();
+
+    // ===================== 叶绿套装 =====================
+
+    /**
+     * 叶绿面具 - +1 召唤栏，+10% 仆从伤害
+     */
+    public static final DeferredItem<Item> ChlorophyteHelmet =
+            Register.register(ARMOR, "chlorophyte_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.ChlorophyteIngot, 12)
+                            .result(ItemRegister.ChlorophyteHelmet)
+                            .save(output))
+                    .build();
+
+    /**
+     * 叶绿板甲 - +6% 仆从伤害
+     */
+    public static final DeferredItem<Item> ChlorophyteChestplate =
+            Register.register(ARMOR, "chlorophyte_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                            .modifier(AttributeRegister.ServantDamage, 0.19, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.ChlorophyteIngot, 24)
+                            .result(ItemRegister.ChlorophyteChestplate)
+                            .save(output))
+                    .build();
+
+    /**
+     * 叶绿护胫 - +4% 仆从伤害
+     */
+    public static final DeferredItem<Item> ChlorophyteLeggings =
+            Register.register(ARMOR, "chlorophyte_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.LEGGINGS)
+                            .modifier(AttributeRegister.ServantDamage, 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.ChlorophyteIngot, 12)
+                            .result(ItemRegister.ChlorophyteLeggings)
+                            .save(output))
+                    .build();
+
+    /**
+     * 叶绿战靴 - +2% 仆从伤害
+     */
+    public static final DeferredItem<Item> ChlorophyteBoots =
+            Register.register(ARMOR, "chlorophyte_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.BOOTS)
+                            .modifier(Attributes.MOVEMENT_SPEED, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(ItemRegister.ChlorophyteIngot, 12)
+                            .result(ItemRegister.ChlorophyteBoots)
+                            .save(output))
+                    .build();
+
+    // ===================== 阴森套装 =====================
+
+    /**
+     * 阴森头盔 - +11% 仆从伤害
+     */
+    public static final DeferredItem<Item> SpookyHelmet =
+            Register.register(ARMOR, "spooky_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(Items.WARPED_STEM, 200)
+                            .ingredient(Items.WARPED_WART_BLOCK, 200)
+                            .result(ItemRegister.SpookyHelmet)
+                            .save(output))
+                    .build();
+
+    /**
+     * 阴森胸甲 - +11% 仆从伤害
+     */
+    public static final DeferredItem<Item> SpookyChestplate =
+            Register.register(ARMOR, "spooky_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.CHESTPLATE)
+                            .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(Items.WARPED_STEM, 300)
+                            .ingredient(Items.WARPED_WART_BLOCK, 300)
+                            .result(ItemRegister.SpookyChestplate)
+                            .save(output))
+                    .build();
+
+    /**
+     * 阴森护腿 - +8% 仆从伤害，+1 召唤栏
+     */
+    public static final DeferredItem<Item> SpookyLeggings =
+            Register.register(ARMOR, "spooky_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.LEGGINGS)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .build())
+                    .recipe(output -> MithrilAnvilRecipe.builder()
+                            .ingredient(Items.WARPED_STEM, 250)
+                            .ingredient(Items.WARPED_WART_BLOCK, 250)
+                            .result(ItemRegister.SpookyLeggings)
+                            .save(output))
+                    .build();
+
+    /**
      * 阴森战靴 - +4% 仆从伤害
      */
     public static final DeferredItem<Item> SpookyBoots =
@@ -870,9 +898,9 @@ public class ItemRegister {
 
     // ===================== 星尘套装 =====================
 
-    public static void register(IEventBus eventBus) {
-        Register.register(eventBus);
-    }    /**
+
+
+    /**
      * 星尘头盔 - +1 召唤栏，+16% 仆从伤害
      */
     public static final DeferredItem<Item> StardustHelmet =
@@ -939,9 +967,6 @@ public class ItemRegister {
     // ===================== 饰品 =====================
 
 
-
-
-
     /**
      * 甲虫莎草纸 - 仆从栏+2，仆从伤害+15%，仆从击退+50%
      */
@@ -965,52 +990,10 @@ public class ItemRegister {
                     .build();
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // ===================== 方块物品 =====================
 
 
-
     // ===================== 材料 =====================
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
