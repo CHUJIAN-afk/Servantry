@@ -32,7 +32,7 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
                         .timer(timer)
                         .colorRGB(0xFFFFFF)
                         .historyLength(4)
-                        .width(0.7075f)
+                        .width(1.0575f)
                         .diamondSize(0.15f)
                         .colorFunction((terraprism, progress, timeShift) -> {
                             EntityData data = terraprism.getOwner().getData(AttachmentRegister.EntityData);
@@ -44,6 +44,7 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
                         .tipAlphaBoost((s, progress) -> progress < 0.3f ? Mth.lerp(progress / 0.3f, 2.5f, 1.0f) : 1.0f)
                         .tipBrightnessBoost((s, progress) -> progress < 0.25f ? Mth.lerp(progress / 0.25f, 1.5f, 1.0f) : 1.0f))
                 .model(new ModelConfig<Terraprism>()
+                        .scale(1.5f)
                         .translateOffset(-0.5f, -0.5f, -0.5f)
                         .rotationOffset(0, 90, 45)
                         .visualNodeFunction((terraprism, partialTick, rawNode) -> rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend))))

@@ -99,7 +99,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         // 椭圆几何参数
         float randAngle = owner.getRandom().nextFloat() * Mth.TWO_PI;
         float randY = 0.5f + owner.getRandom().nextFloat() * 2.5f;
-        Vec3 farPoint = T.add(Math.cos(randAngle) * 4, randY, Math.sin(randAngle) * 4);
+        Vec3 farPoint = T.add(Math.cos(randAngle) * 5, randY, Math.sin(randAngle) * 5);
 
         Vec3 planeNormal = Ellipse.randomPlaneNormal(owner.getRandom(), T, farPoint);
         Ellipse ellipse = new Ellipse(T, farPoint, planeNormal, 0.75f);
@@ -138,8 +138,8 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         Vec3 center = new Vec3(target.getX(), target.getY() + 3, target.getZ());
         Vec3 toStart = startPos.subtract(center);
         double angle = Math.atan2(toStart.z, toStart.x);
-        Vec3 attackPrepPos = center.add(Math.cos(angle) * 4, 0, Math.sin(angle) * 4);
-        Vec3 endPos = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), 0.5f);
+        Vec3 attackPrepPos = center.add(Math.cos(angle) * 5, 0, Math.sin(angle) * 5);
+        Vec3 endPos = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), 0.75f);
 
         // 计算攻击方向
         Vec3 attackDir = endPos.subtract(attackPrepPos);
