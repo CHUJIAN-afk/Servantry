@@ -6,7 +6,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import first.servantry.api.core.ClientEvent;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.register.DataComponentRegister;
-import first.servantry.register.ItemRegister;
+import first.servantry.register.ServantWeaponRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -27,7 +27,7 @@ public class ClientEventMixin {
             )
     )
     private static boolean tooltip(List<Object> instance, Object object, Operation<Boolean> original, @Local(name = "itemStack") ItemStack itemStack) {
-        if (itemStack.is(ItemRegister.InfiniteScabbard)) {
+        if (itemStack.is(ServantWeaponRegister.InfiniteScabbard)) {
             ScabbardContainer container = itemStack.getComponents().getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
             if (!container.isEmpty()) {
                 return instance.add(Component.translatable("item.servantry.tooltip.summon", container.itemStack().getDisplayName()).withStyle(ChatFormatting.GRAY));

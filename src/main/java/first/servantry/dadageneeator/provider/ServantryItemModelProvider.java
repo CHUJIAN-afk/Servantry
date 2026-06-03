@@ -24,10 +24,8 @@ public class ServantryItemModelProvider extends ItemModelProvider {
         BuiltInRegistries.ITEM.stream()
                 .filter(item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Servantry.MODID))
                 .forEach(item -> {
-                    // 方块物品使用方块模型父级
                     if (item instanceof BlockItem) {
-                        withExistingParent(BuiltInRegistries.ITEM.getKey(item).getPath(),
-                                ResourceLocation.fromNamespaceAndPath(Servantry.MODID, "block/" + BuiltInRegistries.ITEM.getKey(item).getPath()));
+                        withExistingParent(BuiltInRegistries.ITEM.getKey(item).getPath(), ResourceLocation.fromNamespaceAndPath(Servantry.MODID, "block/" + BuiltInRegistries.ITEM.getKey(item).getPath()));
                         return;
                     }
                     switch (item) {

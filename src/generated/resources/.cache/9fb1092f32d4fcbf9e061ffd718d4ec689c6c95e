@@ -1,4 +1,4 @@
-// 1.21.1	2026-06-02T22:54:01.719599	Recipes
+// 1.21.1	2026-06-03T20:57:24.0475084	Recipes
 6fd1d2138e434b9d90c298e0c9c543baec241b08 data/servantry/advancement/recipes/mithril_anvil/blade_staff.json
 664fe29e0144f2eebb2bf241d684ec5465e40d51 data/servantry/advancement/recipes/mithril_anvil/chlorophyte_boots.json
 664fe29e0144f2eebb2bf241d684ec5465e40d51 data/servantry/advancement/recipes/mithril_anvil/chlorophyte_chestplate.json
@@ -15,7 +15,7 @@ d50d029635373a264d5723f8f4c479d962fae31d data/servantry/advancement/recipes/mith
 56445f8e49dc4765cbfb177ddd0f39bb0807bc61 data/servantry/advancement/recipes/mithril_anvil/obsidian_chestplate.json
 56445f8e49dc4765cbfb177ddd0f39bb0807bc61 data/servantry/advancement/recipes/mithril_anvil/obsidian_helmet.json
 56445f8e49dc4765cbfb177ddd0f39bb0807bc61 data/servantry/advancement/recipes/mithril_anvil/obsidian_leggings.json
-4db7c614f77111a34cb1b999c3762e281465b7d0 data/servantry/advancement/recipes/mithril_anvil/optic_staff.json
+ee64be9aaaf705010587f9bba33398e83eb316d3 data/servantry/advancement/recipes/mithril_anvil/optic_staff.json
 4a797d88d75cda83e056c4b3ccdd306ca7167d74 data/servantry/advancement/recipes/mithril_anvil/papyrus_scarab.json
 0d58f36dc601d1fba004832f913ac977d6034e39 data/servantry/advancement/recipes/mithril_anvil/spooky_boots.json
 0d58f36dc601d1fba004832f913ac977d6034e39 data/servantry/advancement/recipes/mithril_anvil/spooky_chestplate.json
@@ -44,7 +44,7 @@ e1d80f05868eae26ddbda63e61c72681f100dc7f data/servantry/recipe/mithril_anvil/hal
 dc12bbc6670c3fc93736e879b6c86f32ca27ea79 data/servantry/recipe/mithril_anvil/obsidian_chestplate.json
 1dc19f9f92c81286c87620c472449f3f600d55f6 data/servantry/recipe/mithril_anvil/obsidian_helmet.json
 0771ae5a7ab2a638c3f90f9e4d0c3b43d59f8e9e data/servantry/recipe/mithril_anvil/obsidian_leggings.json
-fee2207c8c270c604bca95a03fed72908f1adbca data/servantry/recipe/mithril_anvil/optic_staff.json
+ebd9f3185def05c00066b940c8fb63fdd759f5f1 data/servantry/recipe/mithril_anvil/optic_staff.json
 3e5c3132be35fa9a1e3ef3dff1eccf8e31260400 data/servantry/recipe/mithril_anvil/papyrus_scarab.json
 17cae891482508e4c85cb7108c976703d4bfe537 data/servantry/recipe/mithril_anvil/spooky_boots.json
 60ecfc442772bb901569fc92df13288e82b6c78f data/servantry/recipe/mithril_anvil/spooky_chestplate.json

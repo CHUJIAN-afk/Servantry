@@ -17,7 +17,11 @@ public class Servantry {
         CreativeTabRegister.register(eventBus);
         DataComponentRegister.register(eventBus);
         AttachmentEntityRegister.register(eventBus);
-        ItemRegister.register(eventBus);
+        ItemRegister.register();
+        ServantWeaponRegister.register();
+        ArmorRegister.register();
+        CurioRegister.register();
+        Registers.getInstance().register(eventBus);
         MobEffectRegister.register(eventBus);
         ParticleRegister.register(eventBus);
         PotionRegister.register(eventBus);

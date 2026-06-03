@@ -2,7 +2,6 @@
   "values": [
     "servantry:necromantic_scroll",
     "servantry:hercules_beetle",
-    "servantry:papyrus_scarab",
     "servantry:pygmy_necklace",
     "servantry:summoner_emblem",
     "servantry:apprentices_scarf",
@@ -17,6 +16,7 @@
     "servantry:primordial_shadowflame",
     "servantry:kaleidoscope",
     "servantry:hunt_soul_emblem",
-    "servantry:stardust_fragment"
+    "servantry:stardust_fragment",
+    "servantry:papyrus_scarab"
   ]
 }

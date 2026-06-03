@@ -67,8 +67,8 @@ public class MithrilAnvilGui {
             graphics.blit(Servantry.rl("textures/gui/crafting_table.png"), x, y, 0, 0, this.imageWidth, this.imageHeight);
             PoseStack pose = graphics.pose();
             pose.pushPose();
-            pose.translate(x + 37, y + 35, -100);
-            pose.scale(3, 3, 3);
+            pose.translate(x + 29, y + 20, -300);
+            pose.scale(4, 4, 4);
             graphics.renderFakeItem(BlockRegister.MITHRIL_ANVIL.toStack(), 0, 0);
             pose.popPose();
             if (this.menu.selectedRecipe != null) {

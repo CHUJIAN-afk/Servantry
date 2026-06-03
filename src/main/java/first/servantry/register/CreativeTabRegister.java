@@ -24,17 +24,11 @@ import java.util.function.Consumer;
 public class CreativeTabRegister {
 
     public static final DeferredRegister<CreativeModeTab> Register = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Servantry.MODID);
-
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> Tab =
-            Register.register("tab", () -> CreativeModeTab.builder()
-                    .title(Component.translatable("modid.servantry"))
-                    .icon(ItemRegister.PygmyNecklace.get()::getDefaultInstance)
-                    .build()
-            );
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> Tab = Register.register("tab", () -> CreativeModeTab.builder().title(Component.translatable("modid.servantry")).icon(CurioRegister.PygmyNecklace.get()::getDefaultInstance).build());
 
     public static void renderBanners(final CreativeModeInventoryScreen screen, final GuiGraphics graphics, int mouseX, int mouseY, float scrollOffs) {
-        List<TabGroup> sections = ItemRegister.Register.sortedEntries();
-        LinkedHashMap<TabGroup, List<DeferredItem<Item>>> map = ItemRegister.Register.getMap();
+        List<TabGroup> sections = Registers.getInstance().sortedEntries();
+        LinkedHashMap<TabGroup, List<DeferredItem<Item>>> map = Registers.getInstance().getMap();
 
         int totalRows = 0;
         for (TabGroup section : sections) {
@@ -61,8 +55,8 @@ public class CreativeTabRegister {
     }
 
     public static void processItems(Consumer<ItemStack> displayItems, Consumer<ItemStack> searchItems) {
-        LinkedHashMap<TabGroup, List<DeferredItem<Item>>> map = ItemRegister.Register.getMap();
-        List<TabGroup> sortedKeys = ItemRegister.Register.sortedEntries();
+        LinkedHashMap<TabGroup, List<DeferredItem<Item>>> map = Registers.getInstance().getMap();
+        List<TabGroup> sortedKeys = Registers.getInstance().sortedEntries();
         for (TabGroup key : sortedKeys) {
             List<DeferredItem<Item>> items = map.get(key);
             List<ItemStack> stacks = new ArrayList<>(items.stream()

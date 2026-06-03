@@ -18,10 +18,10 @@ public class ArmorSetRegister {
 
     public static final Holder<ArmorSet> Obsidian =
             Register.register("obsidian", () -> ArmorSet.builder(Servantry.rl("obsidian"))
-                    .piece(ItemRegister.ObsidianHelmet)
-                    .piece(ItemRegister.ObsidianChestplate)
-                    .piece(ItemRegister.ObsidianLeggings)
-                    .piece(ItemRegister.ObsidianBoots)
+                    .piece(ArmorRegister.ObsidianHelmet)
+                    .piece(ArmorRegister.ObsidianChestplate)
+                    .piece(ArmorRegister.ObsidianLeggings)
+                    .piece(ArmorRegister.ObsidianBoots)
                     .modifier(Attributes.MOVEMENT_SPEED, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .modifier(AttributeRegister.ServantDamage, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .modifier(AttributeRegister.ServantSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -29,10 +29,10 @@ public class ArmorSetRegister {
             );
 
     public static final Holder<ArmorSet> Hallowed = Register.register("hallowed", () -> ArmorSet.builder(Servantry.rl("hallowed"))
-            .piece(ItemRegister.HallowedHelmet)
-            .piece(ItemRegister.HallowedChestplate)
-            .piece(ItemRegister.HallowedLeggings)
-            .piece(ItemRegister.HallowedBoots)
+            .piece(ArmorRegister.HallowedHelmet)
+            .piece(ArmorRegister.HallowedChestplate)
+            .piece(ArmorRegister.HallowedLeggings)
+            .piece(ArmorRegister.HallowedBoots)
             .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
             .modifier(AttributeRegister.ServantArmorPierce, 4, AttributeModifier.Operation.ADD_VALUE)
             .build()
@@ -40,10 +40,10 @@ public class ArmorSetRegister {
 
     public static final Holder<ArmorSet> ValhallaKnight =
             Register.register("valhalla_knight", () -> ArmorSet.builder(Servantry.rl("valhalla_knight"))
-                    .piece(ItemRegister.ValhallaKnightHelmet)
-                    .piece(ItemRegister.ValhallaKnightChestplate)
-                    .piece(ItemRegister.ValhallaKnightLeggings)
-                    .piece(ItemRegister.ValhallaKnightBoots)
+                    .piece(ArmorRegister.ValhallaKnightHelmet)
+                    .piece(ArmorRegister.ValhallaKnightChestplate)
+                    .piece(ArmorRegister.ValhallaKnightLeggings)
+                    .piece(ArmorRegister.ValhallaKnightBoots)
                     .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                     .modifier(AttributeRegister.ServantDamage, 0.40, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .modifier(Attributes.KNOCKBACK_RESISTANCE, 1.0, AttributeModifier.Operation.ADD_VALUE)
@@ -52,10 +52,10 @@ public class ArmorSetRegister {
 
     public static final Holder<ArmorSet> Chlorophyte =
             Register.register("chlorophyte", () -> ArmorSet.builder(Servantry.rl("chlorophyte"))
-                    .piece(ItemRegister.ChlorophyteHelmet)
-                    .piece(ItemRegister.ChlorophyteChestplate)
-                    .piece(ItemRegister.ChlorophyteLeggings)
-                    .piece(ItemRegister.ChlorophyteBoots)
+                    .piece(ArmorRegister.ChlorophyteHelmet)
+                    .piece(ArmorRegister.ChlorophyteChestplate)
+                    .piece(ArmorRegister.ChlorophyteLeggings)
+                    .piece(ArmorRegister.ChlorophyteBoots)
                     .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
                     .onStart(player -> {
                         ChlorophyteCrystal crystal = new ChlorophyteCrystal();
@@ -67,10 +67,10 @@ public class ArmorSetRegister {
 
     public static final Holder<ArmorSet> Spooky =
             Register.register("spooky", () -> ArmorSet.builder(Servantry.rl("spooky"))
-                    .piece(ItemRegister.SpookyHelmet)
-                    .piece(ItemRegister.SpookyChestplate)
-                    .piece(ItemRegister.SpookyLeggings)
-                    .piece(ItemRegister.SpookyBoots)
+                    .piece(ArmorRegister.SpookyHelmet)
+                    .piece(ArmorRegister.SpookyChestplate)
+                    .piece(ArmorRegister.SpookyLeggings)
+                    .piece(ArmorRegister.SpookyBoots)
                     .modifier(AttributeRegister.ServantDamage, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .modifier(AttributeRegister.ServantArmorPierce, 8, AttributeModifier.Operation.ADD_VALUE)
                     .build()
@@ -78,10 +78,10 @@ public class ArmorSetRegister {
 
     public static final Holder<ArmorSet> Tiki =
             Register.register("tiki", () -> ArmorSet.builder(Servantry.rl("tiki"))
-                    .piece(ItemRegister.TikiHelmet)
-                    .piece(ItemRegister.TikiChestplate)
-                    .piece(ItemRegister.TikiLeggings)
-                    .piece(ItemRegister.TikiBoots)
+                    .piece(ArmorRegister.TikiHelmet)
+                    .piece(ArmorRegister.TikiChestplate)
+                    .piece(ArmorRegister.TikiLeggings)
+                    .piece(ArmorRegister.TikiBoots)
                     .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                     .modifier(AttributeRegister.ServantSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
@@ -89,10 +89,10 @@ public class ArmorSetRegister {
 
     public static final Holder<ArmorSet> Stardust =
             Register.register("stardust", () -> ArmorSet.builder(Servantry.rl("stardust"))
-                    .piece(ItemRegister.StardustHelmet)
-                    .piece(ItemRegister.StardustChestplate)
-                    .piece(ItemRegister.StardustLeggings)
-                    .piece(ItemRegister.StardustBoots)
+                    .piece(ArmorRegister.StardustHelmet)
+                    .piece(ArmorRegister.StardustChestplate)
+                    .piece(ArmorRegister.StardustLeggings)
+                    .piece(ArmorRegister.StardustBoots)
                     .build()
             );
 

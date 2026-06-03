@@ -1,6 +1,6 @@
 package first.servantry.dadageneeator.provider;
 
-import first.servantry.register.ItemRegister;
+import first.servantry.register.Registers;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -17,11 +17,11 @@ public class ServantryRecipeProvider extends RecipeProvider {
 
     @Override
     protected void buildRecipes(@NotNull RecipeOutput output) {
-        ItemRegister.Register.getRecipeGenerate().forEach(generate -> generate.recipe(output));
+        Registers.getInstance().getRecipeGenerate().forEach(generate -> generate.recipe(output));
     }
 
     @FunctionalInterface
-    public interface Generate {
+    public interface RecipeGenerate {
         void recipe(RecipeOutput output);
     }
 }

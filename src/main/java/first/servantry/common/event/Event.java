@@ -54,7 +54,7 @@ public class Event {
         if (event.getClickAction() == ClickAction.SECONDARY) {
             ItemStack carried = event.getCarriedItem();
             ItemStack stackedOn = event.getStackedOnItem();
-            if (carried.is(ItemRegister.InfiniteScabbard.get())) {
+            if (carried.is(ServantWeaponRegister.InfiniteScabbard.get())) {
                 Slot slot = event.getSlot();
                 Player player = event.getPlayer();
                 ScabbardContainer scabbard = carried.getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
@@ -88,14 +88,14 @@ public class Event {
         if (event.getType() == VillagerProfession.CLERIC) {
             Int2ObjectMap<List<VillagerTrades.ItemListing>> trades = event.getTrades();
             // 等级1（新手）添加四件基础召唤饰品交易：20绿宝石
-            Item[] items = {ItemRegister.ApprenticesScarf.get(), ItemRegister.HuntressesBuckler.get(), ItemRegister.MonksBelt.get(), ItemRegister.SquiresShield.get()};
+            Item[] items = {CurioRegister.ApprenticesScarf.get(), CurioRegister.HuntressesBuckler.get(), CurioRegister.MonksBelt.get(), CurioRegister.SquiresShield.get()};
             for (Item item : items) {
                 trades.get(1).add(new BasicItemListing(20, item.getDefaultInstance(), 8, 10));
             }
             // 等级3（老手）添加矮人项链交易：25绿宝石 + 1骷髅头
-            trades.get(3).add(new BasicItemListing(new ItemStack(Items.EMERALD, 25), new ItemStack(Items.SKELETON_SKULL), ItemRegister.PygmyNecklace.get().getDefaultInstance(), 1, 30, 1.0f));
+            trades.get(3).add(new BasicItemListing(new ItemStack(Items.EMERALD, 25), new ItemStack(Items.SKELETON_SKULL), CurioRegister.PygmyNecklace.get().getDefaultInstance(), 1, 30, 1.0f));
             // 等级4（专家）添加大力士甲虫交易：30绿宝石
-            trades.get(4).add(new BasicItemListing(30, ItemRegister.HerculesBeetle.get().getDefaultInstance(), 1, 40));
+            trades.get(4).add(new BasicItemListing(30, CurioRegister.HerculesBeetle.get().getDefaultInstance(), 1, 40));
         }
     }
 
@@ -127,7 +127,7 @@ public class Event {
         Level level = player.level();
         if (!level.isClientSide() && level.isRaining() && level.getBiome(player.blockPosition()).is(BiomeTags.IS_OCEAN)) {
             if (player.getRandom().nextFloat() < 0.01f) {
-                event.getDrops().add(ItemRegister.TempestStaff.get().getDefaultInstance());
+                event.getDrops().add(ServantWeaponRegister.TempestStaff.get().getDefaultInstance());
             }
         }
     }
@@ -137,20 +137,20 @@ public class Event {
         if (event.getName().equals(ResourceLocation.withDefaultNamespace("chests/ancient_city"))) {
             event.getTable().addPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(0.05f))
-                    .add(LootItem.lootTableItem(ItemRegister.InfiniteScabbard.get()))
+                    .add(LootItem.lootTableItem(ServantWeaponRegister.InfiniteScabbard.get()))
                     .build());
         }
         if (event.getName().equals(ResourceLocation.withDefaultNamespace("entities/allay"))) {
             event.getTable().addPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1f))
-                    .add(LootItem.lootTableItem(ItemRegister.TerraPrism.get())
+                    .add(LootItem.lootTableItem(ServantWeaponRegister.TerraPrism.get())
                             .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                     .build());
         }
         if (event.getName().equals(ResourceLocation.withDefaultNamespace("entities/evoker"))) {
             event.getTable().addPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1f))
-                    .add(LootItem.lootTableItem(ItemRegister.SummonerEmblem.get())
+                    .add(LootItem.lootTableItem(CurioRegister.SummonerEmblem.get())
                             .when(LootItemRandomChanceCondition.randomChance(0.1f)))
                     .build());
         }
