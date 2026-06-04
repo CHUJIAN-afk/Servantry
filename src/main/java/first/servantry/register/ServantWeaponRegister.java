@@ -27,23 +27,6 @@ public class ServantWeaponRegister {
     public static final TabGroup SERVANT_WEAPON = new TabGroup(0, Servantry.rl("textures/item/banner/banner.png"), new AnimInfo(18, 3, 8));
 
     /**
-     * 致命球法杖 - 召唤致命球仆从
-     */
-    public static final DeferredItem<Item> DeadlySphereStaff =
-            Register.register(SERVANT_WEAPON, "deadly_sphere_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.DeadlySphere)
-                            .sound(SoundRegister.UseServantWeapon)
-                            .summonPost(servant -> {
-                                Player owner = servant.getOwner();
-                                RandomSource random = owner.getRandom();
-                                servant.init(new PathNode(owner.getBoundingBox()
-                                                               .getCenter()
-                                                               .offsetRandom(random, 2), 0, 0, 0));
-                            })
-                            .properties(properties -> properties.rarity(Rarity.RARE))
-                            .build())
-                    .language("Deadly Sphere Staff", "致命球法杖")
-                    .servant(AttachmentEntityRegister.DeadlySphere, "Deadly Sphere", "致命球")
-                    .build();    /**
      * 无人机
      */
     public static final DeferredItem<Item> SurveyDroneRemote =
@@ -64,23 +47,6 @@ public class ServantWeaponRegister {
                     .tooltip(1, "Summons up to 1 Survey Drone", "最多召唤1架矿勘无人机")
                     .build();
     /**
-     * 暴风雨法杖 - 召唤鲨鱼龙卷
-     */
-    public static final DeferredItem<Item> TempestStaff =
-            Register.register(SERVANT_WEAPON, "tempest_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Sharknado)
-                            .sound(SoundRegister.UseServantWeapon)
-                            .summonPost(servant -> {
-                                Player owner = servant.getOwner();
-                                RandomSource random = owner.getRandom();
-                                servant.init(new PathNode(owner.getBoundingBox()
-                                                               .getCenter()
-                                                               .offsetRandom(random, 2), 0, 0, 0));
-                            })
-                            .properties(properties -> properties.rarity(Rarity.RARE))
-                            .build())
-                    .language("Tempest Staff", "暴风雨法杖")
-                    .servant(AttachmentEntityRegister.Sharknado, "Sharknado", "鲨鱼龙卷")
-                    .build();    /**
      * 妖精铃铛
      */
     public static final DeferredItem<Item> FairyBell =
@@ -100,30 +66,6 @@ public class ServantWeaponRegister {
                     .tooltip(1, "Summons up to 1 Scavenger Fairy", "最多召唤1只拾荒妖精")
                     .build();
     /**
-     * 无限剑鞘
-     */
-    public static final DeferredItem<Item> InfiniteScabbard =
-            Register.register(SERVANT_WEAPON, "infinite_scabbard", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.InfiniteShadow)
-                            .sound(SoundRegister.UseTerraprism)
-                            .summonPre((player, infiniteShadow) -> {
-                                ItemStack mainHandItem = player.getMainHandItem();
-                                ScabbardContainer container = mainHandItem.getComponents()
-                                                                          .getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
-                                if (!container.isEmpty()) {
-                                    infiniteShadow.setItemStack(container.itemStack());
-                                    return true;
-                                }
-                                return false;
-                            })
-                            .summonPost(infiniteShadow -> infiniteShadow.init(infiniteShadow.getInterpolatedIdleState(1)))
-                            .properties(properties -> properties.rarity(Rarity.EPIC)
-                                                                .component(DataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
-                            .build())
-                    .language("Infinite Scabbard", "无限剑鞘")
-                    .servant(AttachmentEntityRegister.InfiniteShadow, "Infinite Shadow", "无限之影")
-                    .tooltip(1, "A scabbard that stores a blade of infinite potential", "蕴含无限可能之'剑'的剑鞘")
-                    .tooltip(2, "Right-click an item to store, right-click an empty slot to retrieve", "右键物品存入，右键空格子取出")
-                    .build();    /**
      * 刃杖 - 召唤附魔飞刀群
      */
     public static final DeferredItem<Item> BladeStaff =
@@ -149,9 +91,7 @@ public class ServantWeaponRegister {
                     .tooltip(1, "Ignores 2.5 points of enemy Defense", "忽略敌人 2.5 防御力")
                     .tooltip(2, "Don't let their small size fool you", "别被它们小小的个头给骗了")
                     .build();
-
-    public static void register() {
-    }    /**
+    /**
      * 魔眼法杖 - 召唤双子魔眼
      */
     public static final DeferredItem<Item> OpticStaff =
@@ -186,8 +126,42 @@ public class ServantWeaponRegister {
                     .language("Optic Staff", "魔眼法杖")
                     .servant(AttachmentEntityRegister.Twins, "Twins", "双子魔眼")
                     .build();
-
-
+    /**
+     * 致命球法杖 - 召唤致命球仆从
+     */
+    public static final DeferredItem<Item> DeadlySphereStaff =
+            Register.register(SERVANT_WEAPON, "deadly_sphere_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.DeadlySphere)
+                            .sound(SoundRegister.UseServantWeapon)
+                            .summonPost(servant -> {
+                                Player owner = servant.getOwner();
+                                RandomSource random = owner.getRandom();
+                                servant.init(new PathNode(owner.getBoundingBox()
+                                                               .getCenter()
+                                                               .offsetRandom(random, 2), 0, 0, 0));
+                            })
+                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .build())
+                    .language("Deadly Sphere Staff", "致命球法杖")
+                    .servant(AttachmentEntityRegister.DeadlySphere, "Deadly Sphere", "致命球")
+                    .build();
+    /**
+     * 暴风雨法杖 - 召唤鲨鱼龙卷
+     */
+    public static final DeferredItem<Item> TempestStaff =
+            Register.register(SERVANT_WEAPON, "tempest_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Sharknado)
+                            .sound(SoundRegister.UseServantWeapon)
+                            .summonPost(servant -> {
+                                Player owner = servant.getOwner();
+                                RandomSource random = owner.getRandom();
+                                servant.init(new PathNode(owner.getBoundingBox()
+                                                               .getCenter()
+                                                               .offsetRandom(random, 2), 0, 0, 0));
+                            })
+                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .build())
+                    .language("Tempest Staff", "暴风雨法杖")
+                    .servant(AttachmentEntityRegister.Sharknado, "Sharknado", "鲨鱼龙卷")
+                    .build();
     /**
      * 泰拉棱镜 - 召唤泰拉棱镜仆从
      */
@@ -319,7 +293,32 @@ public class ServantWeaponRegister {
                     .servant(AttachmentEntityRegister.StardustDragon, "Stardust Dragon", "星尘之龙")
                     .tooltip(1, "When you have a dragon, who needs a swarm?", "有了一条巨龙后，谁还需要一群仆从呢？")
                     .build();
+    /**
+     * 无限剑鞘
+     */
+    public static final DeferredItem<Item> InfiniteScabbard =
+            Register.register(SERVANT_WEAPON, "infinite_scabbard", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.InfiniteShadow)
+                            .sound(SoundRegister.UseTerraprism)
+                            .summonPre((player, infiniteShadow) -> {
+                                ItemStack mainHandItem = player.getMainHandItem();
+                                ScabbardContainer container = mainHandItem.getComponents()
+                                                                          .getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                                if (!container.isEmpty()) {
+                                    infiniteShadow.setItemStack(container.itemStack());
+                                    return true;
+                                }
+                                return false;
+                            })
+                            .summonPost(infiniteShadow -> infiniteShadow.init(infiniteShadow.getInterpolatedIdleState(1)))
+                            .properties(properties -> properties.rarity(Rarity.EPIC)
+                                                                .component(DataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
+                            .build())
+                    .language("Infinite Scabbard", "无限剑鞘")
+                    .servant(AttachmentEntityRegister.InfiniteShadow, "Infinite Shadow", "无限之影")
+                    .tooltip(1, "A scabbard that stores a blade of infinite potential", "蕴含无限可能之'剑'的剑鞘")
+                    .tooltip(2, "Right-click an item to store, right-click an empty slot to retrieve", "右键物品存入，右键空格子取出")
+                    .build();
 
-
-
+    public static void register() {
+    }
 }
