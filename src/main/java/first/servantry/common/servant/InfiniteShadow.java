@@ -61,14 +61,16 @@ public class InfiniteShadow extends Terraprism {
             for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
                 if (this.hitTargets.add(living)) {
-                    living.getData(AttachmentRegister.InvincibleData).getHurtHistory().put(owner.getUUID(), new AtomicInteger(100));
+                    living.getData(AttachmentRegister.InvincibleData).getHurtHistory()
+                            .put(owner.getUUID(), new AtomicInteger(100));
                     int invulnerableTime = living.invulnerableTime;
                     living.invulnerableTime = 0;
                     if (!itemStack.is(Items.TNT)) {
                         player.attack(living);
                     } else {
                         Vec3 point = hit.hitPoint();
-                        owner.level().explode(owner, getDamageSource(), null, point.x(), point.y(), point.z(), 1, false, Level.ExplosionInteraction.TNT);
+                        Level level = owner.level();
+                        level.explode(owner, getDamageSource(), null, point.x(), point.y(), point.z(), 1, false, Level.ExplosionInteraction.TNT);
                     }
                     living.invulnerableTime = invulnerableTime;
                 }

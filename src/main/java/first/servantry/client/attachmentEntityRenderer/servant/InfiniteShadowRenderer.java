@@ -3,7 +3,6 @@ package first.servantry.client.attachmentEntityRenderer.servant;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
-import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
 import first.servantry.api.client.render.renderConfig.TrailConfig;
@@ -28,13 +27,13 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
         ItemStack itemStack = infiniteShadow.getItemStack();
         if (!itemStack.isEmpty()) {
             int dominantColor = RenderUtil.getDominantColor(itemStack);
-            TrailConfig<InfiniteShadow, ?> trailConfig;
+            TrailConfig<InfiniteShadow, ?> trailConfig = null;
             if (!(itemStack.getItem() instanceof BlockItem)) {
                 trailConfig = new RibbonTrailConfig<InfiniteShadow>()
                         .timer(timer)
                         .colorRGB(dominantColor)
                         .historyLength(4)
-                        .width(0.7075f)
+                        .width(1.0575f)
                         .diamondSize(0.15f)
                         .colorFunction((shadow, progress, timeShift) -> {
                             float brightness = Mth.lerp(progress, 1f, 0.4f);
@@ -43,22 +42,15 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
                             int b = (int) ((dominantColor & 0xFF) * brightness);
                             return (r << 16) | (g << 8) | b;
                         })
-                        .tipAlphaBoost((s, progress) -> progress < 0.3f ? Mth.lerp(progress / 0.3f, 2.5f, 1.0f) : 1.0f)
-                        .tipBrightnessBoost((s, progress) -> progress < 0.25f ? Mth.lerp(progress / 0.25f, 1.5f, 1.0f) : 1.0f);
-            } else {
-                trailConfig = new ConeTrailConfig<InfiniteShadow>()
-                        .timer(timer)
-                        .colorRGB(dominantColor)
-                        .maxRadius(0.25f)
-                        .minRadiusRatio(0.1f)
-                        .resolution(12)
-                        .fadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0));
+                        .tipAlphaBoost((s, progress) -> progress < 0.3f ? Mth.lerp(progress / 0.3f, 2.5f, 1.0f) : 1.5f)
+                        .tipBrightnessBoost((s, progress) -> progress < 0.25f ? Mth.lerp(progress / 0.25f, 1.5f, 1.0f) : 1.5f);
             }
             return RenderContext.<InfiniteShadow>builder()
                     .trail(trailConfig)
                     .model(new ModelConfig<InfiniteShadow>()
-                            .rotationOffset(0, 90, -45)
-                            .visualNodeFunction((shadow, partialTick, rawNode) -> rawNode.lerp(shadow.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, shadow.idleBlendO, shadow.idleBlend))))
+                                   .scale(1.5f)
+                                   .rotationOffset(0, 90, -45)
+                                   .visualNodeFunction((shadow, partialTick, rawNode) -> rawNode.lerp(shadow.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, shadow.idleBlendO, shadow.idleBlend))))
                     .build();
         }
         return null;

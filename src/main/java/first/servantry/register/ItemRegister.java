@@ -17,8 +17,9 @@ public class ItemRegister {
     public static final TabGroup BLOCK = new TabGroup(5, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
 
     public static final DeferredItem<Item> Zenith =
-            Register.register(SWORD, "zenith", () -> new Zenith(Tiers.NETHERITE, new Item.Properties().rarity(Rarity.EPIC)
-                                                                                                      .stacksTo(1)))
+            Register.register(SWORD, "zenith", () -> new Zenith(Tiers.NETHERITE, new Item.Properties()
+                            .rarity(Rarity.EPIC)
+                            .stacksTo(1)))
                     .language("Zenith", "天顶剑")
                     .build();
     public static final DeferredItem<Item> MithrilAnvil =

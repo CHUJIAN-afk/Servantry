@@ -485,7 +485,7 @@ public class ArmorRegister {
      */
     public static final DeferredItem<Item> SpookyChestplate =
             Register.register(ARMOR, "spooky_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.CHESTPLATE)
-                            .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(AttributeRegister.ServantDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.RARE))
                             .build())

@@ -135,7 +135,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
                 order++;
             }
         }
-        double localZ = 0.5 + order * 0.12;
+        double localZ = 0.75 + order * 0.12;
         double floatSpeed = 0.08 + order * 0.01;
         double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;
         double px = Mth.lerp(partialTick, owner.xo, owner.getX());

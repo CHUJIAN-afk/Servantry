@@ -42,6 +42,7 @@ public class ArmorSetRegister {
                     .piece(ArmorRegister.ForbiddenRobe)
                     .piece(ArmorRegister.ForbiddenLeggings)
                     .piece(ArmorRegister.ForbiddenBoots)
+                    .tooltip(1, "Allows you to summon an ancient storm to attract nearby enemies", "允许你召唤远古风暴吸引附近的敌人")
                     .build()
             );
 
@@ -64,6 +65,7 @@ public class ArmorSetRegister {
             .piece(ArmorRegister.HallowedBoots)
             .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
             .modifier(AttributeRegister.ServantArmorPierce, 4, AttributeModifier.Operation.ADD_VALUE)
+            .tooltip(1, "Servants grant I-frames on attack", "仆从攻击使敌人高亮")
             .build()
     );
 
@@ -91,6 +93,7 @@ public class ArmorSetRegister {
                         player.getData(AttachmentRegister.EntityData).add(EntityData.Type.ExtraServant, crystal);
                     })
                     .onRemove(player -> player.getData(AttachmentRegister.EntityData).getExtraServants().stream().filter(servant -> servant.getType() == AttachmentEntityRegister.ChlorophyteCrystal.get()).forEach(AttachmentEntity::setRemove))
+                    .tooltip(1, "Summons a powerful leaf crystal to shoot at nearby enemies", "召唤强大的叶状水晶来射击附近的敌人")
                     .build()
             );
 
@@ -101,7 +104,7 @@ public class ArmorSetRegister {
                     .piece(ArmorRegister.SpookyLeggings)
                     .piece(ArmorRegister.SpookyBoots)
                     .modifier(AttributeRegister.ServantDamage, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                    .modifier(AttributeRegister.ServantArmorPierce, 8, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.ServantArmorPierce, 12, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -122,6 +125,7 @@ public class ArmorSetRegister {
                     .piece(ArmorRegister.StardustChestplate)
                     .piece(ArmorRegister.StardustLeggings)
                     .piece(ArmorRegister.StardustBoots)
+                    .tooltip(1, "A stardust guardian will protect you from nearby enemies", "星尘守卫将保护你不受附近敌人的伤害")
                     .build()
             );
 

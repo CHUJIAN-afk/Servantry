@@ -55,10 +55,12 @@ public class MithrilAnvilRecipeCategory implements IRecipeCategory<MithrilAnvilR
                 helper.getSlotDrawable().draw(guiGraphics, xOffset, yOffset);
             }
             if (i == 5) {
-                helper.getRecipeArrow().draw(guiGraphics, xOffset + 4, yOffset);
+                xOffset += 4;
+                helper.getRecipeArrow().draw(guiGraphics, xOffset, yOffset);
             }
             if (i == 6) {
-                helper.getSlotDrawable().draw(guiGraphics, xOffset + 12, yOffset);
+                xOffset += 12;
+                helper.getSlotDrawable().draw(guiGraphics, xOffset, yOffset);
             }
         }
     }

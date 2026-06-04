@@ -2,6 +2,8 @@ package first.servantry.api.armorSet;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import first.servantry.dadageneeator.provider.ServantryLanguageProvider;
+import first.servantry.register.Registers;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -12,19 +14,15 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.registries.DeferredItem;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public record ArmorSet(
         ResourceLocation id,
         List<DeferredItem<Item>> items,
         Multimap<Holder<Attribute>, AttributeModifier> modifiers,
-        onTrigger onStart,
-        onTrigger onRemove
+        Consumer<Player> onStart,
+        Consumer<Player> onRemove
 ) {
-
-    @FunctionalInterface
-    public interface onTrigger {
-        void accept(Player player);
-    }
 
     public static final Map<UUID, Map<ArmorSet, Boolean>> CACHE = new HashMap<>();
 
@@ -66,9 +64,9 @@ public record ArmorSet(
         private final ResourceLocation id;
         private final List<DeferredItem<Item>> items = new java.util.ArrayList<>();
         private final ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> modifiers = ImmutableMultimap.builder();
-        private onTrigger onStart = player -> {
+        private Consumer<Player> onStart = player -> {
         };
-        private onTrigger onRemove = player -> {
+        private Consumer<Player> onRemove = player -> {
         };
 
         private Builder(ResourceLocation id) {
@@ -85,13 +83,20 @@ public record ArmorSet(
             return this;
         }
 
-        public Builder onStart(onTrigger onStart) {
+        public Builder onStart(Consumer<Player> onStart) {
             this.onStart = onStart;
             return this;
         }
 
-        public Builder onRemove(onTrigger oRemove) {
+        public Builder onRemove(Consumer<Player> oRemove) {
             this.onRemove = oRemove;
+            return this;
+        }
+
+        public Builder tooltip(int index, String en, String zh) {
+            String key = "servantry." + id.getNamespace() + "." + id.getPath() + ".set." + index;
+            ServantryLanguageProvider.LangEntry langEntry = new ServantryLanguageProvider.LangEntry(key, en, zh);
+            Registers.getInstance().getLanguageGenerate().add(langEntry);
             return this;
         }
 
