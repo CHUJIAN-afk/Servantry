@@ -32,17 +32,6 @@ public class ArmorRegister {
                     .language("Flinx Fur Coat", "小雪怪皮毛外套")
                     .build();
     /**
-     * 英灵殿骑士头盔 - +1 召唤栏，+10% 仆从伤害，+10% 原版伤害
-     */
-    public static final DeferredItem<Item> ValhallaKnightHelmet =
-            Register.register(ARMOR, "valhalla_knight_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.HELMET)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .modifier(Attributes.ATTACK_DAMAGE, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                            .properties(p -> p.rarity(Rarity.RARE))
-                            .build())
-                    .language("Valhalla Knight Helmet", "英灵殿骑士头盔")
-                    .build();    /**
      * 蜜蜂头饰 - +4% 仆从伤害，+1 仆从栏
      */
     public static final DeferredItem<Item> BeeHeadgear =
@@ -57,9 +46,7 @@ public class ArmorRegister {
                             .save(output))
                     .language("Bee Headgear", "蜜蜂头饰")
                     .build();
-
-    public static void register() {
-    }    /**
+    /**
      * 蜜蜂胸甲 - +4% 仆从伤害，+1 仆从栏
      */
     public static final DeferredItem<Item> BeeChestplate =
@@ -391,7 +378,18 @@ public class ArmorRegister {
                             .save(output))
                     .language("Chlorophyte Boots", "叶绿战靴")
                     .build();
-
+    /**
+     * 英灵殿骑士头盔 - +1 召唤栏，+10% 仆从伤害，+10% 原版伤害
+     */
+    public static final DeferredItem<Item> ValhallaKnightHelmet =
+            Register.register(ARMOR, "valhalla_knight_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.HELMET)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(Attributes.ATTACK_DAMAGE, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .properties(p -> p.rarity(Rarity.RARE))
+                            .build())
+                    .language("Valhalla Knight Helmet", "英灵殿骑士头盔")
+                    .build();
     /**
      * 英灵殿骑士胸甲 - +30% 仆从伤害，+0.4 生命再生
      */
@@ -594,5 +592,6 @@ public class ArmorRegister {
                     .language("Stardust Boots", "星尘战靴")
                     .build();
 
-
+    public static void register() {
+    }
 }
