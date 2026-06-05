@@ -1,5 +1,7 @@
 package first.servantry.common.item;
 
+import first.servantry.api.entity.Ellipse;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.TargetCache;
 import first.servantry.common.projectile.ZenithProjectile;
 import first.servantry.register.AttachmentRegister;
@@ -37,11 +39,10 @@ public class Zenith extends SwordItem {
                 DamageSource damageSource = player.damageSources().playerAttack(player);
                 Vec3 lookAngle = player.getLookAngle();
                 Vec3 startPos = player.getBoundingBox().getCenter().add(lookAngle.scale(-1));
-                RandomSource random = player.getRandom();
-                for (int i = 0; i < 1; i++) {
+                for (int i = 0; i < 3; i++) {
                     LivingEntity chase = null;
-                    List<LivingEntity> livingEntityList = collectTargets(player);
-                    if (random.nextBoolean()) {
+                    if (i != 0) {
+                        List<LivingEntity> livingEntityList = collectTargets(player);
                         chase = livingEntityList.stream().findAny().orElse(null);
                     }
                     Vec3 endPos;
@@ -50,13 +51,24 @@ public class Zenith extends SwordItem {
                     } else {
                         endPos = computeEndPos(player);
                     }
-                    ZenithProjectile projectile = new ZenithProjectile(damageSource, startPos, endPos);
+                    RandomSource random = player.getRandom();
+                    endPos = endPos.offsetRandom(random, 2f);
+                    ZenithProjectile projectile = new ZenithProjectile(damageSource);
                     projectile.setOwner(player);
-                    if (chase != null) {
-                        projectile.setChaseEnd(chase);
+                    Vec3 normal = Ellipse.randomPlaneNormal(random, endPos, startPos);
+                    float curvature = (float) Math.min(0.3, 10 / endPos.distanceTo(startPos)) + random.nextFloat() * 0.2f + 0.15f;
+                    Ellipse ellipse = new Ellipse(endPos, startPos, normal, curvature);
+                    List<PathNode> list = new ArrayList<>();
+                    for (int j = i; j < 16; j++) {
+                        float progress = (float) j / 16;
+                        Vec3 point = ellipse.getPoint(progress);
+                        Vec3 tipDir = point.subtract(ellipse.getCenter()).normalize();
+                        list.add(projectile.getEulerNode(point, tipDir, normal));
                     }
-                    projectile.lerp = random.nextFloat() * 0.05f + 0.05f;
-                    projectile.setCurrentPathNode(projectile.getEllipseSlashNode(projectile.lerp));
+                    PathNode first = list.getFirst();
+                    list.removeFirst();
+                    projectile.setPath(list);
+                    projectile.setCurrentPathNode(first);
                     projectile.join(player);
                 }
             }
@@ -116,7 +128,7 @@ public class Zenith extends SwordItem {
     private Vec3 computeEndPos(Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookDir = player.getLookAngle();
-        double reach = 10;
+        double reach = 20;
 
         // 优先检测视线命中的实体
         EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(player, eyePos, eyePos.add(lookDir.scale(reach)), player.getBoundingBox().inflate(reach), e -> e instanceof LivingEntity && e.isAlive() && e != player, reach * reach);

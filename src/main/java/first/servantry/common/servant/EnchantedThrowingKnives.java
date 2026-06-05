@@ -16,8 +16,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -169,19 +167,6 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
 
         return getEulerNode(targetPos, tipDir, toAxis);
     }
-
-    /**
-     * 获取当前法线向量（基于旋转）
-     */
-    public Vec3 getCurrentNormal() {
-        Quaternionf q = new Quaternionf()
-                .rotateY((float) Math.toRadians(-getYaw()))
-                .rotateX((float) Math.toRadians(getPitch()))
-                .rotateZ((float) Math.toRadians(getRoll()));
-        Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
-        return new Vec3(upV.x(), upV.y(), upV.z()).normalize();
-    }
-    // ===================== 注册类型 =====================
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {

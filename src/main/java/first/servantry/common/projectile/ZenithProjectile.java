@@ -4,8 +4,6 @@ import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.*;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.register.AttachmentEntityRegister;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -16,104 +14,32 @@ import java.util.List;
 
 public class ZenithProjectile extends Projectile implements ICollideAttack<ZenithProjectile> {
 
-    public float lerp = 0;
-    private LivingEntity chaseEnd = null;
-    private Vec3 startPos = null;
-    private Vec3 endPos = null;
+    public Vec3 lastOwnerPos = Vec3.ZERO;
+    public int progress = 0;
 
     public ZenithProjectile() {
         super();
     }
 
-    public ZenithProjectile(DamageSource damageSource, Vec3 startPos, Vec3 endPos) {
+    public ZenithProjectile(DamageSource damageSource) {
         super(Vec3.ZERO, null);
         setDamageSource(damageSource);
-        this.startPos = startPos;
-        this.endPos = endPos;
     }
 
     @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
-            if (isValidCollisionTarget(this, chaseEnd)) {
-                endPos = chaseEnd.getBoundingBox().getCenter();
-            }
-            Vec3 center = owner.getBoundingBox().getCenter();
-            startPos = center.add(center.subtract(endPos).normalize());
-            lerp += 0.05f;
-            PathNode node = getEllipseSlashNode(Math.min(lerp, 1));
-            setCurrentPathNode(node);
-            if (lerp >= 1.1) {
+            applyPositionCorrection();
+            if (!isExecutingPath()) {
                 setRemove();
             }
         }
+        lastOwnerPos = owner.getPosition(1);
         super.tick();
-    }
-
-    /**
-     * 规划椭圆斩击攻击路径。
-     */
-    public PathNode getEllipseSlashNode(float progress) {
-        if (endPos != null && startPos != null) {
-            RandomSource random = owner.getRandom();
-            random.setSeed(getUuid().hashCode());
-            Vec3 planeNormal = Ellipse.randomPlaneNormal(random, startPos, endPos);
-            float curvature = random.nextFloat() * 0.25f + 0.25f;
-            Ellipse ellipse = new Ellipse(endPos, startPos, planeNormal, curvature);
-            Vec3 point = ellipse.getPoint(progress);
-            Vec3 tipDir = point.subtract(ellipse.getCenter()).normalize();
-            return getEulerNode(point, tipDir, ellipse.getPlaneNormal());
-        }
-        return currentPathNode;
-    }
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeFloat(lerp);
-        buf.writeVec3(endPos);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        lerp = buf.readFloat();
-        endPos = buf.readVec3();
-    }
-
-    /**
-     * 根据位置、尖端朝向和叶片法向量计算欧拉角节点
-     */
-    public PathNode getEulerNode(Vec3 pos, Vec3 tipDir, Vec3 bladeNormal) {
-        if (tipDir.lengthSqr() < 1e-4) tipDir = new Vec3(0, 0, 1);
-        tipDir = tipDir.normalize();
-
-        float yaw = (float) (Math.atan2(-tipDir.x, tipDir.z) * (180D / Math.PI));
-        double horiz = Math.sqrt(tipDir.x * tipDir.x + tipDir.z * tipDir.z);
-        float pitch = (float) (Math.atan2(-tipDir.y, horiz) * (180D / Math.PI));
-
-        Vec3 defaultUp = new Vec3(0, 1, 0)
-                .xRot((float) Math.toRadians(pitch))
-                .yRot((float) Math.toRadians(yaw));
-        Vec3 projNormal = bladeNormal.subtract(tipDir.scale(bladeNormal.dot(tipDir))).normalize();
-        if (projNormal.lengthSqr() < 1e-4) projNormal = defaultUp;
-
-        double dot = defaultUp.dot(projNormal);
-        Vec3 cross = defaultUp.cross(projNormal);
-        float roll = (float) (Math.atan2(cross.dot(tipDir), dot) * (180D / Math.PI));
-
-        return new PathNode(pos, yaw, pitch, roll);
     }
 
     @Override
     protected void tickPhysics() {
-    }
-
-    public void setChaseEnd(LivingEntity chaseEnd) {
-        this.chaseEnd = chaseEnd;
-        this.endPos = chaseEnd.getBoundingBox().getCenter();
-    }
-
-    public void setEndPos(Vec3 endPos) {
-        this.endPos = endPos;
     }
 
     @Override
@@ -123,7 +49,7 @@ public class ZenithProjectile extends Projectile implements ICollideAttack<Zenit
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.1, -0.04, -0.25, 0.1, 0.04, 0.75);
+        return new AABB(-0.6, -0.1, -1, 0.6, 0.1, 1.5);
     }
 
     @Override
@@ -142,7 +68,33 @@ public class ZenithProjectile extends Projectile implements ICollideAttack<Zenit
         if (source != null) {
             for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
-                InvincibleData.criteriaAttack(living, getUuid(), 0, source, getDamage(), InvincibleData.Type.PARTIAL);
+                InvincibleData.criteriaAttack(living, getUuid(), 2, source, getDamage(), InvincibleData.Type.PARTIAL);
+            }
+        }
+    }
+
+    /**
+     * 位置修正机制
+     */
+    private void applyPositionCorrection() {
+        Vec3 last = lastOwnerPos;
+        if (!last.equals(Vec3.ZERO)) {
+            Vec3 current = owner.getPosition(1);
+            Vec3 offset = current.subtract(last);
+            if (offset.lengthSqr() > 1e-5) {
+                PlannedPath path = getCurrentPath();
+                if (path != null) {
+                    List<PathNode> nodes = path.getNodes();
+                    int startIdx = path.getCurrentIndex();
+                    int remaining = nodes.size() - startIdx;
+                    for (int i = 0; i < remaining; i++) {
+                        PathNode node = nodes.get(startIdx + i);
+                        float weight = (float) (i + 1) / remaining;
+                        Vec3 blendedOffset = offset.scale(weight);
+                        Vec3 pos = node.pos();
+                        nodes.set(startIdx + i, new PathNode(pos.add(blendedOffset), node.yaw(), node.pitch(), node.roll()));
+                    }
+                }
             }
         }
     }

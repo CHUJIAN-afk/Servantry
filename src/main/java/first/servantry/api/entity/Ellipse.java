@@ -4,6 +4,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 /**
  * 椭圆曲线工具类。
@@ -46,11 +48,16 @@ public class Ellipse {
      */
     public static @NotNull Vec3 randomPlaneNormal(RandomSource random, Vec3 pointA, Vec3 pointB) {
         Vec3 majorDir = pointB.subtract(pointA).normalize();
-        Vec3 randVec = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5).normalize();
-        Vec3 planeNormal = randVec.subtract(majorDir.scale(randVec.dot(majorDir))).normalize();
-        if (planeNormal.lengthSqr() < 1e-5) planeNormal = majorDir.cross(new Vec3(0, 1, 0)).normalize();
-        if (planeNormal.lengthSqr() < 1e-5) planeNormal = new Vec3(1, 0, 0);
-        return planeNormal;
+        // 绕长轴随机旋转，取垂直于长轴的随机方向
+        float angle = random.nextFloat() * Mth.TWO_PI;
+        Quaternionf q = new Quaternionf().rotateAxis(angle, (float) majorDir.x, (float) majorDir.y, (float) majorDir.z);
+        // 初始法向量：长轴与(0,1,0)的叉积，退化时用(1,0,0)
+        Vec3 initNormal = majorDir.cross(new Vec3(0, 1, 0)).normalize();
+        if (initNormal.lengthSqr() < 1e-5) {
+            initNormal = majorDir.cross(new Vec3(1, 0, 0)).normalize();
+        }
+        Vector3f rotated = new Vector3f((float) initNormal.x, (float) initNormal.y, (float) initNormal.z).rotate(q);
+        return new Vec3(rotated.x(), rotated.y(), rotated.z()).normalize();
     }
 
     /**
@@ -118,5 +125,17 @@ public class Ellipse {
      */
     public Vec3 getPointB() {
         return pointB;
+    }
+
+    /** 靠近pointA的焦点 */
+    public Vec3 getFocusNearA() {
+        double c = Math.sqrt(Math.max(0, major.lengthSqr() - minor.lengthSqr()));
+        return center.add(majorDir.scale(-c));
+    }
+
+    /** 靠近pointB的焦点 */
+    public Vec3 getFocusNearB() {
+        double c = Math.sqrt(Math.max(0, major.lengthSqr() - minor.lengthSqr()));
+        return center.add(majorDir.scale(c));
     }
 }

@@ -5,9 +5,7 @@ import first.servantry.api.entity.PathNode;
 import first.servantry.api.entity.PlannedPath;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.Terraprism;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -19,6 +17,7 @@ import java.util.List;
 public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
     private boolean firstStrike = true;
+    private boolean lastEllipse = false;
     private Vec3 lastTargetPos = Vec3.ZERO;
 
     public TerraprismAttackGoal(Terraprism servant) {
@@ -45,16 +44,20 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         applyPositionCorrection();
         if (servant.isTargetChange()) {
             planChainStrike();
+            lastEllipse = false;
         }
         if (!servant.isExecutingPath()) {
             if (firstStrike) {
-                firstStrike = false;
                 planFirstStrike();
+                firstStrike = false;
+                lastEllipse = false;
             } else {
-                if (servant.getOwner().getRandom().nextDouble() < 0.5) {
+                if (servant.getOwner().getRandom().nextDouble() < 0.8) {
                     planEllipseSlash();
+                    lastEllipse = true;
                 } else {
                     planHourglassSlash();
+                    lastEllipse = false;
                 }
             }
         }
@@ -90,40 +93,41 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
      * 规划椭圆斩击攻击路径。
      */
     private void planEllipseSlash() {
-        Player owner = servant.getOwner();
-        int duration = 14;
-        int blendTicks = 6;
-        Vec3 currentPos = servant.getPos();
-        Vec3 T = lastTargetPos;
+        // 目标头顶4格、半径4格的圆上，选择离startPos最近的位置
+        Vec3 center = lastTargetPos.add(0, 3, 0);
+        Vec3 startPos = servant.getPos();
+        Vec3 toStart = startPos.subtract(center);
+        double angle = Math.atan2(toStart.z, toStart.x);
+        Vec3 attackPrepPos = center.add(Math.cos(angle) * 5, 0, Math.sin(angle) * 5);
 
-        // 椭圆几何参数
-        float randAngle = owner.getRandom().nextFloat() * Mth.TWO_PI;
-        float randY = 0.5f + owner.getRandom().nextFloat() * 2.5f;
-        Vec3 farPoint = T.add(Math.cos(randAngle) * 5, randY, Math.sin(randAngle) * 5);
+        // 获取当前运动状态
+        Vec3 currentVel = servant.getCurrentVelocity();
 
-        Vec3 planeNormal = Ellipse.randomPlaneNormal(owner.getRandom(), T, farPoint);
-        Ellipse ellipse = new Ellipse(T, farPoint, planeNormal, 0.75f);
+        Vec3 planeNormal = lastEllipse ? servant.getCurrentNormal() : Ellipse.randomPlaneNormal(servant.getOwner()
+                                                                                                        .getRandom(), lastTargetPos, attackPrepPos);
+        Ellipse ellipse = new Ellipse(lastTargetPos, attackPrepPos, planeNormal, 0.45f);
 
-        // 当前运动状态
-        Vec3 currentTip = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
-        Vec3 currentNormal = servant.getCurrentNormal();
+        PathNode attackPrepPathNode = servant.getEulerNode(ellipse.getPoint(0), ellipse.getPoint(0)
+                .subtract(ellipse.getCenter()).normalize(), planeNormal);
 
         List<PathNode> nodes = new ArrayList<>();
-        for (int i = 1; i <= duration; i++) {
-            float progress = (float) i / duration;
-            Vec3 ellipseP = ellipse.getPoint(progress);
-            Vec3 tipDir = ellipseP.subtract(ellipse.getCenter()).normalize();
 
-            if (i <= blendTicks) {
-                float delta = (float) i / blendTicks;
-                float smooth = delta * delta * (3.0f - 2.0f * delta);
-                Vec3 p = currentPos.lerp(ellipseP, smooth);
-                Vec3 bTip = currentTip.lerp(tipDir, smooth);
-                Vec3 bNormal = currentNormal.lerp(planeNormal, smooth);
-                nodes.add(servant.getEulerNode(p, bTip, bNormal));
-            } else {
-                nodes.add(servant.getEulerNode(ellipseP, tipDir, planeNormal));
+        int duration = 14;
+        int prepTicks = Math.min(4, (int) (startPos.distanceTo(attackPrepPos)));
+        if (prepTicks > 0) {
+            for (int i = 0; i <= prepTicks; i++) {
+                float progress = (float) i / prepTicks;
+                Vec3 point = servant.calculateBezierPoint(progress, startPos, startPos.add(currentVel), attackPrepPos);
+                PathNode lerp = servant.getCurrentPathNode().lerp(attackPrepPathNode, progress);
+                nodes.add(new PathNode(point, lerp.yaw(), lerp.pitch(), lerp.roll()));
             }
+        }
+        int attackTicks = duration - prepTicks;
+        for (int i = 0; i < attackTicks; i++) {
+            float progress = (float) i / attackTicks;
+            Vec3 point = ellipse.getPoint(progress);
+            Vec3 tipDir = point.subtract(ellipse.getCenter()).normalize();
+            nodes.add(servant.getEulerNode(point, tipDir, planeNormal));
         }
         servant.setPath(nodes);
     }
@@ -139,7 +143,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         Vec3 toStart = startPos.subtract(center);
         double angle = Math.atan2(toStart.z, toStart.x);
         Vec3 attackPrepPos = center.add(Math.cos(angle) * 5, 0, Math.sin(angle) * 5);
-        Vec3 endPos = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), 0.75f);
+        Vec3 endPos = target.getBoundingBox().getCenter();
 
         // 计算攻击方向
         Vec3 attackDir = endPos.subtract(attackPrepPos);
@@ -153,24 +157,25 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         Vec3 currentTip = Vec3.directionFromRotation(servant.getPitch(), servant.getYaw()).normalize();
         Vec3 currentNormal = servant.getCurrentNormal();
 
-        int prepTicks = 6;
-        int attackTicks = 8;
-
         List<PathNode> nodes = new ArrayList<>();
 
-        for (int i = 1; i <= prepTicks; i++) {
-            float delta = (float) i / prepTicks;
-            delta = delta * delta * (3f - 2f * delta);
-            Vec3 point = servant.calculateBezierPoint(delta, startPos, startPos.add(currentVel), attackPrepPos);
-            Vec3 tipDir = currentTip.lerp(attackDir, delta);
-            nodes.add(servant.getEulerNode(point, tipDir, currentNormal));
+        PathNode attackStartNode = null;
+        int prepTicks = 8;
+        for (int i = 0; i <= prepTicks; i++) {
+            float progress = (float) i / prepTicks;
+            Vec3 point = servant.calculateBezierPoint(progress, startPos, startPos.add(currentVel), attackPrepPos);
+            Vec3 tipDir = currentTip.lerp(attackDir, progress);
+            PathNode pathNode = servant.getEulerNode(point, tipDir, currentNormal);
+            nodes.add(pathNode);
+            attackStartNode = pathNode;
         }
 
-        for (int i = 1; i <= attackTicks; i++) {
-            float delta = (float) i / attackTicks;
-            delta = delta * delta * (3f - 2f * delta);
-            Vec3 point = attackPrepPos.lerp(endPos, delta);
-            nodes.add(servant.getEulerNode(point, attackDir, currentNormal));
+        PathNode attackEndNode = new PathNode(endPos, attackStartNode.yaw(), attackStartNode.pitch(), attackStartNode.roll());
+        int attackTicks = 6;
+        for (int i = 0; i <= attackTicks; i++) {
+            float progress = (float) i / attackTicks;
+            progress = progress * progress;
+            nodes.add(attackStartNode.lerp(attackEndNode, progress));
         }
         servant.setPath(nodes);
     }

@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class AttachmentEntityRenderDispatcher {
         List<AttachmentEntity> entities = player.getData(AttachmentRegister.EntityData).getEntities();
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         boolean showHitboxes = Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes();
-
+        VertexConsumer debugConsumer = showHitboxes ? bufferSource.getBuffer(RenderType.lines()) : null;
         for (AttachmentEntity entity : entities) {
             entity.setOwner(player);
             poseStack.pushPose();
@@ -59,7 +60,15 @@ public class AttachmentEntityRenderDispatcher {
             }
             // 调试渲染（使用原始缓冲源，不受透明度影响）
             if (showHitboxes) {
-                VertexConsumer debugConsumer = bufferSource.getBuffer(RenderType.lines());
+                // 渲染剑尖朝向（蓝色）
+                poseStack.pushPose();
+                poseStack.mulPose(Axis.YN.rotationDegrees(renderNode.yaw()));
+                poseStack.mulPose(Axis.XP.rotationDegrees(renderNode.pitch()));
+                poseStack.mulPose(Axis.ZP.rotationDegrees(renderNode.roll()));
+                LevelRenderer.renderLineBox(poseStack, debugConsumer, new AABB(-0.001, -0.001, 0, 0.001, 0.001, 2), 0, 0, 1, 1.0F);
+                // 渲染法向量（绿色）
+                LevelRenderer.renderLineBox(poseStack, debugConsumer, new AABB(-0.001, 0, -0.001, 0.001, 0.5, 0.001), 0, 0, 1, 1.0F);
+                poseStack.popPose();
                 LevelRenderer.renderLineBox(poseStack, debugConsumer, -0.002, -0.002, -0.002, 0.002, 0.002, 0.002, 1.0F, 1.0F, 0.0F, 1.0F);
                 if (entity instanceof IBlockCollision<?> iBlockCollision) {
                     LevelRenderer.renderLineBox(poseStack, debugConsumer, iBlockCollision.getBlockCollisionBox(), 0.0F, 1.0F, 0.0F, 1.0F);
@@ -75,7 +84,6 @@ public class AttachmentEntityRenderDispatcher {
                     }
                 }
             }
-
             poseStack.popPose();
         }
     }

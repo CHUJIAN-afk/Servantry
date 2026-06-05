@@ -4,20 +4,17 @@ import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import first.servantry.register.DamageRegister;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Targeting;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Map;
@@ -178,38 +175,4 @@ public abstract class Servant extends AttachmentEntity {
     }
 
     public ServantGoalSelector getGoalSelector() { return goalSelector; }
-
-    // ===================== 数学工具 =====================
-
-    /** 球面线性插值两个向量 */
-    public Vec3 slerpVector(Vec3 v1, Vec3 v2, float t) {
-        double dot = Mth.clamp(v1.dot(v2), -1.0, 1.0);
-        double theta = Math.acos(dot) * t;
-        Vec3 relativeVec = v2.subtract(v1.scale(dot));
-        if (relativeVec.lengthSqr() < 1e-5) return v1;
-        relativeVec = relativeVec.normalize();
-        return v1.scale(Math.cos(theta)).add(relativeVec.scale(Math.sin(theta)));
-    }
-
-    /** 根据位置、尖端朝向和叶片法向量计算欧拉角节点 */
-    public PathNode getEulerNode(Vec3 pos, Vec3 tipDir, Vec3 bladeNormal) {
-        if (tipDir.lengthSqr() < 1e-4) tipDir = new Vec3(0, 0, 1);
-        tipDir = tipDir.normalize();
-
-        float yaw = (float) (Math.atan2(-tipDir.x, tipDir.z) * (180D / Math.PI));
-        double horiz = Math.sqrt(tipDir.x * tipDir.x + tipDir.z * tipDir.z);
-        float pitch = (float) (Math.atan2(-tipDir.y, horiz) * (180D / Math.PI));
-
-        Vec3 defaultUp = new Vec3(0, 1, 0)
-                .xRot((float) Math.toRadians(pitch))
-                .yRot((float) Math.toRadians(yaw));
-        Vec3 projNormal = bladeNormal.subtract(tipDir.scale(bladeNormal.dot(tipDir))).normalize();
-        if (projNormal.lengthSqr() < 1e-4) projNormal = defaultUp;
-
-        double dot = defaultUp.dot(projNormal);
-        Vec3 cross = defaultUp.cross(projNormal);
-        float roll = (float) (Math.atan2(cross.dot(tipDir), dot) * (180D / Math.PI));
-
-        return new PathNode(pos, yaw, pitch, roll);
-    }
 }

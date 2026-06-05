@@ -18,8 +18,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -138,10 +136,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         double localZ = 0.75 + order * 0.12;
         double floatSpeed = 0.08 + order * 0.01;
         double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;
-        double px = Mth.lerp(partialTick, owner.xo, owner.getX());
-        double py = Mth.lerp(partialTick, owner.yo, owner.getY());
-        double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
-        Vec3 playerPos = new Vec3(px, py, pz);
+        Vec3 playerPos = owner.getPosition(partialTick);
         Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
         return new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
     }
@@ -162,18 +157,6 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     }
 
     /**
-     * 获取当前法线向量（基于旋转）
-     */
-    public Vec3 getCurrentNormal() {
-        Quaternionf q = new Quaternionf()
-                .rotateY((float) Math.toRadians(-getYaw()))
-                .rotateX((float) Math.toRadians(getPitch()))
-                .rotateZ((float) Math.toRadians(getRoll()));
-        Vector3f upV = new Vector3f(0, 1, 0).rotate(q);
-        return new Vec3(upV.x(), upV.y(), upV.z()).normalize();
-    }
-
-    /**
      * 计算贝塞尔曲线上的点（De Casteljau算法，支持任意数量控制点）
      */
     public Vec3 calculateBezierPoint(float delta, Vec3... P) {
@@ -186,31 +169,6 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
             }
         }
         return pts[0];
-    }
-
-    /**
-     * 计算贝塞尔曲线上的点
-     */
-    public Vec3 calculateBezierPoint(Vec3 P0, Vec3 P1, Vec3 P2, Vec3 P3, float t) {
-        float mt = 1.0f - t;
-        return P0.scale(mt * mt * mt)
-                .add(P1.scale(3 * mt * mt * t))
-                .add(P2.scale(3 * mt * t * t))
-                .add(P3.scale(t * t * t));
-    }
-
-    /**
-     * 计算椭圆上的点
-     */
-    public Vec3 calculateEllipsePoint(Vec3 center, Vec3 major, Vec3 minor, float theta) {
-        return center.add(major.scale(Math.cos(theta))).add(minor.scale(Math.sin(theta)));
-    }
-
-    /**
-     * 计算椭圆切线方向
-     */
-    public Vec3 calculateEllipseTangent(Vec3 major, Vec3 minor, float theta) {
-        return major.scale(-Math.sin(theta)).add(minor.scale(Math.cos(theta))).normalize();
     }
 
     @Override
