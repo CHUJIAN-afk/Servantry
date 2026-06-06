@@ -18,6 +18,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemCooldowns;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.EventPriority;
@@ -108,7 +109,8 @@ public class Event {
         ItemStack itemStack = event.getItemStack();
         Player player = event.getEntity();
         Level level = player.level();
-        if (!level.isClientSide() && event.getHand() == InteractionHand.MAIN_HAND && itemStack.getItem() instanceof IServantWeapon<?> iServantWeapon) {
+        ItemCooldowns cooldowns = player.getCooldowns();
+        if (!level.isClientSide() && event.getHand() == InteractionHand.MAIN_HAND && !cooldowns.isOnCooldown(itemStack.getItem()) && itemStack.getItem() instanceof IServantWeapon<?> iServantWeapon) {
             if (!player.isShiftKeyDown()) {
                 iServantWeapon.handleSummon(player);
             } else {
@@ -119,6 +121,7 @@ public class Event {
             if (soundEvent != null) {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), soundEvent, player.getSoundSource());
             }
+            cooldowns.addCooldown(itemStack.getItem(), 5);
         }
     }
 
