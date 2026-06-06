@@ -41,7 +41,7 @@ public class ZenithProjectile extends Projectile implements ICollideAttack<Zenit
             }
         }
         lastProgress = progress;
-        progress = Math.min(progress + (float) 1 / 10, 1);
+        progress = Math.min(progress + (float) 1 / 14, 1);
         super.tick();
     }
 

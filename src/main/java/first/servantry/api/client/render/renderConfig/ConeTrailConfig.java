@@ -62,7 +62,7 @@ public class ConeTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, 
     @Override
     public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource,
                        float partialTick, PathNode visualNode, RenderType renderType) {
-        List<InterpolatedNode> smoothNodes = buildSmoothNodes(entity, visualNode);
+        List<InterpolatedNode> smoothNodes = buildSmoothNodes(entity, visualNode, partialTick);
         if (smoothNodes.size() < 2) return;
 
         VertexConsumer consumer = bufferSource.getBuffer(renderType);

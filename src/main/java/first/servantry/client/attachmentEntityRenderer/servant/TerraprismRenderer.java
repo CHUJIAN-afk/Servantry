@@ -37,8 +37,8 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
                             float hue = (((float) order / total) + timeShift) % 1.0f;
                             return Mth.hsvToRgb(hue, 0.65f, Mth.lerp(progress, 1f, 0.4f));
                         })
-                        .tipAlphaBoost((s, progress) -> progress < 0.3f ? Mth.lerp(progress / 0.3f, 2.5f, 1.0f) : 1.25f)
-                        .tipBrightnessBoost((s, progress) -> progress < 0.25f ? Mth.lerp(progress / 0.25f, 1.5f, 1.0f) : 1.25f))
+                        .tipAlphaBoost((s, progress) -> progress < 0.3f ? Mth.lerp(progress / 0.3f, 2.5f, 1.0f) : 1f)
+                        .tipBrightnessBoost((s, progress) -> progress < 0.25f ? Mth.lerp(progress / 0.25f, 1.5f, 1.0f) : 1f))
                 .model(new ModelConfig<Terraprism>()
                         .scale(1.5f)
                         .translateOffset(-0.5f, -0.5f, -0.5f)

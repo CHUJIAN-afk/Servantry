@@ -25,9 +25,9 @@ public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Z
     protected RenderContext<ZenithProjectile> createContext(ZenithProjectile zenith) {
         return RenderContext.<ZenithProjectile>builder()
                 .trail(new RibbonTrailConfig<ZenithProjectile>()
-                               .timer(15)
+                               .timer(0)
                                .colorRGB(0xffffff)
-                               .historyLength(6)
+                               .historyLength(2)
                                .width(1.32575f)
                                .diamondSize(0.15f)
                                .tipAlphaBoost((s, progress) -> progress < 0.3f ? Mth.lerp(progress / 0.3f, 2.5f, 1.0f) : 1.5f)
@@ -39,7 +39,7 @@ public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Z
                                .rotationOffset(0, 90, 45)
                                .visualNodeFunction((entity, partialTick, rawNode) -> {
                                    if (entity.chaseTarget != null && entity.chaseTarget.isAlive()) {
-                                       entity.updateDirection(entity.chaseTarget,partialTick);
+                                       entity.updateDirection(entity.chaseTarget, partialTick);
                                    }
                                    Vec3 direction = entity.direction;
                                    if (!direction.equals(Vec3.ZERO)) {

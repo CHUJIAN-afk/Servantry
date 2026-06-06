@@ -13,7 +13,10 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 拖尾渲染配置基类。
@@ -135,20 +138,24 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
                                 float partialTick, PathNode visualNode, RenderType renderType);
 
     /**
-     * 构建平滑节点列表
+     * 构建平滑节点列表。
+     * <p>
+     * 对末端节点（最旧历史节点）使用 partialTick 向前一个节点插值，
+     * 使末端在帧间平滑移动，消除逻辑帧边界导致的末端突变。
+     * 其余节点保持原始值不变。
+     * </p>
      */
-    protected List<InterpolatedNode> buildSmoothNodes(T entity, PathNode visualNode) {
-        ArrayList<PathNode> history = entity.getHistoryNodes();
+    protected List<InterpolatedNode> buildSmoothNodes(T entity, PathNode visualNode, float partialTick) {
+        ArrayList<PathNode> history = new ArrayList<>(entity.getHistoryNodes());
+        history.set(0, visualNode);
         int actualLength = Math.min(history.size(), historyLength);
-        if (actualLength < 2) return List.of();
-
-        PathNode[] nodes = new PathNode[actualLength];
-        Iterator<PathNode> iterator = history.iterator();
-        for (int i = 0; i < actualLength; i++) {
-            nodes[i] = iterator.next();
+        if (actualLength < 2) {
+            return List.of();
         }
-        nodes[0] = new PathNode(visualNode.pos(), visualNode.yaw(), visualNode.pitch(), visualNode.roll());
-
+        PathNode[] nodes = new PathNode[actualLength];
+        for (int i = 0; i < actualLength; i++) {
+            nodes[i] = history.get(i).lerp(history.get(Math.max(0, i - 1)), partialTick);
+        }
         int endIndex = nodes.length - 1;
         int startIdx = Math.max(0, Math.min(startIndex, endIndex - 1));
 
@@ -165,7 +172,7 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
             Quaternionf q2 = eulerToQuaternion(p2.yaw(), p2.pitch(), p2.roll());
 
             for (int j = 0; j < segmentsPerNode; j++) {
-                float t = (float) j / segmentsPerNode;
+                float t = ((float) j / segmentsPerNode);
                 result.add(catmullRomInterpolate(p0, p1, p2, p3, q1, q2, t, tempQuat));
             }
         }
@@ -219,5 +226,11 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
     /**
      * 插值节点记录
      */
-    public record InterpolatedNode(Vec3 pos, Quaternionf rot) {}
+    public record InterpolatedNode(Vec3 pos, Quaternionf rot) {
+
+        public InterpolatedNode lerp(InterpolatedNode to, float lerp) {
+            return new InterpolatedNode(pos().lerp(to.pos(), lerp), rot().slerp(to.rot(), lerp));
+        }
+
+    }
 }
