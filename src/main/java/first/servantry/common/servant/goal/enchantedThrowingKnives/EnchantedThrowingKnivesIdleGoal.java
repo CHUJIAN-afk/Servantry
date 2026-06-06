@@ -1,9 +1,8 @@
 package first.servantry.common.servant.goal.enchantedThrowingKnives;
 
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.EnchantedThrowingKnives;
-
-import java.util.Collections;
 
 /**
  * 附魔飞刀空闲目标。
@@ -36,7 +35,9 @@ public class EnchantedThrowingKnivesIdleGoal extends ServantGoal<EnchantedThrowi
 
     @Override
     public void tick() {
-        servant.setPath(Collections.singletonList(servant.getCurrentPathNode().lerp(servant.getInterpolatedIdleState(1.0f), 0.25f)));
+        PathNode currentPathNode = servant.getCurrentPathNode();
+        PathNode targetPathNode = servant.getInterpolatedIdleState(1.0f);
+        PathNode lerpedPathNode = currentPathNode.lerp(targetPathNode, 0.25f);
+        servant.setCurrentPathNode(lerpedPathNode);
     }
-
 }

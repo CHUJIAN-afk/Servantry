@@ -11,6 +11,7 @@ import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.register.ModelRegister;
 import first.servantry.utils.ParticleHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 /**
@@ -41,7 +42,7 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
 
     @Override
     protected void renderEntity(StardustCell servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> config) {
-        if (config.hasTrail()) {
+        if (config.hasTrail() && !Minecraft.getInstance().isPaused()) {
             int trailTimer = servant.getTrailTimer();
             ParticleHelper.create(servant.getOwner().level())
                     .generic(GenericParticleBuilder.create()

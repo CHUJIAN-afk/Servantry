@@ -216,7 +216,6 @@ public abstract class AttachmentEntity {
     public void setCurrentPathNode(PathNode currentPathNode) {
         this.currentPathNode = currentPathNode;
     }
-// ===================== 网络序列化 =====================
 
     /**
      * 写入实体的基础同步数据（位置与朝向），并调用子类的附加数据写入。
@@ -321,54 +320,26 @@ public abstract class AttachmentEntity {
         return new Vec3(upV.x(), upV.y(), upV.z()).normalize();
     }
 
-
     public PathNode getEulerNode(Vec3 pos, Vec3 direction, Vec3 normal) {
         direction = direction.normalize();
         normal = normal.normalize();
         float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
         float pitch = (float) Math.toDegrees(Math.asin(-direction.y));
-
-        // 构造仅yaw/pitch的四元数
-        Quaternionf ypQuat = new Quaternionf()
-                .rotateY((float) Math.toRadians(-yaw))
-                .rotateX((float) Math.toRadians(pitch));
-
-        // 计算无roll时局部Y轴方向
-        Vector3f localYF = new Vector3f(0, 1, 0).rotate(ypQuat);
-        Vec3 localY = new Vec3(localYF.x(), localYF.y(), localYF.z()).normalize();
-
+        // 已偏转yaw/pitch后，局部Y轴（无roll时法向量）的世界方向
+        float pr = (float) Math.toRadians(pitch);
+        float yr = (float) Math.toRadians(yaw);
+        float cp = (float) Math.cos(pr);
+        float sp = (float) Math.sin(pr);
+        float cy = (float) Math.cos(yr);
+        float sy = (float) Math.sin(yr);
+        Vec3 localY = new Vec3(-sy * sp, cp, cy * sp);
         // 投影到垂直于direction的平面
         Vec3 projLocalY = localY.subtract(direction.scale(localY.dot(direction))).normalize();
         Vec3 projNormal = normal.subtract(direction.scale(normal.dot(direction))).normalize();
-
-        float roll;
-        if (projLocalY.lengthSqr() < 1e-4 || projNormal.lengthSqr() < 1e-4) {
-            roll = 0;
-        } else {
-            // 计算从projLocalY到projNormal的旋转角
-            // 但projLocalY在pitch过零时会翻转，导致roll突变
-            // 修正：当pitch过零时projLocalY翻转，roll应相应补偿180°
-            double rawRoll = Math.atan2(
-                    projLocalY.cross(projNormal).dot(direction),
-                    projLocalY.dot(projNormal)
-            );
-            roll = (float) Math.toDegrees(rawRoll);
-
-            // projLocalY在pitch正负侧方向相反，导致roll在pitch过零时跳变180°
-            // 检测并补偿：当pitch<0时projLocalY的Y分量翻转，roll需要翻转符号
-            // 但这不够——直接用渲染验证：将yaw,pitch,roll转回四元数，看局部Y轴是否匹配normal
-            Quaternionf fullQuat = new Quaternionf()
-                    .rotateY((float) Math.toRadians(-yaw))
-                    .rotateX((float) Math.toRadians(pitch))
-                    .rotateZ((float) Math.toRadians(roll));
-            Vector3f resultYF = new Vector3f(0, 1, 0).rotate(fullQuat);
-            Vec3 resultY = new Vec3(resultYF.x(), resultYF.y(), resultYF.z()).normalize();
-
-            // 法向量无正反面，允许resultY与normal反向
-            if (resultY.dot(normal) < 0) {
-                roll += 180;
-            }
-        }
+        // 不翻转projNormal：atan2自然处理正负，避免dot≈0时翻转振荡
+        double d = projLocalY.dot(projNormal);
+        Vec3 c = projLocalY.cross(projNormal);
+        float roll = (float) Math.toDegrees(Math.atan2(c.dot(direction), d));
         return new PathNode(pos, yaw, pitch, roll);
     }
 }

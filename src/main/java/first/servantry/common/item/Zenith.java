@@ -38,37 +38,26 @@ public class Zenith extends SwordItem {
             if (!level.isClientSide()) {
                 DamageSource damageSource = player.damageSources().playerAttack(player);
                 Vec3 lookAngle = player.getLookAngle();
-                Vec3 startPos = player.getBoundingBox().getCenter().add(lookAngle.scale(-1));
+                Vec3 center = player.getPosition(1).add(0, player.getBbHeight() / 2, 0);
+                Vec3 startPos = center.add(lookAngle.scale(-1));
                 for (int i = 0; i < 3; i++) {
-                    LivingEntity chase = null;
+                    ZenithProjectile projectile = new ZenithProjectile(damageSource);
+                    Vec3 endPos = computeEndPos(player);
                     if (i != 0) {
-                        List<LivingEntity> livingEntityList = collectTargets(player);
-                        chase = livingEntityList.stream().findAny().orElse(null);
-                    }
-                    Vec3 endPos;
-                    if (chase != null) {
-                        endPos = chase.getBoundingBox().getCenter();
-                    } else {
-                        endPos = computeEndPos(player);
+                        LivingEntity living = collectTargets(player).stream().findAny().orElse(null);
+                        if (living != null) {
+                            endPos = living.getBoundingBox().getCenter();
+                            projectile.chaseTarget = living;
+                        }
                     }
                     RandomSource random = player.getRandom();
-                    endPos = endPos.offsetRandom(random, 2f);
-                    ZenithProjectile projectile = new ZenithProjectile(damageSource);
                     projectile.setOwner(player);
-                    Vec3 normal = Ellipse.randomPlaneNormal(random, endPos, startPos);
-                    float curvature = (float) Math.min(0.3, 10 / endPos.distanceTo(startPos)) + random.nextFloat() * 0.2f + 0.15f;
-                    Ellipse ellipse = new Ellipse(endPos, startPos, normal, curvature);
-                    List<PathNode> list = new ArrayList<>();
-                    for (int j = i; j < 16; j++) {
-                        float progress = (float) j / 16;
-                        Vec3 point = ellipse.getPoint(progress);
-                        Vec3 tipDir = point.subtract(ellipse.getCenter()).normalize();
-                        list.add(projectile.getEulerNode(point, tipDir, normal));
-                    }
-                    PathNode first = list.getFirst();
-                    list.removeFirst();
-                    projectile.setPath(list);
-                    projectile.setCurrentPathNode(first);
+                    projectile.direction = endPos.subtract(center).scale(0.95 + random.nextFloat() * 0.05);
+                    projectile.normal = Ellipse.randomPlaneNormal(random, endPos, startPos);
+                    projectile.curvature = (float) Math.min(0.3, 10 / endPos.distanceTo(startPos)) + random.nextFloat() * 0.2f + 0.15f;
+                    projectile.progress += random.nextFloat() * 0.05f;
+                    PathNode node = projectile.getNode(projectile.progress, 1);
+                    projectile.setCurrentPathNode(node);
                     projectile.join(player);
                 }
             }
@@ -95,7 +84,7 @@ public class Zenith extends SwordItem {
             double distToPlayer = entityPos.distanceTo(eyePos);
 
             // 玩家周围4格
-            if (distToPlayer <= 4) {
+            if (distToPlayer <= 8) {
                 result.add(entity);
                 continue;
             }

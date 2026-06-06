@@ -5,6 +5,7 @@ import first.servantry.api.entity.PathNode;
 import first.servantry.api.entity.PlannedPath;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.servant.Terraprism;
+import first.servantry.utils.EasingCurve;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -82,9 +83,8 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         List<PathNode> nodes = new ArrayList<>();
         int duration = 7;
         for (int i = 1; i <= duration; i++) {
-            float delta = (float) i / duration;
-            delta = delta * delta;
-            nodes.add(servant.getEulerNode(start.lerp(end, delta), direction, planeNormal));
+            float progress = (float) i / duration;
+            nodes.add(servant.getEulerNode(start.lerp(end, EasingCurve.EASE_IN_OUT_QUAD.apply(progress)), direction, planeNormal));
         }
         servant.setPath(nodes);
     }
@@ -125,7 +125,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         int attackTicks = duration - prepTicks;
         for (int i = 0; i < attackTicks; i++) {
             float progress = (float) i / attackTicks;
-            Vec3 point = ellipse.getPoint(progress);
+            Vec3 point = ellipse.getPoint(EasingCurve.LINEAR.apply(progress));
             Vec3 tipDir = point.subtract(ellipse.getCenter()).normalize();
             nodes.add(servant.getEulerNode(point, tipDir, planeNormal));
         }
@@ -162,7 +162,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         PathNode attackStartNode = null;
         int prepTicks = 8;
         for (int i = 0; i <= prepTicks; i++) {
-            float progress = (float) i / prepTicks;
+            float progress = EasingCurve.EASE_OUT_QUAD.apply((float) i / prepTicks);
             Vec3 point = servant.calculateBezierPoint(progress, startPos, startPos.add(currentVel), attackPrepPos);
             Vec3 tipDir = currentTip.lerp(attackDir, progress);
             PathNode pathNode = servant.getEulerNode(point, tipDir, currentNormal);
@@ -173,8 +173,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         PathNode attackEndNode = new PathNode(endPos, attackStartNode.yaw(), attackStartNode.pitch(), attackStartNode.roll());
         int attackTicks = 6;
         for (int i = 0; i <= attackTicks; i++) {
-            float progress = (float) i / attackTicks;
-            progress = progress * progress;
+            float progress = EasingCurve.EASE_IN_OUT_QUAD.apply((float) i / attackTicks);
             nodes.add(attackStartNode.lerp(attackEndNode, progress));
         }
         servant.setPath(nodes);

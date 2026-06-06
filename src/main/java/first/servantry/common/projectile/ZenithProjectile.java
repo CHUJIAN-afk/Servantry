@@ -4,6 +4,7 @@ import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.*;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.register.AttachmentEntityRegister;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -14,8 +15,12 @@ import java.util.List;
 
 public class ZenithProjectile extends Projectile implements ICollideAttack<ZenithProjectile> {
 
-    public Vec3 lastOwnerPos = Vec3.ZERO;
-    public int progress = 0;
+    public LivingEntity chaseTarget = null;
+    public Vec3 direction = Vec3.ZERO;
+    public Vec3 normal = Vec3.ZERO;
+    public float curvature = 1;
+    public float lastProgress = 0;
+    public float progress = 0;
 
     public ZenithProjectile() {
         super();
@@ -29,22 +34,62 @@ public class ZenithProjectile extends Projectile implements ICollideAttack<Zenit
     @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
-            applyPositionCorrection();
-            if (!isExecutingPath()) {
+            updateDirection(chaseTarget, 1);
+            setCurrentPathNode(getNode(progress, 1));
+            if (progress >= 1) {
                 setRemove();
             }
         }
-        lastOwnerPos = owner.getPosition(1);
+        lastProgress = progress;
+        progress = Math.min(progress + (float) 1 / 10, 1);
         super.tick();
     }
 
+    public void updateDirection(LivingEntity chaseTarget, float partialTick) {
+        if (chaseTarget != null && chaseTarget.isAlive()) {
+            Vec3 center = owner.getPosition(partialTick).add(0, owner.getBbHeight() / 2, 0);
+            Vec3 endPos = chaseTarget.getPosition(partialTick).add(0, chaseTarget.getBbHeight() / 2, 0);
+            direction = endPos.subtract(center);
+        }
+    }
+
+    public PathNode getNode(float progress, float partialTick) {
+        Vec3 center = owner.getPosition(partialTick).add(0, owner.getBbHeight() / 2, 0);
+        Vec3 endPos = center.add(direction);
+        Vec3 startPos = center.add(direction.normalize().scale(-1));
+        Ellipse ellipse = new Ellipse(endPos, startPos, normal, curvature);
+        Vec3 point = ellipse.getPoint(progress);
+        Vec3 ellipseCenter = ellipse.getCenter();
+        Vec3 tipDir = point.subtract(ellipseCenter).normalize();
+        return getEulerNode(point, tipDir, normal);
+    }
+
     @Override
-    protected void tickPhysics() {
+    public void writeAdditional(RegistryFriendlyByteBuf buf) {
+        buf.writeVec3(direction);
+        buf.writeVec3(normal);
+        buf.writeFloat(curvature);
+        buf.writeInt(chaseTarget != null ? chaseTarget.getId() : -1);
+    }
+
+    @Override
+    public void readAdditional(RegistryFriendlyByteBuf buf) {
+        direction = buf.readVec3();
+        normal = buf.readVec3();
+        curvature = buf.readFloat();
+        int targetId = buf.readInt();
+        if (targetId != -1 && owner != null && owner.level().getEntity(targetId) instanceof LivingEntity living) {
+            chaseTarget = living;
+        }
     }
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
         return AttachmentEntityRegister.ZenithProjectile.get();
+    }
+
+    @Override
+    protected void tickPhysics() {
     }
 
     @Override
@@ -69,32 +114,6 @@ public class ZenithProjectile extends Projectile implements ICollideAttack<Zenit
             for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
                 InvincibleData.criteriaAttack(living, getUuid(), 2, source, getDamage(), InvincibleData.Type.PARTIAL);
-            }
-        }
-    }
-
-    /**
-     * 位置修正机制
-     */
-    private void applyPositionCorrection() {
-        Vec3 last = lastOwnerPos;
-        if (!last.equals(Vec3.ZERO)) {
-            Vec3 current = owner.getPosition(1);
-            Vec3 offset = current.subtract(last);
-            if (offset.lengthSqr() > 1e-5) {
-                PlannedPath path = getCurrentPath();
-                if (path != null) {
-                    List<PathNode> nodes = path.getNodes();
-                    int startIdx = path.getCurrentIndex();
-                    int remaining = nodes.size() - startIdx;
-                    for (int i = 0; i < remaining; i++) {
-                        PathNode node = nodes.get(startIdx + i);
-                        float weight = (float) (i + 1) / remaining;
-                        Vec3 blendedOffset = offset.scale(weight);
-                        Vec3 pos = node.pos();
-                        nodes.set(startIdx + i, new PathNode(pos.add(blendedOffset), node.yaw(), node.pitch(), node.roll()));
-                    }
-                }
             }
         }
     }

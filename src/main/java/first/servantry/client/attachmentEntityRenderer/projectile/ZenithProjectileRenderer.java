@@ -11,6 +11,7 @@ import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.ZenithProjectile;
 import first.servantry.register.ModelRegister;
 import first.servantry.utils.ParticleHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -36,7 +37,16 @@ public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Z
                                .scale(2)
                                .translateOffset(-0.5f, -0.5f, -0.5f)
                                .rotationOffset(0, 90, 45)
-                               .visualNodeFunction((entity, partialTick, rawNode) -> rawNode))
+                               .visualNodeFunction((entity, partialTick, rawNode) -> {
+                                   if (entity.chaseTarget != null && entity.chaseTarget.isAlive()) {
+                                       entity.updateDirection(entity.chaseTarget,partialTick);
+                                   }
+                                   Vec3 direction = entity.direction;
+                                   if (!direction.equals(Vec3.ZERO)) {
+                                       return entity.getNode(Mth.lerp(partialTick, entity.lastProgress, entity.progress), partialTick);
+                                   }
+                                   return rawNode;
+                               }))
                 .build();
     }
 
@@ -44,9 +54,9 @@ public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Z
     protected void renderEntity(ZenithProjectile zenithProjectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ZenithProjectile> config) {
         ArrayList<PathNode> pathNodes = zenithProjectile.getHistoryNodes();
         Player owner = zenithProjectile.getOwner();
-        if (pathNodes.size() > 3) {
+        if (pathNodes.size() > 3 && !Minecraft.getInstance().isPaused()) {
             Vec3 velocity = visualNode.pos().subtract(pathNodes.get(2).pos());
-            if (velocity.length() > 1 && owner.getRandom().nextDouble() < 0.25) {
+            if (velocity.length() > 1) {
                 ParticleHelper.create(owner.level())
                         .generic(GenericParticleBuilder.create()
                                          .color(0xffffff)
@@ -61,10 +71,10 @@ public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Z
                                          .scaleRandom(0.0015f)
                         )
                         .pos(visualNode.pos())
-                        .offset(0.015)
-                        .velocity(velocity)
+                        .offset(0.15)
+                        .velocity(velocity.normalize())
                         .count(1)
-                        .speed(2)
+                        .speed(0.25)
                         .spread(0.05)
                         .emit();
             }

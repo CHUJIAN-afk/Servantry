@@ -98,11 +98,7 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
     public void tick() {
         if (getOwner().level().isClientSide()) {
             // 拖尾计时器更新
-            if (attacking) {
-                trailTimer = 10;
-            } else if (trailTimer > 0) {
-                trailTimer--;
-            }
+            trailTimer = 10;
             // 空闲混合系数更新
             idleBlendO = idleBlend;
             if (!attacking) {
