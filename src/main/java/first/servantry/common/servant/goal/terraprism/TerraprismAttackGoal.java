@@ -53,7 +53,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
                 firstStrike = false;
                 lastEllipse = false;
             } else {
-                if (servant.getOwner().getRandom().nextDouble() < 0.8) {
+                if (servant.getOwner().getRandom().nextDouble() < 0.6) {
                     planEllipseSlash();
                     lastEllipse = true;
                 } else {
@@ -162,7 +162,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         PathNode attackStartNode = null;
         int prepTicks = 7;
         for (int i = 0; i <= prepTicks; i++) {
-            float progress = EasingCurve.EASE_IN_OUT_QUAD.apply((float) i / prepTicks);
+            float progress = EasingCurve.EASE_OUT_QUAD.apply((float) i / prepTicks);
             Vec3 point = servant.calculateBezierPoint(progress, startPos, startPos.add(currentVel), attackPrepPos);
             Vec3 tipDir = currentTip.lerp(attackDir, progress);
             PathNode pathNode = servant.getEulerNode(point, tipDir, currentNormal);
@@ -171,7 +171,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         }
 
         PathNode attackEndNode = new PathNode(endPos, attackStartNode.yaw(), attackStartNode.pitch(), attackStartNode.roll());
-        int attackTicks = 7;
+        int attackTicks = 5;
         for (int i = 0; i <= attackTicks; i++) {
             float progress = EasingCurve.EASE_IN_QUAD.apply((float) i / attackTicks);
             nodes.add(attackStartNode.lerp(attackEndNode, progress));

@@ -17,43 +17,31 @@ import java.util.List;
 
 /**
  * 丝带拖尾配置。
- * <p>
  * 适用于剑状、刀锋、扁平物体、有明显方向性的实体。
- * </p>
- * <pre>{@code
- * 三角形截面：
- *        * 尖端（朝前）
- *       /|\
- *      / | \
- *     *--+--*
- *    左  基部  右
- * }</pre>
- *
  * @param <T> 实体类型
  */
 public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, RibbonTrailConfig<T>> {
 
+    public float upOffset = 0f;
+    private float downOffset = 0f;
+
     /**
-     * 丝带宽度（三角形高度）
+     * 尖端透明度增强函数
      */
-    public float width = 0.15f;
+    public RenderContext.AlphaBoostFunction<T> tipAlphaBoost = (entity, progress) -> (1 - progress) * 10;
 
-    /** 丝带棱形大小（三角形底边长度） */
-    public float diamondSize = 0.3f;
+    /**
+     * 尖端亮度增强函数
+     */
+    public RenderContext.BrightnessBoostFunction<T> tipBrightnessBoost = (entity, progress) -> (1 - progress * 0.75f);
 
-    /** 尖端透明度增强函数 */
-    public RenderContext.AlphaBoostFunction<T> tipAlphaBoost = (entity, progress) -> 1.0f;
-
-    /** 尖端亮度增强函数 */
-    public RenderContext.BrightnessBoostFunction<T> tipBrightnessBoost = (entity, progress) -> 1.0f;
-
-    public RibbonTrailConfig<T> width(float width) {
-        this.width = width;
+    public RibbonTrailConfig<T> upOffset(float upOffset) {
+        this.upOffset = upOffset;
         return this;
     }
 
-    public RibbonTrailConfig<T> diamondSize(float size) {
-        this.diamondSize = size;
+    public RibbonTrailConfig<T> downOffset(float downOffset) {
+        this.downOffset = downOffset;
         return this;
     }
 
@@ -68,10 +56,11 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
     }
 
     @Override
-    public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource,
-                       float partialTick, PathNode visualNode, RenderType renderType) {
+    public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderType renderType) {
         List<InterpolatedNode> smoothNodes = buildSmoothNodes(entity, visualNode, partialTick);
-        if (smoothNodes.size() < 2) return;
+        if (smoothNodes.size() < 2) {
+            return;
+        }
 
         VertexConsumer consumer = bufferSource.getBuffer(renderType);
         Matrix4f pose = poseStack.last().pose();
@@ -92,13 +81,11 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
             float currScale = Math.max(0.0f, 1.0f - currProgress);
             float prevScale = Math.max(0.0f, 1.0f - prevProgress);
 
-            Vector3f currTip = new Vector3f(0, 0, width).rotate(curr.rot());
-            Vector3f currLeft = new Vector3f(-diamondSize * 0.5f * currScale, 0, 0).rotate(curr.rot());
-            Vector3f currRight = new Vector3f(diamondSize * 0.5f * currScale, 0, 0).rotate(curr.rot());
+            Vector3f currTip = new Vector3f(0, 0, upOffset).rotate(curr.rot());
+            Vector3f currLeft = new Vector3f(0, 0, downOffset).rotate(curr.rot());
 
-            Vector3f prevTip = new Vector3f(0, 0, width).rotate(prev.rot());
-            Vector3f prevLeft = new Vector3f(-diamondSize * 0.5f * prevScale, 0, 0).rotate(prev.rot());
-            Vector3f prevRight = new Vector3f(diamondSize * 0.5f * prevScale, 0, 0).rotate(prev.rot());
+            Vector3f prevTip = new Vector3f(0, 0, upOffset).rotate(prev.rot());
+            Vector3f prevLeft = new Vector3f(0, 0, downOffset).rotate(prev.rot());
 
             int currColorRGB = colorFunction.getColor(entity, currProgress, timeShift);
             int prevColorRGB = colorFunction.getColor(entity, prevProgress, timeShift);
@@ -127,45 +114,12 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
             Vec3 currRel = curr.pos().subtract(renderPos);
             Vec3 prevRel = prev.pos().subtract(renderPos);
 
-            emitTriangleStrip(consumer, pose, currRel, prevRel,
-                    currTip, prevTip, currLeft, prevLeft, currRight, prevRight,
-                    currTipColor, prevTipColor, currBaseColor, prevBaseColor);
+            emitTriangleStrip(consumer, pose, currRel, prevRel, currTip, prevTip, currLeft, prevLeft, currTipColor, prevTipColor, currBaseColor, prevBaseColor);
         }
     }
 
-    private void emitTriangleStrip(VertexConsumer consumer, Matrix4f pose,
-                                   Vec3 currRel, Vec3 prevRel,
-                                   Vector3f currTip, Vector3f prevTip,
-                                   Vector3f currLeft, Vector3f prevLeft,
-                                   Vector3f currRight, Vector3f prevRight,
-                                   int currTipColor, int prevTipColor,
-                                   int currBaseColor, int prevBaseColor) {
-        // 左侧三角形正面
-        emitQuad(consumer, pose,
-                (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z, currTipColor,
-                (float) currRel.x + currLeft.x, (float) currRel.y + currLeft.y, (float) currRel.z + currLeft.z, currBaseColor,
-                (float) prevRel.x + prevLeft.x, (float) prevRel.y + prevLeft.y, (float) prevRel.z + prevLeft.z, prevBaseColor,
-                (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z, prevTipColor);
-
-        // 左侧三角形反面
-        emitQuad(consumer, pose,
-                (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z, currTipColor,
-                (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z, prevTipColor,
-                (float) prevRel.x + prevLeft.x, (float) prevRel.y + prevLeft.y, (float) prevRel.z + prevLeft.z, prevBaseColor,
-                (float) currRel.x + currLeft.x, (float) currRel.y + currLeft.y, (float) currRel.z + currLeft.z, currBaseColor);
-
-        // 右侧三角形正面
-        emitQuad(consumer, pose,
-                (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z, currTipColor,
-                (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z, prevTipColor,
-                (float) prevRel.x + prevRight.x, (float) prevRel.y + prevRight.y, (float) prevRel.z + prevRight.z, prevBaseColor,
-                (float) currRel.x + currRight.x, (float) currRel.y + currRight.y, (float) currRel.z + currRight.z, currBaseColor);
-
-        // 右侧三角形反面
-        emitQuad(consumer, pose,
-                (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z, currTipColor,
-                (float) currRel.x + currRight.x, (float) currRel.y + currRight.y, (float) currRel.z + currRight.z, currBaseColor,
-                (float) prevRel.x + prevRight.x, (float) prevRel.y + prevRight.y, (float) prevRel.z + prevRight.z, prevBaseColor,
-                (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z, prevTipColor);
+    private void emitTriangleStrip(VertexConsumer consumer, Matrix4f pose, Vec3 currRel, Vec3 prevRel, Vector3f currTip, Vector3f prevTip, Vector3f currLeft, Vector3f prevLeft, int currTipColor, int prevTipColor, int currBaseColor, int prevBaseColor) {
+        emitQuad(consumer, pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z, currTipColor, (float) currRel.x + currLeft.x, (float) currRel.y + currLeft.y, (float) currRel.z + currLeft.z, currBaseColor, (float) prevRel.x + prevLeft.x, (float) prevRel.y + prevLeft.y, (float) prevRel.z + prevLeft.z, prevBaseColor, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z, prevTipColor);
+        emitQuad(consumer, pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z, currTipColor, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z, prevTipColor, (float) prevRel.x + prevLeft.x, (float) prevRel.y + prevLeft.y, (float) prevRel.z + prevLeft.z, prevBaseColor, (float) currRel.x + currLeft.x, (float) currRel.y + currLeft.y, (float) currRel.z + currLeft.z, currBaseColor);
     }
 }

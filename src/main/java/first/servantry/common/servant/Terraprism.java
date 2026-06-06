@@ -19,7 +19,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -115,6 +114,14 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         this.blend = buf.readBoolean();
     }
 
+    public int getColor(float partialTick) {
+        int order = getOrder();
+        int total = Math.max(1, getSameSize());
+        float hueShift = ((float) order / total + (owner.tickCount + partialTick) * 0.015f) % 1.0f;
+        float breathFactor = 0.5f + 0.5f * Mth.sin(hueShift * Mth.TWO_PI);
+        return Mth.hsvToRgb(hueShift, 0.75f - 0.35f * breathFactor, 1.0f);
+    }
+
     public PathNode getInterpolatedIdleState(float partialTick) {
         float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
         float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);
@@ -139,36 +146,6 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         Vec3 playerPos = owner.getPosition(partialTick);
         Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
         return new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
-    }
-
-    /**
-     * 获取当前速度向量
-     */
-    public Vec3 getCurrentVelocity() {
-        Vec3 currentPos = getPos();
-        ArrayList<PathNode> history = getHistoryNodes();
-        if (history.size() > 1) {
-            Vec3 rawVel = currentPos.subtract(history.getFirst().pos());
-            if (rawVel.lengthSqr() > 1e-5) {
-                return rawVel.normalize();
-            }
-        }
-        return Vec3.directionFromRotation(getPitch(), getYaw()).normalize();
-    }
-
-    /**
-     * 计算贝塞尔曲线上的点（De Casteljau算法，支持任意数量控制点）
-     */
-    public Vec3 calculateBezierPoint(float delta, Vec3... P) {
-        if (P.length == 0) return Vec3.ZERO;
-        if (P.length == 1) return P[0];
-        Vec3[] pts = P.clone();
-        for (int k = P.length - 1; k > 0; k--) {
-            for (int i = 0; i < k; i++) {
-                pts[i] = pts[i].lerp(pts[i + 1], delta);
-            }
-        }
-        return pts[0];
     }
 
     @Override

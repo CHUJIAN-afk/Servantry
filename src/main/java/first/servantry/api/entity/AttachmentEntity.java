@@ -309,6 +309,40 @@ public abstract class AttachmentEntity {
     }
 
     /**
+     * 计算贝塞尔曲线上的点（De Casteljau算法，支持任意数量控制点）
+     */
+    public Vec3 calculateBezierPoint(float delta, Vec3... P) {
+        if (P.length == 0) {
+            return Vec3.ZERO;
+        }
+        if (P.length == 1) {
+            return P[0];
+        }
+        Vec3[] pts = P.clone();
+        for (int k = P.length - 1; k > 0; k--) {
+            for (int i = 0; i < k; i++) {
+                pts[i] = pts[i].lerp(pts[i + 1], delta);
+            }
+        }
+        return pts[0];
+    }
+
+    /**
+     * 获取当前速度向量
+     */
+    public Vec3 getCurrentVelocity() {
+        Vec3 currentPos = getPos();
+        ArrayList<PathNode> history = getHistoryNodes();
+        if (history.size() > 1) {
+            Vec3 rawVel = currentPos.subtract(history.getFirst().pos());
+            if (rawVel.lengthSqr() > 1e-5) {
+                return rawVel.normalize();
+            }
+        }
+        return Vec3.directionFromRotation(getPitch(), getYaw()).normalize();
+    }
+
+    /**
      * 获取当前法线向量（基于旋转）
      */
     public Vec3 getCurrentNormal() {

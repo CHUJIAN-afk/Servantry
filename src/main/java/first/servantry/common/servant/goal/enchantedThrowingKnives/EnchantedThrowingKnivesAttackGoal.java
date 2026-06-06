@@ -38,13 +38,14 @@ public class EnchantedThrowingKnivesAttackGoal extends ServantGoal<EnchantedThro
         if (servant.isTargetChange() || progress >= 1) {
             refreshTarget(target);
         }
-        progress += 0.15f + target.getRandom().nextFloat() * 0.05f;
+        progress += 0.1f + target.getRandom().nextFloat() * 0.1f;
         Vec3 currentNormal = servant.getCurrentNormal();
-        servant.setCurrentPathNode(servant.getEulerNode(
-                startPos.lerp(endPos, progress),
-                target.getBoundingBox().getCenter().subtract(servant.getPos()).normalize(),
-                currentNormal
-        ));
+        servant.setCurrentPathNode(
+                servant.getEulerNode(
+                        startPos.lerp(endPos, progress),
+                        target.getBoundingBox().getCenter().subtract(servant.getPos()).normalize(),
+                        currentNormal
+                ));
     }
 
     private void refreshTarget(LivingEntity target) {

@@ -33,17 +33,15 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
                         .timer(timer)
                         .colorRGB(dominantColor)
                         .historyLength(4)
-                        .width(1.0575f)
-                        .diamondSize(0.15f)
+                        .upOffset(1.0575f)
+                        .upOffset(0.15f)
                         .colorFunction((shadow, progress, timeShift) -> {
                             float brightness = Mth.lerp(progress, 1f, 0.4f);
                             int r = (int) (((dominantColor >> 16) & 0xFF) * brightness);
                             int g = (int) (((dominantColor >> 8) & 0xFF) * brightness);
                             int b = (int) ((dominantColor & 0xFF) * brightness);
                             return (r << 16) | (g << 8) | b;
-                        })
-                        .tipAlphaBoost((s, progress) -> progress < 0.3f ? Mth.lerp(progress / 0.3f, 2.5f, 1.0f) : 1.5f)
-                        .tipBrightnessBoost((s, progress) -> progress < 0.25f ? Mth.lerp(progress / 0.25f, 1.5f, 1.0f) : 1.5f);
+                        });
             }
             return RenderContext.<InfiniteShadow>builder()
                     .trail(trailConfig)

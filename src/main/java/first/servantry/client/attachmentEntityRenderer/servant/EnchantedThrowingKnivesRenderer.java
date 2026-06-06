@@ -9,11 +9,7 @@ import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.EnchantedThrowingKnives;
 import first.servantry.register.ModelRegister;
-import first.servantry.utils.RenderUtil;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.util.Mth;
 
 /**
  * 附魔飞刀渲染器。
@@ -25,25 +21,12 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
 
     @Override
     protected RenderContext<EnchantedThrowingKnives> createContext(EnchantedThrowingKnives servant) {
-        BakedModel bakedModel = Minecraft.getInstance().getModelManager()
-                .getModel(ModelRegister.ENCHANTED_THROWING_KNIVES);
-        int dominantColor = RenderUtil.extractDominantColor(bakedModel);
         return RenderContext.<EnchantedThrowingKnives>builder()
                 .trail(new RibbonTrailConfig<EnchantedThrowingKnives>()
                                .timer(servant.trailTimer)
-                               .colorRGB(dominantColor)
+                               .colorRGB(0x7759ff)
                                .historyLength(4)
-                               .width(0.225f)
-                               .diamondSize(0.25f)
-                               .colorFunction((s, progress, timeShift) -> {
-                                   float brightness = Mth.lerp(progress, 1f, 0.4f);
-                                   int r = (int) (((dominantColor >> 16) & 0xFF) * brightness);
-                                   int g = (int) (((dominantColor >> 8) & 0xFF) * brightness);
-                                   int b = (int) ((dominantColor & 0xFF) * brightness);
-                                   return (r << 16) | (g << 8) | b;
-                               })
-                               .tipAlphaBoost((s, progress) -> progress < 0.3f ? Mth.lerp(progress / 0.3f, 2.0f, 1.0f) : 1.0f)
-                               .tipBrightnessBoost((s, progress) -> progress < 0.25f ? Mth.lerp(progress / 0.25f, 1.3f, 1.0f) : 1.0f))
+                               .upOffset(0.225f))
                 .model(new ModelConfig<EnchantedThrowingKnives>()
                                .scale(0.5f)
                                .translateOffset(-0.5f, -0.5f, -0.5f)
