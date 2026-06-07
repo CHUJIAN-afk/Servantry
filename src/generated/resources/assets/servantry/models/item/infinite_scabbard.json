@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "servantry:item/stick"
+    "layer0": "servantry:item/infinite_scabbard"
   }
 }
