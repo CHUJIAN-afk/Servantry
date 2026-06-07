@@ -97,7 +97,7 @@ public class ClientEvent {
 
                 // 4. 栏位消耗 (例如: "仆从栏位: 3 / 5")
                 toolTip.add(Component.translatable("item.servantry.tooltip.slots",
-                        Component.literal(String.valueOf(data.getUsedSlots())).withStyle(ChatFormatting.BLUE),
+                        Component.literal(String.valueOf(data.getServantUsedSlots())).withStyle(ChatFormatting.BLUE),
                         Component.literal(String.valueOf(data.getMaxServantSize(player))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
 
                 // 5. 移除操作提示 (深灰色，避免喧宾夺主)
