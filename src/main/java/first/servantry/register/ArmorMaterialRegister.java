@@ -1,190 +1,138 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class ArmorMaterialRegister {
 
     private static final DeferredRegister<ArmorMaterial> Register = DeferredRegister.create(Registries.ARMOR_MATERIAL, Servantry.MODID);
 
-    public static final Holder<ArmorMaterial> Flinx = Register.register("flinx", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 0);
-                map.put(ArmorItem.Type.CHESTPLATE, 1);
-                map.put(ArmorItem.Type.LEGGINGS, 0);
-                map.put(ArmorItem.Type.BOOTS, 0);
-            }),
-            5,
-            SoundEvents.ARMOR_EQUIP_LEATHER,
-            () -> Ingredient.of(Items.LEATHER),
-            List.of(new ArmorMaterial.Layer(Servantry.rl("flinx"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> Flinx = builder("flinx")
+            .enchantmentValue(5)
+            .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
+            .build();
 
-    public static final Holder<ArmorMaterial> ObsidianArmorMaterial = Register.register("obsidian", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 1);
-                map.put(ArmorItem.Type.CHESTPLATE, 2);
-                map.put(ArmorItem.Type.LEGGINGS, 2);
-                map.put(ArmorItem.Type.BOOTS, 1);
-            }),
-            5,
-            SoundEvents.ARMOR_EQUIP_IRON,
-            () -> Ingredient.of(Items.OBSIDIAN, Items.CRYING_OBSIDIAN),
-            List.of(new ArmorMaterial.Layer(Servantry.rl("obsidian"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> BeeArmorMaterial = builder("bee")
+            .enchantmentValue(5)
+            .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
+            .build();
 
-    public static final Holder<ArmorMaterial> HallowedArmorMaterial = Register.register("hallowed", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 1);
-                map.put(ArmorItem.Type.CHESTPLATE, 5);
-                map.put(ArmorItem.Type.LEGGINGS, 4);
-                map.put(ArmorItem.Type.BOOTS, 3);
-            }),
-            35,
-            SoundEvents.ARMOR_EQUIP_LEATHER,
-            () -> Ingredient.of(Items.GOLD_INGOT),
-            List.of(new ArmorMaterial.Layer(Servantry.rl("hallowed"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> ObsidianArmorMaterial = builder("obsidian")
+            .enchantmentValue(5)
+            .sound(SoundEvents.ARMOR_EQUIP_IRON)
+            .build();
 
-    public static final Holder<ArmorMaterial> ValhallaKnightArmorMaterial = Register.register("valhalla_knight", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 7);
-                map.put(ArmorItem.Type.CHESTPLATE, 8);
-                map.put(ArmorItem.Type.LEGGINGS, 6);
-                map.put(ArmorItem.Type.BOOTS, 4);
-            }),
-            20,
-            SoundEvents.ARMOR_EQUIP_IRON,
-            () -> Ingredient.EMPTY,
-            List.of(new ArmorMaterial.Layer(Servantry.rl("valhalla_knight"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> SpiderArmorMaterial = builder("spider")
+            .enchantmentValue(10)
+            .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
+            .build();
 
-    public static final Holder<ArmorMaterial> ChlorophyteArmorMaterial = Register.register("chlorophyte", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 1);
-                map.put(ArmorItem.Type.CHESTPLATE, 6);
-                map.put(ArmorItem.Type.LEGGINGS, 5);
-                map.put(ArmorItem.Type.BOOTS, 3);
-            }),
-            10,
-            SoundEvents.ARMOR_EQUIP_IRON,
-            () -> Ingredient.EMPTY,
-            List.of(new ArmorMaterial.Layer(Servantry.rl("chlorophyte"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> ForbiddenArmorMaterial = builder("forbidden")
+            .enchantmentValue(15)
+            .sound(SoundEvents.ARMOR_EQUIP_IRON)
+            .build();
 
-    public static final Holder<ArmorMaterial> SpookyArmorMaterial = Register.register("spooky", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 3);
-                map.put(ArmorItem.Type.CHESTPLATE, 4);
-                map.put(ArmorItem.Type.LEGGINGS, 4);
-                map.put(ArmorItem.Type.BOOTS, 2);
-            }),
-            10,
-            SoundEvents.ARMOR_EQUIP_LEATHER,
-            () -> Ingredient.EMPTY,
-            List.of(new ArmorMaterial.Layer(Servantry.rl("spooky"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> HallowedArmorMaterial = builder("hallowed")
+            .enchantmentValue(35)
+            .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
+            .build();
 
-    public static final Holder<ArmorMaterial> TikiArmorMaterial = Register.register("tiki", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 2);
-                map.put(ArmorItem.Type.CHESTPLATE, 6);
-                map.put(ArmorItem.Type.LEGGINGS, 4);
-                map.put(ArmorItem.Type.BOOTS, 3);
-            }),
-            15,
-            SoundEvents.ARMOR_EQUIP_LEATHER,
-            () -> Ingredient.EMPTY,
-            List.of(new ArmorMaterial.Layer(Servantry.rl("tiki"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> ChlorophyteArmorMaterial = builder("chlorophyte")
+            .enchantmentValue(10)
+            .sound(SoundEvents.ARMOR_EQUIP_IRON)
+            .build();
 
-    public static final Holder<ArmorMaterial> StardustArmorMaterial = Register.register("stardust", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 4);
-                map.put(ArmorItem.Type.CHESTPLATE, 6);
-                map.put(ArmorItem.Type.LEGGINGS, 4);
-                map.put(ArmorItem.Type.BOOTS, 3);
-            }),
-            25,
-            SoundEvents.ARMOR_EQUIP_IRON,
-            () -> Ingredient.EMPTY,
-            List.of(new ArmorMaterial.Layer(Servantry.rl("stardust"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> ValhallaKnightArmorMaterial = builder("valhalla_knight")
+            .enchantmentValue(20)
+            .sound(SoundEvents.ARMOR_EQUIP_IRON)
+            .build();
 
-    public static final Holder<ArmorMaterial> BeeArmorMaterial = Register.register("bee", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 2);
-                map.put(ArmorItem.Type.CHESTPLATE, 2);
-                map.put(ArmorItem.Type.LEGGINGS, 2);
-                map.put(ArmorItem.Type.BOOTS, 1);
-            }),
-            5,
-            SoundEvents.ARMOR_EQUIP_LEATHER,
-            () -> Ingredient.of(Items.HONEYCOMB),
-            List.of(new ArmorMaterial.Layer(Servantry.rl("bee"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> TikiArmorMaterial = builder("tiki")
+            .enchantmentValue(15)
+            .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
+            .build();
 
-    public static final Holder<ArmorMaterial> SpiderArmorMaterial = Register.register("spider", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 2);
-                map.put(ArmorItem.Type.CHESTPLATE, 3);
-                map.put(ArmorItem.Type.LEGGINGS, 3);
-                map.put(ArmorItem.Type.BOOTS, 2);
-            }),
-            10,
-            SoundEvents.ARMOR_EQUIP_LEATHER,
-            () -> Ingredient.EMPTY,
-            List.of(new ArmorMaterial.Layer(Servantry.rl("spider"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> SpookyArmorMaterial = builder("spooky")
+            .enchantmentValue(10)
+            .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
+            .build();
 
-    public static final Holder<ArmorMaterial> ForbiddenArmorMaterial = Register.register("forbidden", () -> new ArmorMaterial(
-            Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
-                map.put(ArmorItem.Type.HELMET, 2);
-                map.put(ArmorItem.Type.CHESTPLATE, 4);
-                map.put(ArmorItem.Type.LEGGINGS, 3);
-                map.put(ArmorItem.Type.BOOTS, 2);
-            }),
-            15,
-            SoundEvents.ARMOR_EQUIP_IRON,
-            () -> Ingredient.EMPTY,
-            List.of(new ArmorMaterial.Layer(Servantry.rl("forbidden"))),
-            0.0F,
-            0.0F
-    ));
+    public static final Holder<ArmorMaterial> StardustArmorMaterial = builder("stardust")
+            .enchantmentValue(25)
+            .sound(SoundEvents.ARMOR_EQUIP_IRON)
+            .build();
 
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
+    }
+
+    private static Builder builder(String name) {
+        return new Builder(name);
+    }
+
+    private static class Builder {
+        private final String name;
+        private int enchantmentValue;
+        private Holder<SoundEvent> sound = SoundEvents.ARMOR_EQUIP_LEATHER;
+        private Supplier<Ingredient> ingredient = () -> Ingredient.EMPTY;
+        private float toughness;
+        private float knockbackResistance;
+
+        Builder(String name) {
+            this.name = name;
+        }
+
+        Builder enchantmentValue(int value) {
+            this.enchantmentValue = value;
+            return this;
+        }
+
+        Builder sound(Holder<SoundEvent> sound) {
+            this.sound = sound;
+            return this;
+        }
+
+        Builder ingredient(ItemLike... items) {
+            this.ingredient = () -> Ingredient.of(items);
+            return this;
+        }
+
+        Builder ingredient(Supplier<Ingredient> ingredient) {
+            this.ingredient = ingredient;
+            return this;
+        }
+
+        Builder toughness(float toughness) {
+            this.toughness = toughness;
+            return this;
+        }
+
+        Builder knockbackResistance(float knockbackResistance) {
+            this.knockbackResistance = knockbackResistance;
+            return this;
+        }
+
+        Holder<ArmorMaterial> build() {
+            return Register.register(name, () -> new ArmorMaterial(
+                    HashMap.newHashMap(4),
+                    enchantmentValue,
+                    sound,
+                    ingredient,
+                    List.of(new ArmorMaterial.Layer(Servantry.rl(name))),
+                    toughness,
+                    knockbackResistance));
+        }
     }
 }
