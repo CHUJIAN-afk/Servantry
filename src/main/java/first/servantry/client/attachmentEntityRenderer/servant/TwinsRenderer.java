@@ -42,5 +42,4 @@ public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
             ModelRenderer.renderModel(ModelRegister.TWINS_CURSED_FLAME, poseStack, bufferSource);
         }
     }
-
 }

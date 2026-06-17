@@ -22,7 +22,11 @@ public class CreativeModeInventoryScreenMixin {
 
     @Inject(
             method = "render",
-            at = @At("TAIL")
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/screens/inventory/EffectRenderingInventoryScreen;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
+                    shift = At.Shift.AFTER
+            )
     )
     private void simulated$render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick, final CallbackInfo ci) {
         if (selectedTab == CreativeTabRegister.Tab.get()) {

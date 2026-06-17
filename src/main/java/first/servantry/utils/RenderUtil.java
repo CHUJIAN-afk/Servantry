@@ -18,7 +18,10 @@ public class RenderUtil {
     private static final Map<Object, Integer> COLOR_CACHE = new WeakHashMap<>();
 
     public static int getDominantColor(ItemStack itemStack) {
-        return getDominantColor(Minecraft.getInstance().getItemRenderer().getModel(itemStack, null, null, 0));
+        if (!itemStack.isEmpty()) {
+            return getDominantColor(Minecraft.getInstance().getItemRenderer().getModel(itemStack, null, null, 0));
+        }
+        return 0xFFFFFF;
     }
 
     public static int getDominantColor(BakedModel bakedModel) {

@@ -1,6 +1,5 @@
 package first.servantry.client.creativeTab;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
@@ -24,12 +23,6 @@ public record AnimInfo(int frameHeight, int frameTime, int totalFrames) {
     public static void blitAnimated(GuiGraphics graphics, ResourceLocation texture, AnimInfo info, int x, int y, int width, int mouseX, int mouseY, boolean hoverDriven) {
         boolean playing = hoverDriven ? mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + info.frameHeight : true;
         int frame = currentFrame(info, texture, playing);
-        RenderSystem.setShaderTexture(0, texture);
-        graphics.blit(texture,
-                x, y,
-                0, frame * info.frameHeight,
-                width, info.frameHeight,
-                width, info.totalFrames * info.frameHeight
-        );
+        graphics.blit(texture, x, y, 0, frame * info.frameHeight, width, info.frameHeight, width, info.totalFrames * info.frameHeight);
     }
 }

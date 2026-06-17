@@ -191,10 +191,8 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         // 检查仆从栏位溢出，标记多余仆从
         if (!player.level().isClientSide()) {
             List<Servant> servants = getServants();
-            if (!servants.isEmpty()) {
-                while (!canSummon(player, 0)) {
-                    servants.getFirst().setRemove();
-                }
+            if (!servants.isEmpty() && !canSummon(player, 0)) {
+                servants.getFirst().setRemove();
             }
 
             // 清理所有分组中标记移除的实体
