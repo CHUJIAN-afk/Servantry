@@ -37,7 +37,7 @@ public class ShatteredStellarCoreProjectile extends Projectile implements IColli
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.03, -0.03, -0.06, 0.03, 0.03, 0.06);
+        return new AABB(-0.06, -0.06, -0.06, 0.06, 0.06, 0.06);
     }
 
     @Override
@@ -92,22 +92,23 @@ public class ShatteredStellarCoreProjectile extends Projectile implements IColli
     public void onRemove() {
         ParticleHelper.create(owner.level())
                 .generic(GenericParticleBuilder.create()
-                        .color(0x7926ff)
-                        .edgeColor(0x7125e2)
-                        .colorRandom(0.2F, 0.2F, 0.0F)
-                        .lifetime(4)
-                        .lifetimeRandom(8)
-                        .spin(0.1f)
-                        .spinRandom(0.25F)
-                        .friction(0.75F)
-                        .scale(0.025f)
-                        .scaleRandom(0.005f)
+                                 .color(0x2fb2e1)
+                                 .edgeColor(0x33ccff)
+                                 .colorRandom(0.2F, 0.2F, 0.0F)
+                                 .lifetime(4)
+                                 .lifetimeRandom(8)
+                                 .spin(0.1f)
+                                 .spinRandom(0.25F)
+                                 .friction(0.75F)
+                                 .scale(0.025f)
+                                 .scaleRandom(0.005f)
                 )
                 .pos(getPos())
-                .velocity(getVelocity())
+                .offset(0.1f)
+                .velocity(getVelocity().normalize())
                 .count(3)
                 .speed(0.55)
-                .spread(0.25)
+                .spread(1)
                 .emit();
     }
 

@@ -176,18 +176,6 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
      * 每tick调用：处理溢出、tick实体、清理标记、添加队列、同步网络
      */
     public void update(Player player) {
-        // tick所有未标记移除的实体
-        for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : groups.values()) {
-            for (List<AttachmentEntity> list : inner.values()) {
-                for (AttachmentEntity entity : list) {
-                    if (!entity.isRemove()) {
-                        entity.setOwner(player);
-                        entity.tick();
-                    }
-                }
-            }
-        }
-
         // 检查仆从栏位溢出，标记多余仆从
         if (!player.level().isClientSide()) {
             List<Servant> servants = getServants();
@@ -197,8 +185,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
 
             // 清理所有分组中标记移除的实体
             for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : groups.values()) {
-                Iterator<Map.Entry<AttachmentEntityType<?>, List<AttachmentEntity>>> typeIt = inner.entrySet()
-                        .iterator();
+                Iterator<Map.Entry<AttachmentEntityType<?>, List<AttachmentEntity>>> typeIt = inner.entrySet().iterator();
                 while (typeIt.hasNext()) {
                     List<AttachmentEntity> list = typeIt.next().getValue();
                     list.removeIf(entity -> {
@@ -229,12 +216,24 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                 pendingAdd.clear();
                 changed = true;
             }
+        }
 
-            // 同步数据到客户端
-            if ((!groups.isEmpty() || changed)) {
-                changed = false;
-                player.syncData(AttachmentRegister.EntityData);
+        // tick所有未标记移除的实体
+        for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : groups.values()) {
+            for (List<AttachmentEntity> list : inner.values()) {
+                for (AttachmentEntity entity : list) {
+                    if (!entity.isRemove()) {
+                        entity.setOwner(player);
+                        entity.tick();
+                    }
+                }
             }
+        }
+
+        // 同步数据到客户端
+        if (!player.level().isClientSide() && (!groups.isEmpty() || changed)) {
+            changed = false;
+            player.syncData(AttachmentRegister.EntityData);
         }
     }
 
