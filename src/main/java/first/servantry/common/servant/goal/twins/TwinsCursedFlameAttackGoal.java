@@ -76,6 +76,7 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                 servant.lookAtPos(targetPos);
                 Vec3 direction = targetPos.subtract(servant.getPos()).normalize();
                 DemonFlameProjectile demonFlameProjectile = new DemonFlameProjectile(servant.getDamageSource(), servant.getPos().add(direction.scale(-1)), direction);
+                demonFlameProjectile.setDamage(servant.getDamage());
                 demonFlameProjectile.join(owner);
                 // 喷射粒子 - 诅咒焰调色，高速小角度散射
                 ParticleHelper.create(owner.level())

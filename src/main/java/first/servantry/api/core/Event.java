@@ -45,7 +45,7 @@ public class Event {
     public static void projectileClear(EntityTravelToDimensionEvent event) {
         if (!event.isCanceled() && event.getEntity() instanceof Player player && !player.level().isClientSide()) {
             EntityData data = player.getData(AttachmentRegister.EntityData);
-            List<Projectile> projectiles = data.getProjectiles();
+            List<Projectile> projectiles = data.get(EntityData.Type.Projectile, Projectile.class);
             for (Projectile projectile : projectiles) {
                 projectile.setRemove();
             }
@@ -101,7 +101,7 @@ public class Event {
         if (!player.level().isClientSide()) {
             player.getData(AttachmentRegister.TargetCache).update(player);
         }
-        player.getData(AttachmentRegister.EntityData).update(player);
+        player.getData(AttachmentRegister.EntityData).tick(player);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -110,18 +110,20 @@ public class Event {
         Player player = event.getEntity();
         Level level = player.level();
         ItemCooldowns cooldowns = player.getCooldowns();
-        if (!level.isClientSide() && event.getHand() == InteractionHand.MAIN_HAND && !cooldowns.isOnCooldown(itemStack.getItem()) && itemStack.getItem() instanceof IServantWeapon<?> iServantWeapon) {
-            if (!player.isShiftKeyDown()) {
-                iServantWeapon.handleSummon(player);
-            } else {
-                iServantWeapon.remove(player);
-            }
+        if (event.getHand() == InteractionHand.MAIN_HAND && !cooldowns.isOnCooldown(itemStack.getItem()) && itemStack.getItem() instanceof IServantWeapon<?> iServantWeapon) {
+            cooldowns.addCooldown(itemStack.getItem(), 4);
             player.swing(InteractionHand.MAIN_HAND, true);
-            SoundEvent soundEvent = iServantWeapon.getSoundEvent();
-            if (soundEvent != null) {
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), soundEvent, player.getSoundSource());
+            if (!level.isClientSide()) {
+                if (!player.isShiftKeyDown()) {
+                    iServantWeapon.handleSummon(player);
+                } else {
+                    iServantWeapon.remove(player);
+                }
+                SoundEvent soundEvent = iServantWeapon.getSoundEvent();
+                if (soundEvent != null) {
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(), soundEvent, player.getSoundSource());
+                }
             }
-            cooldowns.addCooldown(itemStack.getItem(), 5);
         }
     }
 

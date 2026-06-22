@@ -92,12 +92,6 @@ public class ChlorophyteCrystalProjectile extends Projectile implements ICollide
     }
 
     @Override
-    public float getDamage() {
-        float damage = super.getDamage();
-        return damage != 0 ? damage : 10f;
-    }
-
-    @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
         return AttachmentEntityRegister.ChlorophyteCrystalProjectile.get();
     }

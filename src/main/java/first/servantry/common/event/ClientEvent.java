@@ -4,8 +4,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Either;
 import first.servantry.Servantry;
+import first.servantry.api.ServantryHelper;
 import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
 import first.servantry.api.client.renderType.TrailShaders;
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.client.attachmentEntityRenderer.projectile.*;
 import first.servantry.client.attachmentEntityRenderer.servant.*;
 import first.servantry.client.renderType.OreScoutHighlightRenderType;
@@ -45,12 +47,7 @@ public class ClientEvent {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS || clientLevel == null || player == null) {
             return;
         }
-        OreScout scout = player.getData(AttachmentRegister.EntityData).getEntities().stream()
-                .filter(attachmentEntity -> attachmentEntity instanceof OreScout)
-                .map(attachmentEntity -> (OreScout) attachmentEntity)
-                .filter(oreScout -> !oreScout.getHighlightedOres().isEmpty())
-                .findFirst()
-                .orElse(null);
+        OreScout scout = ServantryHelper.get(player).getEntityData().get(EntityData.Type.Servant, OreScout.class).stream().findAny().orElse(null);
         if (scout != null) {
             MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();
             VertexConsumer innerConsumer = bufferSource.getBuffer(OreScoutHighlightRenderType.line());

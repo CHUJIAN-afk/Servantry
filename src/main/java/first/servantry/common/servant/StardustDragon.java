@@ -1,5 +1,6 @@
 package first.servantry.common.servant;
 
+import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
@@ -11,7 +12,6 @@ import first.servantry.common.servant.goal.stardustDragon.StardustDragonAttackGo
 import first.servantry.common.servant.goal.stardustDragon.StardustDragonFollowGoal;
 import first.servantry.common.servant.goal.stardustDragon.StardustDragonIdleGoal;
 import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.AttachmentRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
@@ -55,8 +55,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
             updateTotalSegments();
             // 非头部体节检查头部是否存在
             if (!isHead() && getHead() == null) {
-                EntityData data = owner.getData(AttachmentRegister.EntityData);
-                data.remove(uuid);
+                setRemove();
                 return;
             }
             if (owner.getRandom().nextFloat() < 0.2 * getScale()) {
@@ -91,13 +90,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     }
 
     private StardustDragon getHead() {
-        EntityData data = owner.getData(AttachmentRegister.EntityData);
-        return data.getEntities().stream()
-                .filter(e -> e instanceof StardustDragon)
-                .map(e -> (StardustDragon) e)
-                .filter(StardustDragon::isHead)
-                .findFirst()
-                .orElse(null);
+        return ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class).stream().filter(StardustDragon::isHead).findFirst().orElse(null);
     }
 
     /**
@@ -109,29 +102,19 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     }
 
     private void updateTotalSegments() {
-        if (owner == null) return;
-        EntityData data = owner.getData(AttachmentRegister.EntityData);
-        int count = 0;
-        for (var entity : data.getEntities()) {
-            if (entity instanceof StardustDragon) {
-                count++;
-            }
-        }
+        int count = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class).size();
         this.totalSegments = Math.max(3, count);
     }
 
     public boolean isHead() { return segmentIndex == 0; }
 
     public StardustDragon getPrecedingSegment() {
-        if (isHead() || owner == null) return null;
-
-        EntityData data = owner.getData(AttachmentRegister.EntityData);
-        List<StardustDragon> dragons = data.getEntities().stream()
-                .filter(e -> e instanceof StardustDragon)
-                .map(e -> (StardustDragon) e)
+        if (isHead()) {
+            return null;
+        }
+        List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class).stream()
                 .sorted(Comparator.comparingInt(a -> a.segmentIndex))
                 .toList();
-
         for (int i = 0; i < dragons.size(); i++) {
             if (dragons.get(i) == this && i > 0) {
                 return dragons.get(i - 1);
@@ -198,11 +181,8 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     @Override
     public float getDamage() {
-        return 8f * (1 + 0.23f * (getTotalSegments() - 1));
+        return super.getDamage() * (1 + 0.23f * (getTotalSegments() - 1));
     }
-
-    @Override
-    public float getKnockback() { return 0.5f; }
 
     @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {

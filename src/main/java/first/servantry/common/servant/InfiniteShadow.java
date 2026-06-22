@@ -91,16 +91,6 @@ public class InfiniteShadow extends Terraprism {
     }
 
     @Override
-    public float getKnockback() {
-        return 0;
-    }
-
-    @Override
-    public float getDamage() {
-        return 0;
-    }
-
-    @Override
     public void onRemove() {
         if (fakePlayer != null) {
             fakePlayer.remove(Entity.RemovalReason.DISCARDED);

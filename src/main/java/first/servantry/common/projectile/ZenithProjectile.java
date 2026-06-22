@@ -98,16 +98,6 @@ public class ZenithProjectile extends Projectile implements ICollideAttack<Zenit
     }
 
     @Override
-    public float getDamage() {
-        return 19;
-    }
-
-    @Override
-    public float getKnockback() {
-        return 0.65f;
-    }
-
-    @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
         if (source != null) {

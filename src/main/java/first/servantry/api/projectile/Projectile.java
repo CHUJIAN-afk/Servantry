@@ -1,10 +1,11 @@
 package first.servantry.api.projectile;
 
+import first.servantry.api.ServantryHelper;
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.register.AttachmentRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -154,7 +155,7 @@ public abstract class Projectile extends AttachmentEntity {
      * 加入到玩家的射弹数据
      */
     public void join(Player owner) {
-        owner.getData(AttachmentRegister.EntityData).addProjectile(this);
+        ServantryHelper.get(owner).add(EntityData.Type.Projectile, this);
     }
 
     // ===================== 可重写配置 =====================

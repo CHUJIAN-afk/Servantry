@@ -43,7 +43,7 @@ public class AttachmentEntityRenderDispatcher {
      * @param partialTick   部分 tick 插值进度
      */
     public static void render(Player player, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick) {
-        List<AttachmentEntity> entities = player.getData(AttachmentRegister.EntityData).getEntities();
+        List<AttachmentEntity> entities = player.getData(AttachmentRegister.EntityData).getRenderCache();
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         boolean showHitboxes = Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes();
         VertexConsumer debugConsumer = showHitboxes ? bufferSource.getBuffer(RenderType.lines()) : null;

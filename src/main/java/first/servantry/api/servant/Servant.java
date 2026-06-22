@@ -8,8 +8,7 @@ import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import first.servantry.register.DamageRegister;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Holder;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Targeting;
@@ -104,16 +103,9 @@ public abstract class Servant extends AttachmentEntity {
 
     /** 构造仆从专属伤害来源 */
     public ServantDamageSource getDamageSource() {
-        Registry<DamageType> damageTypes = owner.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
-        return new ServantDamageSource(
-                damageTypes.getHolderOrThrow(DamageRegister.Servant),
-                null,
-                owner,
-                getCurrentPathNode().pos(),
-                this
-        );
+        Holder<DamageType> holder = DamageRegister.getDamageTypeHolder(DamageRegister.Servant, owner.level());
+        return new ServantDamageSource(holder, null, owner, getCurrentPathNode().pos(), this);
     }
-
 
     // ===================== 排序 =====================
 

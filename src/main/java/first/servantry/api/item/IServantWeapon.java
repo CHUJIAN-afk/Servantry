@@ -1,15 +1,14 @@
 package first.servantry.api.item;
 
+import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.servant.Servant;
-import first.servantry.register.AttachmentRegister;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -24,18 +23,11 @@ public interface IServantWeapon<T extends Servant> {
      */
     AttachmentEntityType<T> getType();
 
-    /** 获取临时仆从实例，用于预览或获取基础属性。 */
-    T getDummyServant();
-
     /** 获取仆从伤害值。 */
-    default float getDamage() {
-        return getDummyServant().getDamage();
-    }
+    float getDamage();
 
     /** 获取仆从击退力度。 */
-    default float getKnockback() {
-        return getDummyServant().getKnockback();
-    }
+    float getKnockback();
 
     /**
      * 获取每次召唤的仆从数量，默认为1。
@@ -66,32 +58,26 @@ public interface IServantWeapon<T extends Servant> {
      * 处理仆从召唤逻辑。
      */
     default void handleSummon(Player player) {
-        EntityData data = player.getData(AttachmentRegister.EntityData);
+        ServantryHelper servantryHelper = ServantryHelper.get(player);
         AttachmentEntityType<T> type = getType();
-
         for (int i = 0; i < getSummonCount(); i++) {
             T servant = type.factory().get();
             servant.setOwner(player);
+            servant.setDamage(getDamage());
+            servant.setKnockback(getKnockback());
             if (summonPre(player, servant)) {
-                if (data.summonServant(player, servant)) {
+                if (servantryHelper.summonServant(servant)) {
                     summonPost(servant);
                 }
             }
         }
     }
 
-    /** 移除玩家拥有的此类型仆从。 */
+    /**
+     * 移除玩家拥有的此类型仆从。
+     */
     default void remove(Player player) {
-        EntityData entityData = player.getData(AttachmentRegister.EntityData);
-        AttachmentEntityType<?> type = getType();
-        List<Servant> servants = entityData.getServants();
-        if (!servants.isEmpty()) {
-            for (Servant servant : servants) {
-                if (servant.getType() == type) {
-                    servant.setRemove();
-                }
-            }
-        }
+        ServantryHelper.get(player).getEntityData().remove(EntityData.Type.Servant, getType());
     }
 
     // ===================== 构建器 =====================
@@ -102,6 +88,8 @@ public interface IServantWeapon<T extends Servant> {
     class Builder<T extends Servant> {
 
         private final Supplier<AttachmentEntityType<T>> typeSupplier;
+        private float damage = 0;
+        private float knockback = 0;
         private Supplier<SoundEvent> soundEventSupplier = () -> null;
         private BiPredicate<Player, T> summonPre = (player, servant) -> true;
         private Consumer<T> summonPost = servant -> {
@@ -112,6 +100,18 @@ public interface IServantWeapon<T extends Servant> {
 
         public Builder(@NotNull Supplier<AttachmentEntityType<T>> typeSupplier) {
             this.typeSupplier = typeSupplier;
+        }
+
+        /** 设置仆从伤害值。 */
+        public Builder<T> damage(float damage) {
+            this.damage = damage;
+            return this;
+        }
+
+        /** 设置仆从击退力度。 */
+        public Builder<T> knockback(float knockback) {
+            this.knockback = knockback;
+            return this;
         }
 
         /** 设置召唤时播放的音效。 */
@@ -164,8 +164,6 @@ public interface IServantWeapon<T extends Servant> {
 
         private class ServantWeaponItem extends Item implements IServantWeapon<T> {
 
-            private T dummyServant = null;
-
             public ServantWeaponItem(Properties p) {
                 super(p);
             }
@@ -176,16 +174,18 @@ public interface IServantWeapon<T extends Servant> {
             }
 
             @Override
-            public SoundEvent getSoundEvent() {
-                return soundEventSupplier.get();
+            public float getDamage() {
+                return damage;
             }
 
             @Override
-            public T getDummyServant() {
-                if (dummyServant == null) {
-                    dummyServant = getType().factory().get();
-                }
-                return dummyServant;
+            public float getKnockback() {
+                return knockback;
+            }
+
+            @Override
+            public SoundEvent getSoundEvent() {
+                return soundEventSupplier.get();
             }
 
             @Override

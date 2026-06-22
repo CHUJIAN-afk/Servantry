@@ -13,6 +13,7 @@ public class CuriosUtil {
 
     public static final Map<UUID, Map<Item, Boolean>> CACHE = new HashMap<>();
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean isEquipped(LivingEntity livingEntity, Item item) {
         return CACHE.computeIfAbsent(livingEntity.getUUID(), k -> new HashMap<>()).computeIfAbsent(item, k -> {
             ICuriosItemHandler handler = CuriosApi.getCuriosInventory(livingEntity).orElse(null);

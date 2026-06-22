@@ -1,10 +1,9 @@
-package first.servantry.compat;
+package first.servantry.compat.jei;
 
 import first.servantry.Servantry;
 import first.servantry.api.armorSet.ArmorSet;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
-import first.servantry.compat.jei.MithrilAnvilRecipeCategory;
 import first.servantry.register.CurioRegister;
 import first.servantry.register.ItemRegister;
 import first.servantry.register.MithrilAnvilRecipeRegister;

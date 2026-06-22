@@ -53,7 +53,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
                 firstStrike = false;
                 lastEllipse = false;
             } else {
-                if (servant.getOwner().getRandom().nextDouble() < 0.6) {
+                if (servant.getOwner().getRandom().nextDouble() < 0.5) {
                     planEllipseSlash();
                     lastEllipse = true;
                 } else {
@@ -103,8 +103,8 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
         // 获取当前运动状态
         Vec3 currentVel = servant.getCurrentVelocity();
 
-        Vec3 planeNormal = lastEllipse ? servant.getCurrentNormal() : Ellipse.randomPlaneNormal(servant.getOwner()
-                                                                                                        .getRandom(), lastTargetPos, attackPrepPos);
+        Vec3 planeNormal = lastEllipse ? servant.getCurrentNormal() : Ellipse.randomPlaneNormal(servant.getOwner().getRandom(), lastTargetPos, attackPrepPos);
+
         Ellipse ellipse = new Ellipse(lastTargetPos, attackPrepPos, planeNormal, 0.45f);
 
         PathNode attackPrepPathNode = servant.getEulerNode(ellipse.getPoint(0), ellipse.getPoint(0)

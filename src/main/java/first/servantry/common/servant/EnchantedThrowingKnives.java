@@ -56,18 +56,6 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
         goalSelector.addGoal(1, new EnchantedThrowingKnivesIdleGoal(this));
     }
 
-    // ===================== 属性实现 =====================
-
-    @Override
-    public float getDamage() {
-        return 0.6f;
-    }
-
-    @Override
-    public float getKnockback() {
-        return 0f;
-    }
-
     @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.15, -0.025, -0.25, 0.15, 0.025, 0.25);

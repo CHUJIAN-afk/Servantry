@@ -2,6 +2,7 @@ package first.servantry.api.core;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
+import first.servantry.api.ServantryHelper;
 import first.servantry.api.armorSet.ArmorSet;
 import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
 import first.servantry.api.common.attachment.EntityData;
@@ -95,10 +96,11 @@ public class ClientEvent {
                 toolTip.add(Component.translatable("item.servantry.tooltip.summon",
                         Component.translatable(key).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
 
+                ServantryHelper servantryHelper = ServantryHelper.get(player);
                 // 4. 栏位消耗 (例如: "仆从栏位: 3 / 5")
                 toolTip.add(Component.translatable("item.servantry.tooltip.slots",
-                        Component.literal(String.valueOf(data.getServantUsedSlots())).withStyle(ChatFormatting.BLUE),
-                        Component.literal(String.valueOf(data.getMaxServantSize(player))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
+                        Component.literal(String.valueOf(servantryHelper.getServantUsedSlots())).withStyle(ChatFormatting.BLUE),
+                        Component.literal(String.valueOf(servantryHelper.getServantMaxCount())).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
 
                 // 5. 移除操作提示 (深灰色，避免喧宾夺主)
                 toolTip.add(Component.translatable("item.servantry.tooltip.remove_all").withStyle(ChatFormatting.GRAY));

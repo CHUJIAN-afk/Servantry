@@ -1,5 +1,7 @@
 package first.servantry.common.servant;
 
+import first.servantry.api.ServantryHelper;
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
@@ -11,7 +13,6 @@ import first.servantry.common.servant.goal.terraprism.TerraprismAttackGoal;
 import first.servantry.common.servant.goal.terraprism.TerraprismIdleGoal;
 import first.servantry.common.servant.goal.terraprism.TerraprismPrepGoal;
 import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.AttachmentRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,16 +42,6 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         goalSelector.addGoal(0, new TerraprismAttackGoal(this));
         goalSelector.addGoal(1, new TerraprismPrepGoal(this));
         goalSelector.addGoal(2, new TerraprismIdleGoal(this));
-    }
-
-    @Override
-    public float getDamage() {
-        return 9F;
-    }
-
-    @Override
-    public float getKnockback() {
-        return 0.1f;
     }
 
     @Override
@@ -132,7 +123,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         float rightX = (float) Math.cos(rad);
         float rightZ = (float) -Math.sin(rad);
         int order = 0;
-        for (AttachmentEntity entity : getOwner().getData(AttachmentRegister.EntityData).getEntities()) {
+        for (AttachmentEntity entity : ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, Terraprism.class)) {
             if (entity instanceof Terraprism terraprism) {
                 if (terraprism == this) {
                     break;

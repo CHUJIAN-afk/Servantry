@@ -101,12 +101,6 @@ public class SharkDragonProjectile extends Projectile implements ICollideAttack<
     }
 
     @Override
-    public float getDamage() {
-        float damage = super.getDamage();
-        return damage != 0 ? damage : 5f;
-    }
-
-    @Override
     public AttachmentEntityType<SharkDragonProjectile> getType() {
         return AttachmentEntityRegister.SharkDragonProjectile.get();
     }

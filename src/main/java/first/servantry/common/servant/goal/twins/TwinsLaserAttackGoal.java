@@ -78,6 +78,7 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         RandomSource random = owner.getRandom();
         Vec3 direction = target.getBoundingBox().getCenter().offsetRandom(random, shotCount < 5 ? 0.3f : 1).subtract(start).normalize();
         LaserProjectile projectile = new LaserProjectile(servant.getDamageSource(), start, direction);
+        projectile.setDamage(servant.getDamage() * 1.1f);
         projectile.join(owner);
         ServerLevel level = (ServerLevel) owner.level();
         level.playSound(null, start.x(), start.y(), start.z(), SoundRegister.Laser.get(), owner.getSoundSource());

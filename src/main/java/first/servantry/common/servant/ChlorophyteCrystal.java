@@ -70,6 +70,7 @@ public class ChlorophyteCrystal extends Servant {
         Vec3 direction = target.getBoundingBox().getCenter().subtract(getPos()).normalize();
         Vec3 startPos = getPos().add(direction.scale(0.25));
         ChlorophyteCrystalProjectile projectile = new ChlorophyteCrystalProjectile(getDamageSource(), startPos, direction.scale(1.5));
+        projectile.setDamage(getDamage());
         projectile.join(owner);
         ParticleHelper.create(owner.level())
                 .generic(GenericParticleBuilder.create()
@@ -102,16 +103,6 @@ public class ChlorophyteCrystal extends Servant {
         Vec3 targetPos = new Vec3(px, py, pz).add(0, owner.getBbHeight() + 1.05f + bob, 0);
         int i = isTarget(getTarget()) ? 30 : 15;
         return new PathNode(targetPos, (owner.tickCount + partialTick) * i, 0, 0);
-    }
-
-    @Override
-    public float getDamage() {
-        return 10;
-    }
-
-    @Override
-    public float getKnockback() {
-        return 1;
     }
 
     @Override

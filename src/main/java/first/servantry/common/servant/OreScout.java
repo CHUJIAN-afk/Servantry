@@ -35,16 +35,6 @@ public class OreScout extends Servant {
     }
 
     @Override
-    public float getDamage() {
-        return 0.0f;
-    }
-
-    @Override
-    public float getKnockback() {
-        return 0.0f;
-    }
-
-    @Override
     public AttachmentEntityType<? extends Servant> getType() {
         return AttachmentEntityRegister.OreScout.get();
     }

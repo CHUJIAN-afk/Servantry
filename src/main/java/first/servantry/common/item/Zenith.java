@@ -42,6 +42,8 @@ public class Zenith extends SwordItem {
                 Vec3 startPos = center.add(lookAngle.scale(-1));
                 for (int i = 0; i < 3; i++) {
                     ZenithProjectile projectile = new ZenithProjectile(damageSource);
+                    projectile.setDamage(19);
+                    projectile.setKnockback(0.65f);
                     Vec3 endPos = computeEndPos(player);
                     if (i != 0) {
                         LivingEntity living = collectTargets(player).stream().findAny().orElse(null);

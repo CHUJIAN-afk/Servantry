@@ -92,6 +92,7 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
         StardustProjectile projectile = new StardustProjectile(getDamageSource(), start);
+        projectile.setDamage(getDamage());
         projectile.setChaseTarget(target);
         projectile.setLife(10);
         projectile.join(owner);
@@ -124,16 +125,6 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
     public void teleportTo(Vec3 targetPos) {
         setTrailTimer(4);
         super.teleportTo(targetPos);
-    }
-
-    @Override
-    public float getDamage() {
-        return 6f;
-    }
-
-    @Override
-    public float getKnockback() {
-        return 0.2f;
     }
 
     @Override

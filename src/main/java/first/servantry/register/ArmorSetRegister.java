@@ -1,9 +1,9 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
+import first.servantry.api.ServantryHelper;
 import first.servantry.api.armorSet.ArmorSet;
 import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.servant.ChlorophyteCrystal;
 import net.minecraft.core.Holder;
@@ -90,9 +90,11 @@ public class ArmorSetRegister {
                     .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
                     .onStart(player -> {
                         ChlorophyteCrystal crystal = new ChlorophyteCrystal();
+                        crystal.setDamage(10);
+                        crystal.setKnockback(1);
                         player.getData(AttachmentRegister.EntityData).add(EntityData.Type.ExtraServant, crystal);
                     })
-                    .onRemove(player -> player.getData(AttachmentRegister.EntityData).getExtraServants().stream().filter(servant -> servant.getType() == AttachmentEntityRegister.ChlorophyteCrystal.get()).forEach(AttachmentEntity::setRemove))
+                    .onRemove(player -> ServantryHelper.get(player).getEntityData().remove(EntityData.Type.ExtraServant, AttachmentEntityRegister.ChlorophyteCrystal.get()))
                     .tooltip(1, "Summons a powerful leaf crystal to shoot at nearby enemies", "召唤强大的叶状水晶来射击附近的敌人")
                     .build()
             );

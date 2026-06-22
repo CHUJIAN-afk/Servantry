@@ -9,7 +9,6 @@ import first.servantry.common.recipe.MithrilAnvilRecipe;
 import first.servantry.utils.CuriosUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -17,7 +16,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.registries.DeferredItem;
 
@@ -326,12 +324,10 @@ public class CurioRegister {
     public static final DeferredItem<Item> StardustFragment = Register.register(ACCESSORY, "stardust_fragment", () -> CurioItem.builder()
                     .canEquipFromUse(true)
                     .onPostDamage((servant, owner, target) -> {
-                        if (owner.getRandom()
-                                .nextFloat() < 0.05f) {
-                            Level level = owner.level();
-                            DamageSource damageSource = DamageRegister.getDamageSource(DamageRegister.Servant, level);
+                        if (owner.getRandom().nextFloat() < 0.05f) {
                             Vec3 startPos = servant.getPos();
-                            StardustProjectile projectile = new StardustProjectile(damageSource, startPos);
+                            StardustProjectile projectile = new StardustProjectile(servant.getDamageSource(), startPos);
+                            projectile.setDamage(servant.getDamage());
                             projectile.setVelocity(startPos.offsetRandom(owner.getRandom(), 1)
                                                            .subtract(startPos)
                                                            .normalize()

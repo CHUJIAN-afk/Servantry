@@ -69,12 +69,6 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
     }
 
     @Override
-    public float getDamage() {
-        float damage = super.getDamage();
-        return damage != 0 ? damage : 2.8f;
-    }
-
-    @Override
     public AttachmentEntityType<? extends Projectile> getType() {
         return AttachmentEntityRegister.LaserProjectile.get();
     }

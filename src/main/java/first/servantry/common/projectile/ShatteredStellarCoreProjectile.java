@@ -68,12 +68,6 @@ public class ShatteredStellarCoreProjectile extends Projectile implements IColli
     }
 
     @Override
-    public float getDamage() {
-        float damage = super.getDamage();
-        return damage != 0 ? damage : 3f;
-    }
-
-    @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
             if (chaseTarget != null && chaseTarget.isAlive()) {

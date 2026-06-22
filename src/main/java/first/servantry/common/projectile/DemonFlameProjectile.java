@@ -59,12 +59,6 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
     }
 
     @Override
-    public float getDamage() {
-        float damage = super.getDamage();
-        return damage != 0 ? damage : 2.4f;
-    }
-
-    @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
         return AttachmentEntityRegister.DemonFlameProjectile.get();
     }

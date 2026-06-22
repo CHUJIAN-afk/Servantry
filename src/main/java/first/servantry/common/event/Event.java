@@ -170,26 +170,22 @@ public class Event {
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player && target.isAlive()) {
             EntityData entityData = player.getData(AttachmentRegister.EntityData);
             if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof ChlorophyteCrystal)) {
-                entityData.getExtraServants().stream()
-                        .filter(servant -> servant instanceof ChlorophyteCrystal)
-                        .map(servant -> (ChlorophyteCrystal) servant)
-                        .forEach(crystal -> {
-                            if (crystal.getExtraShootCooldown() <= 0) {
-                                crystal.setExtraShootCooldown(16);
-                                crystal.shootTarget(target);
-                            }
-                        });
+                List<ChlorophyteCrystal> crystals = entityData.get(EntityData.Type.ExtraServant, ChlorophyteCrystal.class);
+                for (ChlorophyteCrystal crystal : crystals) {
+                    if (crystal.getExtraShootCooldown() <= 0) {
+                        crystal.setExtraShootCooldown(16);
+                        crystal.shootTarget(target);
+                    }
+                }
             }
             if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof StardustCell)) {
-                entityData.getServants().stream()
-                        .filter(servant -> servant instanceof StardustCell)
-                        .map(servant -> (StardustCell) servant)
-                        .forEach(cell -> {
-                            if (cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
-                                cell.setExtraShootCooldown(14);
-                                cell.shootAtTarget(target);
-                            }
-                        });
+                List<StardustCell> stardustCells = entityData.get(EntityData.Type.Servant, StardustCell.class);
+                for (StardustCell cell : stardustCells) {
+                    if (cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
+                        cell.setExtraShootCooldown(14);
+                        cell.shootAtTarget(target);
+                    }
+                }
             }
         }
     }

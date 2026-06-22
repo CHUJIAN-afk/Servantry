@@ -122,16 +122,6 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     }
 
     @Override
-    public float getDamage() {
-        return 2.4f;
-    }
-
-    @Override
-    public float getKnockback() {
-        return 0.1f;
-    }
-
-    @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {
         return AttachmentEntityRegister.Twins.get();
     }

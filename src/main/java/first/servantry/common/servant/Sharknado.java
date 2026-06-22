@@ -82,17 +82,8 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
         Vec3 start = getPos();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
         SharkDragonProjectile projectile = new SharkDragonProjectile(getDamageSource(), start, direction);
+        projectile.setDamage(getDamage());
         projectile.join(owner);
-    }
-
-    @Override
-    public float getDamage() {
-        return 5f;
-    }
-
-    @Override
-    public float getKnockback() {
-        return 0.1f;
     }
 
     @Override

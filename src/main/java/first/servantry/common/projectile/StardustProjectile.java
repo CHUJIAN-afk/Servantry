@@ -154,12 +154,6 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
     }
 
     @Override
-    public float getDamage() {
-        float damage = super.getDamage();
-        return damage != 0 ? damage : 6;
-    }
-
-    @Override
     public AttachmentEntityType<? extends AttachingProjectile> getType() {
         return AttachmentEntityRegister.StardustProjectile.get();
     }

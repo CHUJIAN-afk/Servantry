@@ -1,6 +1,7 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
+import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
@@ -70,6 +71,7 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> BladeStaff =
             Register.register(SERVANT_WEAPON, "blade_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.EnchantedThrowingKnives)
+                            .damage(0.6f)
                             .sound(SoundRegister.UseServantWeapon)
                             .summonPost(servant -> {
                                 Player owner = servant.getOwner();
@@ -96,6 +98,8 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> OpticStaff =
             Register.register(SERVANT_WEAPON, "optic_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Twins)
+                            .damage(2.4f)
+                            .knockback(0.1f)
                             .sound(SoundRegister.UseTerraprism)
                             .summonPost(servant -> {
                                 Player owner = servant.getOwner();
@@ -106,13 +110,15 @@ public class ServantWeaponRegister {
                                                                          .getCenter()
                                                                          .offsetRandom(random, 2), 0, 0, 0);
                                 servant.init(pathNode);
-                                EntityData data = owner.getData(AttachmentRegister.EntityData);
+                                ServantryHelper servantryHelper = ServantryHelper.get(owner);
                                 Twins twins = AttachmentEntityRegister.Twins.get()
                                         .factory()
                                         .get();
                                 twins.setOwner(owner);
+                                twins.setDamage(servant.getDamage());
+                                twins.setKnockback(servant.getKnockback());
                                 twins.setLaserEye(false);
-                                if (data.summonServant(owner, twins)) {
+                                if (servantryHelper.summonServant(twins)) {
                                     twins.init(pathNode);
                                 }
                             })
@@ -131,6 +137,8 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> DeadlySphereStaff =
             Register.register(SERVANT_WEAPON, "deadly_sphere_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.DeadlySphere)
+                            .damage(5.5f)
+                            .knockback(0.1f)
                             .sound(SoundRegister.UseServantWeapon)
                             .summonPost(servant -> {
                                 Player owner = servant.getOwner();
@@ -149,6 +157,8 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> TempestStaff =
             Register.register(SERVANT_WEAPON, "tempest_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Sharknado)
+                            .damage(5f)
+                            .knockback(0.1f)
                             .sound(SoundRegister.UseServantWeapon)
                             .summonPost(servant -> {
                                 Player owner = servant.getOwner();
@@ -168,6 +178,7 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> TerraPrism =
             Register.register(SERVANT_WEAPON, "terraprism", () ->
                             new IServantWeapon.Builder<>(AttachmentEntityRegister.TerraPrism)
+                                    .damage(9f).knockback(0.1f)
                                     .sound(SoundRegister.UseTerraprism)
                                     .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1)))
                                     .properties(properties -> properties.rarity(Rarity.EPIC))
@@ -181,6 +192,7 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> EtherealStellarCoreStaff =
             Register.register(SERVANT_WEAPON, "ethereal_stellar_core_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.EtherealStellarCore)
+                            .damage(3.0f).knockback(0.3f)
                             .sound(SoundRegister.UseServantWeapon)
                             .summonPre((player, etherealStellarCore) -> etherealStellarCore.getSameSize() < 9)
                             .summonPost(servant -> {
@@ -206,6 +218,8 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> StardustCellStaff =
             Register.register(SERVANT_WEAPON, "stardust_cell_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.StardustCell)
+                            .damage(6f)
+                            .knockback(0.2f)
                             .sound(SoundRegister.UseServantWeapon)
                             .summonPost(servant -> {
                                 Player owner = servant.getOwner();
@@ -229,18 +243,13 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> StardustDragonStaff =
             Register.register(SERVANT_WEAPON, "stardust_dragon_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.StardustDragon)
+                            .damage(8f).knockback(0.5f)
                             .sound(SoundRegister.UseServantWeapon)
-                            .summonPre((player, servant) -> player.getData(AttachmentRegister.EntityData)
-                                    .canSummon(player, 1))
                             .summonPost(stardustDragon -> {
                                 Player owner = stardustDragon.getOwner();
-                                EntityData data = owner.getData(AttachmentRegister.EntityData);
+                                ServantryHelper servantryHelper = ServantryHelper.get(owner);
                                 AttachmentEntityType<StardustDragon> type = AttachmentEntityRegister.StardustDragon.get();
-                                List<StardustDragon> existing = data.getEntities()
-                                        .stream()
-                                        .filter(e -> e instanceof StardustDragon)
-                                        .map(e -> (StardustDragon) e)
-                                        .toList();
+                                List<StardustDragon> existing = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class);
                                 if (existing.isEmpty()) {
                                     // 首次召唤：设置索引0，额外召唤2个体节
                                     stardustDragon.setSegmentIndex(0);
@@ -252,9 +261,11 @@ public class ServantWeaponRegister {
                                         StardustDragon segment = type.factory()
                                                 .get();
                                         segment.setOwner(owner);
+                                        segment.setDamage(stardustDragon.getDamage());
+                                        segment.setKnockback(stardustDragon.getKnockback());
                                         segment.setSegmentIndex(i);
                                         segment.setTotalSegments(3);
-                                        if (data.summonServant(owner, segment)) {
+                                        if (servantryHelper.summonServant(segment)) {
                                             segment.init(new PathNode(owner.position()
                                                                               .add(0, 3, -i * segment.getSegmentDistance()), 0, 0, 0));
                                         }

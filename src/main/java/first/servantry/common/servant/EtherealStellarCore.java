@@ -14,16 +14,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-/**
- * 永夜之眼 - 环绕玩家旋转的激光仆从。
- * <p>
- * 始终环绕玩家旋转，有目标时维持原轨迹，
- * 通过激光射线对路径上所有敌人造成伤害。
- * </p>
- */
 public class EtherealStellarCore extends Servant {
 
-    private int preShootCooldown = 0;
     private int shootCooldown = 0;
 
     public EtherealStellarCore() {
@@ -32,7 +24,6 @@ public class EtherealStellarCore extends Servant {
 
     @Override
     public void tick() {
-        preShootCooldown = shootCooldown;
         if (!owner.level().isClientSide()) {
             if (shootCooldown > 0) {
                 shootCooldown--;
@@ -65,6 +56,7 @@ public class EtherealStellarCore extends Servant {
             Vec3 start = getPos();
             Vec3 direction = start.offsetRandom(random, 2f).subtract(start).normalize();
             ShatteredStellarCoreProjectile projectile = new ShatteredStellarCoreProjectile(getDamageSource(), start.add(direction.scale(-0.75)), direction.scale(0.5f));
+            projectile.setDamage(getDamage());
             projectile.setChaseTarget(target);
             projectile.join(owner);
             ParticleHelper.create(owner.level())
@@ -89,22 +81,8 @@ public class EtherealStellarCore extends Servant {
         }
     }
 
-    public int getPreShootCooldown() {
-        return preShootCooldown;
-    }
-
     public int getShootCooldown() {
         return shootCooldown;
-    }
-
-    @Override
-    public float getDamage() {
-        return 3.0f;
-    }
-
-    @Override
-    public float getKnockback() {
-        return 0.3f;
     }
 
     @Override

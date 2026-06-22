@@ -122,16 +122,6 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
     }
 
     @Override
-    public float getDamage() {
-        return 5.5f;
-    }
-
-    @Override
-    public float getKnockback() {
-        return 0.1f;
-    }
-
-    @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {
         return AttachmentEntityRegister.DeadlySphere.get();
     }

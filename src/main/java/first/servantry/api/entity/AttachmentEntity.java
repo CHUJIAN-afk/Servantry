@@ -19,6 +19,8 @@ public abstract class AttachmentEntity {
 
     protected UUID uuid;
     protected Player owner;
+    protected float damage = 0;
+    protected float knockback = 0;
 
     // ===================== 路径与轨迹 =====================
 
@@ -38,9 +40,21 @@ public abstract class AttachmentEntity {
 
     // ===================== 抽象方法 =====================
 
-    public abstract float getDamage();
+    public float getDamage() {
+        return damage;
+    }
 
-    public abstract float getKnockback();
+    public void setDamage(float damage) {
+        this.damage = damage;
+    }
+
+    public float getKnockback() {
+        return knockback;
+    }
+
+    public void setKnockback(float knockback) {
+        this.knockback = knockback;
+    }
 
     public abstract AttachmentEntityType<? extends AttachmentEntity> getType();
 
@@ -124,6 +138,7 @@ public abstract class AttachmentEntity {
      *
      * @return 是否正在执行路径
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isExecutingPath() {
         return this.currentPlannedPath != null && !this.currentPlannedPath.isFinished();
     }
