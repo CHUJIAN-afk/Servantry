@@ -72,14 +72,13 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> BladeStaff =
             Register.register(SERVANT_WEAPON, "blade_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.EnchantedThrowingKnives)
                             .damage(0.6f)
+                            .armorPierce(2.5f)
                             .sound(SoundRegister.UseServantWeapon)
                             .summonPost(servant -> {
                                 Player owner = servant.getOwner();
                                 PathNode idle = servant.getInterpolatedIdleState(1.0f);
-                                Vec3 center = owner.getBoundingBox()
-                                        .getCenter();
-                                servant.init(new PathNode(new Vec3(center.x(), idle.pos()
-                                        .y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
+                                Vec3 center = owner.getBoundingBox().getCenter();
+                                servant.init(new PathNode(new Vec3(center.x(), idle.pos().y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
                             })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
@@ -90,8 +89,7 @@ public class ServantWeaponRegister {
                             .save(output))
                     .language("Blade Staff", "刃杖")
                     .servant(AttachmentEntityRegister.EnchantedThrowingKnives, "Enchanted Throwing Knives", "附魔飞刀")
-                    .tooltip(1, "Ignores 2.5 points of enemy Defense", "忽略敌人 2.5 防御力")
-                    .tooltip(2, "Don't let their small size fool you", "别被它们小小的个头给骗了")
+                    .tooltip(1, "Don't let their small size fool you", "别被它们小小的个头给骗了")
                     .build();
     /**
      * 魔眼法杖 - 召唤双子魔眼

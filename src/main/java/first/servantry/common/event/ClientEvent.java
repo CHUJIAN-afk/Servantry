@@ -81,6 +81,7 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.OreScout.get(), new OreScoutServantRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ScavengerFairy.get(), new ScavengerFairyRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ChlorophyteCrystal.get(), new ChlorophyteCrystalRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.CustomLaserProjectile.get(), new CustomLaserProjectileRenderer());
 
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustProjectile.get(), new StardustProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.LaserProjectile.get(), new LaserProjectileRenderer());

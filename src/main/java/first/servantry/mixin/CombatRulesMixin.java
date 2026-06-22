@@ -2,7 +2,6 @@ package first.servantry.mixin;
 
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.common.servant.EnchantedThrowingKnives;
 import first.servantry.register.AttributeRegister;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
@@ -26,9 +25,7 @@ public class CombatRulesMixin {
         if (damageSource instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
             if (servant != null) {
-                if (servant instanceof EnchantedThrowingKnives) {
-                    armorValue -= 2.5f;
-                }
+                armorValue -= servant.getArmorPierce();
                 Player owner = servant.getOwner();
                 AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantArmorPierce);
                 if (instance != null) {

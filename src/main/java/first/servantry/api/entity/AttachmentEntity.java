@@ -21,6 +21,7 @@ public abstract class AttachmentEntity {
     protected Player owner;
     protected float damage = 0;
     protected float knockback = 0;
+    protected float armorPierce = 0;
 
     // ===================== 路径与轨迹 =====================
 
@@ -42,6 +43,14 @@ public abstract class AttachmentEntity {
 
     public float getDamage() {
         return damage;
+    }
+
+    public void setArmorPierce(float armorPierce) {
+        this.armorPierce = armorPierce;
+    }
+
+    public float getArmorPierce() {
+        return armorPierce;
     }
 
     public void setDamage(float damage) {
@@ -241,13 +250,10 @@ public abstract class AttachmentEntity {
      * @param buf 数据包缓冲区
      */
     public void writeBase(RegistryFriendlyByteBuf buf) {
-        buf.writeDouble(currentPathNode.pos().x());
-        buf.writeDouble(currentPathNode.pos().y());
-        buf.writeDouble(currentPathNode.pos().z());
+        buf.writeVec3(currentPathNode.pos());
         buf.writeFloat(currentPathNode.yaw());
         buf.writeFloat(currentPathNode.pitch());
         buf.writeFloat(currentPathNode.roll());
-        writeAdditional(buf);
     }
 
     /**
@@ -259,18 +265,12 @@ public abstract class AttachmentEntity {
      * @param buf 数据包缓冲区
      */
     public void readBase(RegistryFriendlyByteBuf buf) {
-        this.clientTargetNode = new PathNode(
-                new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble()),
-                buf.readFloat(), buf.readFloat(), buf.readFloat()
-        );
-
+        this.clientTargetNode = new PathNode(buf.readVec3(), buf.readFloat(), buf.readFloat(), buf.readFloat());
         // 首次同步时初始化位置
         if (!clientInitialized) {
             clientInitialized = true;
             init(clientTargetNode);
         }
-
-        readAdditional(buf);
     }
 
     // ===================== 便捷访问器 =====================

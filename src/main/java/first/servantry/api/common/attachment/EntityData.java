@@ -25,9 +25,9 @@ import java.util.*;
  */
 public class EntityData implements AttachmentSyncHandler<EntityData> {
 
-    private final List<AttachmentEntity> renderCache = new ArrayList<>();
-    private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> groups = new HashMap<>();
     private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> pendingAdd = new HashMap<>();
+    private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> groups = new HashMap<>();
+    private final List<AttachmentEntity> renderCache = new ArrayList<>();
     private boolean changed = false;
 
     public void tick(Player player) {
@@ -82,6 +82,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                 }
                 if (!ServantryHelper.get(player).canSummon(0)) {
                     servants.getFirst().setRemove();
+                    changed = true;
                 } else {
                     break;
                 }
@@ -154,6 +155,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                 for (AttachmentEntity entity : list) {
                     buf.writeUUID(entity.getUuid());
                     entity.writeBase(buf);
+                    entity.writeAdditional(buf);
                 }
             }
         }
@@ -169,7 +171,9 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         Map<UUID, AttachmentEntity> existing = new HashMap<>();
         for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner : data.groups.values()) {
             for (List<AttachmentEntity> list : inner.values()) {
-                for (AttachmentEntity e : list) existing.put(e.getUuid(), e);
+                for (AttachmentEntity e : list) {
+                    existing.put(e.getUuid(), e);
+                }
             }
         }
 
@@ -197,6 +201,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                         entity.setUuid(uuid);
                     }
                     entity.readBase(buf);
+                    entity.readAdditional(buf);
                     list.add(entity);
                 }
             }

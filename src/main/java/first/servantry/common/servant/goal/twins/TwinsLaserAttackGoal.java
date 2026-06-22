@@ -1,7 +1,9 @@
 package first.servantry.common.servant.goal.twins;
 
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.particle.GenericParticleBuilder;
+import first.servantry.common.projectile.CustomLaserProjectile;
 import first.servantry.common.projectile.LaserProjectile;
 import first.servantry.common.servant.Twins;
 import first.servantry.register.SoundRegister;
@@ -25,6 +27,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
 
+    private CustomLaserProjectile projectile = null;
     private Vec3 wanderTarget = Vec3.ZERO;
     private int shootCooldown = 0;
     /**
@@ -39,6 +42,21 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
     @Override
     public boolean canUse() {
         return servant.isLaserEye() && servant.isTarget(servant.getTarget());
+    }
+
+    @Override
+    public void start() {
+        projectile = new CustomLaserProjectile(servant.getDamageSource(), servant.getCurrentPathNode(), 0xb70700);
+        projectile.join(servant.getOwner());
+        projectile.setDamage(servant.getDamage());
+        projectile.setKnockback(servant.getKnockback());
+    }
+
+    @Override
+    public void stop() {
+        if (projectile != null) {
+            projectile.setRemove();
+        }
     }
 
     @Override
@@ -63,6 +81,13 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
             servant.applyForce(toAnchor.normalize().scale(force));
         }
         servant.lookAtPos(target.getBoundingBox().getCenter());
+
+        if (projectile != null) {
+            PathNode pathNode = servant.getCurrentPathNode();
+            projectile.setCurrentPathNode(new PathNode(pathNode.pos(), pathNode.yaw(), pathNode.pitch(), projectile.getCurrentPathNode().roll() + 30));
+            projectile.setHitbox(projectile.getPos(), target.getBoundingBox().getCenter(), 0.02f);
+        }
+
         // 射击冷却
         if (shootCooldown <= 0) {
             shootAtTarget(owner, target);

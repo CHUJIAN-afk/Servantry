@@ -22,6 +22,8 @@ public final class ServantryHelper {
         this.entityData = player.getData(AttachmentRegister.EntityData);
     }
 
+
+
     public static ServantryHelper get(Player player) {
         return new ServantryHelper(player);
     }
@@ -29,9 +31,6 @@ public final class ServantryHelper {
     public EntityData getEntityData() {
         return entityData;
     }
-
-
-
 
     public void add(EntityData.Type type, AttachmentEntity entity) {
         entityData.add(type, entity);

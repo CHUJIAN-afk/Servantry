@@ -62,6 +62,8 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ZenithProjectile>> ZenithProjectile = register("zenith_projectile", ZenithProjectile::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CustomLaserProjectile>> CustomLaserProjectile = register("custom_laser_projectile", CustomLaserProjectile::new);
+
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));
     }

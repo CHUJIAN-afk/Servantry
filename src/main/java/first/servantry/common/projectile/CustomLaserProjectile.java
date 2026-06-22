@@ -1,0 +1,119 @@
+package first.servantry.common.projectile;
+
+import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.api.entity.ICollideAttack;
+import first.servantry.api.entity.PathNode;
+import first.servantry.api.projectile.Projectile;
+import first.servantry.api.servant.Servant;
+import first.servantry.api.servant.ServantDamageSource;
+import first.servantry.register.AttachmentEntityRegister;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+
+public class CustomLaserProjectile extends Projectile implements ICollideAttack<CustomLaserProjectile>{
+
+    private int color = 0;
+    private float alpha = 1;
+    private AABB hitbox = new AABB(0, 0, 0, 0, 0, 0);
+
+    public CustomLaserProjectile() {
+        super();
+    }
+
+    public CustomLaserProjectile(DamageSource damageSource, PathNode pathNode, int color) {
+        super(pathNode.pos(), Vec3.directionFromRotation(pathNode.pitch(), pathNode.yaw()));
+        this.color = color;
+        setDamageSource(damageSource);
+        setDrag(1);
+        setMaxSpeed(0);
+        setMaxLife(-1);
+    }
+
+    public void setAlpha(float alpha) {
+        this.alpha = alpha;
+    }
+
+    public float getAlpha() {
+        return alpha;
+    }
+
+    @Override
+    public void tick() {
+        if (!owner.level().isClientSide()) {
+            if (damageSource instanceof ServantDamageSource servantDamageSource) {
+                Servant servant = servantDamageSource.getServant();
+                if (servant == null) {
+                    setRemove();
+                }
+            }
+        }
+        super.tick();
+    }
+
+    @Override
+    public void writeAdditional(RegistryFriendlyByteBuf buf) {
+        buf.writeInt(color);
+        buf.writeFloat(alpha);
+        buf.writeVec3(hitbox.getMinPosition());
+        buf.writeVec3(hitbox.getMaxPosition());
+    }
+
+    @Override
+    public void readAdditional(RegistryFriendlyByteBuf buf) {
+        color = buf.readInt();
+        alpha = buf.readFloat();
+        hitbox = new AABB(buf.readVec3(), buf.readVec3());
+    }
+
+    public void setHitbox(Vec3 start, Vec3 end, float radius) {
+        this.hitbox = new AABB(-radius, -radius, 0, radius, radius, start.distanceTo(end));
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    @Override
+    public AttachmentEntityType<? extends AttachmentEntity> getType() {
+        return AttachmentEntityRegister.CustomLaserProjectile.get();
+    }
+
+    @Override
+    public @NotNull AABB getHitbox() {
+        return hitbox;
+    }
+
+    @Override
+    public boolean isValidCollisionTarget(CustomLaserProjectile entity, LivingEntity target) {
+        if (damageSource instanceof ServantDamageSource servantDamageSource) {
+            Servant servant = servantDamageSource.getServant();
+            if (servant != null) {
+                return servant.isTarget(target);
+            }
+        }
+        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+    }
+
+    @Override
+    public void onCollisionAttack(List<HitContext> hitContexts) {
+        DamageSource source = getDamageSource();
+        if (source != null) {
+            for (HitContext hitContext : hitContexts) {
+                LivingEntity target = hitContext.entity();
+                InvincibleData.criteriaAttack(target, uuid, 5, source, getDamage(), InvincibleData.Type.PARTIAL);
+            }
+        }
+    }
+}

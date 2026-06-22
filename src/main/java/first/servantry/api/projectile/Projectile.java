@@ -4,8 +4,6 @@ import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.PathNode;
-import first.servantry.api.servant.Servant;
-import first.servantry.api.servant.ServantDamageSource;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -76,28 +74,6 @@ public abstract class Projectile extends AttachmentEntity {
         return damageSource;
     }
 
-    @Override
-    public float getKnockback() {
-        if (damageSource instanceof ServantDamageSource source) {
-            Servant servant = source.getServant();
-            if (servant != null) {
-                return servant.getKnockback();
-            }
-        }
-        return 0;
-    }
-
-    @Override
-    public float getDamage() {
-        if (damageSource instanceof ServantDamageSource source) {
-            Servant servant = source.getServant();
-            if (servant != null) {
-                return servant.getDamage();
-            }
-        }
-        return 0;
-    }
-
     // ===================== AttachmentEntity 实现 =====================
 
     @Override
@@ -109,7 +85,7 @@ public abstract class Projectile extends AttachmentEntity {
     public void tick() {
         if (!owner.level().isClientSide()) {
             tickPhysics();
-            if (++life >= maxLife || getPos().distanceToSqr(owner.position()) > getMaxDistance() * getMaxDistance()) {
+            if ((++life >= maxLife && maxLife > 0) || getPos().distanceToSqr(owner.position()) > getMaxDistance() * getMaxDistance()) {
                 setRemove();
             }
         }
@@ -177,7 +153,6 @@ public abstract class Projectile extends AttachmentEntity {
         buf.writeDouble(velocity.y);
         buf.writeDouble(velocity.z);
         buf.writeInt(trailTimer);
-        writeAdditional(buf);
     }
 
     @Override
@@ -185,7 +160,6 @@ public abstract class Projectile extends AttachmentEntity {
         super.readBase(buf);
         velocity = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
         trailTimer = buf.readInt();
-        readAdditional(buf);
     }
 
     // ===================== 访问器 =====================

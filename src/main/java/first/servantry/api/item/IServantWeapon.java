@@ -29,6 +29,9 @@ public interface IServantWeapon<T extends Servant> {
     /** 获取仆从击退力度。 */
     float getKnockback();
 
+    /** 获取仆从护甲穿透。 */
+    float getArmorPierce();
+
     /**
      * 获取每次召唤的仆从数量，默认为1。
      */
@@ -90,6 +93,7 @@ public interface IServantWeapon<T extends Servant> {
         private final Supplier<AttachmentEntityType<T>> typeSupplier;
         private float damage = 0;
         private float knockback = 0;
+        private float armorPierce = 0;
         private Supplier<SoundEvent> soundEventSupplier = () -> null;
         private BiPredicate<Player, T> summonPre = (player, servant) -> true;
         private Consumer<T> summonPost = servant -> {
@@ -111,6 +115,12 @@ public interface IServantWeapon<T extends Servant> {
         /** 设置仆从击退力度。 */
         public Builder<T> knockback(float knockback) {
             this.knockback = knockback;
+            return this;
+        }
+
+        /** 设置仆从护甲穿透。 */
+        public Builder<T> armorPierce(float armorPierce) {
+            this.armorPierce = armorPierce;
             return this;
         }
 
@@ -176,6 +186,11 @@ public interface IServantWeapon<T extends Servant> {
             @Override
             public float getDamage() {
                 return damage;
+            }
+
+            @Override
+            public float getArmorPierce() {
+                return armorPierce;
             }
 
             @Override
