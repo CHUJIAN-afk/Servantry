@@ -1,8 +1,9 @@
-package first.servantry.api.servant;
+package first.servantry.api.common.attachment;
 
+import first.servantry.register.AttributeRegister;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.AABB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +27,15 @@ public class TargetCache {
      */
     public void update(Player player) {
         entities.clear();
-        AABB searchBox = player.getBoundingBox().inflate(32);
-        List<LivingEntity> result = player.level().getEntitiesOfClass(LivingEntity.class, searchBox, e -> e.isAlive() && e != player);
+        double value = 1;
+        AttributeInstance instance = player.getAttribute(AttributeRegister.ServantSearchRange);
+        if (instance != null) {
+            value = instance.getValue();
+        }
+        double distance = 32 * value;
+        List<LivingEntity> result = player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(distance)).stream()
+                .filter(living -> living.isAlive() && living != player && living.distanceToSqr(player) <= (distance * distance))
+                .toList();
         entities.addAll(result);
     }
 

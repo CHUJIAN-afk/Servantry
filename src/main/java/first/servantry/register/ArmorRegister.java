@@ -404,12 +404,12 @@ public class ArmorRegister {
                     .language("Chlorophyte Boots", "叶绿战靴")
                     .build();
     /**
-     * 英灵殿骑士头盔 - +1 召唤栏，+10% 仆从伤害，+10% 原版伤害
+     * 英灵殿骑士头盔 - +2 哨兵栏，+10% 仆从伤害，+10% 原版伤害
      */
     public static final DeferredItem<Item> ValhallaKnightHelmet =
             Register.register(ARMOR, "valhalla_knight_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 7, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.SentryServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(AttributeRegister.ServantDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .modifier(Attributes.ATTACK_DAMAGE, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.RARE))
@@ -570,8 +570,10 @@ public class ArmorRegister {
     public static final DeferredItem<Item> StardustHelmet =
             Register.register(ARMOR, "stardust_helmet", () -> AttributeArmorItem.builder(ArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.SentryServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(AttributeRegister.ServantDamage, 0.22, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantSearchRange, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.EPIC))
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()
@@ -588,7 +590,8 @@ public class ArmorRegister {
             Register.register(ARMOR, "stardust_chestplate", () -> AttributeArmorItem.builder(ArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 6, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.37, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantDamage, 0.22, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantSearchRange, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.EPIC))
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()
@@ -604,8 +607,9 @@ public class ArmorRegister {
     public static final DeferredItem<Item> StardustLeggings =
             Register.register(ARMOR, "stardust_leggings", () -> AttributeArmorItem.builder(ArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.37, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                            .modifier(AttributeRegister.ServantDamage, 0.22, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantSearchRange, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.EPIC))
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()
@@ -622,7 +626,7 @@ public class ArmorRegister {
             Register.register(ARMOR, "stardust_boots", () -> AttributeArmorItem.builder(ArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 3, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                            .modifier(AttributeRegister.ServantDamage, 0.22, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                            .modifier(AttributeRegister.ServantSearchRange, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.EPIC))
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()

@@ -24,13 +24,15 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("item.servantry.tooltip.knockback", "Knockback", "击退强度");
         entry("item.servantry.tooltip.armor_pierce", "Armor Pierce", "护甲穿透");
         entry("item.servantry.tooltip.summon", "Summons %s to fight for you", "召唤 %s 为你而战");
-        entry("item.servantry.tooltip.slots", "Servant Slots: %s / %s", "仆从栏位: %s / %s");
+        entry("item.servantry.tooltip.servant_slots", "Servant Slots: %s / %s", "仆从栏位: %s / %s");
+        entry("item.servantry.tooltip.sentry_servant_slots", "Sentry Servant Slots: %s / %s", "哨戒仆从栏位: %s / %s");
         entry("item.servantry.tooltip.remove_all", "Sneak + Use to dismiss all servants of this type", "潜行右键以遣散该类型仆从");
         entry("death.attack.servantry.servant", "%1$s was torn apart by a servant", "%1$s 被仆从撕碎");
         entry("death.attack.servantry.servant.player", "%1$s was torn apart by a servant whilst fighting %2$s", "%1$s 在与 %2$s 战斗时被仆从撕碎");
         entry("container.servantry.mithril_anvil", "Forging", "超凡锻造");
         // ================= 属性 =================
         entry(AttributeRegister.ServantMaxCount.value().getDescriptionId(), "Max Servants", "仆从栏");
+        entry(AttributeRegister.SentryServantMaxCount.value().getDescriptionId(), "Max Sentry Servants", "哨戒仆从栏");
         entry(AttributeRegister.ServantDamage.value().getDescriptionId(), "Servant Damage", "仆从伤害");
         entry(AttributeRegister.ServantKnockback.value().getDescriptionId(), "Servant Knockback", "仆从击退");
         entry(AttributeRegister.ServantArmorPierce.value().getDescriptionId(), "Servant Armor Pierce", "仆从护甲穿透");

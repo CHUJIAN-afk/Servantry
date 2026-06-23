@@ -4,7 +4,7 @@ import first.servantry.Servantry;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.HealthData;
 import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.servant.TargetCache;
+import first.servantry.api.common.attachment.TargetCache;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredHolder;

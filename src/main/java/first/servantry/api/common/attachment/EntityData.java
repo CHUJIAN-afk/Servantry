@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 统一的附件实体数据附件。
@@ -75,16 +76,26 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                 pendingAdd.clear();
                 changed = true;
             }
-            List<Servant> servants = get(Type.Servant, Servant.class);
-            while (true) {
-                if (servants.isEmpty()) {
-                    break;
-                }
-                if (!ServantryHelper.get(player).canSummon(0)) {
-                    servants.getFirst().setRemove();
-                    changed = true;
-                } else {
-                    break;
+            // 标记溢出实体
+            Type[] types = new Type[]{Type.Servant, Type.SentryServant};
+            for (Type type : types) {
+                List<Servant> servants = get(type, Servant.class).stream().filter(servant -> !servant.isRemove()).collect(Collectors.toCollection(ArrayList::new));
+                while (true) {
+                    if (servants.isEmpty()) {
+                        break;
+                    }
+                    if (servants.stream().allMatch(AttachmentEntity::isRemove)) {
+                        break;
+                    }
+                    ServantryHelper servantryHelper = ServantryHelper.get(player);
+                    if (!servantryHelper.canSummon(type, 0)) {
+                        Servant first = servants.getFirst();
+                        first.setRemove();
+                        servants.remove(first);
+                        changed = true;
+                    } else {
+                        break;
+                    }
                 }
             }
             // 清理所有分组中标记移除的实体
@@ -228,7 +239,8 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
 
     public enum Type {
         Servant,
-        Projectile,
-        ExtraServant
+        SentryServant,
+        ExtraServant,
+        Projectile
     }
 }

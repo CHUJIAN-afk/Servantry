@@ -5,6 +5,7 @@ import first.servantry.Servantry;
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.armorSet.ArmorSet;
 import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.register.ServantryRegistries;
@@ -35,7 +36,10 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 @EventBusSubscriber(modid = Servantry.MODID, value = Dist.CLIENT)
 public class ClientEvent {
@@ -54,8 +58,6 @@ public class ClientEvent {
         }
     }
 
-    private static final Map<Item, List<MutableComponent>> Cache = new HashMap<>();
-
     @SubscribeEvent
     public static void tooltip(ItemTooltipEvent event) {
         Player player = event.getEntity();
@@ -69,42 +71,25 @@ public class ClientEvent {
             if (location != null) {
                 String key = "servant." + location.getNamespace() + "." + location.getPath();
                 float damage = iServantWeapon.getDamage();
-                float knockback = iServantWeapon.getKnockback();
-                float armor_pierce = iServantWeapon.getArmorPierce();
-
-                // 1. 伤害 (例如: "9 召唤伤害")
                 if (damage > 0) {
                     AttributeInstance attribute = player.getAttribute(AttributeRegister.ServantDamage);
                     damage = attribute != null ? (float) (damage * attribute.getValue()) : damage;
-                    String damageStr = String.format("%.1f ", damage);
-                    toolTip.add(Component.literal(damageStr).withStyle(ChatFormatting.BLUE)
-                            .append(Component.translatable("item.servantry.tooltip.damage").withStyle(ChatFormatting.GRAY)));
+                    toolTip.add(Component.literal(String.format("%.1f ", damage)).withStyle(ChatFormatting.BLUE).append(Component.translatable("item.servantry.tooltip.damage").withStyle(ChatFormatting.GRAY)));
                 }
-
-                // 2. 击退 (例如: "0.5 击退力")
+                float knockback = iServantWeapon.getKnockback();
                 if (knockback > 0) {
                     AttributeInstance attribute = player.getAttribute(AttributeRegister.ServantKnockback);
                     knockback = attribute != null ? (float) (knockback * attribute.getValue()) : knockback;
-                    String kbStr = String.format("%.1f ", knockback);
-                    toolTip.add(Component.literal(kbStr).withStyle(ChatFormatting.BLUE)
-                            .append(Component.translatable("item.servantry.tooltip.knockback").withStyle(ChatFormatting.GRAY)));
+                    toolTip.add(Component.literal(String.format("%.1f ", knockback)).withStyle(ChatFormatting.BLUE).append(Component.translatable("item.servantry.tooltip.knockback").withStyle(ChatFormatting.GRAY)));
                 }
+                float armor_pierce = iServantWeapon.getArmorPierce();
                 if (armor_pierce > 0) {
-                    toolTip.add(Component.literal(String.format("%.1f ", armor_pierce)).withStyle(ChatFormatting.BLUE)
-                                        .append(Component.translatable("item.servantry.tooltip.armor_pierce").withStyle(ChatFormatting.GRAY)));
+                    toolTip.add(Component.literal(String.format("%.1f ", armor_pierce)).withStyle(ChatFormatting.BLUE).append(Component.translatable("item.servantry.tooltip.armor_pierce").withStyle(ChatFormatting.GRAY)));
                 }
-
-                // 3. 召唤宣言 (例如: "召唤 泰拉棱镜 为你而战")
-                toolTip.add(Component.translatable("item.servantry.tooltip.summon",
-                        Component.translatable(key).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
-
+                toolTip.add(Component.translatable("item.servantry.tooltip.summon", Component.translatable(key).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                // 4. 栏位消耗 (例如: "仆从栏位: 3 / 5")
-                toolTip.add(Component.translatable("item.servantry.tooltip.slots",
-                        Component.literal(String.valueOf(servantryHelper.getServantUsedSlots())).withStyle(ChatFormatting.BLUE),
-                        Component.literal(String.valueOf(servantryHelper.getServantMaxCount())).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
-
-                // 5. 移除操作提示 (深灰色，避免喧宾夺主)
+                toolTip.add(Component.translatable("item.servantry.tooltip.servant_slots", Component.literal(String.valueOf(servantryHelper.getUsedSlots(EntityData.Type.Servant))).withStyle(ChatFormatting.BLUE), Component.literal(String.valueOf(servantryHelper.getMaxCount(EntityData.Type.Servant))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
+                toolTip.add(Component.translatable("item.servantry.tooltip.sentry_servant_slots", Component.literal(String.valueOf(servantryHelper.getUsedSlots(EntityData.Type.SentryServant))).withStyle(ChatFormatting.BLUE), Component.literal(String.valueOf(servantryHelper.getMaxCount(EntityData.Type.SentryServant))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
                 toolTip.add(Component.translatable("item.servantry.tooltip.remove_all").withStyle(ChatFormatting.GRAY));
             }
         }
@@ -112,21 +97,18 @@ public class ClientEvent {
         Item item = itemStack.getItem();
         ResourceLocation registryName = BuiltInRegistries.ITEM.getKey(item);
         if (registryName.getNamespace().equals(Servantry.MODID)) {
-            List<MutableComponent> cachedLore = Cache.computeIfAbsent(item, k -> {
-                List<MutableComponent> lines = new ArrayList<>();
-                String baseKey = "item" + "." + Servantry.MODID + "." + registryName.getPath() + "." + "tooltip" + ".";
-                int index = 1;
-                while (I18n.exists(baseKey + index)) {
-                    lines.add(Component.translatable(baseKey + index));
-                    index++;
-                }
-                return lines;
-            });
-            if (!cachedLore.isEmpty()) {
+            List<MutableComponent> lore = new ArrayList<>();
+            String baseKey = "item" + "." + Servantry.MODID + "." + registryName.getPath() + "." + "tooltip" + ".";
+            int index = 1;
+            while (I18n.exists(baseKey + index)) {
+                lore.add(Component.translatable(baseKey + index));
+                index++;
+            }
+            if (!lore.isEmpty()) {
                 if (player != null) {
                     toolTip.add(Component.empty());
                 }
-                for (MutableComponent component : cachedLore) {
+                for (MutableComponent component : lore) {
                     toolTip.add(component.withStyle(ChatFormatting.DARK_GRAY));
                 }
             }

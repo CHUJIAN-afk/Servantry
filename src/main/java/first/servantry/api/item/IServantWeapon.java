@@ -6,7 +6,6 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
@@ -77,9 +76,10 @@ public interface IServantWeapon<T extends Servant> {
         private Supplier<SoundEvent> soundEventSupplier = () -> null;
         private BiConsumer<IServantWeapon<T>, Player> summonAction = (weapon, player) -> {
             T servant = weapon.createServant(player);
-            if (ServantryHelper.get(player).summonServant(servant)) {
-                RandomSource random = player.getRandom();
-                servant.init(new PathNode(player.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
+            ServantryHelper servantryHelper = ServantryHelper.get(player);
+            if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
+                servant.init(new PathNode(player.getBoundingBox().getCenter().offsetRandom(player.getRandom(), 2), 0, 0, 0));
+                servantryHelper.add(EntityData.Type.Servant, servant);
             }
         };
         private Consumer<Player> onRemove = null;

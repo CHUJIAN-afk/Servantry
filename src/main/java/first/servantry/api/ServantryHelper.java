@@ -34,26 +34,27 @@ public final class ServantryHelper {
         entityData.add(type, entity);
     }
 
-    public boolean canSummon(int slotCost) {
-        return getServantMaxCount() - getServantUsedSlots() >= slotCost;
+    public boolean canSummon(EntityData.Type type, int slotCost) {
+        return getMaxCount(type) - getUsedSlots(type) >= slotCost;
     }
 
-    public boolean summonServant(Servant servant) {
-        if (canSummon(servant.getSlotCost())) {
-            add(EntityData.Type.Servant, servant);
-            return true;
-        }
-        return false;
+    public int getMaxCount(EntityData.Type type) {
+        return switch (type) {
+            case Servant -> {
+                AttributeInstance attributeInstance = player.getAttribute(AttributeRegister.ServantMaxCount);
+                yield attributeInstance != null ? (int) attributeInstance.getValue() : 0;
+            }
+            case SentryServant -> {
+                AttributeInstance attributeInstance = player.getAttribute(AttributeRegister.SentryServantMaxCount);
+                yield attributeInstance != null ? (int) attributeInstance.getValue() : 0;
+            }
+            default -> 0;
+        };
     }
 
-    public int getServantMaxCount() {
-        AttributeInstance attributeInstance = player.getAttribute(AttributeRegister.ServantMaxCount);
-        return attributeInstance != null ? (int) attributeInstance.getValue() : 0;
-    }
-
-    public int getServantUsedSlots() {
+    public int getUsedSlots(EntityData.Type type) {
         int slots = 0;
-        Map<AttachmentEntityType<?>, List<AttachmentEntity>> map = entityData.getGroups().get(EntityData.Type.Servant);
+        Map<AttachmentEntityType<?>, List<AttachmentEntity>> map = entityData.getGroups().get(type);
         if (map != null) {
             for (List<AttachmentEntity> list : map.values()) {
                 for (AttachmentEntity attachmentEntity : list) {

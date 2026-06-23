@@ -75,7 +75,7 @@ public class ArmorSetRegister {
                     .piece(ArmorRegister.ValhallaKnightChestplate)
                     .piece(ArmorRegister.ValhallaKnightLeggings)
                     .piece(ArmorRegister.ValhallaKnightBoots)
-                    .modifier(AttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(AttributeRegister.SentryServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                     .modifier(AttributeRegister.ServantDamage, 0.40, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .modifier(Attributes.KNOCKBACK_RESISTANCE, 1.0, AttributeModifier.Operation.ADD_VALUE)
                     .build()

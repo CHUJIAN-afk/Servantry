@@ -32,7 +32,7 @@ public class ServantWeaponRegister {
                             .summon((weapon, player) -> {
                                 OreScout servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                                if (servant.getSameSize() < 1 && servantryHelper.canSummon(1)) {
+                                if (servant.getSameSize() < 1 && servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     servantryHelper.add(EntityData.Type.Servant, servant);
                                     servant.init(servant.getInterpolatedIdleState(1.0f));
                                 }
@@ -58,7 +58,7 @@ public class ServantWeaponRegister {
                             .summon((weapon, player) -> {
                                 ScavengerFairy servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                                if (servant.getSameSize() < 1 && servantryHelper.canSummon(1)) {
+                                if (servant.getSameSize() < 1 && servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     servant.init(servant.getInterpolatedIdleState(1.0f));
                                     servantryHelper.add(EntityData.Type.Servant, servant);
                                 }
@@ -85,7 +85,7 @@ public class ServantWeaponRegister {
                             .summon((weapon, player) -> {
                                 EnchantedThrowingKnives servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                                if (servantryHelper.canSummon(1)) {
+                                if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     PathNode idle = servant.getInterpolatedIdleState(1.0f);
                                     Vec3 center = player.getBoundingBox().getCenter();
                                     servant.init(new PathNode(new Vec3(center.x(), idle.pos().y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
@@ -113,7 +113,7 @@ public class ServantWeaponRegister {
                             .sound(SoundRegister.UseTerraprism)
                             .summon((weapon, player) -> {
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                                if (servantryHelper.canSummon(1)) {
+                                if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     RandomSource random = player.getRandom();
                                     PathNode pathNode = new PathNode(player.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0);
                                     for (int i = 0; i < 2; i++) {
@@ -171,7 +171,7 @@ public class ServantWeaponRegister {
                             .summon((weapon, player) -> {
                                 Terraprism servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                                if (servantryHelper.canSummon(1)) {
+                                if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     servant.init(servant.getInterpolatedIdleState(1));
                                     servantryHelper.add(EntityData.Type.Servant, servant);
                                 }
@@ -193,7 +193,7 @@ public class ServantWeaponRegister {
                             .summon((weapon, player) -> {
                                 EtherealStellarCore servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                                if (servant.getSameSize() < 9 && servantryHelper.canSummon(1)) {
+                                if (servant.getSameSize() < 9 && servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     servant.init(servant.getInterpolatedIdleState(1.0f));
                                     servantryHelper.add(EntityData.Type.Servant, servant);
                                 }
@@ -235,7 +235,7 @@ public class ServantWeaponRegister {
                             .sound(SoundRegister.UseServantWeapon)
                             .summon((weapon, player) -> {
                                 ServantryHelper helper = ServantryHelper.get(player);
-                                if (helper.canSummon(1)) {
+                                if (helper.canSummon(EntityData.Type.Servant, 1)) {
                                     List<StardustDragon> existing = helper.getEntityData().get(EntityData.Type.Servant, StardustDragon.class);
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
@@ -283,7 +283,7 @@ public class ServantWeaponRegister {
                                 InfiniteShadow servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 ScabbardContainer container = player.getMainHandItem().getComponents().getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
-                                if (servantryHelper.canSummon(1) && !container.isEmpty()) {
+                                if (servantryHelper.canSummon(EntityData.Type.Servant, 1) && !container.isEmpty()) {
                                     servant.setItemStack(container.itemStack());
                                     servant.init(servant.getInterpolatedIdleState(1));
                                     servantryHelper.add(EntityData.Type.Servant, servant);

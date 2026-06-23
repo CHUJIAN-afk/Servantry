@@ -1,8 +1,8 @@
 package first.servantry.common.item;
 
+import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.Ellipse;
 import first.servantry.api.entity.PathNode;
-import first.servantry.api.servant.TargetCache;
 import first.servantry.common.projectile.ZenithProjectile;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.util.RandomSource;
@@ -80,8 +80,6 @@ public class Zenith extends SwordItem {
         Vec3 lookEnd = eyePos.add(lookDir.scale(8));
 
         for (LivingEntity entity : cache.getEntities()) {
-            if (entity == player || !entity.isAlive()) continue;
-
             Vec3 entityPos = entity.getBoundingBox().getCenter();
             double distToPlayer = entityPos.distanceTo(eyePos);
 

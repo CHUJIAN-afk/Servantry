@@ -134,9 +134,11 @@ public class Event {
             event.add(type, AttributeRegister.HealthRegen);
         }
         event.add(EntityType.PLAYER, AttributeRegister.ServantMaxCount);
+        event.add(EntityType.PLAYER, AttributeRegister.SentryServantMaxCount);
         event.add(EntityType.PLAYER, AttributeRegister.ServantDamage);
         event.add(EntityType.PLAYER, AttributeRegister.ServantKnockback);
         event.add(EntityType.PLAYER, AttributeRegister.ServantArmorPierce);
+        event.add(EntityType.PLAYER, AttributeRegister.ServantSearchRange);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

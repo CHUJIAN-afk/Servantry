@@ -2,6 +2,7 @@ package first.servantry.api.servant;
 
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.servant.ai.ServantGoalSelector;
@@ -69,20 +70,43 @@ public abstract class Servant extends AttachmentEntity {
 
     // ===================== 目标搜索 =====================
 
-    /** 在所有者周围搜索有效目标 */
+    /**
+     * 在所有者周围搜索有效目标
+     */
     public LivingEntity searchTarget() {
         int targetDistance = getTargetDistance();
         AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantSearchRange);
         if (instance != null) {
             targetDistance *= instance.getValue();
         }
-        return TargetSelector.create(this)
-                .maxDistance(targetDistance)
-                .requireLineOfSight(requireLineOfSight())
-                .filter(this::isTarget)
-                .preferCloseTo(owner.getBoundingBox().getCenter())
-                .preferCurrentTarget(getTarget())
-                .find();
+        TargetCache cache = owner.getData(AttachmentRegister.TargetCache);
+        if (!cache.isEmpty()) {
+            double maxDistSq = (double) targetDistance * targetDistance;
+            boolean needLOS = requireLineOfSight();
+            LivingEntity currentTarget = getTarget();
+            LivingEntity newTarget = null;
+            double bestScore = Double.MAX_VALUE;
+            for (LivingEntity entity : cache.getEntities()) {
+                double distSq = entity.distanceToSqr(owner);
+                if ((distSq > maxDistSq) || (needLOS && !owner.hasLineOfSight(entity)) || !isTarget(entity)) {
+                    continue;
+                }
+                double score = distSq;
+                if (entity.distanceToSqr(owner) < 36.0) {
+                    score -= 10000.0;
+                }
+                if (entity == currentTarget) {
+                    score -= 1000.0;
+                }
+                score += ((entity.getId() * 31 + hashCode() * 17) % 5) * 40;
+                if (score < bestScore) {
+                    bestScore = score;
+                    newTarget = entity;
+                }
+            }
+            return newTarget;
+        }
+        return null;
     }
 
     public int getTargetDistance() {
