@@ -22,11 +22,6 @@ public class StardustDragonIdleGoal extends ServantGoal<StardustDragon> {
     }
 
     @Override
-    public boolean canContinueToUse() {
-        return servant.isHead() && !servant.isTarget(servant.getTarget());
-    }
-
-    @Override
     public void tick() {
         Player owner = servant.getOwner();
         if (owner.distanceToSqr(servant.getPos()) > 128 * 128) {

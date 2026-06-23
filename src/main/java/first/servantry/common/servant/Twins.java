@@ -1,5 +1,7 @@
 package first.servantry.common.servant;
 
+import first.servantry.api.ServantryHelper;
+import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
@@ -87,9 +89,6 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
-            if (getSameSize() % 2 != 0) {
-                setRemove();
-            }
             if (trailTimer > 0) {
                 trailTimer--;
             }
@@ -99,6 +98,14 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
 
     public int getTargetDistance() {
         return 12;
+    }
+
+    @Override
+    public void onRemove() {
+        List<Twins> twins = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, Twins.class);
+        if (!twins.isEmpty() && twins.size() % 2 != 0) {
+            twins.getFirst().setRemove();
+        }
     }
 
     @Override
@@ -114,19 +121,9 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     }
 
     @Override
-    public int getSlotCost() {
-        if (!isLaserEye()) {
-            return 0;
-        }
-        return super.getSlotCost();
-    }
-
-    @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {
         return AttachmentEntityRegister.Twins.get();
     }
-
-    // ===================== 访问器 =====================
 
     public boolean isLaserEye() {
         return isLaserEye;

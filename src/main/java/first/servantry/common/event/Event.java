@@ -183,7 +183,7 @@ public class Event {
                 for (StardustCell cell : stardustCells) {
                     if (cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
                         cell.setExtraShootCooldown(14);
-                        cell.shootAtTarget(target);
+                        cell.shootExtraAtTarget(target);
                     }
                 }
             }

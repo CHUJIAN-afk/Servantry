@@ -30,9 +30,9 @@ public class ShatteredStellarCoreProjectile extends Projectile implements IColli
     public ShatteredStellarCoreProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
-        setDrag(0.92f);
+        setDrag(0.8f);
         setMaxSpeed(4);
-        setMaxLife(30);
+        setMaxLife(100);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ShatteredStellarCoreProjectile extends Projectile implements IColli
     public void tick() {
         if (!owner.level().isClientSide()) {
             if (chaseTarget != null && chaseTarget.isAlive()) {
-                if (life >= 10) {
+                if (life >= 15) {
                     Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
                     applyForce(targetCenter.subtract(getPos()).normalize().scale(0.6));
                 }
@@ -98,11 +98,11 @@ public class ShatteredStellarCoreProjectile extends Projectile implements IColli
                                  .scaleRandom(0.005f)
                 )
                 .pos(getPos())
-                .offset(0.1f)
-                .velocity(getVelocity().normalize())
+                .offset(0.15f)
+                .velocity(getVelocity())
                 .count(3)
                 .speed(0.55)
-                .spread(1)
+                .spread(2)
                 .emit();
     }
 

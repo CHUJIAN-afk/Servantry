@@ -24,11 +24,6 @@ public class StardustDragonFollowGoal extends ServantGoal<StardustDragon> {
     }
 
     @Override
-    public boolean canContinueToUse() {
-        return !servant.isHead();
-    }
-
-    @Override
     public void tick() {
         StardustDragon preceding = servant.getPrecedingSegment();
         if (preceding == null) return;

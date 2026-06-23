@@ -5,11 +5,9 @@ import first.servantry.Servantry;
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.armorSet.ArmorSet;
 import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
-import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.register.ServantryRegistries;
-import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -70,9 +68,9 @@ public class ClientEvent {
 
             if (location != null) {
                 String key = "servant." + location.getNamespace() + "." + location.getPath();
-                EntityData data = player.getData(AttachmentRegister.EntityData);
                 float damage = iServantWeapon.getDamage();
                 float knockback = iServantWeapon.getKnockback();
+                float armor_pierce = iServantWeapon.getArmorPierce();
 
                 // 1. 伤害 (例如: "9 召唤伤害")
                 if (damage > 0) {
@@ -90,6 +88,10 @@ public class ClientEvent {
                     String kbStr = String.format("%.1f ", knockback);
                     toolTip.add(Component.literal(kbStr).withStyle(ChatFormatting.BLUE)
                             .append(Component.translatable("item.servantry.tooltip.knockback").withStyle(ChatFormatting.GRAY)));
+                }
+                if (armor_pierce > 0) {
+                    toolTip.add(Component.literal(String.format("%.1f ", armor_pierce)).withStyle(ChatFormatting.BLUE)
+                                        .append(Component.translatable("item.servantry.tooltip.armor_pierce").withStyle(ChatFormatting.GRAY)));
                 }
 
                 // 3. 召唤宣言 (例如: "召唤 泰拉棱镜 为你而战")

@@ -110,14 +110,6 @@ public class InfiniteShadow extends Terraprism {
                     modifiers.put(entry.attribute(), entry.modifier());
                 }
                 fakePlayer.getAttributes().addTransientAttributeModifiers(modifiers);
-                /*
-                if (BuiltInRegistries.ITEM.getKey(itemStack.getItem()).getNamespace().equals("minecraft")) {
-                    AttributeInstance instance = fakePlayer.getAttribute(Attributes.ATTACK_DAMAGE);
-                    if (instance != null) {
-                        instance.addPermanentModifier(new AttributeModifier(Servantry.rl("infinite_shadow_fake_player"), 2, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
-                    }
-                }
-                */
             }
         }
         return fakePlayer;
@@ -139,7 +131,7 @@ public class InfiniteShadow extends Terraprism {
 
         @Override
         public float getAttackStrengthScale(float adjustTicks) {
-            return 0.8F;
+            return 0.85F;
         }
 
         public InfiniteShadow getInfiniteShadow() {

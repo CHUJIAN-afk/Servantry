@@ -106,11 +106,6 @@ public class ChlorophyteCrystal extends Servant {
     }
 
     @Override
-    public int getSlotCost() {
-        return 0;
-    }
-
-    @Override
     public int getTargetDistance() {
         return 12;
     }

@@ -88,13 +88,43 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
         super.tick();
     }
 
+    public void shootExtraAtTarget(LivingEntity target){
+        Vec3 start = getPos();
+        // 创建并发射星细胞射弹
+        StardustProjectile projectile = new StardustProjectile(getDamageSource(), start);
+        projectile.setDamage(getDamage() * 0.67f);
+        projectile.setChaseTarget(target);
+        projectile.join(owner);
+        // 后坐力
+        Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
+        // 喷射粒子 - 星尘调色
+        ParticleHelper.create(owner.level())
+                .generic(GenericParticleBuilder.create()
+                                 .color(0x2fb2e1)
+                                 .edgeColor(0x33ccff)
+                                 .colorRandom(0.2F, 0.2F, 0.0F)
+                                 .lifetime(5)
+                                 .lifetimeRandom(25)
+                                 .spin(0.1f)
+                                 .spinRandom(0.5F)
+                                 .friction(0.75F)
+                                 .scale(0.035f)
+                                 .scaleRandom(0.005f)
+                )
+                .pos(start)
+                .velocity(direction)
+                .count(5)
+                .speed(0.35)
+                .spread(0.3)
+                .emit();
+    }
+
     public void shootAtTarget(LivingEntity target) {
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
         StardustProjectile projectile = new StardustProjectile(getDamageSource(), start);
         projectile.setDamage(getDamage());
         projectile.setChaseTarget(target);
-        projectile.setLife(10);
         projectile.join(owner);
         // 后坐力
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();

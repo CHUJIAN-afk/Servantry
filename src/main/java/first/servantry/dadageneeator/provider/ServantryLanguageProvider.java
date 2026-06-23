@@ -22,6 +22,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("item.servantry.tooltip.set_bonus_title", "Set Rewards:", "套装奖励:");
         entry("item.servantry.tooltip.damage", "Summon Damage", "召唤伤害");
         entry("item.servantry.tooltip.knockback", "Knockback", "击退强度");
+        entry("item.servantry.tooltip.armor_pierce", "Armor Pierce", "护甲穿透");
         entry("item.servantry.tooltip.summon", "Summons %s to fight for you", "召唤 %s 为你而战");
         entry("item.servantry.tooltip.slots", "Servant Slots: %s / %s", "仆从栏位: %s / %s");
         entry("item.servantry.tooltip.remove_all", "Sneak + Use to dismiss all servants of this type", "潜行右键以遣散该类型仆从");

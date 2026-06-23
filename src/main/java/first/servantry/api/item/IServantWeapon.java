@@ -3,13 +3,15 @@ package first.servantry.api.item;
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.BiPredicate;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -32,49 +34,27 @@ public interface IServantWeapon<T extends Servant> {
     /** 获取仆从护甲穿透。 */
     float getArmorPierce();
 
-    /**
-     * 获取每次召唤的仆从数量，默认为1。
-     */
-    default int getSummonCount() {
-        return 1;
-    }
-
     /** 获取召唤时播放的音效。 */
     default SoundEvent getSoundEvent() {
         return null;
     }
 
     /**
-     * 召唤前的回调，返回false可取消召唤。
+     * 构建一个已初始化属性的仆从实例。
      */
-    default boolean summonPre(Player player, T servant) {
-        return true;
-    }
-
-    /**
-     * 仆从被召唤后的回调。
-     */
-    default void summonPost(T servant) {
+    default T createServant(Player player) {
+        T servant = getType().factory().get();
+        servant.setOwner(player);
+        servant.setDamage(getDamage());
+        servant.setKnockback(getKnockback());
+        servant.setArmorPierce(getArmorPierce());
+        return servant;
     }
 
     /**
      * 处理仆从召唤逻辑。
      */
-    default void handleSummon(Player player) {
-        ServantryHelper servantryHelper = ServantryHelper.get(player);
-        AttachmentEntityType<T> type = getType();
-        for (int i = 0; i < getSummonCount(); i++) {
-            T servant = type.factory().get();
-            servant.setOwner(player);
-            servant.setDamage(getDamage());
-            servant.setKnockback(getKnockback());
-            if (summonPre(player, servant)) {
-                if (servantryHelper.summonServant(servant)) {
-                    summonPost(servant);
-                }
-            }
-        }
-    }
+    void summon(Player player);
 
     /**
      * 移除玩家拥有的此类型仆从。
@@ -95,12 +75,15 @@ public interface IServantWeapon<T extends Servant> {
         private float knockback = 0;
         private float armorPierce = 0;
         private Supplier<SoundEvent> soundEventSupplier = () -> null;
-        private BiPredicate<Player, T> summonPre = (player, servant) -> true;
-        private Consumer<T> summonPost = servant -> {
+        private BiConsumer<IServantWeapon<T>, Player> summonAction = (weapon, player) -> {
+            T servant = weapon.createServant(player);
+            if (ServantryHelper.get(player).summonServant(servant)) {
+                RandomSource random = player.getRandom();
+                servant.init(new PathNode(player.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0));
+            }
         };
         private Consumer<Player> onRemove = null;
         private Consumer<Item.Properties> properties = null;
-        private int summonCount = 1;
 
         public Builder(@NotNull Supplier<AttachmentEntityType<T>> typeSupplier) {
             this.typeSupplier = typeSupplier;
@@ -131,30 +114,16 @@ public interface IServantWeapon<T extends Servant> {
         }
 
         /**
-         * 设置召唤前回调，返回false取消召唤。
+         * 完整重写召唤逻辑，weapon 可调用 createServant 构建实例。
          */
-        public Builder<T> summonPre(BiPredicate<Player, T> predicate) {
-            this.summonPre = predicate;
-            return this;
-        }
-
-        /**
-         * 设置仆从召唤后回调。
-         */
-        public Builder<T> summonPost(Consumer<T> action) {
-            this.summonPost = action;
+        public Builder<T> summon(BiConsumer<IServantWeapon<T>, Player> action) {
+            this.summonAction = action;
             return this;
         }
 
         /** 设置仆从移除回调。 */
         public Builder<T> onRemove(Consumer<Player> action) {
             this.onRemove = action;
-            return this;
-        }
-
-        /** 设置每次召唤的仆从数量。 */
-        public Builder<T> summonCount(int count) {
-            this.summonCount = count;
             return this;
         }
 
@@ -204,18 +173,8 @@ public interface IServantWeapon<T extends Servant> {
             }
 
             @Override
-            public int getSummonCount() {
-                return summonCount;
-            }
-
-            @Override
-            public boolean summonPre(Player player, T servant) {
-                return summonPre.test(player, servant);
-            }
-
-            @Override
-            public void summonPost(T servant) {
-                summonPost.accept(servant);
+            public void summon(Player player) {
+                summonAction.accept(this, player);
             }
 
             @Override

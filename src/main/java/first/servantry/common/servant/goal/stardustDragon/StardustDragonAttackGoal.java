@@ -20,11 +20,6 @@ public class StardustDragonAttackGoal extends ServantGoal<StardustDragon> {
     }
 
     @Override
-    public boolean canContinueToUse() {
-        return servant.isHead() && servant.isTarget(servant.getTarget());
-    }
-
-    @Override
     public void tick() {
         LivingEntity target = servant.getTarget();
         Vec3 targetPos = target.getBoundingBox().getCenter();

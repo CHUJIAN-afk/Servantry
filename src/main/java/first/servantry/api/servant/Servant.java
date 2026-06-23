@@ -9,6 +9,7 @@ import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import first.servantry.register.DamageRegister;
 import net.minecraft.core.Holder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Targeting;
@@ -27,6 +28,7 @@ public abstract class Servant extends AttachmentEntity {
 
     private final ServantGoalSelector goalSelector = new ServantGoalSelector();
     private LivingEntity target = null;
+    private int slotCost = 1;
     private boolean targetChange = false;
 
     public Servant() {
@@ -46,7 +48,11 @@ public abstract class Servant extends AttachmentEntity {
      * 获取占用栏位数
      */
     public int getSlotCost() {
-        return 1;
+        return slotCost;
+    }
+
+    public void setSlotCost(int slotCost) {
+        this.slotCost = slotCost;
     }
 
     // ===================== 生命周期 =====================
@@ -145,6 +151,18 @@ public abstract class Servant extends AttachmentEntity {
             }
         }
         return count;
+    }
+
+    @Override
+    public void writeBase(RegistryFriendlyByteBuf buf) {
+        super.writeBase(buf);
+        buf.writeInt(slotCost);
+    }
+
+    @Override
+    public void readBase(RegistryFriendlyByteBuf buf) {
+        super.readBase(buf);
+        slotCost = buf.readInt();
     }
 
     // ===================== 目标访问器 =====================

@@ -96,14 +96,12 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
     }
 
     private void tickFlying() {
-        if (life >= 10) {
-            if (chaseTarget != null && chaseTarget.isAlive()) {
-                Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
-                applyForce(targetCenter.subtract(getPos()).normalize().scale(0.3));
-                setTrailTimer(getTrailDuration());
-            } else {
-                setRemove();
-            }
+        if (chaseTarget != null && chaseTarget.isAlive()) {
+            Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
+            applyForce(targetCenter.subtract(getPos()).normalize().scale(0.3));
+            setTrailTimer(getTrailDuration());
+        } else {
+            setRemove();
         }
     }
 

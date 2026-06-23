@@ -90,14 +90,22 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
             // 清理所有分组中标记移除的实体
             for (Map<AttachmentEntityType<?>, List<AttachmentEntity>> map : groups.values()) {
                 map.values().removeIf(list -> {
-                    list.removeIf(entity -> {
-                        if (entity.isRemove()) {
-                            entity.onRemove();
-                            changed = true;
-                            return true;
+                    while (true) {
+                        list.removeIf(entity -> {
+                            if (entity.isRemove()) {
+                                entity.onRemove();
+                                changed = true;
+                                return true;
+                            }
+                            return false;
+                        });
+                        if (list.isEmpty()) {
+                            break;
                         }
-                        return false;
-                    });
+                        if (list.stream().noneMatch(AttachmentEntity::isRemove)) {
+                            break;
+                        }
+                    }
                     return list.isEmpty();
                 });
             }
@@ -115,7 +123,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
             Collection<List<AttachmentEntity>> values = map.values();
             for (List<AttachmentEntity> value : values) {
                 for (AttachmentEntity attachmentEntity : value) {
-                    if (tClass.isInstance(attachmentEntity)) {
+                    if (!attachmentEntity.isRemove() && tClass.isInstance(attachmentEntity)) {
                         @SuppressWarnings("unchecked")
                         T t = (T) attachmentEntity;
                         result.add(t);

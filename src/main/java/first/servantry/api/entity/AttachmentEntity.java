@@ -342,6 +342,10 @@ public abstract class AttachmentEntity {
         return pts[0];
     }
 
+    public Vec3 getLookAngle() {
+        return Vec3.directionFromRotation(getPitch(), getYaw()).normalize();
+    }
+
     /**
      * 获取当前速度向量
      */

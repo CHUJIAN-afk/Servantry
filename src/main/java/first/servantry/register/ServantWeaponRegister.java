@@ -3,18 +3,14 @@ package first.servantry.register;
 import first.servantry.Servantry;
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.client.creativeTab.AnimInfo;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
-import first.servantry.common.servant.StardustDragon;
-import first.servantry.common.servant.Twins;
+import first.servantry.common.servant.*;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.phys.Vec3;
@@ -33,8 +29,14 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> SurveyDroneRemote =
             Register.register(SERVANT_WEAPON, "survey_drone_remote", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.OreScout)
                             .sound(SoundRegister.UseServantWeapon)
-                            .summonPre((player, servant) -> servant.getSameSize() < 1)
-                            .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1.0f)))
+                            .summon((weapon, player) -> {
+                                OreScout servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servant.getSameSize() < 1 && servantryHelper.canSummon(1)) {
+                                    servantryHelper.add(EntityData.Type.Servant, servant);
+                                    servant.init(servant.getInterpolatedIdleState(1.0f));
+                                }
+                            })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()
@@ -53,8 +55,14 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> FairyBell =
             Register.register(SERVANT_WEAPON, "fairy_bell", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.ScavengerFairy)
                             .sound(SoundRegister.UseServantWeapon)
-                            .summonPre((player, servant) -> servant.getSameSize() < 1)
-                            .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1.0f)))
+                            .summon((weapon, player) -> {
+                                ScavengerFairy servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servant.getSameSize() < 1 && servantryHelper.canSummon(1)) {
+                                    servant.init(servant.getInterpolatedIdleState(1.0f));
+                                    servantryHelper.add(EntityData.Type.Servant, servant);
+                                }
+                            })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()
@@ -72,13 +80,17 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> BladeStaff =
             Register.register(SERVANT_WEAPON, "blade_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.EnchantedThrowingKnives)
                             .damage(0.6f)
-                            .armorPierce(2.5f)
+                            .armorPierce(7.5f)
                             .sound(SoundRegister.UseServantWeapon)
-                            .summonPost(servant -> {
-                                Player owner = servant.getOwner();
-                                PathNode idle = servant.getInterpolatedIdleState(1.0f);
-                                Vec3 center = owner.getBoundingBox().getCenter();
-                                servant.init(new PathNode(new Vec3(center.x(), idle.pos().y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
+                            .summon((weapon, player) -> {
+                                EnchantedThrowingKnives servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(1)) {
+                                    PathNode idle = servant.getInterpolatedIdleState(1.0f);
+                                    Vec3 center = player.getBoundingBox().getCenter();
+                                    servant.init(new PathNode(new Vec3(center.x(), idle.pos().y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
+                                    servantryHelper.add(EntityData.Type.Servant, servant);
+                                }
                             })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
@@ -99,25 +111,18 @@ public class ServantWeaponRegister {
                             .damage(2.4f)
                             .knockback(0.1f)
                             .sound(SoundRegister.UseTerraprism)
-                            .summonPost(servant -> {
-                                Player owner = servant.getOwner();
-                                RandomSource random = owner.getRandom();
-                                random.setSeed(owner.level()
-                                                       .getGameTime());
-                                PathNode pathNode = new PathNode(owner.getBoundingBox()
-                                                                         .getCenter()
-                                                                         .offsetRandom(random, 2), 0, 0, 0);
-                                servant.init(pathNode);
-                                ServantryHelper servantryHelper = ServantryHelper.get(owner);
-                                Twins twins = AttachmentEntityRegister.Twins.get()
-                                        .factory()
-                                        .get();
-                                twins.setOwner(owner);
-                                twins.setDamage(servant.getDamage());
-                                twins.setKnockback(servant.getKnockback());
-                                twins.setLaserEye(false);
-                                if (servantryHelper.summonServant(twins)) {
-                                    twins.init(pathNode);
+                            .summon((weapon, player) -> {
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(1)) {
+                                    RandomSource random = player.getRandom();
+                                    PathNode pathNode = new PathNode(player.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0);
+                                    for (int i = 0; i < 2; i++) {
+                                        Twins twins = weapon.createServant(player);
+                                        twins.setLaserEye(i == 0);
+                                        twins.setSlotCost(i);
+                                        twins.init(pathNode);
+                                        servantryHelper.add(EntityData.Type.Servant, twins);
+                                    }
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.RARE))
@@ -138,13 +143,6 @@ public class ServantWeaponRegister {
                             .damage(5.5f)
                             .knockback(0.1f)
                             .sound(SoundRegister.UseServantWeapon)
-                            .summonPost(servant -> {
-                                Player owner = servant.getOwner();
-                                RandomSource random = owner.getRandom();
-                                servant.init(new PathNode(owner.getBoundingBox()
-                                                                  .getCenter()
-                                                                  .offsetRandom(random, 2), 0, 0, 0));
-                            })
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
                     .language("Deadly Sphere Staff", "致命球法杖")
@@ -158,13 +156,6 @@ public class ServantWeaponRegister {
                             .damage(5f)
                             .knockback(0.1f)
                             .sound(SoundRegister.UseServantWeapon)
-                            .summonPost(servant -> {
-                                Player owner = servant.getOwner();
-                                RandomSource random = owner.getRandom();
-                                servant.init(new PathNode(owner.getBoundingBox()
-                                                                  .getCenter()
-                                                                  .offsetRandom(random, 2), 0, 0, 0));
-                            })
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
                     .language("Tempest Staff", "暴风雨法杖")
@@ -174,13 +165,19 @@ public class ServantWeaponRegister {
      * 泰拉棱镜 - 召唤泰拉棱镜仆从
      */
     public static final DeferredItem<Item> TerraPrism =
-            Register.register(SERVANT_WEAPON, "terraprism", () ->
-                            new IServantWeapon.Builder<>(AttachmentEntityRegister.TerraPrism)
-                                    .damage(9f).knockback(0.1f)
-                                    .sound(SoundRegister.UseTerraprism)
-                                    .summonPost(servant -> servant.init(servant.getInterpolatedIdleState(1)))
-                                    .properties(properties -> properties.rarity(Rarity.EPIC))
-                                    .build())
+            Register.register(SERVANT_WEAPON, "terraprism", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.TerraPrism)
+                            .damage(9f).knockback(0.1f)
+                            .sound(SoundRegister.UseTerraprism)
+                            .summon((weapon, player) -> {
+                                Terraprism servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(1)) {
+                                    servant.init(servant.getInterpolatedIdleState(1));
+                                    servantryHelper.add(EntityData.Type.Servant, servant);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
                     .language("Terraprism", "泰拉棱镜")
                     .servant(AttachmentEntityRegister.TerraPrism, "Terraprism", "泰拉棱镜")
                     .tooltip(1, "A flawless blade once hailed as the Prism of the Earth", "曾被冠以大地棱彩美名的无暇之剑")
@@ -190,16 +187,16 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> EtherealStellarCoreStaff =
             Register.register(SERVANT_WEAPON, "ethereal_stellar_core_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.EtherealStellarCore)
-                            .damage(3.0f).knockback(0.3f)
+                            .damage(10.0f)
+                            .knockback(0.5f)
                             .sound(SoundRegister.UseServantWeapon)
-                            .summonPre((player, etherealStellarCore) -> etherealStellarCore.getSameSize() < 9)
-                            .summonPost(servant -> {
-                                Player owner = servant.getOwner();
-                                PathNode idle = servant.getInterpolatedIdleState(1.0f);
-                                Vec3 center = owner.getBoundingBox()
-                                        .getCenter();
-                                servant.init(new PathNode(new Vec3(center.x(), idle.pos()
-                                        .y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
+                            .summon((weapon, player) -> {
+                                EtherealStellarCore servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servant.getSameSize() < 9 && servantryHelper.canSummon(1)) {
+                                    servant.init(servant.getInterpolatedIdleState(1.0f));
+                                    servantryHelper.add(EntityData.Type.Servant, servant);
+                                }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
@@ -219,13 +216,6 @@ public class ServantWeaponRegister {
                             .damage(6f)
                             .knockback(0.2f)
                             .sound(SoundRegister.UseServantWeapon)
-                            .summonPost(servant -> {
-                                Player owner = servant.getOwner();
-                                RandomSource random = owner.getRandom();
-                                servant.init(new PathNode(owner.getBoundingBox()
-                                                                  .getCenter()
-                                                                  .offsetRandom(random, 2), 0, 0, 0));
-                            })
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .recipe(output -> MithrilAnvilRecipe.builder()
@@ -243,53 +233,34 @@ public class ServantWeaponRegister {
             Register.register(SERVANT_WEAPON, "stardust_dragon_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.StardustDragon)
                             .damage(8f).knockback(0.5f)
                             .sound(SoundRegister.UseServantWeapon)
-                            .summonPost(stardustDragon -> {
-                                Player owner = stardustDragon.getOwner();
-                                ServantryHelper servantryHelper = ServantryHelper.get(owner);
-                                AttachmentEntityType<StardustDragon> type = AttachmentEntityRegister.StardustDragon.get();
-                                List<StardustDragon> existing = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class);
-                                if (existing.isEmpty()) {
-                                    // 首次召唤：设置索引0，额外召唤2个体节
-                                    stardustDragon.setSegmentIndex(0);
-                                    stardustDragon.setTotalSegments(3);
-                                    stardustDragon.init(new PathNode(owner.position()
-                                                                             .add(0, 3, 0), 0, 0, 0));
-
-                                    for (int i = 1; i < 3; i++) {
-                                        StardustDragon segment = type.factory()
-                                                .get();
-                                        segment.setOwner(owner);
-                                        segment.setDamage(stardustDragon.getDamage());
-                                        segment.setKnockback(stardustDragon.getKnockback());
-                                        segment.setSegmentIndex(i);
-                                        segment.setTotalSegments(3);
-                                        if (servantryHelper.summonServant(segment)) {
-                                            segment.init(new PathNode(owner.position()
-                                                                              .add(0, 3, -i * segment.getSegmentDistance()), 0, 0, 0));
+                            .summon((weapon, player) -> {
+                                ServantryHelper helper = ServantryHelper.get(player);
+                                if (helper.canSummon(1)) {
+                                    List<StardustDragon> existing = helper.getEntityData().get(EntityData.Type.Servant, StardustDragon.class);
+                                    if (existing.isEmpty()) {
+                                        for (int i = 0; i < 3; i++) {
+                                            StardustDragon servant = weapon.createServant(player);
+                                            servant.setSegmentIndex(i);
+                                            if (i < 2) {
+                                                servant.setSlotCost(0);
+                                            }
+                                            servant.setTotalSegments(3);
+                                            servant.init(new PathNode(player.position().add(0, 3, -i * servant.getSegmentDistance()), 0, 0, 0));
+                                            helper.add(EntityData.Type.Servant, servant);
                                         }
+                                    } else {
+                                        StardustDragon servant = weapon.createServant(player);
+                                        servant.setSegmentIndex(existing.size());
+                                        servant.setTotalSegments(existing.size() + 1);
+                                        for (StardustDragon dragon : existing) {
+                                            dragon.setTotalSegments(existing.size() + 1);
+                                        }
+                                        StardustDragon last = existing.getLast();
+                                        PathNode pathNode = last.getCurrentPathNode();
+                                        Vec3 pos = pathNode.pos().add(last.getLookAngle().scale(-servant.getSegmentDistance()));
+                                        servant.init(new PathNode(pos, pathNode.yaw(), pathNode.pitch(), pathNode.roll()));
+                                        helper.add(EntityData.Type.Servant, servant);
                                     }
-                                } else {
-                                    // 增加体节：找到最大索引，设置新索引
-                                    int maxIndex = existing.stream()
-                                            .mapToInt(StardustDragon::getSegmentIndex)
-                                            .max()
-                                            .orElse(0);
-
-                                    stardustDragon.setSegmentIndex(maxIndex + 1);
-
-                                    // 更新所有体节的总数
-                                    int newTotal = maxIndex + 2;
-                                    existing.forEach(s -> s.setTotalSegments(newTotal));
-                                    stardustDragon.setTotalSegments(newTotal);
-
-                                    // 在最后一个体节位置初始化
-                                    Vec3 lastPos = existing.stream()
-                                            .filter(e -> e.getSegmentIndex() == maxIndex)
-                                            .findFirst()
-                                            .map(StardustDragon::getPos)
-                                            .orElse(owner.position()
-                                                            .add(0, 3, 0));
-                                    stardustDragon.init(new PathNode(lastPos, 0, 0, 0));
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC))
@@ -308,17 +279,16 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> InfiniteScabbard =
             Register.register(SERVANT_WEAPON, "infinite_scabbard", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.InfiniteShadow)
                             .sound(SoundRegister.UseTerraprism)
-                            .summonPre((player, infiniteShadow) -> {
-                                ItemStack mainHandItem = player.getMainHandItem();
-                                ScabbardContainer container = mainHandItem.getComponents()
-                                        .getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
-                                if (!container.isEmpty()) {
-                                    infiniteShadow.setItemStack(container.itemStack());
-                                    return true;
+                            .summon((weapon, player) -> {
+                                InfiniteShadow servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                ScabbardContainer container = player.getMainHandItem().getComponents().getOrDefault(DataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                                if (servantryHelper.canSummon(1) && !container.isEmpty()) {
+                                    servant.setItemStack(container.itemStack());
+                                    servant.init(servant.getInterpolatedIdleState(1));
+                                    servantryHelper.add(EntityData.Type.Servant, servant);
                                 }
-                                return false;
                             })
-                            .summonPost(infiniteShadow -> infiniteShadow.init(infiniteShadow.getInterpolatedIdleState(1)))
                             .properties(properties -> properties.rarity(Rarity.EPIC)
                                     .component(DataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
                             .build())

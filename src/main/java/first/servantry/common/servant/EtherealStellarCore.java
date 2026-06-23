@@ -51,7 +51,7 @@ public class EtherealStellarCore extends Servant {
         Player owner = getOwner();
         RandomSource random = owner.getRandom();
         shootCooldown = 18 + random.nextInt(-2, 2);
-        int count = random.nextInt(2, 4);
+        int count = random.nextInt(2, 5);
         for (int i = 0; i < count; i++) {
             Vec3 start = getPos();
             Vec3 direction = start.offsetRandom(random, 2f).subtract(start).normalize();

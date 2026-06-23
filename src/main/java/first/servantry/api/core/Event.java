@@ -115,7 +115,7 @@ public class Event {
             player.swing(InteractionHand.MAIN_HAND, true);
             if (!level.isClientSide()) {
                 if (!player.isShiftKeyDown()) {
-                    iServantWeapon.handleSummon(player);
+                    iServantWeapon.summon(player);
                 } else {
                     iServantWeapon.remove(player);
                 }
