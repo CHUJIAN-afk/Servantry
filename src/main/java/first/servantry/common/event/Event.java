@@ -110,13 +110,11 @@ public class Event {
     @SubscribeEvent
     public static void onServantIncomingDamage(ServantIncomingDamageEvent event) {
         Servant servant = event.getSource().getServant();
-        if (servant != null) {
-            Player owner = servant.getOwner();
-            if (!owner.level().isClientSide()) {
-                LivingEntity target = event.getEntity();
-                if (ArmorSetRegister.Hallowed.value().full(owner)) {
-                    target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
-                }
+        Player owner = servant.getOwner();
+        if (!owner.level().isClientSide()) {
+            LivingEntity target = event.getEntity();
+            if (ArmorSetRegister.Hallowed.value().full(owner)) {
+                target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
             }
         }
     }
@@ -167,6 +165,9 @@ public class Event {
     public static void onLivingDamageEventPostFromServant(LivingDamageEvent.Post event) {
         DamageSource damageSource = event.getSource();
         LivingEntity target = event.getEntity();
+        if (!target.level().isClientSide() && target instanceof Player player) {
+            player.addEffect(new MobEffectInstance(MobEffectRegister.BallistaPanicked, 100));
+        }
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player && target.isAlive()) {
             EntityData entityData = player.getData(AttachmentRegister.EntityData);
             if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof ChlorophyteCrystal)) {

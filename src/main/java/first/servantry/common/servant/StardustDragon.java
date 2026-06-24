@@ -72,13 +72,6 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
                         .speed(0)
                         .emit();
             }
-            // 限制最大速度
-            double maxSpeed = 1.0;
-            Vec3 vel = getVelocity();
-            double speed = vel.length();
-            if (speed > maxSpeed) {
-                setVelocity(vel.normalize().scale(maxSpeed));
-            }
         }
         super.tick();
     }

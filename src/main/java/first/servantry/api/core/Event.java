@@ -6,6 +6,7 @@ import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ServantryRegistries;
+import first.servantry.api.servant.Servant;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import first.servantry.utils.AttributeUtils;
@@ -45,8 +46,10 @@ public class Event {
     public static void projectileClear(EntityTravelToDimensionEvent event) {
         if (!event.isCanceled() && event.getEntity() instanceof Player player && !player.level().isClientSide()) {
             EntityData data = player.getData(AttachmentRegister.EntityData);
-            List<Projectile> projectiles = data.get(EntityData.Type.Projectile, Projectile.class);
-            for (Projectile projectile : projectiles) {
+            for (Projectile projectile : data.get(EntityData.Type.Projectile, Projectile.class)) {
+                projectile.setRemove();
+            }
+            for (Servant projectile : data.get(EntityData.Type.SentryServant, Servant.class)) {
                 projectile.setRemove();
             }
         }
@@ -129,8 +132,7 @@ public class Event {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void addAttribute(EntityAttributeModificationEvent event) {
-        List<EntityType<? extends LivingEntity>> types = event.getTypes();
-        for (EntityType<? extends LivingEntity> type : types) {
+        for (EntityType<? extends LivingEntity> type : event.getTypes()) {
             event.add(type, AttributeRegister.HealthRegen);
         }
         event.add(EntityType.PLAYER, AttributeRegister.ServantMaxCount);

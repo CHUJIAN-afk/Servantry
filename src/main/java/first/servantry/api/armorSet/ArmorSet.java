@@ -24,14 +24,14 @@ public record ArmorSet(
         Consumer<Player> onRemove
 ) {
 
-    public static final Map<UUID, Map<ArmorSet, Boolean>> CACHE = new HashMap<>();
+    public static final Map<UUID, Map<ArmorSet, Boolean>> CACHE = new WeakHashMap<>();
 
     public static Builder builder(ResourceLocation id) {
         return new Builder(id);
     }
 
     public boolean full(Player player) {
-        return CACHE.computeIfAbsent(player.getUUID(), k -> new HashMap<>())
+        return CACHE.computeIfAbsent(player.getUUID(), k -> new WeakHashMap<>())
                     .computeIfAbsent(this, k -> {
                         Iterable<ItemStack> armorSlots = player.getArmorSlots();
                         List<Item> target = new ArrayList<>();

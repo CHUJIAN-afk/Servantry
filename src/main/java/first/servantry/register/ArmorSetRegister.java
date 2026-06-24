@@ -78,6 +78,8 @@ public class ArmorSetRegister {
                     .modifier(AttributeRegister.SentryServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                     .modifier(AttributeRegister.ServantDamage, 0.40, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .modifier(Attributes.KNOCKBACK_RESISTANCE, 1.0, AttributeModifier.Operation.ADD_VALUE)
+                    .tooltip(1, "Summons a powerful leaf crystal to shoot at nearby enemies", "大幅提升弩车开火速度，弩箭速度，弩箭最大穿透数，弩箭伤害")
+                    .tooltip(2, "Summons a powerful leaf crystal to shoot at nearby enemies", "受到伤害时，提供弩车恐慌增益，极大幅提升弩车开火速度")
                     .build()
             );
 

@@ -20,7 +20,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
         // ================= 模组基础 =================
         entry("modid.servantry", "Servantry", "仆从学");
         entry("item.servantry.tooltip.set_bonus_title", "Set Rewards:", "套装奖励:");
-        entry("item.servantry.tooltip.damage", "Summon Damage", "召唤伤害");
+        entry("item.servantry.tooltip.damage", "Summon Damage", "仆从伤害");
         entry("item.servantry.tooltip.knockback", "Knockback", "击退强度");
         entry("item.servantry.tooltip.armor_pierce", "Armor Pierce", "护甲穿透");
         entry("item.servantry.tooltip.summon", "Summons %s to fight for you", "召唤 %s 为你而战");
@@ -52,6 +52,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("effect.servantry.phantasmal_bulwark", "Phantasmal Bulwark", "幻魂坚盾");
         entry("effect.servantry.phantasmal_rebirth", "Phantasmal Rebirth", "幻魂还生");
         entry("effect.servantry.shadowflame", "Shadowflame", "暗影焰");
+        entry("effect.servantry.moon_bite", "Moon Bite", "月噬");
         // 长效和强效药水
         entry("item.minecraft.potion.effect.obsession", "Potion of Obsession", "着魔药水");
         entry("item.minecraft.splash_potion.effect.obsession", "Splash Potion of Obsession", "喷溅型着魔药水");

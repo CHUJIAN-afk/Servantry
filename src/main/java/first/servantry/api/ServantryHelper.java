@@ -1,6 +1,7 @@
 package first.servantry.api;
 
 import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.servant.Servant;
@@ -24,6 +25,10 @@ public final class ServantryHelper {
 
     public static ServantryHelper get(Player player) {
         return new ServantryHelper(player);
+    }
+
+    public TargetCache getTargetCache(){
+        return player.getData(AttachmentRegister.TargetCache);
     }
 
     public EntityData getEntityData() {

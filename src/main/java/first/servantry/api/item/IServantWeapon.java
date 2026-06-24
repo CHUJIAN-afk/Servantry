@@ -59,7 +59,9 @@ public interface IServantWeapon<T extends Servant> {
      * 移除玩家拥有的此类型仆从。
      */
     default void remove(Player player) {
-        ServantryHelper.get(player).getEntityData().remove(EntityData.Type.Servant, getType());
+        EntityData entityData = ServantryHelper.get(player).getEntityData();
+        entityData.remove(EntityData.Type.Servant, getType());
+        entityData.remove(EntityData.Type.SentryServant, getType());
     }
 
     // ===================== 构建器 =====================

@@ -56,9 +56,7 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
     public boolean isValidCollisionTarget(LaserProjectile entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                return servant.isTarget(target);
-            }
+            return servant.isTarget(target);
         }
         return false;
     }

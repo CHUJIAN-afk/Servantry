@@ -65,7 +65,21 @@ public class MobEffectRegister {
      */
     public static final DeferredHolder<MobEffect, MobEffect> Shadowflame =
             Register.register("shadowflame", () -> builder(MobEffectCategory.HARMFUL, 0x9933FF)
-                    .addAttributeModifier(AttributeRegister.HealthRegen, Servantry.rl("shadowflame"), amplifier -> -(amplifier + 1) * 1.2, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(AttributeRegister.HealthRegen, Servantry.rl("shadowflame"), amplifier -> -(amplifier + 1) * 1.5, AttributeModifier.Operation.ADD_VALUE)
+                    .build()
+            );
+
+    /**
+     * 月噬
+     */
+    public static final DeferredHolder<MobEffect, MobEffect> MoonBite =
+            Register.register("moon_bite", () -> builder(MobEffectCategory.HARMFUL, 0x00d4b0)
+                    .addAttributeModifier(Attributes.ARMOR, Servantry.rl("moon_bite"), amplifier -> -(amplifier + 1) * 10, AttributeModifier.Operation.ADD_VALUE)
+                    .build()
+            );
+
+    public static final DeferredHolder<MobEffect, MobEffect> BallistaPanicked =
+            Register.register("ballista_panicked", () -> builder(MobEffectCategory.BENEFICIAL, 0xffa219)
                     .build()
             );
 

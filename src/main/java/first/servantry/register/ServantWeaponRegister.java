@@ -8,6 +8,9 @@ import first.servantry.api.item.IServantWeapon;
 import first.servantry.client.creativeTab.AnimInfo;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
+import first.servantry.common.sentryServant.Ballista;
+import first.servantry.common.sentryServant.MoonPortal;
+import first.servantry.common.sentryServant.RainbowCrystal;
 import first.servantry.common.servant.*;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
@@ -183,6 +186,73 @@ public class ServantWeaponRegister {
                     .tooltip(1, "A flawless blade once hailed as the Prism of the Earth", "曾被冠以大地棱彩美名的无暇之剑")
                     .build();
     /**
+     * 弩车魔杖
+     */
+    public static final DeferredItem<Item> BallistaRod =
+            Register.register(SERVANT_WEAPON, "ballista_rod", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Ballista)
+                            .damage(3f)
+                            .knockback(0.4f)
+                            .sound(SoundRegister.UseBallistaStaff)
+                            .summon((weapon, player) -> {
+                                Ballista servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
+                                    servant.setLevel(1);
+                                    servant.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
+                                    servantryHelper.add(EntityData.Type.SentryServant, servant);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .language("Ballista Rod", "弩车魔杖")
+                    .tooltip(1, "A slow but high damage tower that shoots piercing bolts", "速度缓慢但伤害力极高的防御塔，可以射出穿透性箭矢")
+                    .build();
+    /**
+     * 弩车手杖
+     */
+    public static final DeferredItem<Item> BallistaCane =
+            Register.register(SERVANT_WEAPON, "ballista_cane", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Ballista)
+                            .damage(7.4f)
+                            .knockback(0.4f)
+                            .sound(SoundRegister.UseBallistaStaff)
+                            .summon((weapon, player) -> {
+                                Ballista servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
+                                    servant.setLevel(2);
+                                    servant.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
+                                    servantryHelper.add(EntityData.Type.SentryServant, servant);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .language("Ballista Cane", "弩车手杖")
+                    .tooltip(1, "A slow but high damage tower that shoots piercing bolts", "速度缓慢但伤害力极高的防御塔，可以射出穿透性箭矢")
+                    .build();
+    /**
+     * 弩车法杖
+     */
+    public static final DeferredItem<Item> BallistaStaff =
+            Register.register(SERVANT_WEAPON, "ballista_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Ballista)
+                            .damage(15.6f)
+                            .knockback(0.4f)
+                            .sound(SoundRegister.UseBallistaStaff)
+                            .summon((weapon, player) -> {
+                                Ballista servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
+                                    servant.setLevel(3);
+                                    servant.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
+                                    servantryHelper.add(EntityData.Type.SentryServant, servant);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .language("Ballista Staff", "弩车法杖")
+                    .servant(AttachmentEntityRegister.Ballista, "Ballista", "弩车")
+                    .tooltip(1, "A slow but high damage tower that shoots piercing bolts", "速度缓慢但伤害力极高的防御塔，可以射出穿透性箭矢")
+                    .build();
+    /**
      * 缥缈星核法杖 - 召唤缥缈星核仆从
      */
     public static final DeferredItem<Item> EtherealStellarCoreStaff =
@@ -272,6 +342,49 @@ public class ServantWeaponRegister {
                     .language("Stardust Dragon Staff", "星尘之龙法杖")
                     .servant(AttachmentEntityRegister.StardustDragon, "Stardust Dragon", "星尘之龙")
                     .tooltip(1, "When you have a dragon, who needs a swarm?", "有了一条巨龙后，谁还需要一群仆从呢？")
+                    .build();
+    /**
+     * 月亮传送门法杖
+     */
+    public static final DeferredItem<Item> MoonPortalStaff =
+            Register.register(SERVANT_WEAPON, "moon_portal_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.MoonPortal)
+                            .damage(10)
+                            .knockback(0.7f)
+                            .sound(SoundRegister.UseMoonPortalStaff)
+                            .summon((weapon, player) -> {
+                                MoonPortal servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
+                                    servant.init(new PathNode(player.position().add(0, 2, 0), 0, 0, 0));
+                                    servantryHelper.add(EntityData.Type.SentryServant, servant);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .language("Moon Portal Staff", "月亮传送门法杖")
+                    .servant(AttachmentEntityRegister.MoonPortal, "Moon Portal", "月亮传送门")
+                    .build();
+    /**
+     * 七彩水晶法杖
+     */
+    public static final DeferredItem<Item> RainbowCrystalStaff =
+            Register.register(SERVANT_WEAPON, "rainbow_crystal_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.RainbowCrystal)
+                            .damage(13)
+                            .knockback(0.7f)
+                            .sound(SoundRegister.UseMoonPortalStaff)
+                            .summon((weapon, player) -> {
+                                RainbowCrystal servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
+                                    servant.init(new PathNode(player.position().add(0, 2, 0), 0, 0, 0));
+                                    servantryHelper.add(EntityData.Type.SentryServant, servant);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .language("Rainbow Crystal Staff", "七彩水晶法杖")
+                    .servant(AttachmentEntityRegister.RainbowCrystal, "Rainbow Crystal", "七彩水晶")
+                    .tooltip(1, "'The colors, Duke, the colors!'", "“公爵，多么缤纷的颜色！”")
                     .build();
     /**
      * 无限剑鞘

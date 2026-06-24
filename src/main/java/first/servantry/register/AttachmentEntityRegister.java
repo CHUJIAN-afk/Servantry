@@ -5,6 +5,9 @@ import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.projectile.*;
+import first.servantry.common.sentryServant.Ballista;
+import first.servantry.common.sentryServant.MoonPortal;
+import first.servantry.common.sentryServant.RainbowCrystal;
 import first.servantry.common.servant.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -45,6 +48,11 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ChlorophyteCrystal>> ChlorophyteCrystal = register("chlorophyte_crystal", ChlorophyteCrystal::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MoonPortal>> MoonPortal = register("moon_portal", MoonPortal::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<RainbowCrystal>> RainbowCrystal = register("rainbow_crystal", RainbowCrystal::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Ballista>> Ballista = register("ballista", Ballista::new);
 
     // ===================== 射弹类型 =====================
 
@@ -63,6 +71,10 @@ public class AttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ZenithProjectile>> ZenithProjectile = register("zenith_projectile", ZenithProjectile::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CustomLaserProjectile>> CustomLaserProjectile = register("custom_laser_projectile", CustomLaserProjectile::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<RainbowCrystalProjectile>> RainbowCrystalProjectile = register("rainbow_crystal_projectile", RainbowCrystalProjectile::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CrossbowBoltProjectile>> CrossbowBoltProjectile = register("crossbow_bolt_projectile", CrossbowBoltProjectile::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));

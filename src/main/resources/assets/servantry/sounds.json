@@ -9,6 +9,21 @@
       "servantry:use_servant_weapon"
     ]
   },
+  "use_moon_portal_staff": {
+    "sounds": [
+      "servantry:use_moon_portal_staff"
+    ]
+  },
+  "use_ballista_staff": {
+    "sounds": [
+      "servantry:use_ballista_staff"
+    ]
+  },
+  "ballista_shot": {
+    "sounds": [
+      "servantry:ballista_shot"
+    ]
+  },
   "laser": {
     "sounds": [
       "servantry:laser"

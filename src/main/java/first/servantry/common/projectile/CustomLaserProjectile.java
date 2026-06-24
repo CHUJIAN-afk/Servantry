@@ -1,6 +1,5 @@
 package first.servantry.common.projectile;
 
-import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
@@ -14,15 +13,19 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.apache.logging.log4j.util.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class CustomLaserProjectile extends Projectile implements ICollideAttack<CustomLaserProjectile>{
+public class CustomLaserProjectile extends Projectile implements ICollideAttack<CustomLaserProjectile> {
 
     private int color = 0;
     private float alpha = 1;
     private AABB hitbox = new AABB(0, 0, 0, 0, 0, 0);
+    private Consumer<CustomLaserProjectile> tickConsumer = null;
+    private BiConsumer<CustomLaserProjectile, List<HitContext>> hitConsumer = null;
 
     public CustomLaserProjectile() {
         super();
@@ -46,8 +49,16 @@ public class CustomLaserProjectile extends Projectile implements ICollideAttack<
     }
 
     @Override
+    protected void tickPhysics() {
+
+    }
+
+    @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
+            if (tickConsumer != null) {
+                tickConsumer.accept(this);
+            }
             if (damageSource instanceof ServantDamageSource servantDamageSource) {
                 Servant servant = servantDamageSource.getServant();
                 if (servant == null) {
@@ -56,6 +67,14 @@ public class CustomLaserProjectile extends Projectile implements ICollideAttack<
             }
         }
         super.tick();
+    }
+
+    public void setTickConsumer(Consumer<CustomLaserProjectile> tickConsumer) {
+        this.tickConsumer = tickConsumer;
+    }
+
+    public void setHitConsumer(BiConsumer<CustomLaserProjectile, List<HitContext>> hitConsumer) {
+        this.hitConsumer = hitConsumer;
     }
 
     @Override
@@ -108,12 +127,8 @@ public class CustomLaserProjectile extends Projectile implements ICollideAttack<
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
-        if (source != null) {
-            for (HitContext hitContext : hitContexts) {
-                LivingEntity target = hitContext.entity();
-                InvincibleData.criteriaAttack(target, uuid, 5, source, getDamage(), InvincibleData.Type.PARTIAL);
-            }
+        if (hitConsumer != null) {
+            hitConsumer.accept(this, hitContexts);
         }
     }
 }

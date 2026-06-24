@@ -18,7 +18,7 @@ public abstract class MomentumServant extends Servant {
 
     private Vec3 velocity = Vec3.ZERO;
     private float drag = 0.95f;
-
+    private float gravity = 0;
     // ===================== 视角状态 =====================
 
     private float desiredYaw;
@@ -35,10 +35,10 @@ public abstract class MomentumServant extends Servant {
     @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
+            tickOrientation();
             if (!isExecutingPath()) {
                 tickPhysics();
             }
-            tickOrientation();
         }
         super.tick();
     }
@@ -51,6 +51,7 @@ public abstract class MomentumServant extends Servant {
     // ===================== 物理更新 =====================
 
     private void tickPhysics() {
+        velocity = velocity.add(0, gravity, 0);
         velocity = velocity.scale(drag);
         Vec3 newPos = getPos().add(velocity);
         setPath(new PlannedPath("physics", Collections.singletonList(new PathNode(newPos, desiredYaw, desiredPitch, desiredRoll))));
@@ -88,6 +89,10 @@ public abstract class MomentumServant extends Servant {
     }
 
     // ===================== 动量控制 =====================
+
+    public void setGravity(float gravity) {
+        this.gravity = gravity;
+    }
 
     /** 施加力（累加到速度） */
     public void applyForce(Vec3 force) {

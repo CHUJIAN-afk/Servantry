@@ -17,6 +17,7 @@ public class ServantDamageSource extends DamageSource {
         this.servant = servant;
     }
 
+    @NotNull
     public Servant getServant() {
         return servant;
     }

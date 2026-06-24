@@ -1,6 +1,9 @@
-// 1.21.1	2026-06-07T22:32:07.7979389	Item Models: servantry
+// 1.21.1	2026-06-24T20:58:37.9235614	Item Models: servantry
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/adamantite_ingot.json
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
+1234a813c7da2a7cf22f8be7f86b6fd620074edc assets/servantry/models/item/ballista_cane.json
+2a05e443fe429a936e59675f1102ae85ebccfd90 assets/servantry/models/item/ballista_rod.json
+cfabe46c64817b4e333ad91add1e9768aa656106 assets/servantry/models/item/ballista_staff.json
 e52c19b6f9e4cfa33bfb7f93947ca0e83696be7a assets/servantry/models/item/bee_boots.json
 b1690c91c1ab4c0368720ddaaa5fb36e2f1b8b13 assets/servantry/models/item/bee_chestplate.json
 c0a847867b3be7830beb6abe84d86cfce0e2b759 assets/servantry/models/item/bee_headgear.json
@@ -37,6 +40,7 @@ dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/kaleidosco
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/luminite_ingot.json
 be3b3c6977845aaeecb84bd5abf299be09738e1a assets/servantry/models/item/mithril_anvil.json
 27453db8a210e9975f578f4d7faf6a0dc3d184e3 assets/servantry/models/item/monks_belt.json
+5343591d07bd6a6d05f6a81142d12f1fcb0ddc73 assets/servantry/models/item/moon_portal_staff.json
 cd35e7ca8216678ea8d40290aa5ea6479fedc66c assets/servantry/models/item/necromantic_scroll.json
 f478ea06525209959303abd83e616649ef9b2f20 assets/servantry/models/item/obsidian_boots.json
 ce5f24d0b6cb1d96d841edc87c591c04940470b7 assets/servantry/models/item/obsidian_chestplate.json
@@ -47,6 +51,7 @@ ba1f28a328a4e9e41446a0a2d44f6c13dac07f24 assets/servantry/models/item/optic_staf
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/phantasmal_relic.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/primordial_shadowflame.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/pygmy_necklace.json
+95f165b53b28837065d03c385b1364cd3304b32e assets/servantry/models/item/rainbow_crystal_staff.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/silk.json
 dbd4ebeb4005e4f6ff1a0ab39e32cdeb29478e35 assets/servantry/models/item/soul_relief.json
 cb39d05dbca9723e4c59f66ac7a498e65e6d70ff assets/servantry/models/item/spider_boots.json
