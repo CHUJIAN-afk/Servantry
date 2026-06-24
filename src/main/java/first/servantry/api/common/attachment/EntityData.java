@@ -128,16 +128,28 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     }
 
     public <T> List<T> get(Type type, Class<T> tClass) {
+        return get(type, tClass, false);
+    }
+
+    public <T> List<T> get(Type type, Class<T> tClass, boolean precise) {
         List<T> result = new ArrayList<>();
         Map<AttachmentEntityType<?>, List<AttachmentEntity>> map = groups.get(type);
         if (map != null) {
             Collection<List<AttachmentEntity>> values = map.values();
             for (List<AttachmentEntity> value : values) {
                 for (AttachmentEntity attachmentEntity : value) {
-                    if (!attachmentEntity.isRemove() && tClass.isInstance(attachmentEntity)) {
-                        @SuppressWarnings("unchecked")
-                        T t = (T) attachmentEntity;
-                        result.add(t);
+                    if (!attachmentEntity.isRemove()) {
+                        if (precise) {
+                            if (tClass == attachmentEntity.getClass()) {
+                                @SuppressWarnings("unchecked")
+                                T t = (T) attachmentEntity;
+                                result.add(t);
+                            }
+                        } else if (tClass.isInstance(attachmentEntity)) {
+                            @SuppressWarnings("unchecked")
+                            T t = (T) attachmentEntity;
+                            result.add(t);
+                        }
                     }
                 }
             }

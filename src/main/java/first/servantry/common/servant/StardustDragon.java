@@ -79,7 +79,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     @Override
     public void onRemove() {
         if (isHead()) {
-            List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class);
+            List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
             for (StardustDragon dragon : dragons) {
                 dragon.setRemove();
             }
@@ -88,19 +88,11 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     @Nullable
     private StardustDragon getHead() {
-        List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class);
+        List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
         if (!dragons.isEmpty()) {
             return dragons.getFirst();
         }
         return null;
-    }
-
-    /**
-     * 限制推力方向在运动方向的角度范围内。
-     */
-    @Override
-    public void applyForce(Vec3 force) {
-        super.applyForce(force);
     }
 
     public boolean isHead() {
@@ -110,7 +102,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     @Nullable
     public StardustDragon getPrecedingSegment() {
         if (!isHead()) {
-            List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class);
+            List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
             return dragons.get(segmentIndex - 1);
         }
         return null;

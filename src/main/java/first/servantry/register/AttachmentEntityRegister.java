@@ -54,6 +54,8 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Ballista>> Ballista = register("ballista", Ballista::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<VoidEater>> VoidEater = register("void_eater", VoidEater::new);
+
     // ===================== 射弹类型 =====================
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustProjectile>> StardustProjectile = register("stardust_projectile", StardustProjectile::new);

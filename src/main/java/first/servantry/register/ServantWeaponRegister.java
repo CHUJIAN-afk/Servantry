@@ -306,7 +306,7 @@ public class ServantWeaponRegister {
                             .summon((weapon, player) -> {
                                 ServantryHelper helper = ServantryHelper.get(player);
                                 if (helper.canSummon(EntityData.Type.Servant, 1)) {
-                                    List<StardustDragon> existing = helper.getEntityData().get(EntityData.Type.Servant, StardustDragon.class);
+                                    List<StardustDragon> existing = helper.getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
                                             StardustDragon servant = weapon.createServant(player);
@@ -409,6 +409,52 @@ public class ServantWeaponRegister {
                     .servant(AttachmentEntityRegister.InfiniteShadow, "Infinite Shadow", "无限之影")
                     .tooltip(1, "A scabbard that stores a blade of infinite potential", "蕴含无限可能之'剑'的剑鞘")
                     .tooltip(2, "Right-click an item to store, right-click an empty slot to retrieve", "右键物品存入，右键空格子取出")
+                    .build();
+    /**
+     * 虚空吞噬者傀具
+     */
+    public static final DeferredItem<Item> VoidEaterMarionette =
+            Register.register(SERVANT_WEAPON, "void_eater_marionette", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.VoidEater)
+                            .damage(11f)
+                            .knockback(0.5f)
+                            .sound(SoundRegister.UseServantWeapon)
+                            .summon((weapon, player) -> {
+                                ServantryHelper helper = ServantryHelper.get(player);
+                                if (helper.canSummon(EntityData.Type.Servant, 1)) {
+                                    List<VoidEater> existing = helper.getEntityData().get(EntityData.Type.Servant, VoidEater.class, true);
+                                    if (existing.isEmpty()) {
+                                        for (int i = 0; i < 3; i++) {
+                                            VoidEater servant = weapon.createServant(player);
+                                            servant.setSegmentIndex(i);
+                                            if (i < 2) {
+                                                servant.setSlotCost(0);
+                                            }
+                                            servant.setTotalSegments(3);
+                                            servant.init(new PathNode(player.position().add(0, 3, -i * servant.getSegmentDistance()), 0, 0, 0));
+                                            helper.add(EntityData.Type.Servant, servant);
+                                        }
+                                    } else {
+                                        VoidEater servant = weapon.createServant(player);
+                                        servant.setSegmentIndex(existing.size());
+                                        servant.setTotalSegments(existing.size() + 1);
+                                        for (VoidEater dragon : existing) {
+                                            dragon.setTotalSegments(existing.size() + 1);
+                                        }
+                                        VoidEater last = existing.getLast();
+                                        PathNode pathNode = last.getCurrentPathNode();
+                                        Vec3 pos = pathNode.pos().add(last.getLookAngle().scale(-servant.getSegmentDistance()));
+                                        servant.init(new PathNode(pos, pathNode.yaw(), pathNode.pitch(), pathNode.roll()));
+                                        helper.add(EntityData.Type.Servant, servant);
+                                    }
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .language("Void Eater Marionette", "虚空吞噬者傀具")
+                    .servant(AttachmentEntityRegister.VoidEater, "Void Eater", "虚空吞噬者")
+                    .tooltip(1, "Contains the power to command miniature devourers", "蕴含掌控小型吞噬者的力量")
+                    .tooltip(2, "The devourer uses the God Eater, Holy Incineration and Cosmic Maelstrom to attack", "吞噬者会使用噬神者，焚灭虔信之火和超宇宙狂涡攻击")
+                    .tooltip(3, "While the devourer is present, all your attacks unleash God-Slaying Fury", "吞噬者在场时，你的所有攻击都会释放弑神怒焰")
                     .build();
 
     public static void register() {

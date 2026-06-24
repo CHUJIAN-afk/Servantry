@@ -78,6 +78,15 @@ public class MobEffectRegister {
                     .build()
             );
 
+    /**
+     * 噬神怒焰
+     */
+    public static final DeferredHolder<MobEffect, MobEffect> GodSlayerInferno =
+            Register.register("god_slayer_inferno", () -> builder(MobEffectCategory.HARMFUL, 0x6f19d4)
+                    .addAttributeModifier(AttributeRegister.HealthRegen, Servantry.rl("god_slayer_inferno"), amplifier -> -(amplifier + 1) * 25, AttributeModifier.Operation.ADD_VALUE)
+                    .build()
+            );
+
     public static final DeferredHolder<MobEffect, MobEffect> BallistaPanicked =
             Register.register("ballista_panicked", () -> builder(MobEffectCategory.BENEFICIAL, 0xffa219)
                     .build()
