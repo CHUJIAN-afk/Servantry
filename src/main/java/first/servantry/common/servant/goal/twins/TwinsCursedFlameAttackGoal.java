@@ -9,22 +9,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-/**
- * 魔焰眼冲刺攻击Goal。
- * <p>
- * 咒焰眼（Spazmatism）的攻击行为：
- * <ul>
- *   <li>冷却期间：看向目标并逐渐加速靠近</li>
- *   <li>冲刺时：施加巨大冲量冲向目标身后</li>
- *   <li>冷却时长：固定14tick</li>
- *   <li>冲刺条件：距离目标小于16格</li>
- * </ul>
- * </p>
- */
 public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
 
-    private Vec3 wanderTarget = Vec3.ZERO;
-    private int cooldown;
+    private Vec3 wanderPos = Vec3.ZERO;
+    private int cooldown = 0;
     private int emit = 0;
     private boolean emited = false;
 
@@ -34,7 +22,7 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
 
     @Override
     public boolean canUse() {
-        return !servant.isLaserEye() && servant.isTarget(servant.getTarget());
+        return servant.isFlameEye() && servant.isTarget(servant.getTarget());
     }
 
     @Override
@@ -43,14 +31,14 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
         Vec3 targetPos = target.getBoundingBox().getCenter();
         Vec3 toTarget = targetPos.subtract(servant.getPos());
         Player owner = servant.getOwner();
+        servant.lookAtPos(targetPos);
         if (!emited) {
-            servant.lookAtDirection(servant.getVelocity().normalize());
             if (--cooldown <= 0) {
                 emit += 5;
                 if (emit > 40) {
                     emited = true;
                 } else {
-                    cooldown = 8 + owner.getRandom().nextInt(-2, 2);
+                    cooldown = 12 + owner.getRandom().nextInt(-2, 2);
                     Vec3 direction = toTarget.offsetRandom(owner.getRandom(), (float) target.getBoundingBox().getSize()).normalize();
                     servant.applyForce(direction.scale(2));
                     servant.setTrailTimer(10);
@@ -58,27 +46,12 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
             }
         } else {
             if (--emit > 0) {
-                // 计算环绕位置
-                if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || targetPos.distanceToSqr(servant.getPos()) > 6 * 6) {
-                    wanderTarget = targetPos.offsetRandom(target.getRandom(), (float) target.getBoundingBox().getSize() * 6);
-                    wanderTarget.add(0, target.getBoundingBox().getSize() * 12, 0);
-                    double height = target.position().y() + target.getBoundingBox().getYsize() / 2;
-                    while (wanderTarget.y() < height) {
-                        wanderTarget = wanderTarget.add(0, 1, 0);
-                    }
-                }
-                Vec3 toAnchor = wanderTarget.subtract(servant.getPos());
-                double dist = toAnchor.length();
-                if (dist > 0.05) {
-                    double force = Math.min(dist * 0.08, 0.4);
-                    servant.applyForce(toAnchor.normalize().scale(force));
-                }
-                servant.lookAtPos(targetPos);
-                Vec3 direction = targetPos.subtract(servant.getPos()).normalize();
-                DemonFlameProjectile demonFlameProjectile = new DemonFlameProjectile(servant.getDamageSource(), servant.getPos().add(direction.scale(-1)), direction);
-                demonFlameProjectile.setDamage(servant.getDamage());
+                wanderPos = servant.getWanderPos(wanderPos, targetPos, 4, 1);
+                double distance = servant.getPos().distanceTo(wanderPos);
+                servant.applyForce(wanderPos.subtract(servant.getPos()).normalize().scale(Math.min(distance * 0.04, 0.4)));
+                DemonFlameProjectile demonFlameProjectile = new DemonFlameProjectile(servant.getDamageSource(), servant.getPos(), targetPos.subtract(servant.getPos()).normalize());
+                demonFlameProjectile.copyDamageData(servant);
                 demonFlameProjectile.join(owner);
-                // 喷射粒子 - 诅咒焰调色，高速小角度散射
                 ParticleHelper.create(owner.level())
                         .generic(GenericParticleBuilder.create()
                                 .color(0x24d509)

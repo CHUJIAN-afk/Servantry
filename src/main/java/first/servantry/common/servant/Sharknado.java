@@ -31,6 +31,7 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
     public Sharknado() {
         super();
         setDrag(0.92f);
+        setRotationSpeed(0);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
             if (shootCooldown > 0) {
                 shootCooldown--;
             }
-            setDesiredRotation(getCurrentPathNode().yaw() + (20 + (float) (getVelocity().length()) * 50), getPitch(), getRoll());
+            setDesiredRotation(getCurrentPathNode().yaw() + 25, getPitch(), getRoll());
             // 产生粒子
             ParticleHelper.create(owner.level())
                     .generic(GenericParticleBuilder.create()
@@ -82,7 +83,7 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
         Vec3 start = getPos();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
         SharkDragonProjectile projectile = new SharkDragonProjectile(getDamageSource(), start, direction);
-        projectile.setDamage(getDamage());
+        projectile.copyDamageData(this);
         projectile.join(owner);
     }
 

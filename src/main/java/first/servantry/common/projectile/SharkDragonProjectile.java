@@ -8,9 +8,7 @@ import first.servantry.api.entity.PathNode;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.utils.ParticleHelper;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -68,34 +66,13 @@ public class SharkDragonProjectile extends Projectile implements ICollideAttack<
 
     @Override
     public void onRemove() {
-        ParticleHelper.create(owner.level())
-                .generic(GenericParticleBuilder.create()
-                        .color(0xca1214)
-                        .edgeColor(0xa21011)
-                        .colorRandom(0.2F, 0.2F, 0.0F)
-                        .lifetime(4)
-                        .lifetimeRandom(8)
-                        .spin(0.1f)
-                        .spinRandom(0.25F)
-                        .friction(0.75F)
-                        .scale(0.025f)
-                        .scaleRandom(0.005f)
-                )
-                .pos(getPos())
-                .velocity(getVelocity())
-                .count(5)
-                .speed(0.55)
-                .spread(0.25)
-                .emit();
     }
 
     @Override
     public boolean isValidCollisionTarget(SharkDragonProjectile entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                return servant.isTarget(target);
-            }
+            return servant.isTarget(target);
         }
         return false;
     }

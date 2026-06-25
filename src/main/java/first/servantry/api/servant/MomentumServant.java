@@ -51,8 +51,7 @@ public abstract class MomentumServant extends Servant {
     // ===================== 物理更新 =====================
 
     private void tickPhysics() {
-        velocity = velocity.add(0, gravity, 0);
-        velocity = velocity.scale(drag);
+        velocity = velocity.add(0, gravity, 0).scale(drag);
         Vec3 newPos = getPos().add(velocity);
         setPath(new PlannedPath("physics", Collections.singletonList(new PathNode(newPos, desiredYaw, desiredPitch, desiredRoll))));
     }
@@ -61,10 +60,15 @@ public abstract class MomentumServant extends Servant {
         float deltaYaw = Mth.wrapDegrees(desiredYaw - getYaw());
         float deltaPitch = Mth.wrapDegrees(desiredPitch - getPitch());
         float deltaRoll = Mth.wrapDegrees(desiredRoll - getRoll());
-
-        desiredYaw = getYaw() + Mth.clamp(deltaYaw, -rotationSpeed, rotationSpeed);
-        desiredPitch = getPitch() + Mth.clamp(deltaPitch, -rotationSpeed, rotationSpeed);
-        desiredRoll = getRoll() + Mth.clamp(deltaRoll, -rotationSpeed, rotationSpeed);
+        if (rotationSpeed > 0) {
+            desiredYaw = getYaw() + Mth.clamp(deltaYaw, -rotationSpeed, rotationSpeed);
+            desiredPitch = getPitch() + Mth.clamp(deltaPitch, -rotationSpeed, rotationSpeed);
+            desiredRoll = getRoll() + Mth.clamp(deltaRoll, -rotationSpeed, rotationSpeed);
+        } else {
+            desiredYaw = getYaw() + deltaYaw;
+            desiredPitch = getPitch() + deltaPitch;
+            desiredRoll = getRoll() + deltaRoll;
+        }
     }
 
     // ===================== 视角控制 =====================
@@ -94,9 +98,21 @@ public abstract class MomentumServant extends Servant {
         this.gravity = gravity;
     }
 
-    /** 施加力（累加到速度） */
+    /**
+     * 施加力（累加到速度）
+     */
     public void applyForce(Vec3 force) {
         velocity = velocity.add(force);
+    }
+
+    /**
+     * 向目标位置方向施加力（累加到速度）
+     */
+    public void applyForce(Vec3 targetPos, float force) {
+        Vec3 direction = targetPos.subtract(getPos());
+        if (!direction.equals(Vec3.ZERO) && targetPos.distanceToSqr(getPos()) > 1) {
+            applyForce(direction.normalize().scale(force));
+        }
     }
 
     /** 设置速度 */
@@ -117,6 +133,17 @@ public abstract class MomentumServant extends Servant {
             path.add(new PathNode(pos, yaw, pitch, roll));
         }
         setPath(path);
+    }
+
+    public Vec3 getWanderPos(Vec3 lastWanderPos, Vec3 targetPos, float distance, float height) {
+        if (lastWanderPos.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || lastWanderPos.distanceToSqr(targetPos) > distance * distance) {
+            Vec3 newPos = targetPos.add(targetPos.offsetRandom(owner.getRandom(), 1).subtract(targetPos).normalize().scale(distance));
+            while (newPos.y() < targetPos.y() + height) {
+                newPos = newPos.add(0, 1, 0);
+            }
+            return newPos;
+        }
+        return lastWanderPos;
     }
 
     // ===================== 访问器 =====================

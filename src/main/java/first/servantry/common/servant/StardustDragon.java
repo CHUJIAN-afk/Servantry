@@ -40,6 +40,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     public StardustDragon() {
         setDrag(0.92f);
+        setRotationSpeed(0);
     }
 
     @Override
@@ -200,11 +201,12 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
      */
     public void spiralToward(Vec3 targetPos, double acceleration) {
         Vec3 currentPos = getPos();
+        targetPos = calculateBezierPoint(0.75f, currentPos, currentPos.add(getVelocity()), targetPos);
         Vec3 toTarget = targetPos.subtract(currentPos);
         double distance = toTarget.length();
-
-        if (distance < 1) return;
-
+        if (distance < 1) {
+            return;
+        }
         // 更新螺旋相位
         double speed = getVelocity().length() / getScale();
         spiralPhase += 0.2f * (float) speed;

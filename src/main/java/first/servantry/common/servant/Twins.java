@@ -40,6 +40,7 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     public Twins() {
         super();
         setDrag(0.75f);
+        setRotationSpeed(20);
     }
 
     @Override
@@ -127,6 +128,10 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
 
     public boolean isLaserEye() {
         return isLaserEye;
+    }
+
+    public boolean isFlameEye() {
+        return !isLaserEye;
     }
 
     public void setLaserEye(boolean laserEye) {

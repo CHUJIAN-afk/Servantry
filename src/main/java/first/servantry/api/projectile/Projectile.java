@@ -127,6 +127,12 @@ public abstract class Projectile extends AttachmentEntity {
         }
     }
 
+    public void copyDamageData(AttachmentEntity entity) {
+        setDamage(entity.getDamage());
+        setKnockback(entity.getKnockback());
+        setArmorPierce(entity.getArmorPierce());
+    }
+
     /**
      * 加入到玩家的射弹数据
      */

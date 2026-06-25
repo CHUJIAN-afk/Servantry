@@ -10,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class StardustDragonIdleGoal extends ServantGoal<StardustDragon> {
 
-    private Vec3 wanderTarget = Vec3.ZERO;
+    private Vec3 wanderPos = Vec3.ZERO;
 
     public StardustDragonIdleGoal(StardustDragon servant) {
         super(servant);
@@ -24,17 +24,14 @@ public class StardustDragonIdleGoal extends ServantGoal<StardustDragon> {
     @Override
     public void tick() {
         Player owner = servant.getOwner();
+        float distance = 8 * servant.getScale();
+        while (wanderPos.equals(Vec3.ZERO) || wanderPos.distanceTo(servant.getPos()) < distance * 0.5f) {
+            wanderPos = servant.getWanderPos(wanderPos, owner.position(), distance, 0);
+        }
+        servant.spiralToward(wanderPos, 0.01 + Math.min(servant.getPos().distanceTo(wanderPos) * 0.01, 0.05));
         if (owner.distanceToSqr(servant.getPos()) > 128 * 128) {
             servant.teleportTo(owner.getBoundingBox().getCenter());
-            wanderTarget = Vec3.ZERO;
+            wanderPos = Vec3.ZERO;
         }
-        // 选择新目标
-        if (wanderTarget.equals(Vec3.ZERO) || servant.getPos().distanceToSqr(wanderTarget) < 4 * servant.getScale() || owner.getRandom().nextDouble() < 0.01 || wanderTarget.distanceToSqr(owner.position()) > 8 * 8 * servant.getScale()) {
-            wanderTarget = owner.position().offsetRandom(owner.getRandom(), 8 * servant.getScale());
-        }
-
-        // 螺旋游动向目标
-        servant.spiralToward(wanderTarget, (wanderTarget.distanceToSqr(servant.getPos()) + 20) * 0.0005);
     }
-
 }

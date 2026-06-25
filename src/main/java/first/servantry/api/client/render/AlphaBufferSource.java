@@ -48,8 +48,8 @@ public class AlphaBufferSource implements MultiBufferSource {
     }
 
     /**
-         * 带透明度调整的 VertexConsumer 包装器。
-         */
+     * 带透明度调整的 VertexConsumer 包装器。
+     */
     private record AlphaVertexConsumer(VertexConsumer inner, float alpha) implements VertexConsumer {
 
         @Override
@@ -93,7 +93,5 @@ public class AlphaBufferSource implements MultiBufferSource {
             inner.misc(element, rawData);
             return this;
         }
-
     }
-
 }

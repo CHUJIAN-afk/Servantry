@@ -10,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class SharknadoIdleGoal extends ServantGoal<Sharknado> {
 
-    private Vec3 wanderTarget = Vec3.ZERO;
+    private Vec3 wanderPos = Vec3.ZERO;
 
     public SharknadoIdleGoal(Sharknado servant) {
         super(servant);
@@ -24,19 +24,12 @@ public class SharknadoIdleGoal extends ServantGoal<Sharknado> {
     @Override
     public void tick() {
         Player owner = servant.getOwner();
-        Vec3 ownerPos = owner.getBoundingBox().getCenter();
-        if (wanderTarget.equals(Vec3.ZERO) || owner.getRandom().nextDouble() < 0.025 || wanderTarget.distanceToSqr(servant.getPos()) < 1 || wanderTarget.distanceToSqr(owner.position()) > 8 * 8) {
-            wanderTarget = ownerPos.offsetRandom(owner.getRandom(), (float) owner.getBoundingBox().getSize() * 4);
-        }
-        Vec3 dir = wanderTarget.subtract(servant.getPos());
-        if (!dir.equals(Vec3.ZERO)) {
-            double dist = dir.length();
-            double force = Math.min(dist * 0.01, 0.1);
-            servant.applyForce(dir.normalize().scale(force));
-        }
-        if (servant.getPos().distanceToSqr(ownerPos) > 48 * 48) {
-            servant.teleportTo(ownerPos);
+        Vec3 targetPos = owner.getBoundingBox().getCenter();
+        wanderPos = servant.getWanderPos(wanderPos, targetPos, 5, 0);
+        double distance = servant.getPos().distanceTo(wanderPos);
+        servant.applyForce(wanderPos.subtract(servant.getPos()).normalize().scale(Math.min(distance * 0.01, 0.1)));
+        if (servant.getPos().distanceToSqr(wanderPos) > 48 * 48) {
+            servant.teleportTo(wanderPos);
         }
     }
-
 }

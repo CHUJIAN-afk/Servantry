@@ -23,6 +23,6 @@ public class StardustDragonAttackGoal extends ServantGoal<StardustDragon> {
     public void tick() {
         LivingEntity target = servant.getTarget();
         Vec3 targetPos = target.getBoundingBox().getCenter();
-        servant.spiralToward(targetPos, 0.25);
+        servant.spiralToward(targetPos, 0.15);
     }
 }

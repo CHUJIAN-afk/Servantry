@@ -30,7 +30,6 @@ public class DeadlySphereAttackGoal extends ServantGoal<DeadlySphere> {
         Vec3 toTarget = targetPos.subtract(servant.getPos());
         Player owner = servant.getOwner();
         Vec3 direction = toTarget.offsetRandom(owner.getRandom(), (float) target.getBoundingBox().getSize()).normalize();
-
         if (--cooldown <= 0) {
             if (++combat == 3) {
                 combat = 0;

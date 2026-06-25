@@ -28,32 +28,25 @@ public class StardustCellAttackGoal extends ServantGoal<StardustCell> {
     @Override
     public void tick() {
         LivingEntity target = servant.getTarget();
-
-        Player owner = servant.getOwner();
-        Vec3 wanderTarget = getHaloAnchorPos(target);
-
-        Vec3 dir = wanderTarget.subtract(servant.getPos()).normalize();
-        double dist = dir.length();
-        if (!dir.equals(Vec3.ZERO)) {
-            double force = Math.min(dist * 0.1, 0.6);
-            servant.applyForce(dir.normalize().scale(force));
-            float friction = dist < 1.5 ? 0.55f : 0.95f;
-            servant.setVelocity(servant.getVelocity().scale(friction));
-        }
-
         double distanceToSqr = servant.getPos().distanceToSqr(target.getBoundingBox().getCenter());
         if (distanceToSqr > 14 * 14 && distanceToSqr < 26 * 26) {
             servant.teleportTo(target.getBoundingBox().getCenter());
-        }
-        // 射击冷却
-        if (!servant.isExecutingPath()) {
-            if (servant.getShootCooldown() <= 0) {
+        } else {
+            Player owner = servant.getOwner();
+            Vec3 wanderPos = getHaloAnchorPos(target);
+            double distance = servant.getPos().distanceTo(wanderPos);
+            servant.applyForce(wanderPos.subtract(servant.getPos()).normalize().scale(Math.min(distance * 0.1, 0.6)));
+            float scale = distance < 1.5 ? 0.55f : 0.95f;
+            servant.setVelocity(servant.getVelocity().scale(scale));
+            if (!servant.isExecutingPath()) {
+                if (servant.getShootCooldown() <= 0) {
+                    servant.shootAtTarget(target);
+                    servant.setShootCooldown(12 + owner.getRandom().nextInt(4));
+                }
+            } else if (servant.getTrailTimer() == 1) {
                 servant.shootAtTarget(target);
                 servant.setShootCooldown(12 + owner.getRandom().nextInt(4));
             }
-        } else if (servant.getTrailTimer() == 1) {
-            servant.shootAtTarget(target);
-            servant.setShootCooldown(12 + owner.getRandom().nextInt(4));
         }
     }
 
@@ -77,5 +70,4 @@ public class StardustCellAttackGoal extends ServantGoal<StardustCell> {
         Vec3 targetCenter = target.position().add(0, target.getBbHeight() / 2.0, 0);
         return targetCenter.add(offsetX, offsetY, offsetZ);
     }
-
 }
