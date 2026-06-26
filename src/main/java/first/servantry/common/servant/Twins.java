@@ -1,7 +1,5 @@
 package first.servantry.common.servant;
 
-import first.servantry.api.ServantryHelper;
-import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
@@ -35,6 +33,7 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
      * 是否为激光眼（true=激光眼，false=咒焰眼）
      */
     private boolean isLaserEye = true;
+    private Twins other = null;
     private int trailTimer = 0;
 
     public Twins() {
@@ -102,11 +101,11 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     }
 
     @Override
-    public void onRemove() {
-        List<Twins> twins = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, Twins.class);
-        if (!twins.isEmpty() && twins.size() % 2 != 0) {
-            twins.getFirst().setRemove();
+    public boolean isRemove() {
+        if (other == null || other.isRemove()) {
+            return true;
         }
+        return super.isRemove();
     }
 
     @Override
@@ -126,12 +125,21 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
         return AttachmentEntityRegister.Twins.get();
     }
 
+    public void setOther(Twins twins) {
+        this.other = twins;
+        twins.other = this;
+    }
+
     public boolean isLaserEye() {
         return isLaserEye;
     }
 
     public boolean isFlameEye() {
         return !isLaserEye;
+    }
+
+    public void setFlameEye(boolean flameEye) {
+        this.isLaserEye = !flameEye;
     }
 
     public void setLaserEye(boolean laserEye) {

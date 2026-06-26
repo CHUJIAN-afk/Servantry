@@ -14,6 +14,7 @@ import first.servantry.common.servant.goal.stardustDragon.StardustDragonIdleGoal
 import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -39,6 +40,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     private float spiralPhase = 0;
 
     public StardustDragon() {
+        super();
         setDrag(0.92f);
         setRotationSpeed(0);
     }
@@ -52,8 +54,13 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     @Override
     public void tick() {
+        emitParticle();
+        super.tick();
+    }
+
+    protected void emitParticle() {
         if (!owner.level().isClientSide()) {
-            if (owner.getRandom().nextFloat() < 0.2 * getScale()) {
+            if (owner.getRandom().nextFloat() < 0.2) {
                 ParticleHelper.create(owner.level())
                         .generic(GenericParticleBuilder.create()
                                 .color(0x2fb2e1)
@@ -67,14 +74,13 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
                                 .scale(0.035f)
                                 .scaleRandom(0.005f)
                         )
-                        .pos(getPos().offsetRandom(owner.getRandom(), 0.2f * getScale()))
+                        .pos(getPos().offsetRandom(owner.getRandom(), 0.2f))
                         .velocity(getVelocity().scale(-1))
                         .spread(0)
                         .speed(0)
                         .emit();
             }
         }
-        super.tick();
     }
 
     @Override
@@ -88,7 +94,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     }
 
     @Nullable
-    private StardustDragon getHead() {
+    public StardustDragon getHead() {
         List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
         if (!dragons.isEmpty()) {
             return dragons.getFirst();
@@ -104,7 +110,22 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     public StardustDragon getPrecedingSegment() {
         if (!isHead()) {
             List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
-            return dragons.get(segmentIndex - 1);
+            int index = segmentIndex - 1;
+            if (index >= 0 && index < dragons.size()) {
+                return dragons.get(index);
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public StardustDragon getNextSegment() {
+        if (segmentIndex < totalSegments - 1) {
+            List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
+            int index = segmentIndex + 1;
+            if (index >= 0 && index < dragons.size()) {
+                return dragons.get(index);
+            }
         }
         return null;
     }
@@ -117,8 +138,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         boolean isTail = segment == total - 1;
         double minZ = isHead ? -0.3 : isTail ? -1.45 : -0.35;
         double maxZ = isHead ? 0.65 : isTail ? 0.3 : 0.35;
-        double scale = getScale();
-        return new AABB(-0.25 * scale, -0.25 * scale, minZ * scale, 0.25 * scale, 0.25 * scale, maxZ * scale);
+        return new AABB(-0.25, -0.25, minZ, 0.25, 0.25, maxZ);
     }
 
     @Override
@@ -185,69 +205,95 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         this.totalSegments = total;
     }
 
-    public float getScale() {
-        return 1 + getTotalSegments() * 0.025f;
-    }
-
     public double getSegmentDistance() {
-        return 0.65 * getScale();
+        return 0.675;
     }
 
     /**
-     * 螺旋游动向目标位置。
+     * 球形穿梭目标位置。
+     * <p>
+     * 加速度方向从当前朝向出发，朝目标方向有限偏转（最小转弯半径），
+     * 穿过目标后不会直接调头，而是受转弯半径约束自然绕行。
+     * </p>
      *
-     * @param targetPos    目标位置
-     * @param acceleration 加速度大小
+     * @param targetPos       目标位置
+     * @param maxTurnDegrees  最大偏转角度
+     * @param acceleration    加速度大小
+     * @param spiral          螺旋偏移是否影响位置；false时仅影响翻滚角
      */
-    public void spiralToward(Vec3 targetPos, double acceleration) {
+    public void orbitToward(Vec3 targetPos, float maxTurnDegrees, double acceleration, boolean spiral) {
         Vec3 currentPos = getPos();
-        targetPos = calculateBezierPoint(0.75f, currentPos, currentPos.add(getVelocity()), targetPos);
+        Vec3 velocity = getVelocity();
         Vec3 toTarget = targetPos.subtract(currentPos);
         double distance = toTarget.length();
-        if (distance < 1) {
-            return;
-        }
-        // 更新螺旋相位
-        double speed = getVelocity().length() / getScale();
-        spiralPhase += 0.2f * (float) speed;
 
-        // 计算到目标的方向
-        Vec3 forward = toTarget.normalize();
+        spiralPhase += 0.2f * (float) velocity.length();
 
-        // 计算右方向和上方向（构建局部坐标系）
-        Vec3 worldUp = new Vec3(0, 1, 0);
-        Vec3 right = forward.cross(worldUp);
-        if (right.lengthSqr() < 0.001) {
-            right = new Vec3(1, 0, 0);
+        Vec3 forward = getCurrentVelocity();
+
+        // 最大偏转角：综合下一体节姿态约束，避免头部与体节重叠
+        double maxTurn;
+        StardustDragon nextSeg = getNextSegment();
+        if (nextSeg != null) {
+            Vec3 nextDir = nextSeg.getCurrentVelocity();
+            double angleToNext = Math.acos(Mth.clamp(forward.dot(nextDir), -1, 1));
+            maxTurn = Math.max(Math.toRadians(2.0), Math.toRadians(maxTurnDegrees) - angleToNext);
         } else {
-            right = right.normalize();
+            maxTurn = Math.toRadians(12.0);
         }
-        Vec3 up = right.cross(forward).normalize();
 
-        // 螺旋偏移：左右和上下同时变化，相位差90度形成螺旋
-        double spiralAmplitude = Math.min(0.4, distance * 0.08);
-        double horizontalOffset = Math.cos(spiralPhase) * spiralAmplitude;
-        double verticalOffset = Math.sin(spiralPhase) * spiralAmplitude;
-
-        // 合成移动方向
-        Vec3 moveDir = forward
-                .add(right.scale(horizontalOffset))
-                .add(up.scale(verticalOffset))
-                .normalize();
-
-        // 施加推力
-        applyForce(moveDir.scale(acceleration));
-
-        // 计算翻滚角：根据螺旋运动
-        float roll = (float) (-Math.sin(spiralPhase) * spiralAmplitude * 90);
-
-        // 更新朝向
-        if (speed > 0.01) {
-            Vec3 motionDir = getVelocity().normalize();
-            float targetYaw = (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z));
-            float targetPitch = (float) Math.toDegrees(Math.asin(-motionDir.y));
-
-            setDesiredRotation(targetYaw, targetPitch, roll);
+        if (distance > 0.01) {
+            Vec3 desiredDir = toTarget.normalize();
+            double angleDiff = Math.acos(Mth.clamp(forward.dot(desiredDir), -1, 1));
+            if (angleDiff > maxTurn) {
+                Vec3 rotAxis = forward.cross(desiredDir);
+                if (rotAxis.lengthSqr() < 0.0001) rotAxis = forward.cross(new Vec3(0, 1, 0));
+                if (rotAxis.lengthSqr() < 0.0001) rotAxis = forward.cross(new Vec3(1, 0, 0));
+                rotAxis = rotAxis.normalize();
+                double cosT = Math.cos(maxTurn), sinT = Math.sin(maxTurn);
+                forward = forward.scale(cosT)
+                        .add(rotAxis.cross(forward).scale(sinT))
+                        .add(rotAxis.scale(rotAxis.dot(forward) * (1 - cosT)))
+                        .normalize();
+            } else {
+                forward = desiredDir;
+            }
         }
+
+        double amplitude = spiral ? Math.max(0.15, Math.min(0.4, distance * 0.08)) : 0;
+
+        if (spiral) {
+            Vec3 right = forward.cross(new Vec3(0, 1, 0));
+            if (right.lengthSqr() < 0.001) {
+                right = new Vec3(1, 0, 0);
+            } else {
+                right = right.normalize();
+            }
+            Vec3 up = right.cross(forward).normalize();
+            forward = forward
+                    .add(right.scale(Math.cos(spiralPhase) * amplitude))
+                    .add(up.scale(Math.sin(spiralPhase) * amplitude))
+                    .normalize();
+        }
+
+        applyForce(forward.scale(acceleration));
+        Vec3 motionDir = velocity.normalize();
+        setDesiredRotation(
+                (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z)),
+                (float) Math.toDegrees(Math.asin(-motionDir.y)),
+                (float) (-Math.sin(spiralPhase) * amplitude * 90)
+        );
+    }
+
+    public void orbitToward(Vec3 targetPos, float maxTurnDegrees, double acceleration) {
+        orbitToward(targetPos, maxTurnDegrees, acceleration, true);
+    }
+
+    public void setSpiralPhase(float spiralPhase) {
+        this.spiralPhase = spiralPhase;
+    }
+
+    public float getSpiralPhase() {
+        return spiralPhase;
     }
 }

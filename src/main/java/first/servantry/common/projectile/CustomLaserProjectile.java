@@ -59,12 +59,6 @@ public class CustomLaserProjectile extends Projectile implements ICollideAttack<
             if (tickConsumer != null) {
                 tickConsumer.accept(this);
             }
-            if (damageSource instanceof ServantDamageSource servantDamageSource) {
-                Servant servant = servantDamageSource.getServant();
-                if (servant == null) {
-                    setRemove();
-                }
-            }
         }
         super.tick();
     }
@@ -118,9 +112,7 @@ public class CustomLaserProjectile extends Projectile implements ICollideAttack<
     public boolean isValidCollisionTarget(CustomLaserProjectile entity, LivingEntity target) {
         if (damageSource instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                return servant.isTarget(target);
-            }
+            return servant.isTarget(target);
         }
         return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }

@@ -1,19 +1,10 @@
 package first.servantry.api.core;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
-import first.servantry.api.ServantryHelper;
 import first.servantry.api.armorSet.ArmorSet;
-import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
-import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.register.ServantryRegistries;
-import first.servantry.register.AttributeRegister;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,7 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -31,7 +21,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import org.jetbrains.annotations.NotNull;
@@ -44,56 +33,14 @@ import java.util.Map;
 @EventBusSubscriber(modid = Servantry.MODID, value = Dist.CLIENT)
 public class ClientEvent {
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onRenderLevelStage(RenderLevelStageEvent event) {
-        Minecraft minecraft = Minecraft.getInstance();
-        ClientLevel clientLevel = minecraft.level;
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS && clientLevel != null) {
-            PoseStack poseStack = event.getPoseStack();
-            float partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(true);
-            MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();
-            for (Player player : clientLevel.players()) {
-                AttachmentEntityRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
-            }
-        }
-    }
-
     @SubscribeEvent
     public static void tooltip(ItemTooltipEvent event) {
         Player player = event.getEntity();
         ItemStack itemStack = event.getItemStack();
         List<Component> toolTip = event.getToolTip();
-
         if (itemStack.getItem() instanceof IServantWeapon<?> iServantWeapon && player != null) {
-            AttachmentEntityType<?> type = iServantWeapon.getType();
-            ResourceLocation location = ServantryRegistries.ATTACHMENT_ENTITY_TYPES.getKey(type);
-
-            if (location != null) {
-                String key = "servant." + location.getNamespace() + "." + location.getPath();
-                float damage = iServantWeapon.getDamage();
-                if (damage > 0) {
-                    AttributeInstance attribute = player.getAttribute(AttributeRegister.ServantDamage);
-                    damage = attribute != null ? (float) (damage * attribute.getValue()) : damage;
-                    toolTip.add(Component.literal(String.format("%.1f ", damage)).withStyle(ChatFormatting.BLUE).append(Component.translatable("item.servantry.tooltip.damage").withStyle(ChatFormatting.GRAY)));
-                }
-                float knockback = iServantWeapon.getKnockback();
-                if (knockback > 0) {
-                    AttributeInstance attribute = player.getAttribute(AttributeRegister.ServantKnockback);
-                    knockback = attribute != null ? (float) (knockback * attribute.getValue()) : knockback;
-                    toolTip.add(Component.literal(String.format("%.1f ", knockback)).withStyle(ChatFormatting.BLUE).append(Component.translatable("item.servantry.tooltip.knockback").withStyle(ChatFormatting.GRAY)));
-                }
-                float armor_pierce = iServantWeapon.getArmorPierce();
-                if (armor_pierce > 0) {
-                    toolTip.add(Component.literal(String.format("%.1f ", armor_pierce)).withStyle(ChatFormatting.BLUE).append(Component.translatable("item.servantry.tooltip.armor_pierce").withStyle(ChatFormatting.GRAY)));
-                }
-                toolTip.add(Component.translatable("item.servantry.tooltip.summon", Component.translatable(key).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
-                ServantryHelper servantryHelper = ServantryHelper.get(player);
-                toolTip.add(Component.translatable("item.servantry.tooltip.servant_slots", Component.literal(String.valueOf(servantryHelper.getUsedSlots(EntityData.Type.Servant))).withStyle(ChatFormatting.BLUE), Component.literal(String.valueOf(servantryHelper.getMaxCount(EntityData.Type.Servant))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
-                toolTip.add(Component.translatable("item.servantry.tooltip.sentry_servant_slots", Component.literal(String.valueOf(servantryHelper.getUsedSlots(EntityData.Type.SentryServant))).withStyle(ChatFormatting.BLUE), Component.literal(String.valueOf(servantryHelper.getMaxCount(EntityData.Type.SentryServant))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
-                toolTip.add(Component.translatable("item.servantry.tooltip.remove_all").withStyle(ChatFormatting.GRAY));
-            }
+            toolTip.addAll(iServantWeapon.getTooltips(player));
         }
-
         Item item = itemStack.getItem();
         ResourceLocation registryName = BuiltInRegistries.ITEM.getKey(item);
         if (registryName.getNamespace().equals(Servantry.MODID)) {

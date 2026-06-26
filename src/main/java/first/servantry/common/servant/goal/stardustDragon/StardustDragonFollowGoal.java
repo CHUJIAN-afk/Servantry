@@ -7,10 +7,16 @@ import first.servantry.common.servant.StardustDragon;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
  * 星尘龙跟随目标（非头部体节）。
+ * <p>
+ * 体节沿前一体节的历史轨迹跟随，不抄近道。
+ * 每tick沿前一体节的historyNodes消耗segmentDistance弧长，
+ * 到达目标位置后朝向前一体节的姿态。
+ * </p>
  */
 public class StardustDragonFollowGoal extends ServantGoal<StardustDragon> {
 
@@ -28,31 +34,37 @@ public class StardustDragonFollowGoal extends ServantGoal<StardustDragon> {
         StardustDragon preceding = servant.getPrecedingSegment();
         if (preceding == null) return;
 
-        Vec3 precedingPos = preceding.getPos();
-        Vec3 currentPos = servant.getPos();
-        Vec3 toPreceding = precedingPos.subtract(currentPos);
-        double distance = toPreceding.length();
+        ArrayList<PathNode> history = preceding.getHistoryNodes();
+        if (history.size() < 2) return;
 
-        // 距离太小时不处理，保持当前位置
-        if (distance < 0.01) return;
+        double trailCursor = servant.getSegmentDistance();
 
-        Vec3 direction = toPreceding.normalize();
-        double targetDistance = servant.getSegmentDistance();
+        double accumulated = 0;
+        Vec3 targetPos = servant.getPos();
 
-        // 只有距离超过目标距离时才移动
-        if (distance > targetDistance) {
-            // 移到前一体节后方固定距离
-            Vec3 targetPos = precedingPos.subtract(direction.scale(targetDistance));
-            servant.setPath(new PlannedPath("physics", Collections.singletonList(new PathNode(targetPos, servant.getYaw(), servant.getPitch(), servant.getRoll()))));
+        for (int i = 0; i < history.size() - 1; i++) {
+            PathNode curr = history.get(i);
+            PathNode next = history.get(i + 1);
+            double segLen = curr.pos().distanceTo(next.pos());
+
+            if (accumulated + segLen >= trailCursor) {
+                float t = segLen > 0.001 ? (float) ((trailCursor - accumulated) / segLen) : 0;
+                targetPos = curr.pos().lerp(next.pos(), Mth.clamp(t, 0, 1));
+                break;
+            }
+            accumulated += segLen;
+
+            if (i == history.size() - 2) {
+                targetPos = next.pos();
+            }
         }
-        // 朝向前一体节
-        float targetYaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
-        float targetPitch = (float) Math.toDegrees(Math.asin(-direction.y));
+        // 朝向：从自身位置指向前一体节位置
+        Vec3 toPreceding = preceding.getPos().subtract(targetPos);
+        Vec3 direction = toPreceding.lengthSqr() > 0.0001 ? toPreceding.normalize() : servant.getCurrentVelocity();
+        Vec3 segNormal = servant.getCurrentNormal().lerp(preceding.getCurrentNormal(), 0.5f);
+        PathNode orientation = servant.getEulerNode(targetPos, direction, segNormal);
 
-        float newYaw = Mth.rotLerp(Math.min(0.5f * servant.getScale(), 0.9f), servant.getYaw(), targetYaw);
-        float newPitch = Mth.rotLerp(Math.min(0.5f * servant.getScale(), 0.9f), servant.getPitch(), targetPitch);
-        float newRoll = Mth.rotLerp(Math.min(0.25f * servant.getScale(), 0.45f), servant.getRoll(), preceding.getRoll());
-
-        servant.setDesiredRotation(newYaw, newPitch, newRoll);
+        servant.setPath(new PlannedPath("physics", Collections.singletonList(orientation)));
+        servant.setDesiredRotation(orientation.yaw(), orientation.pitch(), orientation.roll());
     }
 }

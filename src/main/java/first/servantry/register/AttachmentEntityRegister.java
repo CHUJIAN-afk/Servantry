@@ -78,6 +78,8 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CrossbowBoltProjectile>> CrossbowBoltProjectile = register("crossbow_bolt_projectile", CrossbowBoltProjectile::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<GodFlameProjectile>> GodFlameProjectile = register("god_flame_projectile", GodFlameProjectile::new);
+
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));
     }

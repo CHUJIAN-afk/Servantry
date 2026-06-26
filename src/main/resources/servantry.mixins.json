@@ -10,7 +10,8 @@
     "CreativeModeTabMixin",
     "DamageSourcesMixin",
     "LivingEntityMixin",
-    "MobEffectInstanceAccessor"
+    "MobEffectInstanceAccessor",
+    "PlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -19,6 +20,7 @@
     "requireAnnotations": true
   },
   "client": [
-    "CreativeModeInventoryScreenMixin"
+    "CreativeModeInventoryScreenMixin",
+    "LevelRendererMixin"
   ]
 }

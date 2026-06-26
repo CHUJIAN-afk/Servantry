@@ -31,7 +31,6 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -96,15 +95,6 @@ public class Event {
                 }
             }
         }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void entityDataTick(PlayerTickEvent.Post event) {
-        Player player = event.getEntity();
-        if (!player.level().isClientSide()) {
-            player.getData(AttachmentRegister.TargetCache).update(player);
-        }
-        player.getData(AttachmentRegister.EntityData).tick(player);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

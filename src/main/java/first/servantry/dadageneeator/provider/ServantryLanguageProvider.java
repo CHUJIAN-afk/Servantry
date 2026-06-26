@@ -53,6 +53,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("effect.servantry.phantasmal_rebirth", "Phantasmal Rebirth", "幻魂还生");
         entry("effect.servantry.shadowflame", "Shadowflame", "暗影焰");
         entry("effect.servantry.moon_bite", "Moon Bite", "月噬");
+        entry("effect.servantry.god_slayer_inferno", "God Slayer Inferno", "噬神怒焰");
         // 长效和强效药水
         entry("item.minecraft.potion.effect.obsession", "Potion of Obsession", "着魔药水");
         entry("item.minecraft.splash_potion.effect.obsession", "Splash Potion of Obsession", "喷溅型着魔药水");

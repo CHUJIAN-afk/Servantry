@@ -1,6 +1,7 @@
 package first.servantry.common.event;
 
 import first.servantry.Servantry;
+import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.servant.Servant;
@@ -8,6 +9,7 @@ import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.servant.ChlorophyteCrystal;
 import first.servantry.common.servant.StardustCell;
+import first.servantry.common.servant.VoidEater;
 import first.servantry.register.*;
 import first.servantry.utils.CuriosUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -167,6 +169,12 @@ public class Event {
         LivingEntity target = event.getEntity();
         if (!target.level().isClientSide() && target instanceof Player player) {
             player.addEffect(new MobEffectInstance(MobEffectRegister.BallistaPanicked, 100));
+        }
+        if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player) {
+            List<VoidEater> voidEaters = ServantryHelper.get(player).getEntityData().get(EntityData.Type.Servant, VoidEater.class);
+            if (!voidEaters.isEmpty()) {
+                target.addEffect(new MobEffectInstance(MobEffectRegister.GodSlayerInferno, 60));
+            }
         }
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player && target.isAlive()) {
             EntityData entityData = player.getData(AttachmentRegister.EntityData);

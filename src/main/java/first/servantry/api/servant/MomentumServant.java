@@ -110,7 +110,7 @@ public abstract class MomentumServant extends Servant {
      */
     public void applyForce(Vec3 targetPos, float force) {
         Vec3 direction = targetPos.subtract(getPos());
-        if (!direction.equals(Vec3.ZERO) && targetPos.distanceToSqr(getPos()) > 1) {
+        if (!direction.equals(Vec3.ZERO)) {
             applyForce(direction.normalize().scale(force));
         }
     }

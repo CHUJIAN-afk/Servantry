@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
@@ -65,9 +64,9 @@ public class AttachmentEntityRenderDispatcher {
                 poseStack.mulPose(Axis.YN.rotationDegrees(renderNode.yaw()));
                 poseStack.mulPose(Axis.XP.rotationDegrees(renderNode.pitch()));
                 poseStack.mulPose(Axis.ZP.rotationDegrees(renderNode.roll()));
-                LevelRenderer.renderLineBox(poseStack, debugConsumer, new AABB(-0.001, -0.001, 0, 0.001, 0.001, 2), 0, 0, 1, 1.0F);
+                LevelRenderer.renderLineBox(poseStack, debugConsumer, -0.0001, -0.0001, 0, 0.0001, 0.0001, 2, 0, 0, 1, 1.0F);
                 // 渲染法向量（绿色）
-                LevelRenderer.renderLineBox(poseStack, debugConsumer, new AABB(-0.001, 0, -0.001, 0.001, 0.5, 0.001), 0, 0, 1, 1.0F);
+                LevelRenderer.renderLineBox(poseStack, debugConsumer, -0.0001, 0, -0.0001, 0.0001, 0.5, 0.0001, 0, 0, 1, 1.0F);
                 poseStack.popPose();
                 LevelRenderer.renderLineBox(poseStack, debugConsumer, -0.002, -0.002, -0.002, 0.002, 0.002, 0.002, 1.0F, 1.0F, 0.0F, 1.0F);
                 if (entity instanceof IBlockCollision<?> iBlockCollision) {

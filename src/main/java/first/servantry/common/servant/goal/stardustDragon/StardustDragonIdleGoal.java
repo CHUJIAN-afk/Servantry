@@ -24,11 +24,10 @@ public class StardustDragonIdleGoal extends ServantGoal<StardustDragon> {
     @Override
     public void tick() {
         Player owner = servant.getOwner();
-        float distance = 8 * servant.getScale();
-        while (wanderPos.equals(Vec3.ZERO) || wanderPos.distanceTo(servant.getPos()) < distance * 0.5f) {
-            wanderPos = servant.getWanderPos(wanderPos, owner.position(), distance, 0);
+        while (wanderPos.equals(Vec3.ZERO) || wanderPos.distanceTo(servant.getPos()) < 4) {
+            wanderPos = servant.getWanderPos(wanderPos, owner.position(), 8, 0);
         }
-        servant.spiralToward(wanderPos, 0.01 + Math.min(servant.getPos().distanceTo(wanderPos) * 0.01, 0.05));
+        servant.orbitToward(wanderPos, 120f, 0.01 + Math.min(servant.getPos().distanceTo(wanderPos) * 0.01, 0.05));
         if (owner.distanceToSqr(servant.getPos()) > 128 * 128) {
             servant.teleportTo(owner.getBoundingBox().getCenter());
             wanderPos = Vec3.ZERO;

@@ -88,7 +88,7 @@ public class MoonPortal extends Servant {
             }
             if (laserProjectile.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
                 Servant servant = servantDamageSource.getServant();
-                if (servant == null || servant.isRemove()) {
+                if (servant.isRemove()) {
                     laserProjectile.setRemove();
                     return;
                 }

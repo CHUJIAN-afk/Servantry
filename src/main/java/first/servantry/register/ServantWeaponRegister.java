@@ -119,9 +119,16 @@ public class ServantWeaponRegister {
                                 if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     RandomSource random = player.getRandom();
                                     PathNode pathNode = new PathNode(player.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0);
+                                    Twins laserEye = null;
                                     for (int i = 0; i < 2; i++) {
                                         Twins twins = weapon.createServant(player);
-                                        twins.setLaserEye(i == 0);
+                                        if (i == 0) {
+                                            twins.setLaserEye(true);
+                                            laserEye = twins;
+                                        } else {
+                                            twins.setFlameEye(true);
+                                            twins.setOther(laserEye);
+                                        }
                                         twins.setSlotCost(i);
                                         twins.init(pathNode);
                                         servantryHelper.add(EntityData.Type.Servant, twins);

@@ -81,6 +81,7 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.OreScout.get(), new OreScoutServantRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ScavengerFairy.get(), new ScavengerFairyRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ChlorophyteCrystal.get(), new ChlorophyteCrystalRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.VoidEater.get(), new VoidEaterRenderer());
 
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustProjectile.get(), new StardustProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.LaserProjectile.get(), new LaserProjectileRenderer());
@@ -90,6 +91,7 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ZenithProjectile.get(), new ZenithProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.CustomLaserProjectile.get(), new CustomLaserProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.RainbowCrystalProjectile.get(), new RainbowCrystalProjectileRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.GodFlameProjectile.get(), new GodFlameProjectileRenderer());
     }
 
     @SubscribeEvent

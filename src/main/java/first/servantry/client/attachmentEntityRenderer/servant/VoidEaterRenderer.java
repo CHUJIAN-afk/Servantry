@@ -6,39 +6,27 @@ import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
-import first.servantry.common.servant.StardustDragon;
+import first.servantry.common.servant.VoidEater;
 import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 
-/**
- * 星尘龙渲染器。
- * <p>
- * 根据体节索引决定渲染内容：
- * <ul>
- *   <li>头部</li>
- *   <li>中段</li>
- *   <li>尾部</li>
- * </ul>
- * 不渲染轨迹。
- * </p>
- */
-public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<StardustDragon> {
+public class VoidEaterRenderer extends AbstractAttachmentEntityRenderer<VoidEater> {
 
     @Override
-    protected RenderContext<StardustDragon> createContext(StardustDragon dragon) {
+    protected RenderContext<VoidEater> createContext(VoidEater dragon) {
         int total = dragon.getTotalSegments();
         int index = dragon.getSegmentIndex();
         boolean isTail = index == total - 1;
-        return RenderContext.<StardustDragon>builder()
-                .model(new ModelConfig<StardustDragon>()
-                        .translateOffset(-0.5f, isTail ? -0.4845f : -0.425f, isTail ? -0.103075f : -0.5f)
-                        .rotationOffset(180, 0, 0))
+        return RenderContext.<VoidEater>builder()
+                .model(new ModelConfig<VoidEater>()
+                               .translateOffset(-0.5f, isTail ? -0.4845f : -0.425f, isTail ? -0.103075f : -0.5f)
+                               .rotationOffset(180, 0, 0))
                 .build();
     }
 
     @Override
-    protected void renderEntity(StardustDragon dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustDragon> config) {
+    protected void renderEntity(VoidEater dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<VoidEater> config) {
         int total = dragon.getTotalSegments();
         int index = dragon.getSegmentIndex();
         ModelResourceLocation model;
@@ -53,5 +41,4 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
         }
         ModelRenderer.renderModel(model, poseStack, bufferSource);
     }
-
 }

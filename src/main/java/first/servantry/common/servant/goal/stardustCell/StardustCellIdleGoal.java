@@ -30,7 +30,7 @@ public class StardustCellIdleGoal extends ServantGoal<StardustCell> {
         Vec3 ownerPos = owner.getBoundingBox().getCenter();
         wanderPos = servant.getWanderPos(wanderPos, ownerPos, 4, 1);
         float distance = (float) servant.getPos().distanceTo(wanderPos);
-        servant.applyForce(wanderPos, Math.min(distance * 0.01f, 0.08f));
+        servant.applyForce(wanderPos.subtract(servant.getPos()).normalize().scale(Math.min(distance * 0.01f, 0.08f)));
         if (servant.getPos().distanceToSqr(ownerPos) > 48 * 48) {
             servant.teleportTo(ownerPos.add(servant.getVelocity().scale(10)));
         }
