@@ -93,7 +93,7 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
                     owner.level().playSound(null, start.x(), start.y(), start.z(), SoundRegister.Laser.get(), owner.getSoundSource());
                     for (int i = 0; i < 9; i++) {
                         Vec3 direction = targetPos.offsetRandom(owner.getRandom(), 2f).subtract(servant.getPos()).normalize();
-                        GodFlameProjectile projectile = new GodFlameProjectile(servant.getDamageSource(), start, direction);
+                        GodFlameProjectile projectile = new GodFlameProjectile(servant.getDamageSource(), start, direction.scale(3));
                         projectile.copyDamageData(servant);
                         projectile.setDamage(servant.getDamage() * 0.5f);
                         projectile.join(owner);

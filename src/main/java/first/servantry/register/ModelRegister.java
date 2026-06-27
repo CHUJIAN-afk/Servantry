@@ -34,6 +34,12 @@ public class ModelRegister {
     public static final ModelResourceLocation SHARK_OPEN = standalone("shark_open");
     public static final ModelResourceLocation SHARK_CLOSE = standalone("shark_close");
     public static final ModelResourceLocation CHLOROPHYTE_CRYSTAL = standalone("chlorophyte_crystal");
+    public static final ModelResourceLocation BALLISTA = standalone("ballista");
+    public static final ModelResourceLocation DEADLY_SPHERE = standalone("deadly_sphere");
+    public static final ModelResourceLocation MOON_PORTAL = standalone("moon_portal");
+    public static final ModelResourceLocation RAINBOW_CRYSTAL = standalone("rainbow_crystal");
+    public static final ModelResourceLocation SCAVENGER_FAIRY = standalone("scavenger_fairy");
+    public static final ModelResourceLocation SURVEY_DRONE = standalone("survey_drone");
 
     private static ModelResourceLocation standalone(String path) {
         ModelResourceLocation location = ModelResourceLocation.standalone(Servantry.rl("servant/" + path));

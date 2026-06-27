@@ -82,6 +82,7 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ScavengerFairy.get(), new ScavengerFairyRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.ChlorophyteCrystal.get(), new ChlorophyteCrystalRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.VoidEater.get(), new VoidEaterRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.Ballista.get(), new BallistaRenderer());
 
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.StardustProjectile.get(), new StardustProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.LaserProjectile.get(), new LaserProjectileRenderer());
