@@ -113,8 +113,7 @@ public interface ICollideAttack<T extends AttachmentEntity> {
      * 采样标准：连续两个 OBB 至少 50% 重合
      * </p>
      */
-    private List<SampledOBB> buildSweepOBBs(PathNode prevPrev, PathNode prev, PathNode current,
-                                            Vec3 boxSize, Vec3 boxCenterOffset, boolean hasCenterOffset) {
+    private List<SampledOBB> buildSweepOBBs(PathNode prevPrev, PathNode prev, PathNode current, Vec3 boxSize, Vec3 boxCenterOffset, boolean hasCenterOffset) {
         List<SampledOBB> result = new ArrayList<>();
 
         // 贝塞尔曲线控制点：使用上上tick位置作为控制点方向参考

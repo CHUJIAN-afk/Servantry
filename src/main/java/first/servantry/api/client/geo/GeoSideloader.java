@@ -13,11 +13,12 @@ import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.constant.DataTickets;
-import software.bernie.geckolib.loading.math.MolangQueries;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoRenderer;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Geo 外挂渲染器（单例），独立于 GeckoLib 的 Entity/Item/BlockEntity 渲染体系。
@@ -39,10 +40,6 @@ import java.util.*;
  */
 public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
 
-    /**
-     * 按 ResourceLocation 缓存的 Sideloader 单例池
-     */
-    private static final Map<ResourceLocation, GeoSideloader> CACHE = new HashMap<>();
     /**
      * 当前使用的 Geo 模型定义
      */
@@ -76,7 +73,7 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
      * @return 与该 location 绑定的 Sideloader 实例
      */
     public static GeoSideloader getGeoSideloader(ResourceLocation location) {
-        return CACHE.computeIfAbsent(location, k -> new GeoSideloader(new GeoAttachmentModel(location)));
+        return new GeoSideloader(new GeoAttachmentModel(location));
     }
 
     // ===================== 外挂 API =====================
@@ -88,9 +85,10 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
      * @param animationName animation.json 中定义的动画名称
      * @param progress      动画进度，0=起始 1=结束（循环动画会自动循环）
      */
-    public void setAnimation(String animationName, float progress) {
+    public GeoSideloader setAnimation(String animationName, float progress) {
         this.currentAnimationName = animationName;
         this.progress = progress;
+        return this;
     }
 
     /**
@@ -98,8 +96,9 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
      *
      * @param boneName .geo.json 中定义的骨骼名称
      */
-    public void hideBone(String... boneName) {
+    public GeoSideloader hideBone(String... boneName) {
         this.hiddenBones.addAll(Arrays.asList(boneName));
+        return this;
     }
 
     /**
@@ -144,15 +143,6 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
         GeoRenderer.super.actuallyRender(poseStack, animatable, bakedModel, renderType, bufferSource, buffer, false, partialTick, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
 
         poseStack.popPose();
-
-        // 清理
-        MolangQueries.clearActor();
-        for (String boneName : hiddenBones) {
-            getGeoModel().getBone(boneName).ifPresent(bone -> bone.setHidden(false));
-        }
-        this.currentAnimationName = null;
-        this.progress = 0;
-        this.hiddenBones.clear();
     }
 
     // ===================== GeoRenderer 接口实现 =====================

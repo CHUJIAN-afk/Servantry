@@ -32,9 +32,15 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     private boolean changed = false;
 
     public void tick(Player player) {
-        updateServantSlot(player);
-        tickEntity(player);
-        syncToClient(player);
+        if (isRunning()) {
+            updateServantSlot(player);
+            tickEntity(player);
+            syncToClient(player);
+        }
+    }
+
+    public boolean isRunning() {
+        return !groups.isEmpty() || !pendingAdd.isEmpty() || changed;
     }
 
     private void syncToClient(Player player) {

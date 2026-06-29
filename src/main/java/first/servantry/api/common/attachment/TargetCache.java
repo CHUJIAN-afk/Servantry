@@ -1,5 +1,6 @@
 package first.servantry.api.common.attachment;
 
+import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -27,16 +28,21 @@ public class TargetCache {
      */
     public void update(Player player) {
         entities.clear();
-        double value = 1;
-        AttributeInstance instance = player.getAttribute(AttributeRegister.ServantSearchRange);
-        if (instance != null) {
-            value = instance.getValue();
+        if (player.getData(AttachmentRegister.EntityData).isRunning()) {
+            double value = 1;
+            AttributeInstance instance = player.getAttribute(AttributeRegister.ServantSearchRange);
+            if (instance != null) {
+                value = instance.getValue();
+            }
+            double distance = 32 * value;
+            List<LivingEntity> result = player.level()
+                    .getEntitiesOfClass(LivingEntity.class, player.getBoundingBox()
+                            .inflate(distance))
+                    .stream()
+                    .filter(living -> living.isAlive() && living != player && living.distanceToSqr(player) <= (distance * distance))
+                    .toList();
+            entities.addAll(result);
         }
-        double distance = 32 * value;
-        List<LivingEntity> result = player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(distance)).stream()
-                .filter(living -> living.isAlive() && living != player && living.distanceToSqr(player) <= (distance * distance))
-                .toList();
-        entities.addAll(result);
     }
 
     /**
