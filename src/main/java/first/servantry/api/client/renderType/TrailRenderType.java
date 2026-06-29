@@ -18,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
  * </p>
  */
 public class TrailRenderType extends RenderType {
+
     private TrailRenderType(String name, VertexFormat fmt, VertexFormat.Mode mode, int bufSize, boolean affectsCrumbling, boolean sort, Runnable setup, Runnable clear) {
         super(name, fmt, mode, bufSize, affectsCrumbling, sort, setup, clear);
     }

@@ -7,6 +7,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.*;
+import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
@@ -22,18 +23,16 @@ import javax.annotation.Nullable;
 public class LevelRendererMixin {
 
     @Shadow
-    @Final
-    private RenderBuffers renderBuffers;
-
-    @Shadow
     @Nullable
     private ClientLevel level;
+
+    @Shadow @Final private RenderBuffers renderBuffers;
 
     @Inject(
             method = "renderLevel",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/LevelRenderer;renderDebug(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/Camera;)V"
+                    target = "Lnet/minecraft/client/renderer/RenderBuffers;bufferSource()Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;"
             )
     )
     private void renderLevel(
@@ -45,14 +44,14 @@ public class LevelRendererMixin {
             Matrix4f frustumMatrix,
             Matrix4f projectionMatrix,
             CallbackInfo ci,
-            @Local PoseStack poseStack
+            @Local PoseStack poseStack,
+            @Local TickRateManager tickratemanager
     ) {
-        if (level != null) {
-            float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
-            MultiBufferSource bufferSource = renderBuffers.bufferSource();
-            for (Player player : level.players()) {
-                AttachmentEntityRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
-            }
+        assert level != null;
+        MultiBufferSource.BufferSource bufferSource = renderBuffers.bufferSource();
+        for (Player player : level.players()) {
+            float partialTick = deltaTracker.getGameTimeDeltaPartialTick(!tickratemanager.isEntityFrozen(player));
+            AttachmentEntityRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
         }
     }
 }

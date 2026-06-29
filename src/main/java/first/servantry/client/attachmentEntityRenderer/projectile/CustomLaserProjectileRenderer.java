@@ -21,6 +21,7 @@ public class CustomLaserProjectileRenderer extends AbstractAttachmentEntityRende
     protected RenderContext<CustomLaserProjectile> createContext(CustomLaserProjectile laser) {
         return RenderContext.<CustomLaserProjectile>builder()
                 .model(new ModelConfig<CustomLaserProjectile>()
+                               .alphaDistanceFactor(0)
                                .rotationOffset(180, 0, 0))
                 .build();
     }

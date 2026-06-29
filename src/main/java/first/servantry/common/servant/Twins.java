@@ -89,6 +89,9 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
+            if (other == null || other.isRemove()) {
+                setRemove();
+            }
             if (trailTimer > 0) {
                 trailTimer--;
             }
@@ -98,14 +101,6 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
 
     public int getTargetDistance() {
         return 12;
-    }
-
-    @Override
-    public boolean isRemove() {
-        if (other == null || other.isRemove()) {
-            return true;
-        }
-        return super.isRemove();
     }
 
     @Override

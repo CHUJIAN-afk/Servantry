@@ -21,13 +21,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -59,17 +56,7 @@ public class ClientEvent {
             for (BlockPos pos : scout.getHighlightedOres()) {
                 poseStack.pushPose();
                 poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y+2, pos.getZ() - cameraPos.z);
-                Minecraft.getInstance().getItemRenderer().renderStatic(
-                        ItemRegister.AdamantiteIngot.toStack(),
-                        ItemDisplayContext.FIXED,
-                        LightTexture.FULL_BRIGHT,
-                        OverlayTexture.NO_OVERLAY,
-                        poseStack,
-                        bufferSource,
-                        clientLevel,
-                        0
-                );
-                LevelRenderer.renderLineBox(poseStack, innerConsumer, 0, 0, 0, 2, 2, 2, 0.72F, 0.96F, 1.0F, 1.0F);
+                LevelRenderer.renderLineBox(poseStack, innerConsumer, 0, 0, 0, 1, 1, 1, 0.72F, 0.96F, 1.0F, 1.0F);
                 poseStack.popPose();
             }
         }

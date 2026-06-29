@@ -206,7 +206,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     }
 
     public double getSegmentDistance() {
-        return 0.675;
+        return 0.65;
     }
 
     /**
@@ -277,12 +277,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         }
 
         applyForce(forward.scale(acceleration));
-        Vec3 motionDir = velocity.normalize();
-        setDesiredRotation(
-                (float) Math.toDegrees(Math.atan2(-motionDir.x, motionDir.z)),
-                (float) Math.toDegrees(Math.asin(-motionDir.y)),
-                (float) (-Math.sin(spiralPhase) * amplitude * 90)
-        );
+        lookAtDirection(velocity.normalize());
     }
 
     public void orbitToward(Vec3 targetPos, float maxTurnDegrees, double acceleration) {
