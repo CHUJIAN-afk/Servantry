@@ -6,7 +6,6 @@ import com.mojang.datafixers.util.Either;
 import first.servantry.Servantry;
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
-import first.servantry.api.client.renderType.TrailShaders;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.client.attachmentEntityRenderer.projectile.*;
 import first.servantry.client.attachmentEntityRenderer.servant.*;
@@ -33,7 +32,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @EventBusSubscriber(modid = Servantry.MODID, value = Dist.CLIENT)
@@ -98,11 +96,6 @@ public class ClientEvent {
     @SubscribeEvent
     public static void registerMenuScreens(RegisterMenuScreensEvent event) {
         event.register(MenuRegister.MITHRIL_ANVIL.get(), MithrilAnvilGui.MithrilAnvilScreen::new);
-    }
-
-    @SubscribeEvent
-    public static void registerShaders(RegisterShadersEvent event) throws IOException {
-        TrailShaders.register(event);
     }
 
     @SubscribeEvent

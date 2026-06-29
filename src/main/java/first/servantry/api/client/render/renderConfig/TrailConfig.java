@@ -134,8 +134,7 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
      * @param visualNode   视觉节点
      * @param renderType   渲染类型
      */
-    public abstract void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource,
-                                float partialTick, PathNode visualNode, RenderType renderType);
+    public abstract void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderType renderType);
 
     /**
      * 构建平滑节点列表。
