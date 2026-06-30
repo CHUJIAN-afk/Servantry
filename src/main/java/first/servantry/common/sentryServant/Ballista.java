@@ -58,6 +58,14 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
     }
 
     @Override
+    public void onBlockCollision(CollisionContext context) {
+        if (context.collisionY() && context.position().y() < getPos().y()) {
+            Vec3 velocity = getVelocity();
+            setVelocity(new Vec3(velocity.x(), 0, velocity.y()));
+        }
+    }
+
+    @Override
     public void writeAdditional(RegistryFriendlyByteBuf buf) {
         buf.writeInt(level);
     }

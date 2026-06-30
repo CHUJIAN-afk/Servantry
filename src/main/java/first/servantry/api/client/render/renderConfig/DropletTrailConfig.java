@@ -6,18 +6,15 @@ import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.PathNode;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.FastColor;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.util.List;
-
 /**
  * 水滴拖尾配置（圆锥 + 头部半球）。
  * <p>
- * 适用于需要圆润头部的拖尾效果。
+ * 适用于需要圆润头部的拖尾效果。圆锥主体复用 {@link ConeTrailConfig}，
+ * 本类仅追加头部半球。
  * </p>
  * <pre>{@code
  * 效果示意：
@@ -31,104 +28,42 @@ import java.util.List;
  *
  * @param <T> 实体类型
  */
-public class DropletTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, DropletTrailConfig<T>> {
-
-    /**
-     * 拖尾头部最大半径
-     */
-    public float maxRadius = 0.2f;
-
-    /** 最小半径比例，控制尾端不会完全缩成一点 */
-    public float minRadiusRatio = 0.0f;
-
-    /** 圆锥截面正多边形边数 */
-    public int resolution = 6;
-
-    public DropletTrailConfig<T> maxRadius(float radius) {
-        this.maxRadius = radius;
-        return this;
-    }
-
-    public DropletTrailConfig<T> minRadiusRatio(float ratio) {
-        this.minRadiusRatio = ratio;
-        return this;
-    }
-
-    public DropletTrailConfig<T> resolution(int resolution) {
-        this.resolution = resolution;
-        return this;
-    }
+public class DropletTrailConfig<T extends AttachmentEntity> extends ConeTrailConfig<T> {
 
     @Override
-    public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource,
-                       float partialTick, PathNode visualNode, RenderType renderType) {
-        List<InterpolatedNode> smoothNodes = buildSmoothNodes(entity, visualNode, partialTick);
-        if (smoothNodes.size() < 2) return;
+    public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderType renderType) {
+        RenderSetup<T> setup = beginRender(entity, poseStack, bufferSource, partialTick, visualNode, renderType);
+        if (setup == null) {
+            return;
+        }
+        // 圆锥主体（复用父类）
+        renderConeBody(setup);
+        // 头部半球
+        renderHeadHemisphere(setup);
+    }
 
-        VertexConsumer consumer = bufferSource.getBuffer(renderType);
-        Matrix4f pose = poseStack.last().pose();
+    /**
+     * 渲染头部半球：在首个平滑节点处画半圆封顶。
+     */
+    protected void renderHeadHemisphere(RenderSetup<T> setup) {
+        VertexConsumer consumer = setup.consumer;
+        Matrix4f pose = setup.pose;
+        T entity = setup.entity;
+        float timeShift = setup.timeShift;
+
         float[] cosArr = getCosArray(resolution);
         float[] sinArr = getSinArray(resolution);
 
-        Player owner = entity.getOwner();
-        float timeShift = owner != null ? (owner.tickCount + partialTick) * 0.015f : 0f;
-
-        int nodeCount = smoothNodes.size();
-        Vec3 renderPos = visualNode.pos();
-
-        Vector3f currV1 = new Vector3f(), currV2 = new Vector3f();
-        Vector3f prevV1 = new Vector3f(), prevV2 = new Vector3f();
-
-        // 渲染圆锥部分
-        for (int i = 0; i < nodeCount - 1; i++) {
-            InterpolatedNode curr = smoothNodes.get(i);
-            InterpolatedNode prev = smoothNodes.get(i + 1);
-
-            float currProgress = (float) i / (nodeCount - 1);
-            float prevProgress = (float) (i + 1) / (nodeCount - 1);
-
-            float currFade = fadeOut.getFade(currProgress);
-            float prevFade = fadeOut.getFade(prevProgress);
-            float currRadius = maxRadius * (minRadiusRatio + (1 - minRadiusRatio) * currFade);
-            float prevRadius = maxRadius * (minRadiusRatio + (1 - minRadiusRatio) * prevFade);
-
-            int currColor = colorFunction.getColor(entity, currProgress, timeShift);
-            int prevColor = colorFunction.getColor(entity, prevProgress, timeShift);
-
-            int currAlpha = Math.round(currFade * 200);
-            int prevAlpha = Math.round(prevFade * 200);
-            int currARGB = FastColor.ARGB32.color(currAlpha, (currColor >> 16) & 0xFF, (currColor >> 8) & 0xFF, currColor & 0xFF);
-            int prevARGB = FastColor.ARGB32.color(prevAlpha, (prevColor >> 16) & 0xFF, (prevColor >> 8) & 0xFF, prevColor & 0xFF);
-
-            Vec3 currRel = curr.pos().subtract(renderPos);
-            Vec3 prevRel = prev.pos().subtract(renderPos);
-
-            for (int j = 0; j < resolution; j++) {
-                float cos1 = cosArr[j], sin1 = sinArr[j];
-                float cos2 = cosArr[j + 1], sin2 = sinArr[j + 1];
-
-                currV1.set(cos1 * currRadius, sin1 * currRadius, 0).rotate(curr.rot());
-                currV2.set(cos2 * currRadius, sin2 * currRadius, 0).rotate(curr.rot());
-                prevV1.set(cos1 * prevRadius, sin1 * prevRadius, 0).rotate(prev.rot());
-                prevV2.set(cos2 * prevRadius, sin2 * prevRadius, 0).rotate(prev.rot());
-
-                emitQuad(consumer, pose,
-                        (float) currRel.x + currV1.x, (float) currRel.y + currV1.y, (float) currRel.z + currV1.z, currARGB,
-                        (float) currRel.x + currV2.x, (float) currRel.y + currV2.y, (float) currRel.z + currV2.z, currARGB,
-                        (float) prevRel.x + prevV2.x, (float) prevRel.y + prevV2.y, (float) prevRel.z + prevV2.z, prevARGB,
-                        (float) prevRel.x + prevV1.x, (float) prevRel.y + prevV1.y, (float) prevRel.z + prevV1.z, prevARGB);
-            }
-        }
-
-        // 渲染头部半球
-        InterpolatedNode headNode = smoothNodes.getFirst();
+        InterpolatedNode headNode = setup.smoothNodes.getFirst();
         float headFade = fadeOut.getFade(0);
-        float headRadius = maxRadius * headFade;
+        // 头部半径必须与圆锥第一段（progress=0）的头部半径用同一公式，
+        // 否则半球赤道与圆锥截面半径不一致，接缝处错位重合。
+        float headRadius = maxRadius * (minRadiusRatio + (1 - minRadiusRatio) * headFade);
         int headColor = colorFunction.getColor(entity, 0, timeShift);
-        int headAlpha = Math.round(headFade * 200);
-        int headARGB = FastColor.ARGB32.color(headAlpha, (headColor >> 16) & 0xFF, (headColor >> 8) & 0xFF, headColor & 0xFF);
+        // 旧版 alpha = round(headFade * 200)
+        int headARGB = packColor(headColor, headFade * (200f / 255f));
 
-        Vec3 headRel = headNode.pos().subtract(renderPos);
+        Vec3 headRel = headNode.pos().subtract(setup.renderPos);
         int hemisphereSegments = Math.max(2, resolution / 2);
 
         for (int lat = 0; lat < hemisphereSegments; lat++) {

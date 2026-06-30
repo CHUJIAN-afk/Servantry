@@ -9,9 +9,12 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.FastColor;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,6 +25,7 @@ import java.util.Map;
  * 拖尾渲染配置基类。
  * <p>
  * 使用模板方法模式，将渲染逻辑封装在配置类中，子类实现具体渲染。
+ * 基类提供共享能力：平滑节点构建、圆周缓存、颜色打包、样板化的渲染上下文与四边形发射。
  * </p>
  *
  * @param <T>    实体类型
@@ -31,26 +35,57 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
 
     // ===================== 基础参数 =====================
 
-    /**
-     * 拖尾计时器值，>0 时显示拖尾
-     */
+    /** 拖尾计时器值，>0 时显示拖尾 */
     public int timer = 0;
 
-    /**
-     * 圆形顶点缓存
-     */
-    protected static final Map<Integer, float[]> COS_CACHE = new HashMap<>();
-    protected static final Map<Integer, float[]> SIN_CACHE = new HashMap<>();
     /** 历史节点数量，默认 4 */
     public int historyLength = 4;
 
-    // ===================== 颜色配置 =====================
     /** 每节点插值分段数，默认 8 */
     public int segmentsPerNode = 8;
+
     /** 拖尾起始索引，默认 0 */
     public int startIndex = 0;
+
     /** 基础颜色 RGB */
     public int colorRGB = 0xFF0000;
+
+    /** 颜色函数 */
+    public RenderContext.ColorFunction<T> colorFunction = (entity, progress, timeShift) -> colorRGB;
+
+    /** 淡出函数 */
+    public RenderContext.FadeFunction fadeOut = progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 1.5);
+
+    /** timeShift 时间缩放魔法数（owner.tickCount + partialTick）× 此值 */
+    private static final float TIME_SHIFT_SCALE = 0.015f;
+
+    // ===================== 圆周缓存 =====================
+
+    /** 圆形顶点缓存 */
+    protected static final Map<Integer, float[]> COS_CACHE = new HashMap<>();
+    protected static final Map<Integer, float[]> SIN_CACHE = new HashMap<>();
+
+    protected static float[] getCosArray(int resolution) {
+        return COS_CACHE.computeIfAbsent(resolution, r -> {
+            float[] arr = new float[r + 1];
+            float delta = (float) (2.0 * Math.PI / r);
+            for (int i = 0; i <= r; i++) {
+                arr[i] = (float) Math.cos(i * delta);
+            }
+            return arr;
+        });
+    }
+
+    protected static float[] getSinArray(int resolution) {
+        return SIN_CACHE.computeIfAbsent(resolution, r -> {
+            float[] arr = new float[r + 1];
+            float delta = (float) (2.0 * Math.PI / r);
+            for (int i = 0; i <= r; i++) {
+                arr[i] = (float) Math.sin(i * delta);
+            }
+            return arr;
+        });
+    }
 
     // ===================== 链式配置方法 =====================
 
@@ -94,35 +129,7 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
         return self();
     }
 
-    // ===================== 抽象渲染方法 =====================
-    /** 颜色函数 */
-    public RenderContext.ColorFunction<T> colorFunction = (entity, progress, timeShift) -> colorRGB;
-
-    // ===================== 共享渲染工具 =====================
-    /** 淡出函数 */
-    public RenderContext.FadeFunction fadeOut = progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 1.5);
-
-    protected static float[] getCosArray(int resolution) {
-        return COS_CACHE.computeIfAbsent(resolution, r -> {
-            float[] arr = new float[r + 1];
-            float delta = (float) (2.0 * Math.PI / r);
-            for (int i = 0; i <= r; i++) {
-                arr[i] = (float) Math.cos(i * delta);
-            }
-            return arr;
-        });
-    }
-
-    protected static float[] getSinArray(int resolution) {
-        return SIN_CACHE.computeIfAbsent(resolution, r -> {
-            float[] arr = new float[r + 1];
-            float delta = (float) (2.0 * Math.PI / r);
-            for (int i = 0; i <= r; i++) {
-                arr[i] = (float) Math.sin(i * delta);
-            }
-            return arr;
-        });
-    }
+    // ===================== 渲染入口 =====================
 
     /**
      * 渲染拖尾。
@@ -135,6 +142,81 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
      * @param renderType   渲染类型
      */
     public abstract void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderType renderType);
+
+    /**
+     * 渲染样板：一次性算好子类所需的全部上下文。
+     * <p>
+     * 子类 {@code render} 开头调用此方法，若返回 {@code null}（节点不足）则直接 return。
+     * </p>
+     */
+    protected final RenderSetup<T> beginRender(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderType renderType) {
+        List<InterpolatedNode> smoothNodes = buildSmoothNodes(entity, visualNode, partialTick);
+        if (smoothNodes.size() < 2) {
+            return null;
+        }
+        VertexConsumer consumer = bufferSource.getBuffer(renderType);
+        Matrix4f pose = poseStack.last().pose();
+        Player owner = entity.getOwner();
+        float timeShift = owner != null ? (owner.tickCount + partialTick) * TIME_SHIFT_SCALE : 0f;
+        Vec3 renderPos = visualNode.pos();
+        return new RenderSetup<>(entity, consumer, pose, timeShift, renderPos, smoothNodes);
+    }
+
+    /**
+     * 渲染上下文（渲染样板产物），供子类直接取用。
+     */
+    protected static final class RenderSetup<T extends AttachmentEntity> {
+        public final T entity;
+        public final VertexConsumer consumer;
+        public final Matrix4f pose;
+        public final float timeShift;
+        public final net.minecraft.world.phys.Vec3 renderPos;
+        public final List<InterpolatedNode> smoothNodes;
+
+        RenderSetup(T entity, VertexConsumer consumer, Matrix4f pose, float timeShift, Vec3 renderPos, List<InterpolatedNode> smoothNodes) {
+            this.entity = entity;
+            this.consumer = consumer;
+            this.pose = pose;
+            this.timeShift = timeShift;
+            this.renderPos = renderPos;
+            this.smoothNodes = smoothNodes;
+        }
+
+        /** 节点数（含头尾） */
+        public int nodeCount() {
+            return smoothNodes.size();
+        }
+    }
+
+    // ===================== 颜色工具 =====================
+
+    /**
+     * 将 RGB 颜色与 alpha 打包为 ARGB 顶点色。
+     *
+     * @param rgb   RGB 颜色（仅低 24 位有效）
+     * @param alpha 0~1 透明度
+     */
+    protected static int packColor(int rgb, float alpha) {
+        int a = clampByte(alpha * 255f);
+        return FastColor.ARGB32.color(a, (rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
+    }
+
+    /**
+     * 将 RGB 颜色与 alpha、亮度增强打包为 ARGB 顶点色。
+     *
+     * @param rgb         RGB 颜色
+     * @param alpha       0~1 透明度
+     * @param brightness  RGB 亮度系数（>1 会被钳到 255）
+     */
+    protected static int packColor(int rgb, float alpha, float brightness) {
+        int a = clampByte(alpha * 255f);
+        int r = Math.min(255, Math.round(((rgb >> 16) & 0xFF) * brightness));
+        int g = Math.min(255, Math.round(((rgb >> 8) & 0xFF) * brightness));
+        int b = Math.min(255, Math.round((rgb & 0xFF) * brightness));
+        return FastColor.ARGB32.color(a, r, g, b);
+    }
+
+    // ===================== 平滑节点构建 =====================
 
     /**
      * 构建平滑节点列表。
@@ -207,6 +289,14 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
                 .rotateZ((float) Math.toRadians(roll));
     }
 
+    // ===================== 四边形发射 =====================
+
+    /**
+     * 发射一个四边形（float 坐标版本）。
+     * <p>
+     * 调用顺序：addVertex → setColor → setUv → setOverlay → setLight → setNormal（触发提交）。
+     * </p>
+     */
     protected void emitQuad(VertexConsumer consumer, Matrix4f pose,
                             float x1, float y1, float z1, int c1,
                             float x2, float y2, float z2, int c2,
@@ -223,13 +313,37 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
     }
 
     /**
+     * 发射一个四边形（{@link Vector3f} 顶点版本，可读性更好）。
+     * <p>
+     * 顶点顺序：v1 → v2 → v3 → v4（逆时针）。
+     * </p>
+     */
+    protected void emitQuad(VertexConsumer consumer, Matrix4f pose,
+                            Vector3f v1, int c1,
+                            Vector3f v2, int c2,
+                            Vector3f v3, int c3,
+                            Vector3f v4, int c4) {
+        consumer.addVertex(pose, v1.x, v1.y, v1.z).setColor(c1).setUv(0, 0)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+        consumer.addVertex(pose, v2.x, v2.y, v2.z).setColor(c2).setUv(1, 0)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+        consumer.addVertex(pose, v3.x, v3.y, v3.z).setColor(c3).setUv(1, 1)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+        consumer.addVertex(pose, v4.x, v4.y, v4.z).setColor(c4).setUv(0, 1)
+                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+    }
+
+    // ===================== 插值节点记录 =====================
+
+    /**
      * 插值节点记录
      */
     public record InterpolatedNode(Vec3 pos, Quaternionf rot) {
+    }
 
-        public InterpolatedNode lerp(InterpolatedNode to, float lerp) {
-            return new InterpolatedNode(pos().lerp(to.pos(), lerp), rot().slerp(to.rot(), lerp));
-        }
+    // ===================== 工具 =====================
 
+    private static int clampByte(float v) {
+        return Math.max(0, Math.min(255, Math.round(v)));
     }
 }

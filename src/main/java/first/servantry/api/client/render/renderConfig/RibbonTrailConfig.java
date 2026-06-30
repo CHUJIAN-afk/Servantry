@@ -7,17 +7,16 @@ import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.PathNode;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.FastColor;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.util.List;
-
 /**
  * 丝带拖尾配置。
+ * <p>
  * 适用于剑状、刀锋、扁平物体、有明显方向性的实体。
+ * </p>
+ *
  * @param <T> 实体类型
  */
 public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, RibbonTrailConfig<T>> {
@@ -25,14 +24,10 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
     public float upOffset = 0f;
     private float downOffset = 0f;
 
-    /**
-     * 尖端透明度增强函数
-     */
+    /** 尖端透明度增强函数 */
     public RenderContext.AlphaBoostFunction<T> tipAlphaBoost = (entity, progress) -> (1 - progress) * 10;
 
-    /**
-     * 尖端亮度增强函数
-     */
+    /** 尖端亮度增强函数 */
     public RenderContext.BrightnessBoostFunction<T> tipBrightnessBoost = (entity, progress) -> (1 - progress * 0.75f);
 
     public RibbonTrailConfig<T> upOffset(float upOffset) {
@@ -57,69 +52,66 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
 
     @Override
     public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderType renderType) {
-        List<InterpolatedNode> smoothNodes = buildSmoothNodes(entity, visualNode, partialTick);
-        if (smoothNodes.size() < 2) {
+        RenderSetup<T> setup = beginRender(entity, poseStack, bufferSource, partialTick, visualNode, renderType);
+        if (setup == null) {
             return;
         }
 
-        VertexConsumer consumer = bufferSource.getBuffer(renderType);
-        Matrix4f pose = poseStack.last().pose();
+        VertexConsumer consumer = setup.consumer;
+        Matrix4f pose = setup.pose;
+        float timeShift = setup.timeShift;
+        Vec3 renderPos = setup.renderPos;
 
-        Player owner = entity.getOwner();
-        float timeShift = owner != null ? (owner.tickCount + partialTick) * 0.015f : 0f;
+        int nodeCount = setup.nodeCount();
 
-        int nodeCount = smoothNodes.size();
-        Vec3 renderPos = visualNode.pos();
+        // 复用向量
+        Vector3f currTip = new Vector3f(), currBase = new Vector3f();
+        Vector3f prevTip = new Vector3f(), prevBase = new Vector3f();
+        Vector3f currTipPos = new Vector3f(), currBasePos = new Vector3f();
+        Vector3f prevTipPos = new Vector3f(), prevBasePos = new Vector3f();
 
         for (int i = 0; i < nodeCount - 1; i++) {
-            InterpolatedNode curr = smoothNodes.get(i);
-            InterpolatedNode prev = smoothNodes.get(i + 1);
+            InterpolatedNode curr = setup.smoothNodes.get(i);
+            InterpolatedNode prev = setup.smoothNodes.get(i + 1);
 
             float currProgress = (float) i / (nodeCount - 1);
             float prevProgress = (float) (i + 1) / (nodeCount - 1);
 
-            float currScale = Math.max(0.0f, 1.0f - currProgress);
-            float prevScale = Math.max(0.0f, 1.0f - prevProgress);
+            // 顶/底偏移向量（按节点朝向旋转）
+            currTip.set(0, 0, upOffset).rotate(curr.rot());
+            currBase.set(0, 0, downOffset).rotate(curr.rot());
+            prevTip.set(0, 0, upOffset).rotate(prev.rot());
+            prevBase.set(0, 0, downOffset).rotate(prev.rot());
 
-            Vector3f currTip = new Vector3f(0, 0, upOffset).rotate(curr.rot());
-            Vector3f currLeft = new Vector3f(0, 0, downOffset).rotate(curr.rot());
-
-            Vector3f prevTip = new Vector3f(0, 0, upOffset).rotate(prev.rot());
-            Vector3f prevLeft = new Vector3f(0, 0, downOffset).rotate(prev.rot());
-
+            // 颜色与亮度
             int currColorRGB = colorFunction.getColor(entity, currProgress, timeShift);
             int prevColorRGB = colorFunction.getColor(entity, prevProgress, timeShift);
+            float currBright = tipBrightnessBoost.getBoost(entity, currProgress);
+            float prevBright = tipBrightnessBoost.getBoost(entity, prevProgress);
             float currAlphaBoost = tipAlphaBoost.getBoost(entity, currProgress);
-            float currBrightBoost = tipBrightnessBoost.getBoost(entity, currProgress);
             float prevAlphaBoost = tipAlphaBoost.getBoost(entity, prevProgress);
-            float prevBrightBoost = tipBrightnessBoost.getBoost(entity, prevProgress);
 
-            int currR = Math.min(255, Math.round(((currColorRGB >> 16) & 0xFF) * currBrightBoost));
-            int currG = Math.min(255, Math.round(((currColorRGB >> 8) & 0xFF) * currBrightBoost));
-            int currB = Math.min(255, Math.round((currColorRGB & 0xFF) * currBrightBoost));
-            int prevR = Math.min(255, Math.round(((prevColorRGB >> 16) & 0xFF) * prevBrightBoost));
-            int prevG = Math.min(255, Math.round(((prevColorRGB >> 8) & 0xFF) * prevBrightBoost));
-            int prevB = Math.min(255, Math.round((prevColorRGB & 0xFF) * prevBrightBoost));
+            // 尖端 alpha = scale * 0.1 * boost；基部 alpha = max(0, 1-progress*2.5) * 0.04 * boost
+            float currScale = Math.max(0f, 1f - currProgress);
+            float prevScale = Math.max(0f, 1f - prevProgress);
+            int currTipColor = packColor(currColorRGB, currScale * 0.1f * currAlphaBoost, currBright);
+            int currBaseColor = packColor(currColorRGB, Math.max(0f, 1f - currProgress * 2.5f) * 0.04f * currAlphaBoost, currBright);
+            int prevTipColor = packColor(prevColorRGB, prevScale * 0.1f * prevAlphaBoost, prevBright);
+            int prevBaseColor = packColor(prevColorRGB, Math.max(0f, 1f - prevProgress * 2.5f) * 0.04f * prevAlphaBoost, prevBright);
 
-            int currTipAlpha = Math.min(255, Math.round(currScale * 0.1f * 255 * currAlphaBoost));
-            int currBaseAlpha = Math.min(255, Math.round(Math.max(0f, 1.0f - currProgress * 2.5f) * 0.04f * 255 * currAlphaBoost));
-            int prevTipAlpha = Math.min(255, Math.round(prevScale * 0.1f * 255 * prevAlphaBoost));
-            int prevBaseAlpha = Math.min(255, Math.round(Math.max(0f, 1.0f - prevProgress * 2.5f) * 0.04f * 255 * prevAlphaBoost));
+            // 四个顶点位置 = 节点相对位置 + 偏移
+            Vector3f currRel = toVec(curr.pos()).sub(toVec(renderPos));
+            Vector3f prevRel = toVec(prev.pos()).sub(toVec(renderPos));
+            currTipPos.set(currRel).add(currTip);
+            currBasePos.set(currRel).add(currBase);
+            prevTipPos.set(prevRel).add(prevTip);
+            prevBasePos.set(prevRel).add(prevBase);
 
-            int currTipColor = FastColor.ARGB32.color(currTipAlpha, currR, currG, currB);
-            int currBaseColor = FastColor.ARGB32.color(currBaseAlpha, currR, currG, currB);
-            int prevTipColor = FastColor.ARGB32.color(prevTipAlpha, prevR, prevG, prevB);
-            int prevBaseColor = FastColor.ARGB32.color(prevBaseAlpha, prevR, prevG, prevB);
-
-            Vec3 currRel = curr.pos().subtract(renderPos);
-            Vec3 prevRel = prev.pos().subtract(renderPos);
-
-            emitTriangleStrip(consumer, pose, currRel, prevRel, currTip, prevTip, currLeft, prevLeft, currTipColor, prevTipColor, currBaseColor, prevBaseColor);
+            emitQuad(consumer, pose, currTipPos, currTipColor, currBasePos, currBaseColor, prevBasePos, prevBaseColor, prevTipPos, prevTipColor);
         }
     }
 
-    private void emitTriangleStrip(VertexConsumer consumer, Matrix4f pose, Vec3 currRel, Vec3 prevRel, Vector3f currTip, Vector3f prevTip, Vector3f currLeft, Vector3f prevLeft, int currTipColor, int prevTipColor, int currBaseColor, int prevBaseColor) {
-        emitQuad(consumer, pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z, currTipColor, (float) currRel.x + currLeft.x, (float) currRel.y + currLeft.y, (float) currRel.z + currLeft.z, currBaseColor, (float) prevRel.x + prevLeft.x, (float) prevRel.y + prevLeft.y, (float) prevRel.z + prevLeft.z, prevBaseColor, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z, prevTipColor);
-        emitQuad(consumer, pose, (float) currRel.x + currTip.x, (float) currRel.y + currTip.y, (float) currRel.z + currTip.z, currTipColor, (float) prevRel.x + prevTip.x, (float) prevRel.y + prevTip.y, (float) prevRel.z + prevTip.z, prevTipColor, (float) prevRel.x + prevLeft.x, (float) prevRel.y + prevLeft.y, (float) prevRel.z + prevLeft.z, prevBaseColor, (float) currRel.x + currLeft.x, (float) currRel.y + currLeft.y, (float) currRel.z + currLeft.z, currBaseColor);
+    private static Vector3f toVec(Vec3 v) {
+        return new Vector3f((float) v.x, (float) v.y, (float) v.z);
     }
 }

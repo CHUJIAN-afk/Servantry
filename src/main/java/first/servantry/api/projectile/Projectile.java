@@ -83,9 +83,10 @@ public abstract class Projectile extends AttachmentEntity {
 
     @Override
     public void tick() {
+        life++;
         if (!owner.level().isClientSide()) {
             tickPhysics();
-            if ((++life >= maxLife && maxLife > 0) || getPos().distanceToSqr(owner.position()) > getMaxDistance() * getMaxDistance()) {
+            if ((life >= maxLife && maxLife > 0) || getPos().distanceToSqr(owner.position()) > getMaxDistance() * getMaxDistance()) {
                 setRemove();
             }
         }

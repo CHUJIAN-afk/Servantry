@@ -6,13 +6,9 @@ import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.PathNode;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.FastColor;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-
-import java.util.List;
 
 /**
  * 圆锥拖尾配置。
@@ -29,13 +25,15 @@ import java.util.List;
  * 头→尾
  * }</pre>
  *
+ * <p>
+ * 圆锥主体渲染抽为 {@link #renderConeBody(RenderSetup)}，供子类（如 {@link DropletTrailConfig}）复用。
+ * </p>
+ *
  * @param <T> 实体类型
  */
 public class ConeTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, ConeTrailConfig<T>> {
 
-    /**
-     * 拖尾头部最大半径
-     */
+    /** 拖尾头部最大半径 */
     public float maxRadius = 0.2f;
 
     /** 最小半径比例，控制尾端不会完全缩成一点 */
@@ -62,26 +60,41 @@ public class ConeTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, 
     @Override
     public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource,
                        float partialTick, PathNode visualNode, RenderType renderType) {
-        List<InterpolatedNode> smoothNodes = buildSmoothNodes(entity, visualNode, partialTick);
-        if (smoothNodes.size() < 2) return;
+        RenderSetup<T> setup = beginRender(entity, poseStack, bufferSource, partialTick, visualNode, renderType);
+        if (setup == null) {
+            return;
+        }
+        renderConeBody(setup);
+    }
 
-        VertexConsumer consumer = bufferSource.getBuffer(renderType);
-        Matrix4f pose = poseStack.last().pose();
+    /**
+     * 渲染圆锥主体：相邻平滑节点间画 {@link #resolution} 边截面壳面。
+     * <p>
+     * 半径 = maxRadius × (minRadiusRatio + (1 - minRadiusRatio) × fadeOut(progress))，
+     * 头粗尾细；颜色与透明度由 {@link #colorFunction} / {@link #fadeOut} 决定。
+     * </p>
+     *
+     * @param setup 渲染样板产物（含 entity/consumer/pose/timeShift/renderPos/smoothNodes）
+     */
+    protected void renderConeBody(RenderSetup<T> setup) {
+        VertexConsumer consumer = setup.consumer;
+        Matrix4f pose = setup.pose;
+        T entity = setup.entity;
+        float timeShift = setup.timeShift;
+
         float[] cosArr = getCosArray(resolution);
         float[] sinArr = getSinArray(resolution);
 
-        Player owner = entity.getOwner();
-        float timeShift = owner != null ? (owner.tickCount + partialTick) * 0.015f : 0f;
+        int nodeCount = setup.nodeCount();
+        Vec3 renderPos = setup.renderPos;
 
-        int nodeCount = smoothNodes.size();
-        Vec3 renderPos = visualNode.pos();
-
+        // 复用向量，避免循环内分配
         Vector3f currV1 = new Vector3f(), currV2 = new Vector3f();
         Vector3f prevV1 = new Vector3f(), prevV2 = new Vector3f();
 
         for (int i = 0; i < nodeCount - 1; i++) {
-            InterpolatedNode curr = smoothNodes.get(i);
-            InterpolatedNode prev = smoothNodes.get(i + 1);
+            InterpolatedNode curr = setup.smoothNodes.get(i);
+            InterpolatedNode prev = setup.smoothNodes.get(i + 1);
 
             float currProgress = (float) i / (nodeCount - 1);
             float prevProgress = (float) (i + 1) / (nodeCount - 1);
@@ -93,11 +106,9 @@ public class ConeTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, 
 
             int currColor = colorFunction.getColor(entity, currProgress, timeShift);
             int prevColor = colorFunction.getColor(entity, prevProgress, timeShift);
-
-            int currAlpha = Math.round(currFade * 200);
-            int prevAlpha = Math.round(prevFade * 200);
-            int currARGB = FastColor.ARGB32.color(currAlpha, (currColor >> 16) & 0xFF, (currColor >> 8) & 0xFF, currColor & 0xFF);
-            int prevARGB = FastColor.ARGB32.color(prevAlpha, (prevColor >> 16) & 0xFF, (prevColor >> 8) & 0xFF, prevColor & 0xFF);
+            // 旧版 alpha = round(fade * 200)，等价于 fade * (200/255) 后 pack
+            int currARGB = packColor(currColor, currFade * (200f / 255f));
+            int prevARGB = packColor(prevColor, prevFade * (200f / 255f));
 
             Vec3 currRel = curr.pos().subtract(renderPos);
             Vec3 prevRel = prev.pos().subtract(renderPos);

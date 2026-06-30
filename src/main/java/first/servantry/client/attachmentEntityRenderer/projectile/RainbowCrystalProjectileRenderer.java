@@ -17,8 +17,7 @@ public class RainbowCrystalProjectileRenderer extends AbstractAttachmentEntityRe
                                .colorRGB(crystal.getColor(partialTick))
                                .historyLength(16)
                                .segmentsPerNode(2)
-                               .maxRadius(0.25f)
-                               .minRadiusRatio(0.2f)
+                               .maxRadius((crystal.getLife() + partialTick) * 0.025f)
                                .resolution(4))
                 .build();
     }
