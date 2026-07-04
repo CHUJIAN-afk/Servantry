@@ -86,10 +86,12 @@ public interface IBlockCollision<T extends AttachmentEntity> {
         if (!correctedMotion.equals(motion)) {
             Vec3 correctedPos = from.add(correctedMotion);
             entity.currentPathNode = new PathNode(correctedPos, entity.currentPathNode.yaw(), entity.currentPathNode.pitch(), entity.currentPathNode.roll());
-            onBlockCollision(new CollisionContext(correctedPos,
-                    correctedMotion.x != motion.x,
-                    correctedMotion.y != motion.y,
-                    correctedMotion.z != motion.z));
+            boolean collisionX = correctedMotion.x != motion.x;
+            boolean collisionY = correctedMotion.y != motion.y;
+            boolean collisionZ = correctedMotion.z != motion.z;
+            // 被底部方块支撑：原运动向下且 Y 轴被碰撞截断（即落地）
+            boolean bottomSupported = motion.y < 0 && collisionY;
+            onBlockCollision(new CollisionContext(correctedPos, collisionX, collisionY, collisionZ, bottomSupported));
         }
     }
 
@@ -160,8 +162,14 @@ public interface IBlockCollision<T extends AttachmentEntity> {
     }
 
     /**
-     * 碰撞上下文
+     * 碰撞上下文。
+     *
+     * @param position         碰撞修正后位置
+     * @param collisionX       X 轴是否被碰撞截断
+     * @param collisionY       Y 轴是否被碰撞截断
+     * @param collisionZ       Z 轴是否被碰撞截断
+     * @param bottomSupported  是否被底部方块支撑（原运动向下且 Y 轴被截断，即落地）
      */
-    record CollisionContext(Vec3 position, boolean collisionX, boolean collisionY, boolean collisionZ) {
+    record CollisionContext(Vec3 position, boolean collisionX, boolean collisionY, boolean collisionZ, boolean bottomSupported) {
     }
 }

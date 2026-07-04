@@ -55,6 +55,7 @@ public final class ServantryHelper {
             }
             default -> 0;
         };
+
     }
 
     public int getUsedSlots(EntityData.Type type) {

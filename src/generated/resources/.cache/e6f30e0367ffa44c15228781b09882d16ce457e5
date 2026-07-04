@@ -1,4 +1,4 @@
-// 1.21.1	2026-06-27T20:30:33.7754523	Item Models: servantry
+// 1.21.1	2026-07-03T23:42:22.3921932	Item Models: servantry
 d882c3a8d9d37b2217246221442c70da01b9ad66 assets/servantry/models/item/adamantite_ingot.json
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 1234a813c7da2a7cf22f8be7f86b6fd620074edc assets/servantry/models/item/ballista_cane.json
@@ -77,6 +77,7 @@ fc85c4b0542a6c73088ae615248411c1c4b65365 assets/servantry/models/item/summoner_e
 efdbf40b0d7ab4fe5b19b9ac565caf03ed858cfb assets/servantry/models/item/tempest_staff.json
 15c8f22cc643d21501adcfe2badf319b0b3b5039 assets/servantry/models/item/terraprism.json
 5480b2988d2d54b7637ea32ca855c38b9f3cf08d assets/servantry/models/item/threat_analyzer.json
+beeb621811a710d636284042f7d97b6e48c778ac assets/servantry/models/item/thundercloud_bonsai.json
 51a7bfa0660dfa1079a786fa302b8347e92cbfd9 assets/servantry/models/item/tiki_boots.json
 3c1874b16bed70e47dada9a42cefba1f1d163321 assets/servantry/models/item/tiki_chestplate.json
 e51128977d460da817d2a29a3515fbe6cc2d98ad assets/servantry/models/item/tiki_helmet.json

@@ -11,6 +11,7 @@ import first.servantry.common.recipe.MithrilAnvilRecipe;
 import first.servantry.common.sentryServant.Ballista;
 import first.servantry.common.sentryServant.MoonPortal;
 import first.servantry.common.sentryServant.RainbowCrystal;
+import first.servantry.common.sentryServant.SuperPeashooter;
 import first.servantry.common.servant.*;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
@@ -462,6 +463,29 @@ public class ServantWeaponRegister {
                     .tooltip(1, "Contains the power to command miniature devourers", "蕴含掌控小型吞噬者的力量")
                     .tooltip(2, "The devourer uses the God Eater, Holy Incineration and Cosmic Maelstrom to attack", "吞噬者会使用噬神者，焚灭虔信之火和超宇宙狂涡攻击")
                     .tooltip(3, "While the devourer is present, all your attacks unleash God-Slaying Fury", "吞噬者在场时，你的所有攻击都会释放弑神怒焰")
+                    .build();
+    /**
+     * 雷云盆栽
+     */
+    public static final DeferredItem<Item> ThundercloudBonsai =
+            Register.register(SERVANT_WEAPON, "thundercloud_bonsai", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.SuperPeashooter)
+                            .damage(12f)
+                            .knockback(0)
+                            .sound(SoundRegister.UseMoonPortalStaff)
+                            .summon((weapon, player) -> {
+                                SuperPeashooter servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
+                                    servant.setLevel(3);
+                                    servant.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
+                                    servantryHelper.add(EntityData.Type.SentryServant, servant);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .language("Thundercloud Bonsai", "雷云盆栽")
+                    .servant(AttachmentEntityRegister.SuperPeashooter, "Super Peashooter", "超级电能豌豆射手")
+                    .tooltip(1, "Fires seven lightning balls at once, with a chance to fire a large number of scattered lightning balls at once", "一次发射七颗雷电球，有概率一次发射大量散射雷电球")
                     .build();
 
     public static void register() {

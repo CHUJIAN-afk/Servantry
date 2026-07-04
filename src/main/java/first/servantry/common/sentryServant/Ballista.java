@@ -29,6 +29,9 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
     @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
+            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+                setRemove();
+            }
             LivingEntity target = getTarget();
             cooldown--;
             if (isTargetChange()) {
@@ -59,9 +62,9 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        if (context.collisionY() && context.position().y() < getPos().y()) {
-            Vec3 velocity = getVelocity();
-            setVelocity(new Vec3(velocity.x(), 0, velocity.y()));
+        if (context.bottomSupported()) {
+            Vec3 v = getVelocity();
+            setVelocity(new Vec3(v.x(), 0, v.z()));
         }
     }
 
@@ -87,10 +90,7 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
         Vec3 direction = getLookAngle();
         Vec3 pos = getPos();
         CrossbowBoltProjectile projectile = new CrossbowBoltProjectile(getDamageSource(), pos, direction);
-        projectile.setDamageSource(getDamageSource());
-        projectile.setDamage(getDamage());
-        projectile.setKnockback(getKnockback());
-        projectile.setArmorPierce(getArmorPierce());
+        projectile.copyDamageData(this);
         if (ArmorSetRegister.ValhallaKnight.value().full(owner)) {
             projectile.setMaxPierceCount(6);
             projectile.setDamage(projectile.getDamage() * 1.33f);

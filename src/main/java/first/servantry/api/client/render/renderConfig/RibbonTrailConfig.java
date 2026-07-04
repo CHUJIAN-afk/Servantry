@@ -25,10 +25,10 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
     private float downOffset = 0f;
 
     /** 尖端透明度增强函数 */
-    public RenderContext.AlphaBoostFunction<T> tipAlphaBoost = (entity, progress) -> (1 - progress) * 10;
+    public RenderContext.AlphaBoostFunction<T> tipAlphaBoost = (entity, progress) -> (1 - progress) * 20;
 
     /** 尖端亮度增强函数 */
-    public RenderContext.BrightnessBoostFunction<T> tipBrightnessBoost = (entity, progress) -> (1 - progress * 0.75f);
+    public RenderContext.BrightnessBoostFunction<T> tipBrightnessBoost = (entity, progress) -> (1 - (progress * 0.5f));
 
     public RibbonTrailConfig<T> upOffset(float upOffset) {
         this.upOffset = upOffset;

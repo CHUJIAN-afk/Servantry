@@ -60,7 +60,7 @@ public class RainbowCrystalProjectile extends Projectile {
                 if (damageSource != null) {
                     List<LivingEntity> entities = ServantryHelper.get(owner).getTargetCache().getEntities();
                     for (LivingEntity living : entities) {
-                        if (living.distanceToSqr(pos) < 8) {
+                        if (living.distanceToSqr(pos) < 9) {
                             boolean isTarget = true;
                             if (damageSource instanceof ServantDamageSource servantDamageSource) {
                                 Servant servant = servantDamageSource.getServant();

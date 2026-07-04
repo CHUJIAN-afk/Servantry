@@ -53,7 +53,7 @@ public class ClientEvent {
             PoseStack poseStack = event.getPoseStack();
             for (BlockPos pos : scout.getHighlightedOres()) {
                 poseStack.pushPose();
-                poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y+2, pos.getZ() - cameraPos.z);
+                poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
                 LevelRenderer.renderLineBox(poseStack, innerConsumer, 0, 0, 0, 1, 1, 1, 0.72F, 0.96F, 1.0F, 1.0F);
                 poseStack.popPose();
             }
@@ -91,6 +91,7 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.CustomLaserProjectile.get(), new CustomLaserProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.RainbowCrystalProjectile.get(), new RainbowCrystalProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.GodFlameProjectile.get(), new GodFlameProjectileRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.BlitzBall.get(), new BlitzBallRenderer());
     }
 
     @SubscribeEvent
