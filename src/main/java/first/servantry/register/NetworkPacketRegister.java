@@ -1,15 +1,12 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import first.servantry.client.screen.MithrilAnvilGui;
-import first.servantry.common.recipe.MithrilAnvilRecipe;
+import first.servantry.network.BatchedParticlesPayload;
 import first.servantry.network.MithrilAnvilPlaceRecipePayload;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.HandlerThread;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class NetworkPacketRegister {
 
@@ -18,28 +15,18 @@ public class NetworkPacketRegister {
     }
 
     private static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        event.registrar(Servantry.MODID)
-                .executesOn(HandlerThread.MAIN)
+        PayloadRegistrar registrar = event.registrar(Servantry.MODID);
+        registrar.executesOn(HandlerThread.MAIN)
                 .playToServer(
                         MithrilAnvilPlaceRecipePayload.TYPE,
                         MithrilAnvilPlaceRecipePayload.STREAM_CODEC,
-                        NetworkPacketRegister::handlePlaceRecipe
+                        MithrilAnvilPlaceRecipePayload::handlePlaceRecipe
+                )
+                .playToClient(
+                        BatchedParticlesPayload.TYPE,
+                        BatchedParticlesPayload.STREAM_CODEC,
+                        BatchedParticlesPayload::handleClient
                 );
     }
 
-    @SuppressWarnings("unchecked")
-    private static void handlePlaceRecipe(MithrilAnvilPlaceRecipePayload payload, IPayloadContext context) {
-        if (!(context.player() instanceof ServerPlayer player)) return;
-        context.enqueueWork(() -> {
-            if (player.containerMenu instanceof MithrilAnvilGui.MithrilAnvilMenu menu && menu.containerId == payload.containerId()) {
-                player.getServer().getRecipeManager()
-                        .byKey(payload.recipeId())
-                        .ifPresent(holder -> {
-                            if (holder.value() instanceof MithrilAnvilRecipe && menu.stillValid(player)) {
-                                menu.setSelectedRecipe((RecipeHolder<MithrilAnvilRecipe>) holder);
-                            }
-                        });
-            }
-        });
-    }
 }

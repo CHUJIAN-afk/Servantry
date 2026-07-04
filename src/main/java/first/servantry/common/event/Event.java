@@ -2,6 +2,7 @@ package first.servantry.common.event;
 
 import first.servantry.Servantry;
 import first.servantry.api.ServantryHelper;
+import first.servantry.api.common.attachment.BatchedParticlesData;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.servant.Servant;
@@ -10,10 +11,12 @@ import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.servant.ChlorophyteCrystal;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.common.servant.VoidEater;
+import first.servantry.network.BatchedParticlesPayload;
 import first.servantry.register.*;
 import first.servantry.utils.CuriosUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -34,6 +37,7 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.BasicItemListing;
@@ -42,7 +46,9 @@ import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 
 import java.util.List;
@@ -50,6 +56,17 @@ import java.util.Map;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void tick(LevelTickEvent.Post event) {
+        Level level = event.getLevel();
+        if (!level.isClientSide()) {
+            BatchedParticlesData data = level.getData(AttachmentRegister.BatchedParticles);
+            if (data.size() > 0) {
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new BatchedParticlesPayload(data.drain()));
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void onItemStackedOnOther(ItemStackedOnOtherEvent event) {

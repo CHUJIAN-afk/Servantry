@@ -6,8 +6,10 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
+import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.register.AttachmentEntityRegister;
 import first.servantry.register.AttachmentRegister;
+import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -60,11 +62,53 @@ public class BlitzBall extends Projectile {
             for (Integer id : idList) {
                 if (level.getEntity(id) instanceof LivingEntity living) {
                     targetList.add(living);
+                    ParticleHelper.create(owner.level())
+                            .generic(GenericParticleBuilder.create()
+                                             .color(0x38ffec)
+                                             .edgeColor(0x2fc1ae)
+                                             .lifetime(5)
+                                             .lifetimeRandom(5)
+                                             .spin(0.3f)
+                                             .spinRandom(0.05F)
+                                             .friction(0.75F)
+                                             .scale(0.025f)
+                                             .scaleRandom(0.005f)
+                            )
+                            .pos(living.getBoundingBox().getCenter())
+                            .offset(0.15)
+                            .velocity(getVelocity())
+                            .count(1)
+                            .speed(0.25)
+                            .spread(2)
+                            .emit();
                 }
             }
             idList.clear();
         }
         super.tick();
+    }
+
+    @Override
+    public void onRemove() {
+        ParticleHelper.create(owner.level())
+                .generic(GenericParticleBuilder.create()
+                                 .color(0x38ffec)
+                                 .edgeColor(0x2fc1ae)
+                                 .lifetime(5)
+                                 .lifetimeRandom(5)
+                                 .spin(0.3f)
+                                 .spinRandom(0.05F)
+                                 .friction(0.75F)
+                                 .scale(0.025f)
+                                 .scaleRandom(0.005f)
+                )
+                .pos(getPos())
+                .offset(0.15)
+                .velocity(getVelocity())
+                .count(4)
+                .speed(0.25)
+                .spread(2)
+                .emit();
     }
 
     @Override

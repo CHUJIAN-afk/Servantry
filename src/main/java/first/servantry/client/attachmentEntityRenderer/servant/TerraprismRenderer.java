@@ -56,5 +56,4 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
         int mr = (mColorRGB >> 16) & 0xFF, mg = (mColorRGB >> 8) & 0xFF, mb = mColorRGB & 0xFF;
         ModelRenderer.renderModel(ModelRegister.TERRAPRISM, poseStack, type -> new TintedVertexConsumer(bufferSource.getBuffer(type), mr, mg, mb, 255));
     }
-
 }

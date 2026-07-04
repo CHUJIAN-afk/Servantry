@@ -53,7 +53,7 @@ public class GodFlameProjectile extends Projectile implements ICollideAttack<God
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.1, -0.1, -1, 0.1, 0.1, 0);
+        return new AABB(-0.1, -0.1, -2, 0.1, 0.1, 0);
     }
 
     @Override

@@ -1,8 +1,9 @@
 package first.servantry.utils;
 
+import first.servantry.api.common.attachment.BatchedParticlesData;
 import first.servantry.common.particle.GenericParticleBuilder;
+import first.servantry.register.AttachmentRegister;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -134,16 +135,23 @@ public class ParticleHelper {
 
     /**
      * 发射粒子，根据 count 自动选择模式。
+     * <p>
+     * 服务端：累积到 Level 的 {@link BatchedParticlesData} 附件，由 tick 末统一打包下发，
+     * 避免每个粒子单独发送网络包。客户端：直接调用 {@link Level#addParticle} 生成粒子。
+     * </p>
      */
     public void emit() {
         if (particleType == null && genericBuilder == null) {
             throw new IllegalStateException("Particle type not set. Call type() or generic() first.");
         }
 
+        boolean server = !level.isClientSide();
+        BatchedParticlesData batch = server ? level.getData(AttachmentRegister.BatchedParticles) : null;
+
         if (count <= 0) {
             ParticleOptions options = genericBuilder != null ? genericBuilder.build() : particleType;
-            if (!level.isClientSide()) {
-                ((ServerLevel) level).sendParticles(options, x, y, z, 0, vx, vy, vz, 1);
+            if (server) {
+                batch.add(options, x, y, z, vx, vy, vz);
             } else {
                 level.addParticle(options, false, x, y, z, vx, vy, vz);
             }
@@ -163,8 +171,8 @@ public class ParticleHelper {
                 double pz = z + (offsetZ > 0 ? (random.nextDouble() - 0.5) * 2 * offsetZ : 0);
 
                 ParticleOptions options = genericBuilder != null ? genericBuilder.build() : particleType;
-                if (!level.isClientSide()) {
-                    ((ServerLevel) level).sendParticles(options, px, py, pz, 0, velocity.x, velocity.y, velocity.z, 1);
+                if (server) {
+                    batch.add(options, px, py, pz, velocity.x, velocity.y, velocity.z);
                 } else {
                     level.addParticle(options, false, px, py, pz, velocity.x, velocity.y, velocity.z);
                 }

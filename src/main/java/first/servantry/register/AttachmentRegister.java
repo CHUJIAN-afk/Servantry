@@ -1,10 +1,7 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.common.attachment.HealthData;
-import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.common.attachment.TargetCache;
+import first.servantry.api.common.attachment.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -31,6 +28,10 @@ public class AttachmentRegister {
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<TargetCache>> TargetCache =
             Register.register("target_cache", () -> AttachmentType.builder(TargetCache::new).build());
+
+    /** Level 级批量粒子累积附件（仅服务端使用，不同步） */
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<BatchedParticlesData>> BatchedParticles =
+            Register.register("batched_particles", () -> AttachmentType.builder(BatchedParticlesData::new).build());
 
     public static void register(IEventBus eventbus) {
         Register.register(eventbus);
