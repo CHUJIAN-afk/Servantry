@@ -23,7 +23,6 @@ import java.util.Set;
 public class BlitzBall extends Projectile {
 
     private final Set<Integer> idList = new HashSet<>();
-    private final Set<LivingEntity> targetList = new HashSet<>();
 
     public BlitzBall() {
         super();
@@ -58,10 +57,8 @@ public class BlitzBall extends Projectile {
             }
         }
         if (level.isClientSide()){
-            targetList.clear();
             for (Integer id : idList) {
                 if (level.getEntity(id) instanceof LivingEntity living) {
-                    targetList.add(living);
                     ParticleHelper.create(owner.level())
                             .generic(GenericParticleBuilder.create()
                                              .color(0x38ffec)
@@ -83,7 +80,6 @@ public class BlitzBall extends Projectile {
                             .emit();
                 }
             }
-            idList.clear();
         }
         super.tick();
     }
@@ -126,13 +122,14 @@ public class BlitzBall extends Projectile {
 
     @Override
     public void readAdditional(RegistryFriendlyByteBuf buf) {
+        idList.clear();
         int size = buf.readInt();
         for (int i = 0; i < size; i++) {
             idList.add(buf.readInt());
         }
     }
 
-    public Set<LivingEntity> getIdList() {
-        return targetList;
+    public Set<Integer> getIdList() {
+        return idList;
     }
 }

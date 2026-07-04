@@ -2,7 +2,6 @@ package first.servantry.common.item;
 
 import com.google.common.collect.Multimap;
 import first.servantry.Servantry;
-import first.servantry.api.event.ServantIncomingDamageEvent;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.utils.CuriosUtil;
@@ -16,6 +15,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -31,7 +31,6 @@ import java.util.function.Consumer;
 @EventBusSubscriber(modid = Servantry.MODID)
 public class CurioItem extends Item implements ICurioItem {
 
-    private final ServantDamageCallback servantDamageCallback;
     private final PreDamageCallback preDamageCallback;
     private final PostDamageCallback postDamageCallback;
 
@@ -46,31 +45,11 @@ public class CurioItem extends Item implements ICurioItem {
         this.canSync = builder.canSync;
         this.writeSyncData = builder.writeSyncData;
         this.readSyncData = builder.readSyncData;
-        this.servantDamageCallback = builder.servantDamageCallback;
         this.preDamageCallback = builder.preDamageCallback;
         this.postDamageCallback = builder.postDamageCallback;
     }
 
-    @SubscribeEvent
-    public static void onServantIncomingDamageEvent(ServantIncomingDamageEvent event) {
-        Servant servant = event.getSource().getServant();
-        if (servant != null) {
-            Player owner = servant.getOwner();
-            if (!owner.level().isClientSide()) {
-                List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
-                for (CurioItem curioItem : curiosItemList) {
-                    if (curioItem.servantDamageCallback != null) {
-                        float result = curioItem.servantDamageCallback.apply(servant, owner, event.getEntity(), event.getAmount());
-                        if (result != event.getAmount()) {
-                            event.setAmount(result);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
         if (event.getSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
@@ -79,8 +58,8 @@ public class CurioItem extends Item implements ICurioItem {
                 if (!owner.level().isClientSide()) {
                     List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
                     for (CurioItem curioItem : curiosItemList) {
-                        if (curioItem.servantDamageCallback != null) {
-                            float result = curioItem.servantDamageCallback.apply(servant, owner, event.getEntity(), event.getNewDamage());
+                        if (curioItem.preDamageCallback != null) {
+                            float result = curioItem.preDamageCallback.apply(servant, owner, event.getEntity(), event.getNewDamage());
                             if (result != event.getNewDamage()) {
                                 event.setNewDamage(result);
                             }
@@ -91,7 +70,7 @@ public class CurioItem extends Item implements ICurioItem {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingDamageEventPost(LivingDamageEvent.Post event) {
         if (event.getSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
@@ -121,11 +100,6 @@ public class CurioItem extends Item implements ICurioItem {
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    @FunctionalInterface
-    public interface ServantDamageCallback {
-        float apply(Servant servant, Player owner, LivingEntity target, float damage);
     }
 
     @FunctionalInterface
@@ -211,7 +185,6 @@ public class CurioItem extends Item implements ICurioItem {
         private BiFunction<SlotContext, ItemStack, Boolean> canSync;
         private BiFunction<SlotContext, ItemStack, CompoundTag> writeSyncData;
         private TriConsumer<SlotContext, CompoundTag, ItemStack> readSyncData;
-        private ServantDamageCallback servantDamageCallback;
         private PreDamageCallback preDamageCallback;
         private PostDamageCallback postDamageCallback;
 
@@ -261,11 +234,6 @@ public class CurioItem extends Item implements ICurioItem {
 
         public Builder readSyncData(TriConsumer<SlotContext, CompoundTag, ItemStack> readSyncData) {
             this.readSyncData = readSyncData;
-            return this;
-        }
-
-        public Builder onServantDamage(ServantDamageCallback callback) {
-            this.servantDamageCallback = callback;
             return this;
         }
 

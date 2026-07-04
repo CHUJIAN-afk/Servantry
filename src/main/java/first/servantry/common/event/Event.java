@@ -4,8 +4,6 @@ import first.servantry.Servantry;
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.BatchedParticlesData;
 import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.event.ServantIncomingDamageEvent;
-import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.servant.ChlorophyteCrystal;
@@ -127,18 +125,6 @@ public class Event {
     }
 
     @SubscribeEvent
-    public static void onServantIncomingDamage(ServantIncomingDamageEvent event) {
-        Servant servant = event.getSource().getServant();
-        Player owner = servant.getOwner();
-        if (!owner.level().isClientSide()) {
-            LivingEntity target = event.getEntity();
-            if (ArmorSetRegister.Hallowed.value().full(owner)) {
-                target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
-            }
-        }
-    }
-
-    @SubscribeEvent
     public static void onItemFished(ItemFishedEvent event) {
         Player player = event.getEntity();
         Level level = player.level();
@@ -188,6 +174,9 @@ public class Event {
             player.addEffect(new MobEffectInstance(MobEffectRegister.BallistaPanicked, 100));
         }
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player) {
+            if (ArmorSetRegister.Hallowed.value().full(player)) {
+                target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
+            }
             List<VoidEater> voidEaters = ServantryHelper.get(player).getEntityData().get(EntityData.Type.Servant, VoidEater.class);
             if (!voidEaters.isEmpty()) {
                 target.addEffect(new MobEffectInstance(MobEffectRegister.GodSlayerInferno, 60));

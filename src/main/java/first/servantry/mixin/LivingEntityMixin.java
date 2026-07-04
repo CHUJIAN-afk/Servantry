@@ -1,5 +1,7 @@
 package first.servantry.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.sugar.Local;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
@@ -14,6 +16,18 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
+
+    @WrapMethod(method = "hurt")
+    public boolean hurt(DamageSource source, float amount, Operation<Boolean> original) {
+        if (source instanceof ServantDamageSource servantDamageSource) {
+            Servant servant = servantDamageSource.getServant();
+            Player owner = servant.getOwner();
+            AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantDamage);
+            float scale = instance != null ? (float) instance.getValue() : 1;
+            amount *= scale;
+        }
+        return original.call(source, amount);
+    }
 
     @ModifyArg(
             method = "hurt",
@@ -34,5 +48,4 @@ public class LivingEntityMixin {
         }
         return strength;
     }
-
 }

@@ -24,13 +24,11 @@ public class CombatRulesMixin {
     private static float modifyArmorValue(float armorValue, LivingEntity entity, float damage, DamageSource damageSource, float armorToughness) {
         if (damageSource instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                armorValue -= servant.getArmorPierce();
-                Player owner = servant.getOwner();
-                AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantArmorPierce);
-                if (instance != null) {
-                    armorValue -= (float) instance.getValue();
-                }
+            armorValue -= servant.getArmorPierce();
+            Player owner = servant.getOwner();
+            AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantArmorPierce);
+            if (instance != null) {
+                armorValue -= (float) instance.getValue();
             }
         }
         return Math.max(armorValue, 0);

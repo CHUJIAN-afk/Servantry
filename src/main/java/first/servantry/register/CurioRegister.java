@@ -203,9 +203,8 @@ public class CurioRegister {
      */
     public static final DeferredItem<Item> Kaleidoscope = Register.register(ACCESSORY, "kaleidoscope", () -> CurioItem.builder()
                     .canEquipFromUse(true)
-                    .onServantDamage((servant, owner, target, damage) -> {
-                        if (owner.getRandom()
-                                .nextFloat() < 0.1f) {
+                    .onPreDamage((servant, owner, target, damage) -> {
+                        if (owner.getRandom().nextFloat() < 0.1f) {
                             return damage * 1.5f;
                         }
                         return damage;

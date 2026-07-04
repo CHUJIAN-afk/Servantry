@@ -6,7 +6,6 @@
   "mixins": [
     "ClientEventMixin",
     "CombatRulesMixin",
-    "CommonHooksMixin",
     "CreativeModeTabMixin",
     "DamageSourcesMixin",
     "LivingEntityMixin",
