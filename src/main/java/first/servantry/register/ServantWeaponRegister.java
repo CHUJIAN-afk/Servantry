@@ -111,6 +111,7 @@ public class ServantWeaponRegister {
             Register.register(SERVANT_WEAPON, "rain_cloud_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Cloud)
                             .damage(3f)
                             .knockback(0)
+                            .sentryServant()
                             .sound(SoundRegister.UseCloudStaff)
                             .summon((weapon, player) -> {
                                 Cloud cloud = weapon.createServant(player);
@@ -180,6 +181,31 @@ public class ServantWeaponRegister {
                     .servant(AttachmentEntityRegister.DeadlySphere, "Deadly Sphere", "致命球")
                     .build();
     /**
+     * 脉冲炮塔遥控装置
+     */
+    public static final DeferredItem<Item> PulseTurretRemote =
+            Register.register(SERVANT_WEAPON, "pulse_turret_remote", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.PulseTurret)
+                            .damage(7.5f)
+                            .knockback(0.1f)
+                            .sentryServant()
+                            .sound(SoundRegister.UseBallistaStaff)
+                            .summon((weapon, player) -> {
+                                PulseTurret servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
+                                    if (servantryHelper.getEntityData().get(EntityData.Type.SentryServant, PulseTurret.class).isEmpty()) {
+                                        servant.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
+                                        servantryHelper.add(EntityData.Type.SentryServant, servant);
+                                    }
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .language("Pulse Turret Remote", "脉冲炮塔遥控装置")
+                    .servant(AttachmentEntityRegister.PulseTurret, "Pulse Turret", "脉冲炮塔")
+                    .tooltip(1, "At most one pulse turret can exist at a time", "最多召唤一个脉冲炮塔")
+                    .build();
+    /**
      * 暴风雨法杖 - 召唤鲨鱼龙卷
      */
     public static final DeferredItem<Item> TempestStaff =
@@ -219,7 +245,8 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> BallistaRod =
             Register.register(SERVANT_WEAPON, "ballista_rod", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Ballista)
                             .damage(3f)
-                            .knockback(0.4f)
+                            .knockback(0.1f)
+                            .sentryServant()
                             .sound(SoundRegister.UseBallistaStaff)
                             .summon((weapon, player) -> {
                                 Ballista servant = weapon.createServant(player);
@@ -241,7 +268,8 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> BallistaCane =
             Register.register(SERVANT_WEAPON, "ballista_cane", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Ballista)
                             .damage(7.4f)
-                            .knockback(0.4f)
+                            .knockback(0.2f)
+                            .sentryServant()
                             .sound(SoundRegister.UseBallistaStaff)
                             .summon((weapon, player) -> {
                                 Ballista servant = weapon.createServant(player);
@@ -264,6 +292,7 @@ public class ServantWeaponRegister {
             Register.register(SERVANT_WEAPON, "ballista_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Ballista)
                             .damage(15.6f)
                             .knockback(0.4f)
+                            .sentryServant()
                             .sound(SoundRegister.UseBallistaStaff)
                             .summon((weapon, player) -> {
                                 Ballista servant = weapon.createServant(player);
@@ -378,6 +407,7 @@ public class ServantWeaponRegister {
             Register.register(SERVANT_WEAPON, "moon_portal_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.MoonPortal)
                             .damage(10)
                             .knockback(0.7f)
+                            .sentryServant()
                             .sound(SoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player) -> {
                                 MoonPortal servant = weapon.createServant(player);
@@ -399,6 +429,7 @@ public class ServantWeaponRegister {
             Register.register(SERVANT_WEAPON, "rainbow_crystal_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.RainbowCrystal)
                             .damage(13)
                             .knockback(0.7f)
+                            .sentryServant()
                             .sound(SoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player) -> {
                                 RainbowCrystal servant = weapon.createServant(player);
@@ -491,6 +522,7 @@ public class ServantWeaponRegister {
             Register.register(SERVANT_WEAPON, "thundercloud_bonsai", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.SuperPeashooter)
                             .damage(12f)
                             .knockback(0)
+                            .sentryServant()
                             .sound(SoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player) -> {
                                 SuperPeashooter servant = weapon.createServant(player);

@@ -58,6 +58,8 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cloud>> Cloud = register("cloud", Cloud::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<PulseTurret>> PulseTurret = register("pulse_turret", PulseTurret::new);
+
     // ===================== 射弹类型 =====================
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustProjectile>> StardustProjectile = register("stardust_projectile", StardustProjectile::new);
@@ -85,6 +87,8 @@ public class AttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<BlitzBall>> BlitzBall = register("blitz_ball", BlitzBall::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Rain>> Rain = register("rain", Rain::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DestructionBullet>> DestructionBullet = register("destruction_bullet", DestructionBullet::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));

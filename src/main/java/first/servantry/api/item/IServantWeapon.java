@@ -32,6 +32,11 @@ public interface IServantWeapon<T extends Servant> {
      */
     AttachmentEntityType<T> getType();
 
+    /**
+     * 是否是哨兵。
+     */
+    boolean isSentryServant();
+
     /** 获取仆从伤害值。 */
     float getDamage();
 
@@ -65,8 +70,11 @@ public interface IServantWeapon<T extends Servant> {
             }
             toolTips.add(Component.translatable("item.servantry.tooltip.summon", Component.translatable(key).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
             ServantryHelper servantryHelper = ServantryHelper.get(player);
-            toolTips.add(Component.translatable("item.servantry.tooltip.servant_slots", Component.literal(String.valueOf(servantryHelper.getUsedSlots(EntityData.Type.Servant))).withStyle(ChatFormatting.BLUE), Component.literal(String.valueOf(servantryHelper.getMaxCount(EntityData.Type.Servant))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
-            toolTips.add(Component.translatable("item.servantry.tooltip.sentry_servant_slots", Component.literal(String.valueOf(servantryHelper.getUsedSlots(EntityData.Type.SentryServant))).withStyle(ChatFormatting.BLUE), Component.literal(String.valueOf(servantryHelper.getMaxCount(EntityData.Type.SentryServant))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
+            if (!isSentryServant()){
+                toolTips.add(Component.translatable("item.servantry.tooltip.servant_slots", Component.literal(String.valueOf(servantryHelper.getUsedSlots(EntityData.Type.Servant))).withStyle(ChatFormatting.BLUE), Component.literal(String.valueOf(servantryHelper.getMaxCount(EntityData.Type.Servant))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
+            } else {
+                toolTips.add(Component.translatable("item.servantry.tooltip.sentry_servant_slots", Component.literal(String.valueOf(servantryHelper.getUsedSlots(EntityData.Type.SentryServant))).withStyle(ChatFormatting.BLUE), Component.literal(String.valueOf(servantryHelper.getMaxCount(EntityData.Type.SentryServant))).withStyle(ChatFormatting.BLUE)).withStyle(ChatFormatting.GRAY));
+            }
             toolTips.add(Component.translatable("item.servantry.tooltip.remove_all").withStyle(ChatFormatting.GRAY));
         }
         return toolTips;
@@ -111,6 +119,7 @@ public interface IServantWeapon<T extends Servant> {
     class Builder<T extends Servant> {
 
         private final Supplier<AttachmentEntityType<T>> typeSupplier;
+        private boolean sentryServant = false;
         private float damage = 0;
         private float knockback = 0;
         private float armorPierce = 0;
@@ -128,6 +137,14 @@ public interface IServantWeapon<T extends Servant> {
 
         public Builder(@NotNull Supplier<AttachmentEntityType<T>> typeSupplier) {
             this.typeSupplier = typeSupplier;
+        }
+
+        /**
+         * 设置为哨兵。
+         */
+        public Builder<T> sentryServant() {
+            this.sentryServant = true;
+            return this;
         }
 
         /** 设置仆从伤害值。 */
@@ -191,6 +208,11 @@ public interface IServantWeapon<T extends Servant> {
             @Override
             public AttachmentEntityType<T> getType() {
                 return typeSupplier.get();
+            }
+
+            @Override
+            public boolean isSentryServant() {
+                return sentryServant;
             }
 
             @Override

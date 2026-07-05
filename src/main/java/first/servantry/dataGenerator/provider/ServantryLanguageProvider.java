@@ -26,6 +26,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("item.servantry.tooltip.summon", "Summons %s to fight for you", "召唤 %s 为你而战");
         entry("item.servantry.tooltip.servant_slots", "Servant Slots: %s / %s", "仆从栏位: %s / %s");
         entry("item.servantry.tooltip.sentry_servant_slots", "Sentry Servant Slots: %s / %s", "哨戒仆从栏位: %s / %s");
+        entry("item.servantry.tooltip.sentry_servant", "Sentry Servant", "哨戒仆从");
         entry("item.servantry.tooltip.remove_all", "Sneak + Use to dismiss all servants of this type", "潜行右键以遣散该类型仆从");
         entry("death.attack.servantry.servant", "%1$s was torn apart by a servant", "%1$s 被仆从撕碎");
         entry("death.attack.servantry.servant.player", "%1$s was torn apart by a servant whilst fighting %2$s", "%1$s 在与 %2$s 战斗时被仆从撕碎");
@@ -54,6 +55,7 @@ public class ServantryLanguageProvider extends LanguageProvider {
         entry("effect.servantry.shadowflame", "Shadowflame", "暗影焰");
         entry("effect.servantry.moon_bite", "Moon Bite", "月噬");
         entry("effect.servantry.god_slayer_inferno", "God Slayer Inferno", "噬神怒焰");
+        entry("effect.servantry.armor_crunch", "Armor Crunch", "碎甲");
         // 长效和强效药水
         entry("item.minecraft.potion.effect.obsession", "Potion of Obsession", "着魔药水");
         entry("item.minecraft.splash_potion.effect.obsession", "Splash Potion of Obsession", "喷溅型着魔药水");

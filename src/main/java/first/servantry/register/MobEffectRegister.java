@@ -87,6 +87,15 @@ public class MobEffectRegister {
                     .build()
             );
 
+    /**
+     * 碎甲
+     */
+    public static final DeferredHolder<MobEffect, MobEffect> ArmorCrunch =
+            Register.register("armor_crunch", () -> builder(MobEffectCategory.HARMFUL, 0x303030)
+                    .addAttributeModifier(Attributes.ARMOR, Servantry.rl("armor_crunch"), amplifier -> -(amplifier + 1) * 5, AttributeModifier.Operation.ADD_VALUE)
+                    .build()
+            );
+
     public static final DeferredHolder<MobEffect, MobEffect> BallistaPanicked =
             Register.register("ballista_panicked", () -> builder(MobEffectCategory.BENEFICIAL, 0xffa219)
                     .build()
