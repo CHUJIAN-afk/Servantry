@@ -2,7 +2,7 @@ package first.servantry.api.armorSet;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import first.servantry.dadageneeator.provider.ServantryLanguageProvider;
+import first.servantry.dataGenerator.provider.ServantryLanguageProvider;
 import first.servantry.register.Registers;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;

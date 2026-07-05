@@ -15,6 +15,7 @@ public class SoundRegister {
     public static final DeferredHolder<SoundEvent, SoundEvent> UseServantWeapon = create("use_servant_weapon");
     public static final DeferredHolder<SoundEvent, SoundEvent> UseMoonPortalStaff = create("use_moon_portal_staff");
     public static final DeferredHolder<SoundEvent, SoundEvent> UseBallistaStaff = create("use_ballista_staff");
+    public static final DeferredHolder<SoundEvent, SoundEvent> UseCloudStaff = create("use_cloud_staff");
 
     public static final DeferredHolder<SoundEvent, SoundEvent> BallistaShot = create("ballista_shot");
     public static final DeferredHolder<SoundEvent, SoundEvent> Laser = create("laser");

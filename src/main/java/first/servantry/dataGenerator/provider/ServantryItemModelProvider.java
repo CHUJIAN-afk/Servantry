@@ -1,4 +1,4 @@
-package first.servantry.dadageneeator.provider;
+package first.servantry.dataGenerator.provider;
 
 import first.servantry.Servantry;
 import first.servantry.api.item.IServantWeapon;

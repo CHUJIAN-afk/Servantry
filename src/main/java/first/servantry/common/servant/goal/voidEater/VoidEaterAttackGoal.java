@@ -2,7 +2,6 @@ package first.servantry.common.servant.goal.voidEater;
 
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.api.servant.ai.ServantGoal;
@@ -154,10 +153,7 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
                         laserProjectile.setRemove();
                         return;
                     }
-                    PathNode node = laserProjectile.getCurrentPathNode();
-                    PathNode servantNode = servant.getCurrentPathNode();
-                    PathNode pathNode = new PathNode(servantNode.pos(), servantNode.yaw(), servantNode.pitch(), node.roll() + 15);
-                    laserProjectile.setCurrentPathNode(pathNode);
+                    laserProjectile.setCurrentPathNode(servant.getCurrentPathNode());
                     // 沿当前朝向射线追踪方块，计算碰撞箱
                     float pYaw = laserProjectile.getCurrentPathNode().yaw();
                     float pPitch = laserProjectile.getCurrentPathNode().pitch();

@@ -1,4 +1,4 @@
-package first.servantry.dadageneeator.provider;
+package first.servantry.dataGenerator.provider;
 
 import first.servantry.register.AttributeRegister;
 import first.servantry.register.Registers;

@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-03T23:42:22.3921932	Item Models: servantry
+// 1.21.1	2026-07-05T00:06:39.9540657	Item Models: servantry
 d882c3a8d9d37b2217246221442c70da01b9ad66 assets/servantry/models/item/adamantite_ingot.json
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 1234a813c7da2a7cf22f8be7f86b6fd620074edc assets/servantry/models/item/ballista_cane.json
@@ -52,6 +52,7 @@ b3b27e103b021f0f238fa6c70a5291999166a9bd assets/servantry/models/item/phantasmal
 dd4217ef60406750fceef6cd31050bca99c4f4a8 assets/servantry/models/item/primordial_shadowflame.json
 8ae1f31b254f1558033dee33be23f6846079d47f assets/servantry/models/item/pygmy_necklace.json
 95f165b53b28837065d03c385b1364cd3304b32e assets/servantry/models/item/rainbow_crystal_staff.json
+179de75228ca00fb5f395c1afef8e4f8a910d269 assets/servantry/models/item/rain_cloud_staff.json
 0f66572b6262ed41c2fae47fa02ef9da6d2fc3e4 assets/servantry/models/item/silk.json
 edd35d69a3d599a6af32c4d85bb77c44571d2346 assets/servantry/models/item/soul_relief.json
 cb39d05dbca9723e4c59f66ac7a498e65e6d70ff assets/servantry/models/item/spider_boots.json

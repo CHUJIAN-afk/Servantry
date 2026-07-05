@@ -8,10 +8,7 @@ import first.servantry.api.item.IServantWeapon;
 import first.servantry.client.creativeTab.AnimInfo;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
-import first.servantry.common.sentryServant.Ballista;
-import first.servantry.common.sentryServant.MoonPortal;
-import first.servantry.common.sentryServant.RainbowCrystal;
-import first.servantry.common.sentryServant.SuperPeashooter;
+import first.servantry.common.sentryServant.*;
 import first.servantry.common.servant.*;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
@@ -106,6 +103,29 @@ public class ServantWeaponRegister {
                     .language("Blade Staff", "刃杖")
                     .servant(AttachmentEntityRegister.EnchantedThrowingKnives, "Enchanted Throwing Knives", "附魔飞刀")
                     .tooltip(1, "Don't let their small size fool you", "别被它们小小的个头给骗了")
+                    .build();
+    /**
+     * 雨云法杖
+     */
+    public static final DeferredItem<Item> RainCloudStaff =
+            Register.register(SERVANT_WEAPON, "rain_cloud_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Cloud)
+                            .damage(3f)
+                            .knockback(0)
+                            .sound(SoundRegister.UseCloudStaff)
+                            .summon((weapon, player) -> {
+                                Cloud cloud = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
+                                    cloud.init(new PathNode(player.getBoundingBox().getCenter(), 0, 0, 0));
+                                    cloud.setVelocity(player.getLookAngle());
+                                    servantryHelper.add(EntityData.Type.SentryServant, cloud);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .language("Rain Cloud Staff", "雨云法杖")
+                    .servant(AttachmentEntityRegister.Cloud, "Rain Cloud", "雨云")
+                    .tooltip(1, "Summons a cloud to rain down on your foes", "召唤云朵来向敌人降下大雨")
                     .build();
     /**
      * 魔眼法杖 - 召唤双子魔眼

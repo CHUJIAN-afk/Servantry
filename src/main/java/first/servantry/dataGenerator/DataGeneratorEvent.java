@@ -1,7 +1,7 @@
-package first.servantry.dadageneeator;
+package first.servantry.dataGenerator;
 
 import first.servantry.Servantry;
-import first.servantry.dadageneeator.provider.*;
+import first.servantry.dataGenerator.provider.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;

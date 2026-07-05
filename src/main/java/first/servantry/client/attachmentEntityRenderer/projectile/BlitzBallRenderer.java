@@ -42,13 +42,13 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
                         .to(box.getCenter().offsetRandom(random, (float) box.getSize() * 0.5f))
                         .renderOrigin(node.pos())
                         .layers(1)
-                        .segments(5)
+                        .segments(4)
                         .branches(0)
                         .jitter(0.1f)
                         .branchLength(0f)
-                        .radius(0.02f, 0.02f)
+                        .radius(0.01f, 0.01f)
                         .color(0x38ffec)
-                        .alpha(0.75f)
+                        .alpha(0.5f)
                         .render(poseStack, bufferSource, random);
             }
         }
@@ -57,7 +57,7 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
     @Override
     protected void renderEntity(BlitzBall entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> config) {
         SphereRenderer.builder()
-                .radius(0.1f)
+                .radius(0.15f)
                 .layers(3)
                 .sides(6)
                 .color(0x38ffec)

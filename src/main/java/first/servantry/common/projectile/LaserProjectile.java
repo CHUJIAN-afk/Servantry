@@ -58,7 +58,7 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
             Servant servant = servantDamageSource.getServant();
             return servant.isTarget(target);
         }
-        return false;
+        return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }
 
     @Override
@@ -69,11 +69,6 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
     @Override
     public AttachmentEntityType<? extends Projectile> getType() {
         return AttachmentEntityRegister.LaserProjectile.get();
-    }
-
-    @Override
-    public int getTrailDuration() {
-        return 10;
     }
 
     @Override

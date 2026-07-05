@@ -41,7 +41,7 @@ public class CustomLaserProjectileRenderer extends AbstractAttachmentEntityRende
                 .segments(16)
                 .color(color)
                 .alpha(entity.getAlpha())
-                .innerRatio(0.15f)
+                .innerRatio(0.35f)
                 .render(poseStack, bufferSource);
     }
 }

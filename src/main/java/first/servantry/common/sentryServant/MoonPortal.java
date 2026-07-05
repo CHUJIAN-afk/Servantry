@@ -58,12 +58,12 @@ public class MoonPortal extends Servant {
         Vec3 middleDirection = pos.subtract(middlePos).scale(-1).normalize();
         float middleYaw = (float) Math.toDegrees(Math.atan2(-middleDirection.x, middleDirection.z));
         float middlePitch = (float) Math.toDegrees(Math.asin(-middleDirection.y));
-        PathNode middlePathNode = new PathNode(pos, middleYaw, middlePitch, 180);
+        PathNode middlePathNode = new PathNode(pos, middleYaw, middlePitch, 0);
 
         Vec3 endDirection = pos.subtract(endPos).scale(-1).normalize();
         float endYaw = (float) Math.toDegrees(Math.atan2(-endDirection.x, endDirection.z));
         float endPitch = (float) Math.toDegrees(Math.asin(-endDirection.y));
-        PathNode endPathNode = new PathNode(pos, endYaw, endPitch, 360);
+        PathNode endPathNode = new PathNode(pos, endYaw, endPitch, 0);
 
         List<PathNode> pathNodes = new ArrayList<>(40);
         for (int i = 0; i < 10; i++) {

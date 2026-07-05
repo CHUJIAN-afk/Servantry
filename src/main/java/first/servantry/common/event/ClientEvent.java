@@ -92,6 +92,7 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.RainbowCrystalProjectile.get(), new RainbowCrystalProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.GodFlameProjectile.get(), new GodFlameProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.BlitzBall.get(), new BlitzBallRenderer());
+        AttachmentEntityRenderDispatcher.register(AttachmentEntityRegister.Rain.get(), new RainRenderer());
     }
 
     @SubscribeEvent

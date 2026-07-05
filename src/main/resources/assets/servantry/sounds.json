@@ -28,5 +28,10 @@
     "sounds": [
       "servantry:laser"
     ]
+  },
+  "use_cloud_staff": {
+    "sounds": [
+      "servantry:use_cloud_staff"
+    ]
   }
 }

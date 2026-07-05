@@ -47,20 +47,21 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
             if (task == null) {
                 cooldown--;
             }
+            if (task != null) {
+                if (task.tick(this)) {
+                    Vec3 pos = getPos();
+                    Level level = owner.level();
+                    level.playSound(null, pos.x(), pos.y(), pos.z(), SoundRegister.BallistaShot.get(), owner.getSoundSource());
+                } else {
+                    task = null;
+                }
+            }
             LivingEntity target = getTarget();
             if (isTarget(target)) {
                 aiming++;
                 AABB box = target.getBoundingBox();
                 lookAtPos(box.getCenter());
-                if (task != null) {
-                    if (task.tick(this)) {
-                        Vec3 pos = getPos();
-                        Level level = owner.level();
-                        level.playSound(null, pos.x(), pos.y(), pos.z(), SoundRegister.BallistaShot.get(), owner.getSoundSource());
-                    } else {
-                        task = null;
-                    }
-                } else if (cooldown < 0 && aiming > 10) {
+                if (task == null && cooldown < 0 && aiming > 10) {
                     RandomSource random = owner.getRandom();
                     cooldown = 20 + random.nextInt(2);
                     if (random.nextInt(10) == 0) {

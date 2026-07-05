@@ -2,8 +2,8 @@ package first.servantry.register;
 
 import first.servantry.Servantry;
 import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.dadageneeator.provider.ServantryLanguageProvider;
-import first.servantry.dadageneeator.provider.ServantryRecipeProvider;
+import first.servantry.dataGenerator.provider.ServantryLanguageProvider;
+import first.servantry.dataGenerator.provider.ServantryRecipeProvider;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;

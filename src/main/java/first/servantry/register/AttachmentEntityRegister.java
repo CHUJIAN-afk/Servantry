@@ -5,10 +5,7 @@ import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.projectile.*;
-import first.servantry.common.sentryServant.Ballista;
-import first.servantry.common.sentryServant.MoonPortal;
-import first.servantry.common.sentryServant.RainbowCrystal;
-import first.servantry.common.sentryServant.SuperPeashooter;
+import first.servantry.common.sentryServant.*;
 import first.servantry.common.servant.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -59,6 +56,8 @@ public class AttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<VoidEater>> VoidEater = register("void_eater", VoidEater::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cloud>> Cloud = register("cloud", Cloud::new);
+
     // ===================== 射弹类型 =====================
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustProjectile>> StardustProjectile = register("stardust_projectile", StardustProjectile::new);
@@ -84,6 +83,8 @@ public class AttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<GodFlameProjectile>> GodFlameProjectile = register("god_flame_projectile", GodFlameProjectile::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<BlitzBall>> BlitzBall = register("blitz_ball", BlitzBall::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Rain>> Rain = register("rain", Rain::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));
