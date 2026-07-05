@@ -157,7 +157,7 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
                 Vec3 start = pos.add(dir.scale(i * 0.25));
                 BlitzBall projectile = new BlitzBall(shooter.getDamageSource(), start, dir);
                 projectile.copyDamageData(shooter);
-                projectile.setVelocity(dir.scale(0.5));
+                projectile.setVelocity(dir);
                 projectile.join(shooter.owner);
                 firedShots++;
             }

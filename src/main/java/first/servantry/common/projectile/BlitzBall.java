@@ -43,7 +43,7 @@ public class BlitzBall extends Projectile {
             idList.clear();
             List<LivingEntity> entities = owner.getData(AttachmentRegister.TargetCache).getEntities();
             for (LivingEntity living : entities) {
-                if (living.distanceToSqr(getPos()) < 9) {
+                if (living.getBoundingBox().getCenter().distanceToSqr(getPos()) < 9 + living.getBoundingBox().getSize() * 0.5) {
                     boolean isTarget = true;
                     if (damageSource instanceof ServantDamageSource servantDamageSource) {
                         Servant servant = servantDamageSource.getServant();
@@ -51,7 +51,7 @@ public class BlitzBall extends Projectile {
                     }
                     if (isTarget) {
                         idList.add(living.getId());
-                        InvincibleData.criteriaAttack(living, getUuid(), 5, damageSource, getDamage(), InvincibleData.Type.PARTIAL);
+                        InvincibleData.criteriaAttack(living, getUuid(), 3, damageSource, getDamage(), InvincibleData.Type.PARTIAL);
                     }
                 }
             }
