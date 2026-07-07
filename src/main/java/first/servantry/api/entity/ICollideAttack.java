@@ -1,8 +1,8 @@
 package first.servantry.api.entity;
 
+import first.servantry.register.AttachmentRegister;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -30,13 +30,6 @@ public interface ICollideAttack<T extends AttachmentEntity> {
     }
 
     /**
-     * 当碰撞检测命中目标时调用，执行具体的攻击逻辑
-     *
-     * @param hitContexts 命中上下文列表，按碰撞先后顺序排序
-     */
-    void onCollisionAttack(List<HitContext> hitContexts);
-
-    /**
      * 是否启用碰撞攻击检测
      */
     default boolean canCollideAttack() {
@@ -51,18 +44,23 @@ public interface ICollideAttack<T extends AttachmentEntity> {
     }
 
     /**
+     * 当碰撞检测命中目标时调用，执行具体的攻击逻辑
+     *
+     * @param hitContexts 命中上下文列表，按碰撞先后顺序排序
+     */
+    void onCollisionAttack(List<HitContext> hitContexts);
+
+    /**
      * 执行基于历史轨迹的精确碰撞检测，并触发攻击
      */
     default void processCollision(T entity) {
-        if (!canCollideAttack()) return;
-
         ArrayList<PathNode> historyNodes = entity.getHistoryNodes();
         if (historyNodes.size() < 2) return;
 
         // 采样点：上一tick、上上tick、当前位置
+        PathNode current = entity.currentPathNode;    // 当前位置
         PathNode prevTick = historyNodes.get(0);      // 上一tick
         PathNode prevPrevTick = historyNodes.get(1);  // 上上tick
-        PathNode current = entity.currentPathNode;    // 当前位置
 
         AABB localBox = getHitbox();
         Vec3 boxSize = new Vec3(localBox.getXsize(), localBox.getYsize(), localBox.getZsize());
@@ -73,18 +71,10 @@ public interface ICollideAttack<T extends AttachmentEntity> {
         List<SampledOBB> sweepOBBs = buildSweepOBBs(prevPrevTick, prevTick, current, boxSize, boxCenterOffset, hasCenterOffset);
         if (sweepOBBs.isEmpty()) return;
 
-        // 计算包围盒用于粗筛
-        AABB broadAABB = null;
-        for (SampledOBB sampled : sweepOBBs) {
-            broadAABB = (broadAABB == null) ? sampled.obb.getBoundingBox() : broadAABB.minmax(sampled.obb.getBoundingBox());
-        }
-        if (broadAABB == null) return;
-
-        // 粗筛潜在目标
-        Player owner = entity.getOwner();
-        if (owner == null) return;
-
-        List<LivingEntity> potentialTargets = owner.level().getEntitiesOfClass(LivingEntity.class, broadAABB);
+        // 粗筛潜在目标从缓存
+        List<LivingEntity> potentialTargets = entity.getOwner()
+                .getData(AttachmentRegister.TargetCache)
+                .getEntities();
 
         // 精确碰撞检测并收集碰撞点
         Map<LivingEntity, Vec3> hitPoints = new HashMap<>();

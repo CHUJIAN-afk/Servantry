@@ -1,5 +1,6 @@
 package first.servantry.api.servant;
 
+import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.common.attachment.TargetCache;
@@ -7,14 +8,12 @@ import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.register.AttachmentRegister;
-import first.servantry.register.AttributeRegister;
 import first.servantry.register.DamageRegister;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Targeting;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.monster.Enemy;
 
 import java.util.List;
@@ -74,37 +73,18 @@ public abstract class Servant extends AttachmentEntity {
      * 在所有者周围搜索有效目标
      */
     public LivingEntity searchTarget() {
-        int targetDistance = getTargetDistance();
-        AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantSearchRange);
-        if (instance != null) {
-            targetDistance *= instance.getValue();
-        }
-        TargetCache cache = owner.getData(AttachmentRegister.TargetCache);
-        if (!cache.isEmpty()) {
-            double maxDistSq = (double) targetDistance * targetDistance;
-            boolean needLOS = requireLineOfSight();
-            LivingEntity currentTarget = getTarget();
-            LivingEntity newTarget = null;
-            double bestScore = Double.MAX_VALUE;
-            for (LivingEntity entity : cache.getEntities()) {
-                double distSq = entity.distanceToSqr(owner);
-                if ((distSq > maxDistSq) || (needLOS && !owner.hasLineOfSight(entity)) || !isTarget(entity)) {
-                    continue;
-                }
-                double score = distSq;
-                if (entity.distanceToSqr(owner) < 36.0) {
-                    score -= 10000.0;
-                }
-                if (entity == currentTarget) {
-                    score -= 1000.0;
-                }
-                score += ((entity.getId() * 31 + hashCode() * 17) % 5) * 40;
-                if (score < bestScore) {
-                    bestScore = score;
-                    newTarget = entity;
-                }
-            }
-            return newTarget;
+        ServantryHelper helper = ServantryHelper.get(owner);
+        TargetCache targetCache = helper.getTargetCache();
+        if (!targetCache.isEmpty()) {
+            float searchRange = targetCache.getServantSearchRange(this.getOwner(), 32);
+            List<LivingEntity> targets = targetCache.getEntities()
+                    .stream()
+                    .filter(living -> targetCache.isVisibility(owner, living))
+                    .filter(living -> targetCache.isVisibility(this, living))
+                    .filter(living -> targetCache.getDistance(owner, living) < searchRange)
+                    .filter(living -> isTarget(living))
+                    .toList();
+            return targetCache.getNewTarget(this, targets, 0, true);
         }
         return null;
     }
@@ -117,14 +97,26 @@ public abstract class Servant extends AttachmentEntity {
         return true;
     }
 
-    /** 判断生物是否为有效攻击目标 */
+    /**
+     * 判断生物是否为有效攻击目标
+     */
     public boolean isTarget(LivingEntity target) {
         if (target != null && owner != target && target.isAlive()) {
-            boolean isEnemy = target instanceof Enemy;
-            boolean targetingOwner = target instanceof Targeting t && t.getTarget() == owner;
-            boolean hurtOwner = owner.getLastHurtByMob() == target;
-            boolean hurtTarget = InvincibleData.recentlyAttacked(target, owner.getUUID()) || InvincibleData.recentlyAttacked(target, this.getUuid());
-            return isEnemy || targetingOwner || hurtOwner || hurtTarget;
+            if (target instanceof Enemy) {
+                return true;
+            }
+            if (target instanceof Targeting targeting && targeting.getTarget() == owner) {
+                return true;
+            }
+            if (InvincibleData.recentlyAttacked(target, owner.getUUID())) {
+                return true;
+            }
+            if (InvincibleData.recentlyAttacked(owner, target.getUUID())) {
+                return true;
+            }
+            if (InvincibleData.recentlyAttacked(target, this.getUuid())) {
+                return true;
+            }
         }
         return false;
     }

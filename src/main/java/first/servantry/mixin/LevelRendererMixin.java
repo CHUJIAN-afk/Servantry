@@ -7,7 +7,6 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.*;
-import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
@@ -26,7 +25,9 @@ public class LevelRendererMixin {
     @Nullable
     private ClientLevel level;
 
-    @Shadow @Final private RenderBuffers renderBuffers;
+    @Shadow
+    @Final
+    private RenderBuffers renderBuffers;
 
     @Inject(
             method = "renderLevel",
@@ -44,13 +45,12 @@ public class LevelRendererMixin {
             Matrix4f frustumMatrix,
             Matrix4f projectionMatrix,
             CallbackInfo ci,
-            @Local PoseStack poseStack,
-            @Local TickRateManager tickratemanager
+            @Local PoseStack poseStack
     ) {
         assert level != null;
         MultiBufferSource.BufferSource bufferSource = renderBuffers.bufferSource();
         for (Player player : level.players()) {
-            float partialTick = deltaTracker.getGameTimeDeltaPartialTick(!tickratemanager.isEntityFrozen(player));
+            float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
             AttachmentEntityRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
         }
     }

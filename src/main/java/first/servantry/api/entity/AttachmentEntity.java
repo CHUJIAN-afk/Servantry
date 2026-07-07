@@ -87,17 +87,19 @@ public abstract class AttachmentEntity {
             if (!isRemove()) {
                 // 方块碰撞检测
                 if (this instanceof IBlockCollision<?>) {
-                    @SuppressWarnings("unchecked")
-                    IBlockCollision<AttachmentEntity> blockCollision = (IBlockCollision<AttachmentEntity>) this;
-                    blockCollision.processBlockCollision(this);
+                    @SuppressWarnings("unchecked") IBlockCollision<AttachmentEntity> blockCollision = (IBlockCollision<AttachmentEntity>) this;
+                    if (blockCollision.canCollideWithBlocks()) {
+                        blockCollision.processBlockCollision(this);
+                    }
                 }
             }
             if (!isRemove()) {
                 // 碰撞攻击检测
                 if (this instanceof ICollideAttack<?>) {
-                    @SuppressWarnings("unchecked")
-                    ICollideAttack<AttachmentEntity> collideAttack = (ICollideAttack<AttachmentEntity>) this;
-                    collideAttack.processCollision(this);
+                    @SuppressWarnings("unchecked") ICollideAttack<AttachmentEntity> collideAttack = (ICollideAttack<AttachmentEntity>) this;
+                    if (collideAttack.canCollideAttack()) {
+                        collideAttack.processCollision(this);
+                    }
                 }
             }
         } else {

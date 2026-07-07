@@ -66,7 +66,6 @@ public interface IBlockCollision<T extends AttachmentEntity> {
      * 使用原版 Entity.collideBoundingBox 算法
      */
     default void processBlockCollision(T entity) {
-        if (!canCollideWithBlocks()) return;
 
         ArrayList<PathNode> history = entity.getHistoryNodes();
         if (history.size() < 2) return;

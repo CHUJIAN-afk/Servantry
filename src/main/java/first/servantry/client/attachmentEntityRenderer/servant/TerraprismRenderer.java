@@ -28,7 +28,7 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
                 .trail(new RibbonTrailConfig<Terraprism>()
                                .timer(timer)
                                .colorRGB(0xFFFFFF)
-                               .segmentsPerNode(16)
+                               .segmentsPerNode(8)
                                .historyLength(5)
                                .upOffset(1.015f)
                                .colorFunction((terraprism, progress, timeShift) -> {
