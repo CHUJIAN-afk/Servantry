@@ -1,6 +1,8 @@
 package first.servantry.common.servant;
 
+import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.entity.PathNode;
@@ -103,13 +105,26 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
     }
 
     @Override
-    public int getTargetDistance() {
-        return 12;
+    public LivingEntity searchTarget() {
+        ServantryHelper helper = ServantryHelper.get(owner);
+        TargetCache targetCache = helper.getTargetCache();
+        if (!targetCache.isEmpty()) {
+            float searchRange = targetCache.getServantSearchRange(this.getOwner(), this.getSearchDistance());
+            List<LivingEntity> targets = targetCache.getEntities()
+                    .stream()
+                    .filter(living -> attacking || targetCache.isVisibility(owner, living))
+                    .filter(living -> attacking || targetCache.isVisibility(this, living))
+                    .filter(living -> targetCache.getDistance(owner, living) < searchRange)
+                    .filter(this::isTarget)
+                    .toList();
+            return targetCache.getNewTarget(this, targets, 8, false);
+        }
+        return null;
     }
 
     @Override
-    public boolean requireLineOfSight() {
-        return !attacking;
+    public int getSearchDistance() {
+        return 32;
     }
 
     // ===================== 网络同步 =====================

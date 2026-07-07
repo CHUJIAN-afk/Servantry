@@ -21,6 +21,11 @@ public class Cloud extends MomentumServant implements IBlockCollision<Cloud> {
     }
 
     @Override
+    public int getSearchDistance() {
+        return 0;
+    }
+
+    @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
             if (--cooldown <= 0) {

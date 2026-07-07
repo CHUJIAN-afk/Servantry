@@ -55,14 +55,9 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
         DamageSource source = entity.getDamageSource();
         if (source instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                return servant.isTarget(target);
-            }
+            return servant.isTarget(target);
         }
-        if (source != null) {
-            return target == chaseTarget;
-        }
-        return false;
+        return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }
 
     @Override
@@ -117,7 +112,7 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
                 DamageSource source = getDamageSource();
                 LivingEntity target = getAttachedTarget();
                 if (source != null && target != null && target.isAlive()) {
-                    InvincibleData.criteriaAttack(target, getUuid(), 0, source, getDamage(), InvincibleData.Type.PARTIAL);
+                    InvincibleData.criteriaAttack(target, getUuid(), 0, source, getDamage() * 0.5f, InvincibleData.Type.PARTIAL);
                 }
                 count *= 4;
                 baseSpeed *= 4;

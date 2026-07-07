@@ -73,29 +73,26 @@ public abstract class Servant extends AttachmentEntity {
      * 在所有者周围搜索有效目标
      */
     public LivingEntity searchTarget() {
-        ServantryHelper helper = ServantryHelper.get(owner);
-        TargetCache targetCache = helper.getTargetCache();
-        if (!targetCache.isEmpty()) {
-            float searchRange = targetCache.getServantSearchRange(this.getOwner(), 32);
-            List<LivingEntity> targets = targetCache.getEntities()
-                    .stream()
-                    .filter(living -> targetCache.isVisibility(owner, living))
-                    .filter(living -> targetCache.isVisibility(this, living))
-                    .filter(living -> targetCache.getDistance(owner, living) < searchRange)
-                    .filter(living -> isTarget(living))
-                    .toList();
-            return targetCache.getNewTarget(this, targets, 0, true);
+        int distance = this.getSearchDistance();
+        if (distance > 0) {
+            ServantryHelper helper = ServantryHelper.get(owner);
+            TargetCache targetCache = helper.getTargetCache();
+            if (!targetCache.isEmpty()) {
+                float searchRange = targetCache.getServantSearchRange(this.getOwner(), distance);
+                List<LivingEntity> targets = targetCache.getEntities()
+                        .stream()
+                        .filter(living -> targetCache.isVisibility(owner, living))
+                        .filter(living -> targetCache.isVisibility(this, living))
+                        .filter(living -> targetCache.getDistance(owner, living) < searchRange)
+                        .filter(living -> isTarget(living))
+                        .toList();
+                return targetCache.getNewTarget(this, targets, 0, true);
+            }
         }
         return null;
     }
 
-    public int getTargetDistance() {
-        return 64;
-    }
-
-    public boolean requireLineOfSight() {
-        return true;
-    }
+    public abstract int getSearchDistance();
 
     /**
      * 判断生物是否为有效攻击目标

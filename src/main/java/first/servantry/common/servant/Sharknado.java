@@ -72,8 +72,8 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
         super.tick();
     }
 
-    public int getTargetDistance() {
-        return 16;
+    public int getSearchDistance() {
+        return 32;
     }
 
     /**

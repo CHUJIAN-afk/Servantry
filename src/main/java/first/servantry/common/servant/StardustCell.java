@@ -66,8 +66,8 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
     }
 
     @Override
-    public int getTargetDistance() {
-        return 24;
+    public int getSearchDistance() {
+        return 32;
     }
 
     @Override

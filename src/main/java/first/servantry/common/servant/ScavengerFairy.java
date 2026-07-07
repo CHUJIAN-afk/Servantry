@@ -44,10 +44,10 @@ public class ScavengerFairy extends Servant {
     public AttachmentEntityType<? extends Servant> getType() {
         return AttachmentEntityRegister.ScavengerFairy.get();
     }
-
+    
     @Override
-    public LivingEntity searchTarget() {
-        return null;
+    public int getSearchDistance() {
+        return 0;
     }
 
     @Override

@@ -110,7 +110,6 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> RainCloudStaff =
             Register.register(SERVANT_WEAPON, "rain_cloud_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Cloud)
                             .damage(3f)
-                            .knockback(0)
                             .sentryServant()
                             .sound(SoundRegister.UseCloudStaff)
                             .summon((weapon, player) -> {
@@ -134,7 +133,7 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> OpticStaff =
             Register.register(SERVANT_WEAPON, "optic_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Twins)
                             .damage(2.4f)
-                            .knockback(0.1f)
+                            .knockback(0.2f)
                             .sound(SoundRegister.UseTerraprism)
                             .summon((weapon, player) -> {
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
@@ -173,7 +172,7 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> DeadlySphereStaff =
             Register.register(SERVANT_WEAPON, "deadly_sphere_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.DeadlySphere)
                             .damage(5.5f)
-                            .knockback(0.1f)
+                            .knockback(0.2f)
                             .sound(SoundRegister.UseServantWeapon)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
@@ -185,8 +184,7 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> PulseTurretRemote =
             Register.register(SERVANT_WEAPON, "pulse_turret_remote", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.PulseTurret)
-                            .damage(7.5f)
-                            .knockback(0.1f)
+                            .damage(15f)
                             .sentryServant()
                             .sound(SoundRegister.UseBallistaStaff)
                             .summon((weapon, player) -> {
@@ -211,7 +209,7 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> TempestStaff =
             Register.register(SERVANT_WEAPON, "tempest_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Sharknado)
                             .damage(5f)
-                            .knockback(0.1f)
+                            .knockback(0.2f)
                             .sound(SoundRegister.UseServantWeapon)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
@@ -223,7 +221,8 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> TerraPrism =
             Register.register(SERVANT_WEAPON, "terraprism", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.TerraPrism)
-                            .damage(9f).knockback(0.1f)
+                            .damage(9f)
+                            .knockback(0.4f)
                             .sound(SoundRegister.UseTerraprism)
                             .summon((weapon, player) -> {
                                 Terraprism servant = weapon.createServant(player);
@@ -245,7 +244,7 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> BallistaRod =
             Register.register(SERVANT_WEAPON, "ballista_rod", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Ballista)
                             .damage(3f)
-                            .knockback(0.1f)
+                            .knockback(0.47f)
                             .sentryServant()
                             .sound(SoundRegister.UseBallistaStaff)
                             .summon((weapon, player) -> {
@@ -268,7 +267,7 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> BallistaCane =
             Register.register(SERVANT_WEAPON, "ballista_cane", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Ballista)
                             .damage(7.4f)
-                            .knockback(0.2f)
+                            .knockback(0.47f)
                             .sentryServant()
                             .sound(SoundRegister.UseBallistaStaff)
                             .summon((weapon, player) -> {
@@ -291,7 +290,7 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> BallistaStaff =
             Register.register(SERVANT_WEAPON, "ballista_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.Ballista)
                             .damage(15.6f)
-                            .knockback(0.4f)
+                            .knockback(0.47f)
                             .sentryServant()
                             .sound(SoundRegister.UseBallistaStaff)
                             .summon((weapon, player) -> {
@@ -315,7 +314,7 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> EtherealStellarCoreStaff =
             Register.register(SERVANT_WEAPON, "ethereal_stellar_core_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.EtherealStellarCore)
                             .damage(10.0f)
-                            .knockback(0.5f)
+                            .knockback(0.2f)
                             .sound(SoundRegister.UseServantWeapon)
                             .summon((weapon, player) -> {
                                 EtherealStellarCore servant = weapon.createServant(player);
@@ -358,7 +357,8 @@ public class ServantWeaponRegister {
      */
     public static final DeferredItem<Item> StardustDragonStaff =
             Register.register(SERVANT_WEAPON, "stardust_dragon_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.StardustDragon)
-                            .damage(8f).knockback(0.5f)
+                            .damage(4f)
+                            .knockback(0.2f)
                             .sound(SoundRegister.UseServantWeapon)
                             .summon((weapon, player) -> {
                                 ServantryHelper helper = ServantryHelper.get(player);
@@ -406,7 +406,7 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> MoonPortalStaff =
             Register.register(SERVANT_WEAPON, "moon_portal_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.MoonPortal)
                             .damage(10)
-                            .knockback(0.7f)
+                            .knockback(0.75f)
                             .sentryServant()
                             .sound(SoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player) -> {
@@ -428,7 +428,7 @@ public class ServantWeaponRegister {
     public static final DeferredItem<Item> RainbowCrystalStaff =
             Register.register(SERVANT_WEAPON, "rainbow_crystal_staff", () -> new IServantWeapon.Builder<>(AttachmentEntityRegister.RainbowCrystal)
                             .damage(13)
-                            .knockback(0.7f)
+                            .knockback(0.75f)
                             .sentryServant()
                             .sound(SoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player) -> {

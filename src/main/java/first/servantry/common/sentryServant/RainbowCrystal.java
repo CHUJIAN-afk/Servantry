@@ -35,6 +35,11 @@ public class RainbowCrystal extends Servant {
         super.tick();
     }
 
+    @Override
+    public int getSearchDistance() {
+        return 32;
+    }
+
     public void fire(LivingEntity target) {
         for (int i = 0; i < 3; i++) {
             Vec3 center = target.getBoundingBox().getCenter();

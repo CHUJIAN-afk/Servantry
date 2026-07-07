@@ -36,6 +36,11 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
     }
 
     @Override
+    public int getSearchDistance() {
+        return 32;
+    }
+
+    @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
             if (getPos().distanceToSqr(owner.position()) > 128 * 128) {

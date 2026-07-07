@@ -40,8 +40,8 @@ public class OreScout extends Servant {
     }
 
     @Override
-    public LivingEntity searchTarget() {
-        return null;
+    public int getSearchDistance() {
+        return 0;
     }
 
     @Override

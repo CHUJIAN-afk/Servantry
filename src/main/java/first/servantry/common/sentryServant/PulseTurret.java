@@ -23,6 +23,11 @@ public class PulseTurret extends MomentumServant implements IBlockCollision<Puls
     }
 
     @Override
+    public int getSearchDistance() {
+        return 32;
+    }
+
+    @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
             if (getPos().distanceToSqr(owner.position()) > 128 * 128) {

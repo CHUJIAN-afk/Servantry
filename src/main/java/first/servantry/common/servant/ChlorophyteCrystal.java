@@ -106,8 +106,8 @@ public class ChlorophyteCrystal extends Servant {
     }
 
     @Override
-    public int getTargetDistance() {
-        return 12;
+    public int getSearchDistance() {
+        return 16;
     }
 
     @Override

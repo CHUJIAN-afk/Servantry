@@ -99,8 +99,8 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
         super.tick();
     }
 
-    public int getTargetDistance() {
-        return 12;
+    public int getSearchDistance() {
+        return 32;
     }
 
     @Override

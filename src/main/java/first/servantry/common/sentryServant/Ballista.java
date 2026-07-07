@@ -27,6 +27,11 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
     }
 
     @Override
+    public int getSearchDistance() {
+        return 32;
+    }
+
+    @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
             if (getPos().distanceToSqr(owner.position()) > 128 * 128) {

@@ -44,6 +44,11 @@ public class MoonPortal extends Servant {
         }
     }
 
+    @Override
+    public int getSearchDistance() {
+        return 32;
+    }
+
     private void fireLaser(LivingEntity target) {
         Vec3 pos = getPos();
         Vec3 middlePos = target.getBoundingBox().getCenter();

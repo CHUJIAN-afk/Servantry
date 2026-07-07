@@ -3,6 +3,7 @@ package first.servantry.common.servant;
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
@@ -50,6 +51,29 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         goalSelector.addGoal(0, new StardustDragonAttackGoal(this));
         goalSelector.addGoal(1, new StardustDragonIdleGoal(this));
         goalSelector.addGoal(2, new StardustDragonFollowGoal(this));
+    }
+
+    @Override
+    public LivingEntity searchTarget() {
+        if (isHead()) {
+            ServantryHelper helper = ServantryHelper.get(owner);
+            TargetCache targetCache = helper.getTargetCache();
+            if (!targetCache.isEmpty()) {
+                float searchRange = targetCache.getServantSearchRange(this.getOwner(), this.getSearchDistance());
+                List<LivingEntity> targets = targetCache.getEntities()
+                        .stream()
+                        .filter(living -> targetCache.getDistance(owner, living) < searchRange)
+                        .filter(this::isTarget)
+                        .toList();
+                return targetCache.getNewTarget(this, targets, 0, true);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int getSearchDistance() {
+        return 32;
     }
 
     @Override
@@ -160,12 +184,6 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
             }
         }
     }
-
-    @Override
-    public int getTargetDistance() { return 24; }
-
-    @Override
-    public boolean requireLineOfSight() { return false; }
 
     @Override
     public void writeAdditional(RegistryFriendlyByteBuf buf) {
@@ -282,13 +300,5 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     public void orbitToward(Vec3 targetPos, float maxTurnDegrees, double acceleration) {
         orbitToward(targetPos, maxTurnDegrees, acceleration, true);
-    }
-
-    public void setSpiralPhase(float spiralPhase) {
-        this.spiralPhase = spiralPhase;
-    }
-
-    public float getSpiralPhase() {
-        return spiralPhase;
     }
 }

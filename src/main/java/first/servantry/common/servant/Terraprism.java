@@ -3,6 +3,7 @@ package first.servantry.common.servant;
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
@@ -45,6 +46,29 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     }
 
     @Override
+    public LivingEntity searchTarget() {
+        ServantryHelper helper = ServantryHelper.get(owner);
+        TargetCache targetCache = helper.getTargetCache();
+        if (!targetCache.isEmpty()) {
+            float searchRange = targetCache.getServantSearchRange(this.getOwner(), this.getSearchDistance());
+            List<LivingEntity> targets = targetCache.getEntities()
+                    .stream()
+                    .filter(living -> attacking || targetCache.isVisibility(owner, living))
+                    .filter(living -> attacking || targetCache.isVisibility(this, living))
+                    .filter(living -> targetCache.getDistance(owner, living) < searchRange)
+                    .filter(this::isTarget)
+                    .toList();
+            return targetCache.getNewTarget(this, targets, 8, false);
+        }
+        return null;
+    }
+
+    @Override
+    public int getSearchDistance() {
+        return 32;
+    }
+
+    @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.15, -0.06, -0.35, 0.15, 0.06, 1);
     }
@@ -66,16 +90,6 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     @Override
     public boolean isValidCollisionTarget(Terraprism entity, LivingEntity target) {
         return isTarget(target);
-    }
-
-    @Override
-    public int getTargetDistance() {
-        return 18;
-    }
-
-    @Override
-    public boolean requireLineOfSight() {
-        return !attacking;
     }
 
     @Override
