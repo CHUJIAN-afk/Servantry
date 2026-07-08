@@ -208,9 +208,9 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
                     .pos(servant.getPos())
                     .offset(0.5f)
                     .velocity(servant.getLookAngle())
-                    .count(10)
+                    .count(5)
                     .speed(1)
-                    .spread(0.75)
+                    .spread(0.5)
                     .emit();
             servant.orbitToward(targetPos, 90f, 0.025f, false);
             combat++;

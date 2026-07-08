@@ -175,12 +175,20 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     @Override
     public boolean canCollideAttack() {
-        return isTarget(getTarget());
+        StardustDragon head = getHead();
+        if (head != null) {
+            return head.isTarget(head.getTarget());
+        }
+        return false;
     }
 
     @Override
     public boolean isValidCollisionTarget(StardustDragon entity, LivingEntity target) {
-        return isTarget(target);
+        StardustDragon head = getHead();
+        if (head != null) {
+            return head.isTarget(target);
+        }
+        return false;
     }
 
     @Override

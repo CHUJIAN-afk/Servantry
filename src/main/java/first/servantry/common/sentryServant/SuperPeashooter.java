@@ -31,6 +31,7 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
     private ShootTask task = null;
 
     public SuperPeashooter() {
+        super();
         setGravity(-0.05f);
         setRotationSpeed(18f);
     }
@@ -68,11 +69,16 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
                 lookAtPos(box.getCenter());
                 if (task == null && cooldown < 0 && aiming > 10) {
                     RandomSource random = owner.getRandom();
-                    cooldown = 20 + random.nextInt(2);
-                    if (random.nextInt(10) == 0) {
+                    if (true) {
+                        cooldown = 0;
                         task = new ShootTask(225, 60, true);
                     } else {
-                        task = new ShootTask(7, 7, false);
+                        cooldown = 20 + random.nextInt(2);
+                        if (random.nextInt(10) == 0) {
+                            task = new ShootTask(225, 60, true);
+                        } else {
+                            task = new ShootTask(7, 7, false);
+                        }
                     }
                 }
             }

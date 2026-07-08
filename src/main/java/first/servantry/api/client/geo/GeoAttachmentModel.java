@@ -65,10 +65,10 @@ public class GeoAttachmentModel extends GeoModel<DummyGeoAnimatable> {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof GeoAttachmentModel that)) return false;
-        return Objects.equals(modelResource, that.modelResource)
-                && Objects.equals(textureResource, that.textureResource)
-                && Objects.equals(animationResource, that.animationResource);
+        if (!(object instanceof GeoAttachmentModel that)) {
+            return false;
+        }
+        return Objects.equals(modelResource, that.modelResource) && Objects.equals(textureResource, that.textureResource) && Objects.equals(animationResource, that.animationResource);
     }
 
     @Override

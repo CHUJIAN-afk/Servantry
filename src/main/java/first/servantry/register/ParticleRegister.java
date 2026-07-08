@@ -1,9 +1,12 @@
 package first.servantry.register;
 
+import com.mojang.serialization.MapCodec;
 import first.servantry.Servantry;
 import first.servantry.common.particle.GenericParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -16,12 +19,12 @@ public class ParticleRegister {
     public static final DeferredHolder<ParticleType<?>, ParticleType<GenericParticleOptions>> Generic = Register.register("generic", () ->
             new ParticleType<>(true) {
                 @Override
-                public com.mojang.serialization.@NotNull MapCodec<GenericParticleOptions> codec() {
+                public @NotNull MapCodec<GenericParticleOptions> codec() {
                     return GenericParticleOptions.CODEC;
                 }
 
                 @Override
-                public net.minecraft.network.codec.@NotNull StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, GenericParticleOptions> streamCodec() {
+                public @NotNull StreamCodec<RegistryFriendlyByteBuf, GenericParticleOptions> streamCodec() {
                     return GenericParticleOptions.STREAM_CODEC;
                 }
             });
