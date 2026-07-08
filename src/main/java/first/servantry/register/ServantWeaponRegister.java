@@ -363,7 +363,9 @@ public class ServantWeaponRegister {
                             .summon((weapon, player) -> {
                                 ServantryHelper helper = ServantryHelper.get(player);
                                 if (helper.canSummon(EntityData.Type.Servant, 1)) {
-                                    List<StardustDragon> existing = helper.getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
+                                    List<StardustDragon> existing = helper
+                                            .getEntityData()
+                                            .get(EntityData.Type.Servant, AttachmentEntityRegister.StardustDragon.get());
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
                                             StardustDragon servant = weapon.createServant(player);
@@ -480,7 +482,8 @@ public class ServantWeaponRegister {
                             .summon((weapon, player) -> {
                                 ServantryHelper helper = ServantryHelper.get(player);
                                 if (helper.canSummon(EntityData.Type.Servant, 1)) {
-                                    List<VoidEater> existing = helper.getEntityData().get(EntityData.Type.Servant, VoidEater.class, true);
+                                    List<VoidEater> existing = helper.getEntityData()
+                                            .get(EntityData.Type.Servant, AttachmentEntityRegister.VoidEater.get());
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
                                             VoidEater servant = weapon.createServant(player);

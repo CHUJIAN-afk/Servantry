@@ -3,15 +3,14 @@ package first.servantry.api;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
+import java.util.HashMap;
 
 public final class ServantryHelper {
 
@@ -59,18 +58,16 @@ public final class ServantryHelper {
     }
 
     public int getUsedSlots(EntityData.Type type) {
-        int slots = 0;
-        Map<AttachmentEntityType<?>, List<AttachmentEntity>> map = entityData.getGroups().get(type);
-        if (map != null) {
-            for (List<AttachmentEntity> list : map.values()) {
-                for (AttachmentEntity attachmentEntity : list) {
-                    if (attachmentEntity instanceof Servant servant && !servant.isRemove()) {
-                        slots += servant.getSlotCost();
-                    }
-                }
-            }
-        }
-        return slots;
+        return entityData.getGroups()
+                .getOrDefault(type, new HashMap<>())
+                .values()
+                .stream()
+                .flatMap(Collection::stream)
+                .filter(entity -> entity instanceof Servant)
+                .map(entity -> (Servant) entity)
+                .filter(servant -> !servant.isRemove())
+                .mapToInt(Servant::getSlotCost)
+                .sum();
     }
 
     public Player getPlayer() {

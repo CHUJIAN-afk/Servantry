@@ -116,7 +116,7 @@ public class TargetCache {
             if (maxVec3 != null) {
                 distance = getServantSearchRange(player, Math.max(32, (float) maxVec3.distanceTo(center) + 4));
             } else {
-                distance = getServantSearchRange(player, 64);
+                distance = getServantSearchRange(player, 32);
             }
             List<LivingEntity> result = player.level()
                     .getEntitiesOfClass(LivingEntity.class, box.inflate(distance))

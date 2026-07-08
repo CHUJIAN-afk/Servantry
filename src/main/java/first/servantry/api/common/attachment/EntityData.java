@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 统一的附件实体数据附件。
@@ -67,7 +66,6 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     }
 
     private void updateServantSlot(Player player) {
-        // 检查仆从栏位溢出，标记多余仆从
         if (!player.level().isClientSide()) {
             // 将待添加队列合并到主分组
             if (!pendingAdd.isEmpty()) {
@@ -84,8 +82,9 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
             }
             // 标记溢出实体
             Type[] types = new Type[]{Type.Servant, Type.SentryServant};
+            ServantryHelper helper = ServantryHelper.get(player);
             for (Type type : types) {
-                List<Servant> servants = get(type, Servant.class).stream().filter(servant -> !servant.isRemove()).collect(Collectors.toCollection(ArrayList::new));
+                List<Servant> servants = get(type, Servant.class);
                 while (true) {
                     if (servants.isEmpty()) {
                         break;
@@ -93,8 +92,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                     if (servants.stream().allMatch(AttachmentEntity::isRemove)) {
                         break;
                     }
-                    ServantryHelper servantryHelper = ServantryHelper.get(player);
-                    if (!servantryHelper.canSummon(type, 0)) {
+                    if (!helper.canSummon(type, 0)) {
                         Servant first = servants.getFirst();
                         first.setRemove();
                         servants.remove(first);
@@ -133,46 +131,36 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
         pendingAdd.computeIfAbsent(type, k -> new HashMap<>()).computeIfAbsent(entity.getType(), k -> new ArrayList<>()).add(entity);
     }
 
-    public <T> List<T> get(Type type, Class<T> tClass) {
-        return get(type, tClass, false);
+    @SuppressWarnings("unchecked")
+    public <T extends AttachmentEntity> List<T> get(Type type, AttachmentEntityType<T> attachmentEntityType) {
+        List<T> result = new ArrayList<>();
+        groups.getOrDefault(type, new HashMap<>())
+                .getOrDefault(attachmentEntityType, new ArrayList<>())
+                .stream()
+                .filter(entity -> !entity.isRemove())
+                .map(entity -> (T) entity)
+                .forEach(result::add);
+        return result;
     }
 
-    public <T> List<T> get(Type type, Class<T> tClass, boolean precise) {
+    @SuppressWarnings("unchecked")
+    public <T extends AttachmentEntity> List<T> get(Type type, Class<T> classType) {
         List<T> result = new ArrayList<>();
-        Map<AttachmentEntityType<?>, List<AttachmentEntity>> map = groups.get(type);
-        if (map != null) {
-            Collection<List<AttachmentEntity>> values = map.values();
-            for (List<AttachmentEntity> value : values) {
-                for (AttachmentEntity attachmentEntity : value) {
-                    if (!attachmentEntity.isRemove()) {
-                        if (precise) {
-                            if (tClass == attachmentEntity.getClass()) {
-                                @SuppressWarnings("unchecked")
-                                T t = (T) attachmentEntity;
-                                result.add(t);
-                            }
-                        } else if (tClass.isInstance(attachmentEntity)) {
-                            @SuppressWarnings("unchecked")
-                            T t = (T) attachmentEntity;
-                            result.add(t);
-                        }
-                    }
-                }
-            }
-        }
+        groups.getOrDefault(type, new HashMap<>())
+                .values()
+                .stream()
+                .flatMap(Collection::stream)
+                .filter(entity -> !entity.isRemove())
+                .filter(classType::isInstance)
+                .map(entity -> (T) entity)
+                .forEach(result::add);
         return result;
     }
 
     public void remove(Type type, AttachmentEntityType<?> entityType) {
-        Map<AttachmentEntityType<?>, List<AttachmentEntity>> map = getGroups().get(type);
-        if (map != null) {
-            List<AttachmentEntity> entities = map.get(entityType);
-            if (entities != null) {
-                for (AttachmentEntity entity : entities) {
-                    entity.setRemove();
-                }
-            }
-        }
+        getGroups().getOrDefault(type, new HashMap<>())
+                .getOrDefault(entityType, new ArrayList<>())
+                .forEach(AttachmentEntity::setRemove);
     }
 
     @Override

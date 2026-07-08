@@ -31,7 +31,6 @@ public class Servantry {
         MenuRegister.register(eventBus);
         MithrilAnvilRecipeRegister.register(eventBus);
         NetworkPacketRegister.register(eventBus);
-
     }
 
     public static ResourceLocation rl(String path) {

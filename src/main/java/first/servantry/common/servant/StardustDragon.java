@@ -110,7 +110,9 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     @Override
     public void onRemove() {
         if (isHead()) {
-            List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
+            List<StardustDragon> dragons = ServantryHelper.get(owner)
+                    .getEntityData()
+                    .get(EntityData.Type.Servant, AttachmentEntityRegister.StardustDragon.get());
             for (StardustDragon dragon : dragons) {
                 dragon.setRemove();
             }
@@ -119,7 +121,9 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     @Nullable
     public StardustDragon getHead() {
-        List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
+        List<StardustDragon> dragons = ServantryHelper.get(owner)
+                .getEntityData()
+                .get(EntityData.Type.Servant, AttachmentEntityRegister.StardustDragon.get());
         if (!dragons.isEmpty()) {
             return dragons.getFirst();
         }
@@ -133,7 +137,9 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     @Nullable
     public StardustDragon getPrecedingSegment() {
         if (!isHead()) {
-            List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
+            List<StardustDragon> dragons = ServantryHelper.get(owner)
+                    .getEntityData()
+                    .get(EntityData.Type.Servant, AttachmentEntityRegister.StardustDragon.get());
             int index = segmentIndex - 1;
             if (index >= 0 && index < dragons.size()) {
                 return dragons.get(index);
@@ -145,7 +151,9 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     @Nullable
     public StardustDragon getNextSegment() {
         if (segmentIndex < totalSegments - 1) {
-            List<StardustDragon> dragons = ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, StardustDragon.class, true);
+            List<StardustDragon> dragons = ServantryHelper.get(owner)
+                    .getEntityData()
+                    .get(EntityData.Type.Servant, AttachmentEntityRegister.StardustDragon.get());
             int index = segmentIndex + 1;
             if (index >= 0 && index < dragons.size()) {
                 return dragons.get(index);
