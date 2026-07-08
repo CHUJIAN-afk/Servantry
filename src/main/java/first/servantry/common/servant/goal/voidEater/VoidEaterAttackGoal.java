@@ -166,7 +166,11 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
                     if (source != null) {
                         for (ICollideAttack.HitContext hitContext : hitContexts) {
                             LivingEntity living = hitContext.entity();
-                            InvincibleData.criteriaAttack(living, laserProjectile.getUuid(), 0, source, laserProjectile.getDamage(), InvincibleData.Type.PARTIAL);
+                            InvincibleData.attack(living)
+                                    .attacker(laserProjectile.getUuid())
+                                    .damageSource(source)
+                                    .damageAmount(laserProjectile.getDamage())
+                                    .apply();
                             Vec3 hitPoint = living.getBoundingBox().getCenter();
                             Vec3 direction = hitPoint.offsetRandom(owner.getRandom(), 2).subtract(hitPoint).normalize();
                             ParticleHelper.create(owner.level())

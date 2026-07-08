@@ -52,7 +52,11 @@ public class ChlorophyteCrystalProjectile extends Projectile implements ICollide
             }
             HitContext context = hitContexts.getFirst();
             LivingEntity target = context.entity();
-            InvincibleData.criteriaAttack(target, uuid, 2, source, getDamage(), InvincibleData.Type.PARTIAL);
+            InvincibleData.attack(target)
+                    .attacker(uuid)
+                    .damageSource(source)
+                    .damageAmount(getDamage())
+                    .apply();
             Vec3 pos = getPos();
             Vec3 direction = getVelocity();
             ParticleHelper.create(owner.level())
@@ -84,9 +88,7 @@ public class ChlorophyteCrystalProjectile extends Projectile implements ICollide
     public boolean isValidCollisionTarget(ChlorophyteCrystalProjectile entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                return servant.isTarget(target);
-            }
+            return servant.isTarget(target);
         }
         return false;
     }

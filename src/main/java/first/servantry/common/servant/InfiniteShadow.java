@@ -3,10 +3,10 @@ package first.servantry.common.servant;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
+import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.AttachmentRegister;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +27,6 @@ import net.neoforged.neoforge.common.util.FakePlayer;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class InfiniteShadow extends Terraprism {
 
@@ -59,7 +58,8 @@ public class InfiniteShadow extends Terraprism {
             for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
                 if (this.hitTargets.add(living)) {
-                    living.getData(AttachmentRegister.InvincibleData).getHurtHistory().put(owner.getUUID(), new AtomicInteger(100));
+                    InvincibleData.get(living)
+                            .recordHit(owner.getUUID(), 100);
                     int invulnerableTime = living.invulnerableTime;
                     living.invulnerableTime = 0;
                     if (!itemStack.is(Items.TNT)) {

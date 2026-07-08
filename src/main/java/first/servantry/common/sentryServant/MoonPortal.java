@@ -134,9 +134,15 @@ public class MoonPortal extends Servant {
             if (source != null) {
                 for (ICollideAttack.HitContext hitContext : hitContexts) {
                     LivingEntity living = hitContext.entity();
-                    living.addEffect(new MobEffectInstance(MobEffectRegister.MoonBite, 60));
-                    InvincibleData.criteriaAttack(living, laser.getUuid(), 3, source, getDamage(), InvincibleData.Type.PARTIAL);
-                    Vec3 hitPoint = living.getBoundingBox().getCenter();
+                    InvincibleData.attack(living)
+                            .attacker(laser.getUuid())
+                            .damageSource(source)
+                            .damageAmount(getDamage())
+                            .invincibleTime(3)
+                            .effect(new MobEffectInstance(MobEffectRegister.MoonBite, 60))
+                            .apply();
+                    Vec3 hitPoint = living.getBoundingBox()
+                            .getCenter();
                     Vec3 direction = hitPoint.offsetRandom(owner.getRandom(), 2).subtract(hitPoint).normalize();
                     ParticleHelper.create(owner.level())
                             .generic(GenericParticleBuilder.create()

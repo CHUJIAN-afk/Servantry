@@ -3,6 +3,7 @@ package first.servantry.api.core;
 import first.servantry.Servantry;
 import first.servantry.api.armorSet.ArmorSet;
 import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ServantryRegistries;
@@ -36,7 +37,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
@@ -137,7 +137,8 @@ public class Event {
     public static void hurtHistory(LivingDamageEvent.Post event) {
         DamageSource damageSource = event.getSource();
         if (damageSource.getEntity() instanceof Player attacker) {
-            event.getEntity().getData(AttachmentRegister.InvincibleData).getHurtHistory().put(attacker.getUUID(), new AtomicInteger(100));
+            InvincibleData.get(event.getEntity())
+                    .recordHit(attacker.getUUID(), 100);
         }
     }
 }

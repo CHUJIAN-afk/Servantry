@@ -105,13 +105,13 @@ public abstract class Servant extends AttachmentEntity {
             if (target instanceof Targeting targeting && targeting.getTarget() == owner) {
                 return true;
             }
-            if (InvincibleData.recentlyAttacked(target, owner.getUUID())) {
+            if (InvincibleData.get(target).hasAttack(owner.getUUID())) {
                 return true;
             }
-            if (InvincibleData.recentlyAttacked(owner, target.getUUID())) {
+            if (InvincibleData.get(owner).hasAttack(target.getUUID())) {
                 return true;
             }
-            if (InvincibleData.recentlyAttacked(target, this.getUuid())) {
+            if (InvincibleData.get(target).hasAttack(this.getUuid())) {
                 return true;
             }
         }

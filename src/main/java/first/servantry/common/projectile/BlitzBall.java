@@ -51,7 +51,12 @@ public class BlitzBall extends Projectile {
                     }
                     if (isTarget) {
                         idList.add(living.getId());
-                        InvincibleData.criteriaAttack(living, getUuid(), 3, damageSource, getDamage(), InvincibleData.Type.PARTIAL);
+                        InvincibleData.attack(living)
+                                .attacker(getUuid())
+                                .damageSource(damageSource)
+                                .damageAmount(getDamage())
+                                .invincibleTime(3)
+                                .apply();
                     }
                 }
             }

@@ -65,15 +65,24 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
             LivingEntity living = hit.entity();
-            InvincibleData.criteriaAttack(living, getUuid(), 4, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
-            if (appearance == Appearance.ICE) {
-                living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40));
-            }
-            if (appearance == Appearance.FIRE) {
-                living.setRemainingFireTicks(40);
-            }
-            if (appearance == Appearance.LIGHT) {
-                living.addEffect(new MobEffectInstance(MobEffects.GLOWING, 40));
+            boolean applied = InvincibleData.attack(living)
+                    .attacker(getUuid())
+                    .damageSource(getDamageSource())
+                    .damageAmount(getDamage())
+                    .invincibleTime(4)
+                    .apply();
+            if (applied) {
+                if (appearance == Appearance.ICE) {
+                    living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100));
+                }
+                if (appearance == Appearance.FIRE) {
+                    if (living.getRemainingFireTicks() < 100) {
+                        living.setRemainingFireTicks(100);
+                    }
+                }
+                if (appearance == Appearance.LIGHT) {
+                    living.addEffect(new MobEffectInstance(MobEffects.GLOWING, 100));
+                }
             }
         }
     }

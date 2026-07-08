@@ -67,7 +67,11 @@ public class RainbowCrystalProjectile extends Projectile {
                                 isTarget = servant.isTarget(living);
                             }
                             if (isTarget) {
-                                InvincibleData.criteriaAttack(living, uuid, 0, damageSource, getDamage(), InvincibleData.Type.PARTIAL);
+                                InvincibleData.attack(living)
+                                        .attacker(uuid)
+                                        .damageSource(damageSource)
+                                        .damageAmount(getDamage())
+                                        .apply();
                             }
                         }
                     }

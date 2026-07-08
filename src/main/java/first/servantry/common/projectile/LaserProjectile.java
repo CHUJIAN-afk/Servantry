@@ -45,7 +45,11 @@ public class LaserProjectile extends Projectile implements ICollideAttack<LaserP
             if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
                 uuid = servant.getUuid();
             }
-            InvincibleData.criteriaAttack(target, uuid, 0, source, getDamage(), InvincibleData.Type.PARTIAL);
+            InvincibleData.attack(target)
+                    .attacker(uuid)
+                    .damageSource(source)
+                    .damageAmount(getDamage())
+                    .apply();
             target.setRemainingFireTicks(Math.min(target.getRemainingFireTicks() + 20, 120));
         }
         currentPathNode = new PathNode(hit.hitPoint(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());

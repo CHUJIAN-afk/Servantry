@@ -82,7 +82,11 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
             if (this.hitTargets.add(hit.entity())) {
-                InvincibleData.criteriaAttack(hit.entity(), getUuid(), -1, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+                InvincibleData.attack(hit.entity())
+                        .attacker(getUuid())
+                        .damageSource(getDamageSource())
+                        .damageAmount(getDamage())
+                        .apply();
             }
         }
     }

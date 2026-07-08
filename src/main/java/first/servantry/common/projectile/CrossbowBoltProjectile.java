@@ -73,7 +73,12 @@ public class CrossbowBoltProjectile extends Projectile implements IBlockCollisio
             for (HitContext hitContext : hitContexts) {
                 LivingEntity living = hitContext.entity();
                 if (hitTargets.add(living)) {
-                    InvincibleData.criteriaAttack(living, uuid, 20, damageSource, getDamage(), InvincibleData.Type.PARTIAL);
+                    InvincibleData.attack(living)
+                            .attacker(uuid)
+                            .damageSource(damageSource)
+                            .damageAmount(getDamage())
+                            .invincibleTime(20)
+                            .apply();
                 }
                 if (hitTargets.size() >= maxPierceCount) {
                     setRemove();

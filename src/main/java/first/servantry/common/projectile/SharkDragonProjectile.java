@@ -58,14 +58,14 @@ public class SharkDragonProjectile extends Projectile implements ICollideAttack<
             if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
                 uuid = servant.getUuid();
             }
-            InvincibleData.criteriaAttack(target, uuid, 0, source, getDamage(), InvincibleData.Type.PARTIAL);
+            InvincibleData.attack(target)
+                    .attacker(uuid)
+                    .damageSource(source)
+                    .damageAmount(getDamage())
+                    .apply();
         }
         currentPathNode = new PathNode(hit.hitPoint().add(getVelocity().scale(0.5)), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
         setRemove();
-    }
-
-    @Override
-    public void onRemove() {
     }
 
     @Override

@@ -112,7 +112,12 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
-            InvincibleData.criteriaAttack(hit.entity(), getUuid(), 2, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+            InvincibleData.attack(hit.entity())
+                    .attacker(getUuid())
+                    .damageSource(getDamageSource())
+                    .damageAmount(getDamage())
+                    .invincibleTime(2)
+                    .apply();
         }
     }
 

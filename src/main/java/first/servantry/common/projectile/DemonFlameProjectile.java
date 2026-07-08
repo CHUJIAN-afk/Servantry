@@ -41,8 +41,13 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
             }
             for (HitContext hitContext : hitContexts) {
                 LivingEntity target = hitContext.entity();
-                InvincibleData.criteriaAttack(target, uuid, 2, source, getDamage(), InvincibleData.Type.PARTIAL);
-                target.addEffect(new MobEffectInstance(MobEffectRegister.CursedFlame, 100, 0));
+                InvincibleData.attack(target)
+                        .attacker(uuid)
+                        .damageSource(source)
+                        .damageAmount(getDamage())
+                        .invincibleTime(20)
+                        .effect(new MobEffectInstance(MobEffectRegister.CursedFlame, 100, 0))
+                        .apply();
             }
         }
     }
@@ -51,9 +56,7 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
     public boolean isValidCollisionTarget(DemonFlameProjectile entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                return servant.isTarget(target);
-            }
+            return servant.isTarget(target);
         }
         return false;
     }

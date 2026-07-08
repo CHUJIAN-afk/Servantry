@@ -88,8 +88,13 @@ public class DestructionBullet extends Projectile implements ICollideAttack<Dest
         if (source != null) {
             HitContext hitContext = hitContexts.getFirst();
             LivingEntity living = hitContext.entity();
-            InvincibleData.criteriaAttack(living, getUuid(), 20, source, getDamage(), InvincibleData.Type.PARTIAL);
-            living.addEffect(new MobEffectInstance(MobEffectRegister.ArmorCrunch, 100));
+            InvincibleData.attack(living)
+                    .attacker(getUuid())
+                    .damageSource(source)
+                    .damageAmount(getDamage())
+                    .invincibleTime(20)
+                    .effect(new MobEffectInstance(MobEffectRegister.ArmorCrunch, 100))
+                    .apply();
             ParticleHelper.create(owner.level())
                     .generic(GenericParticleBuilder.create()
                                      .color(0xff3d00)

@@ -68,11 +68,16 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
         attachTo(hit.hitPoint());
         DamageSource source = getDamageSource();
         if (source != null) {
-            InvincibleData.criteriaAttack(target, getUuid(), 0, source, getDamage(), InvincibleData.Type.PARTIAL);
+            MobEffectInstance existing = target.getEffect(MobEffectRegister.CellParasitism);
+            int amplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, 9);
+            MobEffectInstance effectInstance = new MobEffectInstance(MobEffectRegister.CellParasitism, 100, amplifier);
+            InvincibleData.attack(target)
+                    .attacker(getUuid())
+                    .damageSource(source)
+                    .damageAmount(getDamage())
+                    .effect(effectInstance)
+                    .apply();
         }
-        MobEffectInstance existing = target.getEffect(MobEffectRegister.CellParasitism);
-        int amplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, 10 - 1);
-        target.addEffect(new MobEffectInstance(MobEffectRegister.CellParasitism, 100, amplifier));
     }
 
     @Override
@@ -112,7 +117,11 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
                 DamageSource source = getDamageSource();
                 LivingEntity target = getAttachedTarget();
                 if (source != null && target != null && target.isAlive()) {
-                    InvincibleData.criteriaAttack(target, getUuid(), 0, source, getDamage() * 0.5f, InvincibleData.Type.PARTIAL);
+                    InvincibleData.attack(target)
+                            .attacker(getUuid())
+                            .damageSource(source)
+                            .damageAmount(getDamage() * 0.5f)
+                            .apply();
                 }
                 count *= 4;
                 baseSpeed *= 4;

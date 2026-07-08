@@ -8,32 +8,39 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 
 public class DamageRegister {
 
     public static final ResourceKey<DamageType> Servant = ResourceKey.create(Registries.DAMAGE_TYPE, Servantry.rl("servant"));
 
-    public static Holder<DamageType> getDamageTypeHolder(ResourceKey<DamageType> resourceKey, @NotNull Level level) {
-        Registry<DamageType> damageTypes = level.registryAccess().registry(Registries.DAMAGE_TYPE).orElse(null);
+    public static Holder<DamageType> getDamageTypeHolder(ResourceKey<DamageType> resourceKey, Level level) {
+        Registry<DamageType> damageTypes = level.registryAccess()
+                .registry(Registries.DAMAGE_TYPE)
+                .orElse(null);
         if (damageTypes != null) {
-            Holder.Reference<DamageType> holder = damageTypes.getHolder(resourceKey).orElse(null);
+            Holder.Reference<DamageType> holder = damageTypes.getHolder(resourceKey)
+                    .orElse(null);
             if (holder != null) {
                 return holder;
             }
         }
-        return level.damageSources().generic().typeHolder();
+        return level.damageSources()
+                .generic()
+                .typeHolder();
     }
 
     public static DamageSource getDamageSource(ResourceKey<DamageType> resourceKey, Level level) {
-        Registry<DamageType> damageTypes = level.registryAccess().registry(Registries.DAMAGE_TYPE).orElse(null);
+        Registry<DamageType> damageTypes = level.registryAccess()
+                .registry(Registries.DAMAGE_TYPE)
+                .orElse(null);
         if (damageTypes != null) {
-            Holder.Reference<DamageType> holder = damageTypes.getHolder(resourceKey).orElse(null);
+            Holder.Reference<DamageType> holder = damageTypes.getHolder(resourceKey)
+                    .orElse(null);
             if (holder != null) {
                 return new DamageSource(holder, null, null, null);
             }
         }
-        return level.damageSources().generic();
+        return level.damageSources()
+                .generic();
     }
-
 }

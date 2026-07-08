@@ -3,8 +3,6 @@ package first.servantry.api.common.attachment;
 import first.servantry.Servantry;
 import first.servantry.register.AttachmentRegister;
 import first.servantry.register.AttributeRegister;
-import first.servantry.register.DamageRegister;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.neoforged.bus.api.EventPriority;
@@ -31,14 +29,10 @@ public class HealthData {
                         amount -= heal;
                     } else if (amount < -1) {
                         float damage = -1 - amount;
-                        InvincibleData.criteriaAttack(
-                                living,
-                                null,
-                                0,
-                                DamageRegister.getDamageSource(DamageTypes.GENERIC, living.level()),
-                                damage,
-                                InvincibleData.Type.Global
-                        );
+                        InvincibleData.attack(living)
+                                .damageAmount(damage)
+                                .global()
+                                .apply();
                         amount += damage;
                     }
                 }

@@ -37,7 +37,12 @@ public class GodFlameProjectile extends Projectile implements ICollideAttack<God
         DamageSource source = getDamageSource();
         if (source != null) {
             for (HitContext hitContext : hitContexts) {
-                InvincibleData.criteriaAttack(hitContext.entity(), getUuid(), 20, source, getDamage(), InvincibleData.Type.PARTIAL);
+                InvincibleData.attack(hitContext.entity())
+                        .attacker(getUuid())
+                        .damageSource(source)
+                        .damageAmount(getDamage())
+                        .invincibleTime(20)
+                        .apply();
             }
         }
     }

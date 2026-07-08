@@ -82,7 +82,12 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
-            InvincibleData.criteriaAttack(hit.entity(), getUuid(), 4, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+            InvincibleData.attack(hit.entity())
+                    .attacker(getUuid())
+                    .damageSource(getDamageSource())
+                    .damageAmount(getDamage())
+                    .invincibleTime(4)
+                    .apply();
         }
     }
 

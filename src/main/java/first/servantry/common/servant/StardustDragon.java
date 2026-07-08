@@ -196,7 +196,12 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         StardustDragon head = getHead();
         if (head != null) {
             for (HitContext hit : hitContexts) {
-                InvincibleData.criteriaAttack(hit.entity(), head.getUuid(), 2, getDamageSource(), getDamage(), InvincibleData.Type.PARTIAL);
+                InvincibleData.attack(hit.entity())
+                        .attacker(head.getUuid())
+                        .damageSource(getDamageSource())
+                        .damageAmount(getDamage())
+                        .invincibleTime(2)
+                        .apply();
             }
         }
     }

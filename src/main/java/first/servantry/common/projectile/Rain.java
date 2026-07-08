@@ -64,7 +64,12 @@ public class Rain extends Projectile implements IBlockCollision<Rain>, ICollideA
         if (source != null) {
             for (HitContext hitContext : hitContexts) {
                 LivingEntity living = hitContext.entity();
-                InvincibleData.criteriaAttack(living, getUuid(), 3, source, getDamage(), InvincibleData.Type.PARTIAL);
+                InvincibleData.attack(living)
+                        .attacker(getUuid())
+                        .damageSource(source)
+                        .damageAmount(getDamage())
+                        .invincibleTime(20)
+                        .apply();
                 living.setRemainingFireTicks(0);
             }
         }

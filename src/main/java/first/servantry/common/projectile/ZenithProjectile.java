@@ -103,7 +103,12 @@ public class ZenithProjectile extends Projectile implements ICollideAttack<Zenit
         if (source != null) {
             for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
-                InvincibleData.criteriaAttack(living, getUuid(), 2, source, getDamage(), InvincibleData.Type.PARTIAL);
+                InvincibleData.attack(living)
+                        .attacker(getUuid())
+                        .damageSource(source)
+                        .damageAmount(getDamage())
+                        .invincibleTime(2)
+                        .apply();
             }
         }
     }
