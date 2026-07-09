@@ -81,10 +81,9 @@ public abstract class Servant extends AttachmentEntity {
                 float searchRange = targetCache.getServantSearchRange(this.getOwner(), distance);
                 List<LivingEntity> targets = targetCache.getEntities()
                         .stream()
-                        .filter(living -> targetCache.isVisibility(owner, living))
-                        .filter(living -> targetCache.isVisibility(this, living))
-                        .filter(living -> targetCache.getDistance(owner, living) < searchRange)
                         .filter(living -> isTarget(living))
+                        .filter(living -> targetCache.getDistance(owner, living) < searchRange)
+                        .filter(living -> targetCache.isVisibility(owner, living))
                         .toList();
                 return targetCache.getNewTarget(this, targets, 0, true);
             }

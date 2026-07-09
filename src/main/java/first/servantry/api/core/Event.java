@@ -153,14 +153,11 @@ public class Event {
                     .subtract(pos)
                     .normalize();
             DamageInfoData.add(level)
+                    .damageType(damageSource.typeHolder().getRegisteredName())
                     .damageAmount(event.getNewDamage())
                     .pos(pos)
                     .velocity(velocity.scale(random.nextInt(70, 90) * 0.01f))
                     .critical(event.getNewDamage() > event.getOriginalDamage() * 3)
-                    .color(0xff3d00)
-                    .endColor(0xc73300)
-                    .drag(0.75f)
-                    .roll(random.nextInt(-30, 30))
                     .emit();
         }
     }

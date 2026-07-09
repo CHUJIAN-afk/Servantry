@@ -118,7 +118,6 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
             List<LivingEntity> targets = targetCache.getEntities()
                     .stream()
                     .filter(living -> attacking || targetCache.isVisibility(owner, living))
-                    .filter(living -> attacking || targetCache.isVisibility(this, living))
                     .filter(living -> targetCache.getDistance(owner, living) < searchRange)
                     .filter(this::isTarget)
                     .toList();

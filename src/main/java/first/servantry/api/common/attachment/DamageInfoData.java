@@ -5,10 +5,14 @@ import first.servantry.network.DamageInfoPayload;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 伤害数字累积附件（挂载于 {@link net.minecraft.world.level.Level}）。
@@ -26,8 +30,10 @@ public class DamageInfoData {
 
     /** 服务端：累积 Entry 待发包 */
     private final List<DamageInfoPayload.Entry> pendingEntries = new ArrayList<>();
-    /** 客户端：持有活跃 DamageInfo 渲染列表 */
-    private final List<DamageInfo> activeInfos = new ArrayList<>();
+    /**
+     * 客户端：持有活跃 DamageInfo 渲染列表
+     */
+    private final Map<ResourceLocation, List<DamageInfo>> activeInfos = new HashMap<>();
 
     public DamageInfoData() {}
 
@@ -58,17 +64,23 @@ public class DamageInfoData {
     // ===================== 客户端 =====================
 
     /**
-     * 接收网络包中的伤害记录，转为渲染数据
+     * 接收网络包中的伤害记录，转为渲染数据。
+     * <p>
+     * 若伤害类型未在 JSON 中定义且无 default，该条目将被跳过。
+     * </p>
      */
     public void receive(List<DamageInfoPayload.Entry> entries) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null) {
             for (DamageInfoPayload.Entry entry : entries) {
                 DamageInfo info = entry.toDamageInfo();
-                Vec3 pos = info.getRenderPos(0);
-                Vec3 eyePosition = player.getEyePosition(0);
-                if (pos.distanceToSqr(eyePosition) < 64 * 64) {
-                    activeInfos.add(entry.toDamageInfo());
+                if (info != null) {
+                    Vec3 pos = info.getRenderPos(0);
+                    Vec3 eyePosition = player.getEyePosition(0);
+                    if (pos.distanceToSqr(eyePosition) < 64 * 64) {
+                        activeInfos.computeIfAbsent(info.getTexture(), key -> new ArrayList<>())
+                                .add(info);
+                    }
                 }
             }
         }
@@ -76,38 +88,43 @@ public class DamageInfoData {
 
     /** 客户端 tick：驱动 DamageInfo 生命周期衰减，移除已过期的 */
     public void tick() {
-        activeInfos.removeIf(info -> {
-            info.tick();
-            return info.isRemove();
-        });
+        activeInfos.values()
+                .removeIf(infoList -> {
+                    infoList.removeIf(DamageInfo::tick);
+                    return infoList.isEmpty();
+                });
     }
 
     /** 获取当前活跃的渲染数据列表 */
-    public List<DamageInfo> getActiveInfos() {
+    public Map<ResourceLocation, List<DamageInfo>> getActiveInfos() {
         return activeInfos;
     }
 
     // ===================== 链式构建器 =====================
 
     /**
-     * 链式伤害数字构建器：必填 damageAmount/pos，可省略其余（有默认值）。
+     * 链式伤害数字构建器：必填 damageType/damageAmount/pos，可省略其余（有默认值）。
      * <p>
      * 调用 {@link #emit()} 将记录写入 Level 附件，由 tick 末统一批发包。
+     * 渲染参数（贴图、颜色、尺寸等）由客户端根据 damageType 从 JSON 样式表查询，
+     * 不通过网络同步。
      * </p>
      */
     public static final class DamageInfoBuilder {
-        private final net.minecraft.world.level.Level level;
+        private final Level level;
+        private String damageType = "default";
         private float damageAmount;
         private double x, y, z;
         private double vx, vy, vz;
-        private float drag = 0.9f;
         private boolean critical = false;
-        private int color = 0xFFFFFF;
-        private int endColor = 0xFFFFFF;
-        private float roll = 0;
 
-        DamageInfoBuilder(net.minecraft.world.level.Level level) {
+        DamageInfoBuilder(Level level) {
             this.level = level;
+        }
+
+        public DamageInfoBuilder damageType(String damageType) {
+            this.damageType = damageType;
+            return this;
         }
 
         public DamageInfoBuilder damageAmount(float amount) {
@@ -137,28 +154,8 @@ public class DamageInfoData {
             return velocity(velocity.x, velocity.y, velocity.z);
         }
 
-        public DamageInfoBuilder drag(float drag) {
-            this.drag = drag;
-            return this;
-        }
-
         public DamageInfoBuilder critical(boolean critical) {
             this.critical = critical;
-            return this;
-        }
-
-        public DamageInfoBuilder color(int color) {
-            this.color = color;
-            return this;
-        }
-
-        public DamageInfoBuilder endColor(int endColor) {
-            this.endColor = endColor;
-            return this;
-        }
-
-        public DamageInfoBuilder roll(int roll) {
-            this.roll = roll;
             return this;
         }
 
@@ -168,7 +165,7 @@ public class DamageInfoData {
         public void emit() {
             if (!level.isClientSide()) {
                 level.getData(AttachmentRegister.DamageInfoData)
-                        .addEntry(new DamageInfoPayload.Entry(damageAmount, x, y, z, vx, vy, vz, drag, critical, color, endColor,roll));
+                        .addEntry(new DamageInfoPayload.Entry(damageType, damageAmount, x, y, z, vx, vy, vz, critical));
             }
         }
     }

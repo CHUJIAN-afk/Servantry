@@ -54,7 +54,6 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
             List<LivingEntity> targets = targetCache.getEntities()
                     .stream()
                     .filter(living -> attacking || targetCache.isVisibility(owner, living))
-                    .filter(living -> attacking || targetCache.isVisibility(this, living))
                     .filter(living -> targetCache.getDistance(owner, living) < searchRange)
                     .filter(this::isTarget)
                     .toList();

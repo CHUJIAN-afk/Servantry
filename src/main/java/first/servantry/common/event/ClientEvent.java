@@ -7,6 +7,7 @@ import first.servantry.Servantry;
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
 import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.damageInfo.DamageInfoStyleManager;
 import first.servantry.client.attachmentEntityRenderer.projectile.*;
 import first.servantry.client.attachmentEntityRenderer.servant.*;
 import first.servantry.client.renderType.OreScoutHighlightRenderType;
@@ -63,6 +64,11 @@ public class ClientEvent {
     @SubscribeEvent
     public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ParticleRegister.Generic.get(), GenericParticleProvider::new);
+    }
+
+    @SubscribeEvent
+    public static void registerClientReloadListeners(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(DamageInfoStyleManager.INSTANCE);
     }
 
     @SubscribeEvent

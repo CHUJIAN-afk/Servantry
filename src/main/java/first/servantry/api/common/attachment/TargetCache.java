@@ -74,6 +74,7 @@ public class TargetCache {
         return distance;
     }
 
+    //此缓存不能被共享，极易卡顿
     public boolean isVisibility(Servant servant, LivingEntity living) {
         Integer key = servant.getUuid().hashCode() + living.getUUID().hashCode();
         return visibilityCache.computeIfAbsent(key, k -> {

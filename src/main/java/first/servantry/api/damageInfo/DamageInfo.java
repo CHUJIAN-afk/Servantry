@@ -1,48 +1,32 @@
 package first.servantry.api.damageInfo;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import first.servantry.Servantry;
+import com.mojang.math.Axis;
 import first.servantry.utils.EasingCurve;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * 伤害数字渲染数据。
  * <p>
- * 贴图布局：320×32，1~9,0 从左到右排列，每个数字 32×32 像素。
+ * 渲染参数由 {@link DamageInfoStyle} 驱动，贴图布局固定 0-9 顺序，
+ * UV = digit / 10。闪烁为纯亮度脉冲，每 10 tick（0.5 秒）一次。
  * </p>
  */
 public class DamageInfo {
 
-    private static final ResourceLocation TEXTURE = Servantry.rl("textures/damage_font.png");
-
-    /** 贴图中数字总数 */
-    private static final int GLYPH_COUNT = 10;
-    /** 每个数字在世界中的渲染尺寸 */
-    public static final float RENDER_SIZE = 0.2f;
-    /** 数字间距系数 */
-    public static final float STEP_FACTOR = 0.75f;
-
-    /** 静态缓存：每个 digit 对应的贴图 U 坐标 [digit] = {u0, u1} */
-    private static final float[][] GLYPH_UV = new float[10][2];
-
-    static {
-        for (int d = 0; d < 10; d++) {
-            // 贴图排列顺序：1~9,0，即 digit 1 在 index 0，digit 0 在 index 9
-            int index = (d == 0) ? 9 : d - 1;
-            GLYPH_UV[d][0] = (float) index / GLYPH_COUNT;
-            GLYPH_UV[d][1] = (float) (index + 1) / GLYPH_COUNT;
-        }
-    }
-
-    private final int color;
-    private final int endColor;
+    private final DamageInfoStyle style;
     private int lastLife;
     private int life;
-    private final int maxLife = 40;
-    private final float damageAmount;
     private Vec3 lastPos;
     private Vec3 pos;
     private Vec3 velocity;
@@ -53,94 +37,151 @@ public class DamageInfo {
     /** 缓存：damageAmount 取整后的字符串 */
     private final String text;
 
-    public DamageInfo(float damageAmount, Vec3 pos, Vec3 velocity, float drag, boolean critical, int color, int endColor, float roll) {
-        this.color = color;
-        this.endColor = endColor;
+    public DamageInfo(DamageInfoStyle style, float damageAmount, Vec3 pos, Vec3 velocity, boolean critical) {
+        this.style = style;
         this.lastLife = 0;
         this.life = 0;
-        this.damageAmount = damageAmount;
         this.pos = pos;
         this.lastPos = pos;
         this.velocity = velocity;
-        this.drag = drag;
+        this.drag = 0.75f;
         this.critical = critical;
-        this.roll = roll;
+        this.roll = ThreadLocalRandom.current().nextInt(-30, 30);
         this.text = String.valueOf((int) damageAmount);
     }
 
-    public void tick() {
+    public boolean tick() {
         lastLife = life;
         life++;
         lastPos = pos;
         velocity = velocity.scale(drag);
         pos = pos.add(velocity);
+        return isRemove();
+    }
+
+    /** 获取伤害数字贴图 */
+    public ResourceLocation getTexture() {
+        return style.texture();
     }
 
     // ===================== 渲染 =====================
 
-    /** 获取伤害数字贴图 */
-    public static ResourceLocation getTexture() {
-        return TEXTURE;
-    }
-
-    /** 获取数字字符串（已缓存） */
-    public String getText() {
-        return text;
-    }
-
-    /** 渲染总宽度（含间距），考虑缩放 */
-    public float getTotalWidth(float scale) {
-        return text.length() * RENDER_SIZE * STEP_FACTOR * scale;
-    }
-
     /**
-     * 将本条伤害数字的顶点写入 VertexConsumer。
+     * 完整渲染本条伤害数字：PoseStack 变换 + 顶点写入。
      * <p>
-     * 调用方需已设置好 PoseStack（平移+旋转+居中偏移），
-     * 此方法只负责逐字符写入 quad 顶点。
+     * 调用方只需提供已按贴图分组好的 VertexConsumer、相机位置和渲染调度器。
      * </p>
+     *
+     * @param poseStack   当前 PoseStack
+     * @param consumer    已绑定贴图的 VertexConsumer
+     * @param alphaSource SuperCacheBufferSource，用于设置逐顶点 alpha
+     * @param camPos      相机世界坐标
+     * @param dispatcher  实体渲染调度器（获取 cameraOrientation）
+     * @param partialTick 插值因子
      */
-    public void renderQuads(Matrix4f matrix, VertexConsumer consumer, float scale, float r, float g, float b, float a) {
-        float size = RENDER_SIZE * scale;
-        float step = size * STEP_FACTOR;
+    public void render(PoseStack poseStack, VertexConsumer consumer, MultiBufferSource alphaSource, Vec3 camPos, EntityRenderDispatcher dispatcher, float partialTick) {
+        Vec3 renderPos = getRenderPos(partialTick);
+
+        // 预计算渲染参数
+        float scale = getRenderScale(partialTick);
+        int color = getRenderColor(partialTick);
+        float roll = getRenderRoll(partialTick);
+
+        // 居中偏移
+        float offsetX = -getTotalWidth(scale) / 2f;
+
+        poseStack.pushPose();
+        // 平移到渲染位置（相对于相机）
+        poseStack.translate(renderPos.x() - camPos.x(), renderPos.y() - camPos.y(), renderPos.z() - camPos.z());
+        // 面向相机
+        poseStack.mulPose(dispatcher.cameraOrientation());
+        poseStack.mulPose(Axis.XN.rotationDegrees(180));
+        poseStack.mulPose(Axis.ZN.rotationDegrees(roll));
+        // 居中偏移
+        poseStack.translate(offsetX, 0, 0);
+
+        Matrix4f matrix = poseStack.last().pose();
+        float size = style.renderSize() * scale;
+        float spacingWorld = style.glyphSpacing() * style.renderSize() / style.glyphPixelWidth();
+        float step = size + spacingWorld * scale;
         float halfSize = size * 0.5f;
+
+        int glyphPixelWidth = style.glyphPixelWidth();
 
         for (int i = 0; i < text.length(); i++) {
             int digit = text.charAt(i) - '0';
-            float u0 = GLYPH_UV[digit][0];
-            float u1 = GLYPH_UV[digit][1];
+            float u0 = (float) (digit * glyphPixelWidth) / style.textureWidth();
+            float u1 = (float) ((digit + 1) * glyphPixelWidth) / style.textureWidth();
 
             float x0 = i * step;
             float x1 = x0 + size;
             float y0 = -halfSize;
+            //noinspection UnnecessaryLocalVariable
             float y1 = halfSize;
 
-            consumer.addVertex(matrix, x0, y1, 0).setColor(r, g, b, a).setUv(u0, 1f).setOverlay(0).setLight(0xF000F0).setNormal(0, 0, 1);
-            consumer.addVertex(matrix, x1, y1, 0).setColor(r, g, b, a).setUv(u1, 1f).setOverlay(0).setLight(0xF000F0).setNormal(0, 0, 1);
-            consumer.addVertex(matrix, x1, y0, 0).setColor(r, g, b, a).setUv(u1, 0f).setOverlay(0).setLight(0xF000F0).setNormal(0, 0, 1);
-            consumer.addVertex(matrix, x0, y0, 0).setColor(r, g, b, a).setUv(u0, 0f).setOverlay(0).setLight(0xF000F0).setNormal(0, 0, 1);
+            consumer.addVertex(matrix, x0, y1, 0).setColor(color).setUv(u0, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
+            consumer.addVertex(matrix, x1, y1, 0).setColor(color).setUv(u1, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
+            consumer.addVertex(matrix, x1, y0, 0).setColor(color).setUv(u1, 0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
+            consumer.addVertex(matrix, x0, y0, 0).setColor(color).setUv(u0, 0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
         }
+
+        poseStack.popPose();
     }
 
-    // ===================== 动画参数 =====================
+    /** 渲染总宽度（含间距），考虑缩放 */
+    private float getTotalWidth(float scale) {
+        float size = style.renderSize() * scale;
+        float spacingWorld = style.glyphSpacing() * style.renderSize() / style.glyphPixelWidth();
+        float step = size + spacingWorld * scale;
+        return text.length() * step;
+    }
 
-    public int getRenderColor(float partialTick) {
-        float progress = Mth.lerp(partialTick, lastLife, life) / maxLife;
-        float flicker = (Mth.sin(progress * Mth.PI * 4f) + 1f) * 0.5f;
+    /**
+     * 获取渲染颜色（ARGB）。
+     * <p>
+     * 暴击使用 criticalColor，普通使用 color。
+     * 闪烁为纯亮度脉冲：每 10 tick（0.5 秒）一次 sin 波，随 progress 衰减。
+     * 透明度由 EASE_IN_OUT_QUAD 缓动曲线驱动淡入淡出。
+     * </p>
+     */
+    private int getRenderColor(float partialTick) {
+        float progress = Mth.lerp(partialTick, lastLife, life) / style.maxLife();
+        int baseColor = critical ? style.criticalColor() : style.color();
+
+        // 亮度脉冲：每 10 tick 一个完整周期
+        float flicker = (Mth.sin(progress * style.maxLife() * Mth.PI / 5f) + 1f) * 0.5f;
         float weight = flicker * (1f - progress);
-        int r = Mth.lerpInt(weight, (endColor >> 16) & 0xFF, (color >> 16) & 0xFF);
-        int g = Mth.lerpInt(weight, (endColor >> 8) & 0xFF, (color >> 8) & 0xFF);
-        int b = Mth.lerpInt(weight, endColor & 0xFF, color & 0xFF);
-        return (r << 16) | (g << 8) | b;
+
+        int r = (baseColor >> 16) & 0xFF;
+        int g = (baseColor >> 8) & 0xFF;
+        int b = baseColor & 0xFF;
+
+        // 亮度叠加：向 255 方向提亮
+        r = Mth.lerpInt(weight, r, Math.min(255, (int) (r * 1.3f)));
+        g = Mth.lerpInt(weight, g, Math.min(255, (int) (g * 1.3f)));
+        b = Mth.lerpInt(weight, b, Math.min(255, (int) (b * 1.3f)));
+
+        // 透明度：缓动淡入淡出
+        float easedProgress = EasingCurve.EASE_IN_OUT_QUAD.apply(progress);
+        int a;
+        if (easedProgress < 0.2f) {
+            a = Mth.lerpInt(easedProgress / 0.2f, 51, 255); // 0.2*255=51
+        } else if (easedProgress > 0.9f) {
+            a = Mth.lerpInt((easedProgress - 0.9f) / 0.1f, 255, 0);
+        } else {
+            a = 255;
+        }
+
+        return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
-    public float getRenderRoll(float partialTick) {
-        float progress = Mth.lerp(partialTick, lastLife, life) / maxLife;
+    private float getRenderRoll(float partialTick) {
+        float progress = Mth.lerp(partialTick, lastLife, life) / style.maxLife();
         return Mth.lerp(progress, roll, 0);
     }
 
-    public float getRenderScale(float partialTick) {
-        float progress = Mth.lerp(partialTick, lastLife, life) / maxLife;
+    private float getRenderScale(float partialTick) {
+        float progress = Mth.lerp(partialTick, lastLife, life) / style.maxLife();
         progress = EasingCurve.EASE_IN_OUT_QUAD.apply(progress);
         if (progress < 0.1) {
             return Mth.lerp(progress / 0.1f, 0.5f, 1.0f);
@@ -151,39 +192,11 @@ public class DamageInfo {
         return 1;
     }
 
-    public float getRenderAlpha(float partialTick) {
-        float progress = Mth.lerp(partialTick, lastLife, life) / maxLife;
-        progress = EasingCurve.EASE_IN_OUT_QUAD.apply(progress);
-        if (progress < 0.2) {
-            return Mth.lerp(progress / 0.2f, 0.2f, 1.0f);
-        }
-        if (progress > 0.9f) {
-            return Mth.lerp((progress - 0.9f) / 0.1f, 1.0f, 0.0f);
-        }
-        return 1;
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public int getEndColor() {
-        return endColor;
-    }
-
     public Vec3 getRenderPos(float partialTick) {
         return lastPos.lerp(pos, partialTick);
     }
 
-    public float getDamageAmount() {
-        return damageAmount;
-    }
-
     public boolean isRemove() {
-        return life >= maxLife - 1;
-    }
-
-    public boolean isCritical() {
-        return critical;
+        return life >= style.maxLife() - 1;
     }
 }
