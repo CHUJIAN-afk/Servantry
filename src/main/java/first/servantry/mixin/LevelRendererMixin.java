@@ -3,6 +3,7 @@ package first.servantry.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
+import first.servantry.api.damageInfo.DamageInfoRenderDispatcher;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -49,9 +50,10 @@ public class LevelRendererMixin {
     ) {
         assert level != null;
         MultiBufferSource.BufferSource bufferSource = renderBuffers.bufferSource();
+        float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
         for (Player player : level.players()) {
-            float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
             AttachmentEntityRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
         }
+        DamageInfoRenderDispatcher.render(level, camera, poseStack, bufferSource, partialTick);
     }
 }

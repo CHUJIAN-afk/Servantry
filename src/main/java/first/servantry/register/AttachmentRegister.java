@@ -33,6 +33,10 @@ public class AttachmentRegister {
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<BatchedParticlesData>> BatchedParticles =
             Register.register("batched_particles", () -> AttachmentType.builder(BatchedParticlesData::new).build());
 
+    /** Level 级伤害数字累积附件（服务端累积，客户端接收渲染，不同步） */
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<DamageInfoData>> DamageInfoData =
+            Register.register("damage_info_data", () -> AttachmentType.builder(DamageInfoData::new).build());
+
     public static void register(IEventBus eventbus) {
         Register.register(eventbus);
     }

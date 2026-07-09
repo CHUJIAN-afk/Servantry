@@ -2,6 +2,7 @@ package first.servantry.api.core;
 
 import first.servantry.Servantry;
 import first.servantry.api.armorSet.ArmorSet;
+import first.servantry.api.common.attachment.DamageInfoData;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.item.IServantWeapon;
@@ -13,6 +14,7 @@ import first.servantry.register.AttributeRegister;
 import first.servantry.utils.AttributeUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -23,6 +25,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemCooldowns;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -136,9 +140,28 @@ public class Event {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void hurtHistory(LivingDamageEvent.Post event) {
         DamageSource damageSource = event.getSource();
-        if (damageSource.getEntity() instanceof Player attacker) {
-            InvincibleData.get(event.getEntity())
+        LivingEntity entity = event.getEntity();
+        Level level = entity.level();
+        if (!level.isClientSide() && damageSource.getEntity() instanceof Player attacker) {
+            InvincibleData.get(entity)
                     .recordHit(attacker.getUUID(), 100);
+            AABB box = entity.getBoundingBox();
+            RandomSource random = entity.getRandom();
+            Vec3 pos = box.getCenter();
+            Vec3 velocity = pos.add(0, box.getYsize(), 0)
+                    .offsetRandom(random, (float) box.getSize())
+                    .subtract(pos)
+                    .normalize();
+            DamageInfoData.add(level)
+                    .damageAmount(event.getNewDamage())
+                    .pos(pos)
+                    .velocity(velocity.scale(random.nextInt(70, 90) * 0.01f))
+                    .critical(event.getNewDamage() > event.getOriginalDamage() * 3)
+                    .color(0xff3d00)
+                    .endColor(0xc73300)
+                    .drag(0.75f)
+                    .roll(random.nextInt(-30, 30))
+                    .emit();
         }
     }
 }

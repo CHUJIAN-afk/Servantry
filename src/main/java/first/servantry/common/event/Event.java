@@ -3,6 +3,7 @@ package first.servantry.common.event;
 import first.servantry.Servantry;
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.BatchedParticlesData;
+import first.servantry.api.common.attachment.DamageInfoData;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.dataComponent.ScabbardContainer;
@@ -10,6 +11,7 @@ import first.servantry.common.servant.ChlorophyteCrystal;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.common.servant.VoidEater;
 import first.servantry.network.BatchedParticlesPayload;
+import first.servantry.network.DamageInfoPayload;
 import first.servantry.register.*;
 import first.servantry.utils.CuriosUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -63,6 +65,12 @@ public class Event {
             if (data.size() > 0) {
                 PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new BatchedParticlesPayload(data.drain()));
             }
+            DamageInfoData damageData = level.getData(AttachmentRegister.DamageInfoData);
+            if (damageData.size() > 0) {
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new DamageInfoPayload(damageData.drain()));
+            }
+        } else {
+            level.getData(AttachmentRegister.DamageInfoData).tick();
         }
     }
 

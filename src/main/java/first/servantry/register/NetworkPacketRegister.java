@@ -2,6 +2,7 @@ package first.servantry.register;
 
 import first.servantry.Servantry;
 import first.servantry.network.BatchedParticlesPayload;
+import first.servantry.network.DamageInfoPayload;
 import first.servantry.network.MithrilAnvilPlaceRecipePayload;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -26,6 +27,11 @@ public class NetworkPacketRegister {
                         BatchedParticlesPayload.TYPE,
                         BatchedParticlesPayload.STREAM_CODEC,
                         BatchedParticlesPayload::handleClient
+                )
+                .playToClient(
+                        DamageInfoPayload.TYPE,
+                        DamageInfoPayload.STREAM_CODEC,
+                        DamageInfoPayload::handleClient
                 );
     }
 
