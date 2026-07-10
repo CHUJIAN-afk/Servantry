@@ -1,17 +1,15 @@
 package first.servantry.api.damageInfo;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import first.servantry.utils.EasingCurve;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -67,19 +65,19 @@ public class DamageInfo {
     // ===================== 渲染 =====================
 
     /**
-     * 完整渲染本条伤害数字：PoseStack 变换 + 顶点写入。
+     * 完整渲染本条伤害数字：直接构造 Matrix4f + 顶点写入。
      * <p>
-     * 调用方只需提供已按贴图分组好的 VertexConsumer、相机位置和渲染调度器。
+     * 绕过 PoseStack 以避免每条数字 3 次 mulPose（矩阵乘法 + 栈拷贝）。
+     * 相机朝向（{@code cameraOrientation × XN(180)}）由调用方每帧预计算一次传入 {@code baseRotation}，
+     * 本条数字只需在此基础上叠加 roll 旋转与平移。
      * </p>
      *
-     * @param poseStack   当前 PoseStack
-     * @param consumer    已绑定贴图的 VertexConsumer
-     * @param alphaSource SuperCacheBufferSource，用于设置逐顶点 alpha
-     * @param camPos      相机世界坐标
-     * @param dispatcher  实体渲染调度器（获取 cameraOrientation）
-     * @param partialTick 插值因子
+     * @param consumer      已绑定贴图的 VertexConsumer
+     * @param baseRotation  相机朝向 + XN(180) 预乘旋转（每帧一次，所有数字共享）
+     * @param camPos        相机世界坐标
+     * @param partialTick   插值因子
      */
-    public void render(PoseStack poseStack, VertexConsumer consumer, MultiBufferSource alphaSource, Vec3 camPos, EntityRenderDispatcher dispatcher, float partialTick) {
+    public void render(VertexConsumer consumer, Quaternionf baseRotation, Vec3 camPos, float partialTick) {
         Vec3 renderPos = getRenderPos(partialTick);
 
         // 预计算渲染参数
@@ -87,53 +85,46 @@ public class DamageInfo {
         int color = getRenderColor(partialTick);
         float roll = getRenderRoll(partialTick);
 
-        // 居中偏移
-        float offsetX = -getTotalWidth(scale) / 2f;
-
-        poseStack.pushPose();
-        // 平移到渲染位置（相对于相机）
-        poseStack.translate(renderPos.x() - camPos.x(), renderPos.y() - camPos.y(), renderPos.z() - camPos.z());
-        // 面向相机
-        poseStack.mulPose(dispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.XN.rotationDegrees(180));
-        poseStack.mulPose(Axis.ZN.rotationDegrees(roll));
-        // 居中偏移
-        poseStack.translate(offsetX, 0, 0);
-
-        Matrix4f matrix = poseStack.last().pose();
         float size = style.renderSize() * scale;
         float spacingWorld = style.glyphSpacing() * style.renderSize() / style.glyphPixelWidth();
         float step = size + spacingWorld * scale;
         float halfSize = size * 0.5f;
 
-        int glyphPixelWidth = style.glyphPixelWidth();
+        // 居中偏移：基于真实顶点跨度（首字符左缘到末字符右缘），缩放中心位于字符串几何中心
+        // 顶点本地 x 减 totalWidth/2，使几何中心落在本地原点，再经矩阵旋转+平移
+        float totalWidth = !text.isEmpty() ? (text.length() - 1) * step + size : 0f;
+        float halfWidth = totalWidth / 2f;
 
-        for (int i = 0; i < text.length(); i++) {
+        // 构造变换矩阵：baseRotation × ZN(roll) 旋转 + 平移到渲染位置（相对相机）
+        // 平移在旋转之后（世界空间），故 offsetX 不应进平移列，而应在本地坐标里居中
+        Matrix4f matrix = new Matrix4f()
+                .rotate(baseRotation.rotateZ(roll * Mth.DEG_TO_RAD, new Quaternionf()))
+                .setTranslation((float) (renderPos.x() - camPos.x()),
+                                (float) (renderPos.y() - camPos.y()),
+                                (float) (renderPos.z() - camPos.z()));
+
+        int glyphPixelWidth = style.glyphPixelWidth();
+        int length = text.length();
+        Vector3f v = new Vector3f();
+        for (int i = 0; i < length; i++) {
             int digit = text.charAt(i) - '0';
             float u0 = (float) (digit * glyphPixelWidth) / style.textureWidth();
             float u1 = (float) ((digit + 1) * glyphPixelWidth) / style.textureWidth();
 
-            float x0 = i * step;
+            // 本地坐标先减 halfWidth 居中，再变换
+            float x0 = i * step - halfWidth;
             float x1 = x0 + size;
-            float y0 = -halfSize;
-            //noinspection UnnecessaryLocalVariable
-            float y1 = halfSize;
 
-            consumer.addVertex(matrix, x0, y1, 0).setColor(color).setUv(u0, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
-            consumer.addVertex(matrix, x1, y1, 0).setColor(color).setUv(u1, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
-            consumer.addVertex(matrix, x1, y0, 0).setColor(color).setUv(u1, 0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
-            consumer.addVertex(matrix, x0, y0, 0).setColor(color).setUv(u0, 0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(0, 0, 1);
+            // 4 个顶点，逐个变换后走 10 参数 fast path
+            matrix.transformPosition(x0, -halfSize, 0, v);
+            consumer.addVertex(v.x, v.y, v.z, color, u0, 0f, OverlayTexture.NO_OVERLAY, LightTexture.FULL_BRIGHT, 0, 0, 1);
+            matrix.transformPosition(x0, halfSize, 0, v);
+            consumer.addVertex(v.x, v.y, v.z, color, u0, 1f, OverlayTexture.NO_OVERLAY, LightTexture.FULL_BRIGHT, 0, 0, 1);
+            matrix.transformPosition(x1, halfSize, 0, v);
+            consumer.addVertex(v.x, v.y, v.z, color, u1, 1f, OverlayTexture.NO_OVERLAY, LightTexture.FULL_BRIGHT, 0, 0, 1);
+            matrix.transformPosition(x1, -halfSize, 0, v);
+            consumer.addVertex(v.x, v.y, v.z, color, u1, 0f, OverlayTexture.NO_OVERLAY, LightTexture.FULL_BRIGHT, 0, 0, 1);
         }
-
-        poseStack.popPose();
-    }
-
-    /** 渲染总宽度（含间距），考虑缩放 */
-    private float getTotalWidth(float scale) {
-        float size = style.renderSize() * scale;
-        float spacingWorld = style.glyphSpacing() * style.renderSize() / style.glyphPixelWidth();
-        float step = size + spacingWorld * scale;
-        return text.length() * step;
     }
 
     /**

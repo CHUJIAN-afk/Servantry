@@ -6,9 +6,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * 带透明度调整的 MultiBufferSource 包装器。
  * <p>
@@ -17,7 +14,6 @@ import java.util.Map;
  */
 public class AlphaBufferSource implements MultiBufferSource {
 
-    private final Map<String, VertexConsumer> cache = new HashMap<>();
     private final MultiBufferSource inner;
     private float alpha = 1.0f;
 
@@ -43,14 +39,12 @@ public class AlphaBufferSource implements MultiBufferSource {
 
     @Override
     public @NotNull VertexConsumer getBuffer(@NotNull RenderType renderType) {
-        return cache.computeIfAbsent(renderType.name, k -> {
-            VertexConsumer innerConsumer = inner.getBuffer(renderType);
-            if (alpha >= 1.0f) {
-                return innerConsumer;
-            }
-            // 返回一个包装的 VertexConsumer，在设置颜色时应用透明度
-            return new AlphaVertexConsumer(innerConsumer, alpha);
-        });
+        VertexConsumer innerConsumer = inner.getBuffer(renderType);
+        if (alpha >= 1.0f) {
+            return innerConsumer;
+        }
+        // 返回一个包装的 VertexConsumer，在设置颜色时应用透明度
+        return new AlphaVertexConsumer(innerConsumer, alpha);
     }
 
     /**

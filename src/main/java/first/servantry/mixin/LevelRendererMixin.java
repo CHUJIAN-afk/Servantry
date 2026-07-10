@@ -54,6 +54,6 @@ public class LevelRendererMixin {
         for (Player player : level.players()) {
             AttachmentEntityRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
         }
-        DamageInfoRenderDispatcher.render(level, camera, poseStack, bufferSource, partialTick);
+        DamageInfoRenderDispatcher.render(level, camera, bufferSource, partialTick);
     }
 }
