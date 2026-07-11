@@ -1,12 +1,17 @@
 package first.servantry.common.particle;
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -124,14 +129,10 @@ public class GenericParticle extends TextureSheetParticle {
         // 平滑插值缩放
         float scale = Mth.lerp(partialTick, this.prevScale, this.currentScale);
 
-        // 颜色插值
+        // 颜色插值 → ARGB int（供 10 参数 fast path 使用）
         float progress = (this.age + partialTick) / (float) this.lifetime;
-        float centerR = Mth.lerp(progress, this.startR, this.endR);
-        float centerG = Mth.lerp(progress, this.startG, this.endG);
-        float centerB = Mth.lerp(progress, this.startB, this.endB);
-        float edgeR = Mth.lerp(progress, this.startEdgeR, this.endEdgeR);
-        float edgeG = Mth.lerp(progress, this.startEdgeG, this.endEdgeG);
-        float edgeB = Mth.lerp(progress, this.startEdgeB, this.endEdgeB);
+        int centerColor = packColor(Mth.lerp(progress, this.startR, this.endR), Mth.lerp(progress, this.startG, this.endG), Mth.lerp(progress, this.startB, this.endB), this.alpha);
+        int edgeColor = packColor(Mth.lerp(progress, this.startEdgeR, this.endEdgeR), Mth.lerp(progress, this.startEdgeG, this.endEdgeG), Mth.lerp(progress, this.startEdgeB, this.endEdgeB), this.alpha);
 
         // 纹理坐标
         float u0 = this.sprite.getU0();
@@ -140,62 +141,84 @@ public class GenericParticle extends TextureSheetParticle {
         float v1 = this.sprite.getV1();
 
         int light = getLightColor(partialTick);
+        int overlay = OverlayTexture.NO_OVERLAY;
 
         // 每个色块大小相同（scale x scale），形成十字形
         // 中心色块
-        renderQuad(buffer, x, y, z, quaternion, -scale, -scale, scale, scale, u0, u1, v0, v1, centerR, centerG, centerB, light);
+        renderQuad(buffer, x, y, z, quaternion, -scale, -scale, scale, scale, u0, u1, v0, v1, centerColor, light, overlay);
 
         // 四个边缘色块，每个偏移 2*scale
         // 上
-        renderQuad(buffer, x, y, z, quaternion, -scale, scale, scale, scale * 3, u0, u1, v0, v1, edgeR, edgeG, edgeB, light);
+        renderQuad(buffer, x, y, z, quaternion, -scale, scale, scale, scale * 3, u0, u1, v0, v1, edgeColor, light, overlay);
         // 下
-        renderQuad(buffer, x, y, z, quaternion, -scale, -scale * 3, scale, -scale, u0, u1, v0, v1, edgeR, edgeG, edgeB, light);
+        renderQuad(buffer, x, y, z, quaternion, -scale, -scale * 3, scale, -scale, u0, u1, v0, v1, edgeColor, light, overlay);
         // 左
-        renderQuad(buffer, x, y, z, quaternion, -scale * 3, -scale, -scale, scale, u0, u1, v0, v1, edgeR, edgeG, edgeB, light);
+        renderQuad(buffer, x, y, z, quaternion, -scale * 3, -scale, -scale, scale, u0, u1, v0, v1, edgeColor, light, overlay);
         // 右
-        renderQuad(buffer, x, y, z, quaternion, scale, -scale, scale * 3, scale, u0, u1, v0, v1, edgeR, edgeG, edgeB, light);
+        renderQuad(buffer, x, y, z, quaternion, scale, -scale, scale * 3, scale, u0, u1, v0, v1, edgeColor, light, overlay);
     }
 
-    private void renderQuad(VertexConsumer buffer, float cx, float cy, float cz, Quaternionf quaternion,
-                            float minX, float minY, float maxX, float maxY,
-                            float u0, float u1, float v0, float v1,
-                            float r, float g, float b, int light) {
-        Vector3f[] vertices = new Vector3f[]{
-                new Vector3f(minX, minY, 0.0F),
-                new Vector3f(maxX, minY, 0.0F),
-                new Vector3f(maxX, maxY, 0.0F),
-                new Vector3f(minX, maxY, 0.0F)
-        };
+    /** 将 float 颜色分量打包为 ARGB int */
+    private static int packColor(float r, float g, float b, float a) {
+        return ((int) (Mth.clamp(a, 0, 1) * 255) << 24) | ((int) (Mth.clamp(r, 0, 1) * 255) << 16) | ((int) (Mth.clamp(g, 0, 1) * 255) << 8) | (int) (Mth.clamp(b, 0, 1) * 255);
+    }
 
-        for (Vector3f vertex : vertices) {
-            vertex.rotate(quaternion);
+    /**
+     * 渲染单个 quad：保留 quaternion 旋转保证正确朝向，用 10 参数 fast path 写顶点。
+     * <p>
+     * 自定义 {@link #GENERIC_PARTICLE_TYPE} 使用 NEW_ENTITY 格式，触发 BufferBuilder fastFormat 走 fast path，
+     * 单次 addVertex 完成全部元素写入，跳过逐元素 beginElement 校验。
+     * </p>
+     */
+    private void renderQuad(VertexConsumer buffer, float cx, float cy, float cz, Quaternionf quaternion, float minX, float minY, float maxX, float maxY, float u0, float u1, float v0, float v1, int color, int light, int overlay) {
+        // 复用静态 Vector3f 避免 per-quad 分配，旋转后直接写顶点
+        Vector3f v = TMP_VEC;
+
+        v.set(minX, minY, 0.0F).rotate(quaternion);
+        buffer.addVertex(cx + v.x, cy + v.y, cz + v.z, color, u0, v0, overlay, light, 0.0F, 0.0F, 1.0F);
+        v.set(maxX, minY, 0.0F).rotate(quaternion);
+        buffer.addVertex(cx + v.x, cy + v.y, cz + v.z, color, u1, v0, overlay, light, 0.0F, 0.0F, 1.0F);
+        v.set(maxX, maxY, 0.0F).rotate(quaternion);
+        buffer.addVertex(cx + v.x, cy + v.y, cz + v.z, color, u1, v1, overlay, light, 0.0F, 0.0F, 1.0F);
+        v.set(minX, maxY, 0.0F).rotate(quaternion);
+        buffer.addVertex(cx + v.x, cy + v.y, cz + v.z, color, u0, v1, overlay, light, 0.0F, 0.0F, 1.0F);
+    }
+
+    /** per-quad 旋转复用的临时 Vector3f（单线程渲染，安全复用） */
+    private static final Vector3f TMP_VEC = new Vector3f();
+
+    /**
+     * 自定义粒子渲染类型：NEW_ENTITY 格式 + entity translucent shader，使 BufferBuilder 走 fastFormat fast path。
+     * <p>
+     * 原版 {@link ParticleRenderType#PARTICLE_SHEET_TRANSLUCENT} 使用 PARTICLE 格式（无 overlay/normal），
+     * BufferBuilder 对其 fastFormat=false，10 参数 addVertex 走慢路径。改用 NEW_ENTITY 后：
+     * <ul>
+     *   <li>fastFormat=true → 10 参数 addVertex 一次 beginVertex + 连续 memPut，跳过所有 beginElement</li>
+     *   <li>需匹配 rendertypeEntityTranslucent shader（支持 POSITION_COLOR_TEX_OVERLAY_LIGHT_NORMAL）</li>
+     *   <li>纹理仍用粒子 atlas（Sampler0）</li>
+     * </ul>
+     * </p>
+     */
+    public static final ParticleRenderType GENERIC_PARTICLE_TYPE = new ParticleRenderType() {
+        @Override
+        public BufferBuilder begin(Tesselator tesselator, @NotNull TextureManager textureManager) {
+            RenderSystem.depthMask(true);
+            RenderSystem.setShader(GameRenderer::getRendertypeEntityTranslucentShader);
+            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.NEW_ENTITY);
         }
 
-        buffer.addVertex(cx + vertices[0].x(), cy + vertices[0].y(), cz + vertices[0].z())
-                .setColor(r, g, b, this.alpha)
-                .setUv(u0, v0)
-                .setLight(light)
-                .setNormal(0.0F, 0.0F, 1.0F);
-        buffer.addVertex(cx + vertices[1].x(), cy + vertices[1].y(), cz + vertices[1].z())
-                .setColor(r, g, b, this.alpha)
-                .setUv(u1, v0)
-                .setLight(light)
-                .setNormal(0.0F, 0.0F, 1.0F);
-        buffer.addVertex(cx + vertices[2].x(), cy + vertices[2].y(), cz + vertices[2].z())
-                .setColor(r, g, b, this.alpha)
-                .setUv(u1, v1)
-                .setLight(light)
-                .setNormal(0.0F, 0.0F, 1.0F);
-        buffer.addVertex(cx + vertices[3].x(), cy + vertices[3].y(), cz + vertices[3].z())
-                .setColor(r, g, b, this.alpha)
-                .setUv(u0, v1)
-                .setLight(light)
-                .setNormal(0.0F, 0.0F, 1.0F);
-    }
+        @Override
+        public String toString() {
+            return "GENERIC_PARTICLE";
+        }
+    };
 
     @Override
     public @NotNull ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return GENERIC_PARTICLE_TYPE;
     }
 
     @Override

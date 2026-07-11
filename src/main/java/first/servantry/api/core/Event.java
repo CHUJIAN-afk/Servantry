@@ -147,16 +147,17 @@ public class Event {
                     .recordHit(attacker.getUUID(), 100);
             AABB box = entity.getBoundingBox();
             RandomSource random = entity.getRandom();
-            Vec3 pos = box.getCenter();
-            Vec3 velocity = pos.add(0, box.getYsize(), 0)
-                    .offsetRandom(random, (float) box.getSize())
+            Vec3 pos = box.getCenter()
+                    .add(0, box.getYsize() / 2, 0);
+            Vec3 velocity = pos.add(0, box.getYsize() / 2, 0)
+                    .offsetRandom(random, (float) (box.getXsize() + box.getZsize()))
                     .subtract(pos)
                     .normalize();
             DamageInfoData.add(level)
                     .damageType(damageSource.typeHolder().getRegisteredName())
                     .damageAmount(event.getNewDamage())
                     .pos(pos)
-                    .velocity(velocity.scale(random.nextInt(70, 90) * 0.01f))
+                    .velocity(velocity.scale(random.nextInt(50, 70) * 0.01f))
                     .critical(event.getNewDamage() > event.getOriginalDamage() * 3)
                     .emit();
         }

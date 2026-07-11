@@ -10,7 +10,6 @@ import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.EnchantedThrowingKnives;
 import first.servantry.register.ModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.Mth;
 
 /**
  * 附魔飞刀渲染器。
@@ -32,7 +31,7 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
                                .scale(0.5f)
                                .translateOffset(-0.5f, -0.5f, -0.5f)
                                .rotationOffset(0, 90, 0)
-                               .visualNodeFunction((knives, partialTick, rawNode) -> rawNode.lerp(knives.getRenderNode(partialTick), Mth.lerp(partialTick, knives.idleBlendO, knives.idleBlendO))))
+                               .visualNodeFunction((knives, partialTick, rawNode) -> rawNode))
                 .build();
     }
 
@@ -40,5 +39,4 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
     protected void renderEntity(EnchantedThrowingKnives servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EnchantedThrowingKnives> config) {
         ModelRenderer.renderModel(ModelRegister.ENCHANTED_THROWING_KNIVES, poseStack, bufferSource);
     }
-
 }

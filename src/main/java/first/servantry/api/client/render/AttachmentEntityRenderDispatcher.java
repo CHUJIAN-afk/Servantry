@@ -7,9 +7,9 @@ import first.servantry.api.entity.*;
 import first.servantry.register.AttachmentRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -46,6 +46,7 @@ public class AttachmentEntityRenderDispatcher {
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         boolean showHitboxes = Minecraft.getInstance().getEntityRenderDispatcher().shouldRenderHitBoxes();
         VertexConsumer debugConsumer = showHitboxes ? bufferSource.getBuffer(RenderType.lines()) : null;
+        int packedLight = LightTexture.FULL_BRIGHT;
         for (AttachmentEntity entity : entities) {
             entity.setOwner(player);
             poseStack.pushPose();
@@ -54,7 +55,6 @@ public class AttachmentEntityRenderDispatcher {
             // 渲染实体模型
             IAttachmentEntityRenderer<AttachmentEntity> renderer = getRenderer(entity);
             if (renderer != null) {
-                int packedLight = LevelRenderer.getLightColor(player.level(), BlockPos.containing(renderNode.pos().x(), renderNode.pos().y(), renderNode.pos().z()));
                 renderer.render(entity, poseStack, bufferSource, partialTick, packedLight, renderNode);
             }
             // 调试渲染（使用原始缓冲源，不受透明度影响）

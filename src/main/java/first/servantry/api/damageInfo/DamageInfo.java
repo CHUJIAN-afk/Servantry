@@ -6,12 +6,11 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 伤害数字渲染数据。
@@ -44,7 +43,7 @@ public class DamageInfo {
         this.velocity = velocity;
         this.drag = 0.75f;
         this.critical = critical;
-        this.roll = ThreadLocalRandom.current().nextInt(-30, 30);
+        this.roll = RandomSource.create(velocity.hashCode()).nextInt(-30, 30);
         this.text = String.valueOf((int) damageAmount);
     }
 
