@@ -5,7 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 /**
  * 伤害数字样式定义，由 JSON 数据包驱动。
  * <p>
- * 字符固定 0-9 顺序，UV = digit / 10。
+ * 贴图布局固定：0-9 顺序排列后追加一个小数点贴图（索引 10），
+ * UV = glyphIndex / GLYPH_COUNT。
  * </p>
  *
  * @param damageType    伤害类型 ID（如 "servantry:servant"）
@@ -30,8 +31,8 @@ public record DamageInfoStyle(
         int criticalColor
 ) {
 
-    /** 贴图中数字总数（固定 0-9） */
-    public static final int GLYPH_COUNT = 10;
+    /** 贴图中字符总数：0-9 共 10 个数字 + 1 个小数点（位于末尾，索引 10） */
+    public static final int GLYPH_COUNT = 11;
 
     /** 单字符在贴图中的像素宽度 */
     public int glyphPixelWidth() {

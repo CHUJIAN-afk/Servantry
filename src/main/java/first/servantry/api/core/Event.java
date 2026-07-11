@@ -5,6 +5,7 @@ import first.servantry.api.armorSet.ArmorSet;
 import first.servantry.api.common.attachment.DamageInfoData;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.damageInfo.IDamageSourceCritical;
 import first.servantry.api.item.IServantWeapon;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.register.ServantryRegistries;
@@ -153,12 +154,13 @@ public class Event {
                     .offsetRandom(random, (float) (box.getXsize() + box.getZsize()))
                     .subtract(pos)
                     .normalize();
+            boolean critical = damageSource instanceof IDamageSourceCritical iDamageSourceCritical && iDamageSourceCritical.servantry$isCritical();
             DamageInfoData.add(level)
                     .damageType(damageSource.typeHolder().getRegisteredName())
                     .damageAmount(event.getNewDamage())
                     .pos(pos)
                     .velocity(velocity.scale(random.nextInt(50, 70) * 0.01f))
-                    .critical(event.getNewDamage() > event.getOriginalDamage() * 3)
+                    .critical(critical)
                     .emit();
         }
     }

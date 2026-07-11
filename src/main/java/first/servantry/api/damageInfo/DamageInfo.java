@@ -15,8 +15,11 @@ import org.joml.Vector3f;
 /**
  * 伤害数字渲染数据。
  * <p>
- * 渲染参数由 {@link DamageInfoStyle} 驱动，贴图布局固定 0-9 顺序，
- * UV = digit / 10。闪烁为纯亮度脉冲，每 10 tick（0.5 秒）一次。
+ * 渲染参数由 {@link DamageInfoStyle} 驱动，贴图布局为 0-9 顺序排列后追加一个小数点贴图
+ * （索引 10），UV = glyphIndex / GLYPH_COUNT。闪烁为纯亮度脉冲，每 10 tick（0.5 秒）一次。
+ * </p>
+ * <p>
+ * 小数显示规则：低于 1 保留两位小数，低于 10 保留一位小数，不低于 10 不保留小数。
  * </p>
  */
 public class DamageInfo {
@@ -31,7 +34,7 @@ public class DamageInfo {
     private final boolean critical;
     private final float roll;
 
-    /** 缓存：damageAmount 取整后的字符串 */
+    /** 缓存：格式化后的伤害值字符串（含小数点） */
     private final String text;
 
     public DamageInfo(DamageInfoStyle style, float damageAmount, Vec3 pos, Vec3 velocity, boolean critical) {
@@ -44,7 +47,40 @@ public class DamageInfo {
         this.drag = 0.75f;
         this.critical = critical;
         this.roll = RandomSource.create(velocity.hashCode()).nextInt(-30, 30);
-        this.text = String.valueOf((int) damageAmount);
+        this.text = formatDamage(damageAmount);
+    }
+
+    /**
+     * 根据伤害值大小格式化显示文本：
+     * <ul>
+     *   <li>低于 1：保留两位小数</li>
+     *   <li>低于 10：保留一位小数</li>
+     *   <li>不低于 10：不保留小数</li>
+     * </ul>
+     */
+    private static String formatDamage(float damageAmount) {
+        if (damageAmount < 1f) {
+            return String.format("%.2f", damageAmount);
+        } else if (damageAmount < 10f) {
+            return String.format("%.1f", damageAmount);
+        } else {
+            return String.valueOf((int) damageAmount);
+        }
+    }
+
+    /**
+     * 将文本字符映射为贴图字形索引：'0'-'9' → 0-9，'.' → 10。
+     *
+     * @throws IllegalArgumentException 遇到非数字、非小数点字符
+     */
+    private static int glyphIndex(char c) {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        if (c == '.') {
+            return 10;
+        }
+        throw new IllegalArgumentException("Unexpected damage glyph: " + c);
     }
 
     public boolean tick() {
@@ -106,9 +142,9 @@ public class DamageInfo {
         int length = text.length();
         Vector3f v = new Vector3f();
         for (int i = 0; i < length; i++) {
-            int digit = text.charAt(i) - '0';
-            float u0 = (float) (digit * glyphPixelWidth) / style.textureWidth();
-            float u1 = (float) ((digit + 1) * glyphPixelWidth) / style.textureWidth();
+            int glyph = glyphIndex(text.charAt(i));
+            float u0 = (float) (glyph * glyphPixelWidth) / style.textureWidth();
+            float u1 = (float) ((glyph + 1) * glyphPixelWidth) / style.textureWidth();
 
             // 本地坐标先减 halfWidth 居中，再变换
             float x0 = i * step - halfWidth;

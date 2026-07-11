@@ -91,9 +91,11 @@ public record DamageInfoPayload(List<Entry> entries) implements CustomPacketPayl
         /** 转为客户端渲染数据：根据 damageType 查询样式重建 DamageInfo，样式未定义时返回 null */
         @Nullable
         public DamageInfo toDamageInfo() {
-            DamageInfoStyle style = DamageInfoStyleManager.INSTANCE.getStyle(ResourceLocation.parse(damageType));
-            if (style != null) {
-                return new DamageInfo(style, damageAmount, new Vec3(x, y, z), new Vec3(vx, vy, vz), critical);
+            if (damageAmount >= 0.01) {
+                DamageInfoStyle style = DamageInfoStyleManager.INSTANCE.getStyle(ResourceLocation.parse(damageType));
+                if (style != null) {
+                    return new DamageInfo(style, damageAmount, new Vec3(x, y, z), new Vec3(vx, vy, vz), critical);
+                }
             }
             return null;
         }
