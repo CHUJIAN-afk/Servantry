@@ -7,8 +7,8 @@ import first.servantry.api.damageInfo.DamageInfoRenderDispatcher;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.*;
-import net.minecraft.world.entity.player.Player;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 @Mixin(LevelRenderer.class)
 public class LevelRendererMixin {
@@ -51,9 +52,8 @@ public class LevelRendererMixin {
         assert level != null;
         MultiBufferSource.BufferSource bufferSource = renderBuffers.bufferSource();
         float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
-        for (Player player : level.players()) {
-            AttachmentEntityRenderDispatcher.render(player, poseStack, bufferSource, partialTick);
-        }
+        List<AbstractClientPlayer> players = level.players();
+        AttachmentEntityRenderDispatcher.render(players, camera, poseStack, bufferSource, partialTick);
         DamageInfoRenderDispatcher.render(level, camera, bufferSource, partialTick);
     }
 }
