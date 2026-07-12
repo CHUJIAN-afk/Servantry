@@ -8,7 +8,7 @@ import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.Twins;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
@@ -37,9 +37,9 @@ public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
     @Override
     protected void renderEntity(Twins servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Twins> config) {
         if (servant.isLaserEye()) {
-            ModelRenderer.renderModel(ModelRegister.TWINS_LASER, poseStack, bufferSource);
+            ModelRenderer.renderModel(ServantryModelRegister.TWINS_LASER, poseStack, bufferSource);
         } else {
-            ModelRenderer.renderModel(ModelRegister.TWINS_CURSED_FLAME, poseStack, bufferSource);
+            ModelRenderer.renderModel(ServantryModelRegister.TWINS_CURSED_FLAME, poseStack, bufferSource);
         }
     }
 }

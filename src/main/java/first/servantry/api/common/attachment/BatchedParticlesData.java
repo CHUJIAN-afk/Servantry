@@ -1,25 +1,27 @@
 package first.servantry.api.common.attachment;
 
 import first.servantry.network.BatchedParticlesPayload;
+import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 批量粒子累积附件（挂载于 {@link net.minecraft.world.level.Level}）。
- * <p>
- * 服务端在单 tick 内多次调用 {@link first.servantry.utils.ParticleHelper#emit} 时，
- * 将每条粒子记录累积到此附件，避免每个粒子单独发送网络包。
- * tick 末由 {@link first.servantry.common.event.Event#tick} 一次性取出并打包为
- * {@link BatchedParticlesPayload} 下发，随后清空。
- * </p>
- * <p>
- * 仅服务端使用：客户端 {@code emit} 直接调用 {@link net.minecraft.world.level.Level#addParticle} 生成粒子，
- * 不经过此附件。
- * </p>
- */
 public class BatchedParticlesData {
+
+    public static void handler(LevelTickEvent.Post event) {
+        Level level = event.getLevel();
+        if (!level.isClientSide()) {
+            BatchedParticlesData data = level.getData(ServantryAttachmentRegister.BatchedParticles);
+            if (data.size() > 0) {
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new BatchedParticlesPayload(data.drain()));
+            }
+        }
+    }
 
     private final List<BatchedParticlesPayload.Entry> entries = new ArrayList<>();
 

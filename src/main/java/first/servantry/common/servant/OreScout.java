@@ -3,7 +3,7 @@ package first.servantry.common.servant;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -36,7 +36,7 @@ public class OreScout extends Servant {
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return AttachmentEntityRegister.OreScout.get();
+        return ServantryAttachmentEntityRegister.OreScout.get();
     }
 
     @Override

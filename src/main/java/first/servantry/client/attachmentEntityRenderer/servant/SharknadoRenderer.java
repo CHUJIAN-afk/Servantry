@@ -7,7 +7,7 @@ import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.Sharknado;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class SharknadoRenderer extends AbstractAttachmentEntityRenderer<Sharknado> {
@@ -29,6 +29,6 @@ public class SharknadoRenderer extends AbstractAttachmentEntityRenderer<Sharknad
 
     @Override
     protected void renderEntity(Sharknado entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Sharknado> config) {
-        ModelRenderer.renderModel(ModelRegister.SHARKNADO, poseStack, bufferSource);
+        ModelRenderer.renderModel(ServantryModelRegister.SHARKNADO, poseStack, bufferSource);
     }
 }

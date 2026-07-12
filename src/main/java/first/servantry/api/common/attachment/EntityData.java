@@ -5,10 +5,12 @@ import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.api.servant.Servant;
-import first.servantry.register.AttachmentRegister;
+import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.attachment.AttachmentSyncHandler;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +30,30 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> pendingAdd = new HashMap<>();
     private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> groups = new HashMap<>();
     private final List<AttachmentEntity> renderCache = new ArrayList<>();
+    private ResourceKey<Level> dimension = null;
     private boolean changed = false;
 
     public void tick(Player player) {
         if (isRunning()) {
+            updateLevel(player);
             updateServantSlot(player);
             tickEntity(player);
             syncToClient(player);
+        }
+    }
+
+    private void updateLevel(Player player) {
+        Level level = player.level();
+        if (!level.isClientSide() && dimension != level.dimension()) {
+            if (dimension != null) {
+                groups.values()
+                        .stream()
+                        .map(Map::values)
+                        .flatMap(Collection::stream)
+                        .flatMap(Collection::stream)
+                        .forEach(AttachmentEntity::dimensionChange);
+            }
+            dimension = level.dimension();
         }
     }
 
@@ -45,7 +64,7 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
     private void syncToClient(Player player) {
         if (!player.level().isClientSide() && (!groups.isEmpty() || changed)) {
             changed = false;
-            player.syncData(AttachmentRegister.EntityData);
+            player.syncData(ServantryAttachmentRegister.EntityData);
         }
     }
 

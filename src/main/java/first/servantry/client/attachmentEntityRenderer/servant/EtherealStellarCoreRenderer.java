@@ -7,7 +7,7 @@ import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.EtherealStellarCore;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 /**
@@ -34,6 +34,6 @@ public class EtherealStellarCoreRenderer extends AbstractAttachmentEntityRendere
 
     @Override
     protected void renderEntity(EtherealStellarCore servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EtherealStellarCore> config) {
-        ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource);
+        ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 }

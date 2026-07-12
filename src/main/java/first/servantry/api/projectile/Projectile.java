@@ -134,6 +134,11 @@ public abstract class Projectile extends AttachmentEntity {
         setArmorPierce(entity.getArmorPierce());
     }
 
+    @Override
+    public void dimensionChange() {
+        setRemove();
+    }
+
     /**
      * 加入到玩家的射弹数据
      */

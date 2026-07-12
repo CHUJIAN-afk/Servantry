@@ -3,7 +3,7 @@ package first.servantry.common.projectile;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.*;
 import first.servantry.api.projectile.Projectile;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -85,7 +85,7 @@ public class ZenithProjectile extends Projectile implements ICollideAttack<Zenit
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.ZenithProjectile.get();
+        return ServantryAttachmentEntityRegister.ZenithProjectile.get();
     }
 
     @Override

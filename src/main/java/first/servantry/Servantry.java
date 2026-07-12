@@ -11,26 +11,26 @@ public class Servantry {
     public static final String MODID = "servantry";
 
     public Servantry(IEventBus eventBus) {
-        ArmorMaterialRegister.register(eventBus);
-        AttachmentRegister.register(eventBus);
-        AttributeRegister.register(eventBus);
-        CreativeTabRegister.register(eventBus);
-        DataComponentRegister.register(eventBus);
-        AttachmentEntityRegister.register(eventBus);
-        ItemRegister.register();
-        ServantWeaponRegister.register();
-        ArmorRegister.register();
-        CurioRegister.register();
-        Registers.getInstance().register(eventBus);
-        MobEffectRegister.register(eventBus);
-        ParticleRegister.register(eventBus);
-        PotionRegister.register(eventBus);
-        SoundRegister.register(eventBus);
-        ArmorSetRegister.register(eventBus);
-        BlockRegister.register(eventBus);
-        MenuRegister.register(eventBus);
-        MithrilAnvilRecipeRegister.register(eventBus);
-        NetworkPacketRegister.register(eventBus);
+        ServantryArmorMaterialRegister.register(eventBus);
+        ServantryAttachmentRegister.register(eventBus);
+        ServantryAttributeRegister.register(eventBus);
+        ServantryCreativeTabRegister.register(eventBus);
+        ServantryDataComponentRegister.register(eventBus);
+        ServantryAttachmentEntityRegister.register(eventBus);
+        ServantryItemRegister.register();
+        ServantryServantWeaponRegister.register();
+        ServantryArmorRegister.register();
+        ServantryCurioRegister.register();
+        ServantryRegisters.getInstance().register(eventBus);
+        ServantryMobEffectRegister.register(eventBus);
+        ServantryParticleRegister.register(eventBus);
+        ServantryPotionRegister.register(eventBus);
+        ServantrySoundRegister.register(eventBus);
+        ServantryArmorSetRegister.register(eventBus);
+        ServantryBlockRegister.register(eventBus);
+        ServantryMenuRegister.register(eventBus);
+        ServantryMithrilAnvilRecipeRegister.register(eventBus);
+        ServantryNetworkPacketRegister.register(eventBus);
     }
 
     public static ResourceLocation rl(String path) {

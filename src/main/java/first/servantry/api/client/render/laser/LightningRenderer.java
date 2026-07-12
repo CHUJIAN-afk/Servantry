@@ -13,7 +13,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 /**
- * 雷电/闪电链渲染器（链式 Builder）。
+ * 雷电/闪电链渲染器（链式 ServantWeaponItemBuilder）。
  * <p>
  * 在两个绝对世界坐标点之间绘制带扭曲效果的闪电链。整体形态借鉴 {@link LaserRenderer} 的
  * “多层 alpha 梯度叠加”思路：内层窄而亮（锐利核心），外层宽而散（泛光边缘），多层标准半透明
@@ -74,7 +74,7 @@ public class LightningRenderer {
     }
 
     /**
-     * 创建 Builder 实例。
+     * 创建 ServantWeaponItemBuilder 实例。
      */
     public static LightningRenderer builder() {
         return new LightningRenderer();

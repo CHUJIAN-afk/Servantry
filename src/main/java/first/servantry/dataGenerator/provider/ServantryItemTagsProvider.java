@@ -1,7 +1,7 @@
 package first.servantry.dataGenerator.provider;
 
 import first.servantry.Servantry;
-import first.servantry.common.item.CurioItem;
+import first.servantry.api.item.CurioItem;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;

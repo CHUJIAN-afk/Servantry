@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import first.servantry.api.entity.*;
-import first.servantry.register.AttachmentRegister;
+import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -47,7 +47,7 @@ public class AttachmentEntityRenderDispatcher {
      */
     public static void render(List<AbstractClientPlayer> players, Camera camera, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick) {
         for (AbstractClientPlayer player : players) {
-            List<AttachmentEntity> entities = player.getData(AttachmentRegister.EntityData)
+            List<AttachmentEntity> entities = player.getData(ServantryAttachmentRegister.EntityData)
                     .getRenderCache();
             Vec3 cameraPos = camera.getPosition();
             boolean showHitboxes = Minecraft.getInstance()

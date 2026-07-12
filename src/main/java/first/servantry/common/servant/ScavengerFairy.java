@@ -6,7 +6,7 @@ import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.scavengerFairy.ScavengerFairyCollectItemGoal;
 import first.servantry.common.servant.goal.scavengerFairy.ScavengerFairyIdleGoal;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -42,7 +42,7 @@ public class ScavengerFairy extends Servant {
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return AttachmentEntityRegister.ScavengerFairy.get();
+        return ServantryAttachmentEntityRegister.ScavengerFairy.get();
     }
     
     @Override

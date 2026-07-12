@@ -1,6 +1,6 @@
 package first.servantry.dataGenerator.provider;
 
-import first.servantry.register.Registers;
+import first.servantry.register.ServantryRegisters;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -17,7 +17,7 @@ public class ServantryRecipeProvider extends RecipeProvider {
 
     @Override
     protected void buildRecipes(@NotNull RecipeOutput output) {
-        Registers.getInstance().getRecipeGenerate().forEach(generate -> generate.recipe(output));
+        ServantryRegisters.getInstance().getRecipeGenerate().forEach(generate -> generate.recipe(output));
     }
 
     @FunctionalInterface

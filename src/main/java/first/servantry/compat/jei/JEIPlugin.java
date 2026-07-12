@@ -4,10 +4,11 @@ import first.servantry.Servantry;
 import first.servantry.api.armorSet.ArmorSet;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
-import first.servantry.register.CurioRegister;
-import first.servantry.register.ItemRegister;
-import first.servantry.register.MithrilAnvilRecipeRegister;
-import first.servantry.register.ServantWeaponRegister;
+import first.servantry.compat.jei.category.MithrilAnvilRecipeCategory;
+import first.servantry.register.ServantryCurioRegister;
+import first.servantry.register.ServantryItemRegister;
+import first.servantry.register.ServantryMithrilAnvilRecipeRegister;
+import first.servantry.register.ServantryServantWeaponRegister;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -40,13 +41,13 @@ public class JEIPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(ItemRegister.MithrilAnvil.asItem()), MithrilAnvilRecipeCategory.SoulRecipeType);
+        registration.addRecipeCatalyst(new ItemStack(ServantryItemRegister.MithrilAnvil.asItem()), MithrilAnvilRecipeCategory.SoulRecipeType);
     }
 
     @Override
     public void registerRecipes(@NotNull IRecipeRegistration registration) {
         if (Minecraft.getInstance().level instanceof Level level) {
-            List<MithrilAnvilRecipe> soulRecipeList = level.getRecipeManager().getAllRecipesFor(MithrilAnvilRecipeRegister.MITHRIL_ANVIL_TYPE.get())
+            List<MithrilAnvilRecipe> soulRecipeList = level.getRecipeManager().getAllRecipesFor(ServantryMithrilAnvilRecipeRegister.MITHRIL_ANVIL_TYPE.get())
                     .stream()
                     .map(RecipeHolder::value)
                     .toList();
@@ -61,16 +62,16 @@ public class JEIPlugin implements IModPlugin {
             registration.addItemStackInfo(itemStackList, Component.empty());
         }
         // 牧师出售
-        registration.addIngredientInfo(CurioRegister.PygmyNecklace.get(), Component.translatable("jei.servantry.description.sold"));
-        registration.addIngredientInfo(CurioRegister.HerculesBeetle.get(), Component.translatable("jei.servantry.description.sold"));
-        registration.addIngredientInfo(CurioRegister.ApprenticesScarf.get(), Component.translatable("jei.servantry.description.sold"));
-        registration.addIngredientInfo(CurioRegister.HuntressesBuckler.get(), Component.translatable("jei.servantry.description.sold"));
-        registration.addIngredientInfo(CurioRegister.MonksBelt.get(), Component.translatable("jei.servantry.description.sold"));
-        registration.addIngredientInfo(CurioRegister.SquiresShield.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ServantryCurioRegister.PygmyNecklace.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ServantryCurioRegister.HerculesBeetle.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ServantryCurioRegister.ApprenticesScarf.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ServantryCurioRegister.HuntressesBuckler.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ServantryCurioRegister.MonksBelt.get(), Component.translatable("jei.servantry.description.sold"));
+        registration.addIngredientInfo(ServantryCurioRegister.SquiresShield.get(), Component.translatable("jei.servantry.description.sold"));
         // 掉落
-        registration.addIngredientInfo(ServantWeaponRegister.TerraPrism.get(), Component.translatable("jei.servantry.description.terraprism"));
-        registration.addIngredientInfo(CurioRegister.SummonerEmblem.get(), Component.translatable("jei.servantry.description.drops_from_evokers"));
-        registration.addIngredientInfo(ItemRegister.BlackLens.get(), Component.translatable("jei.servantry.description.drops_from_zombie"));
-        registration.addIngredientInfo(ServantWeaponRegister.TempestStaff.get(), Component.translatable("jei.servantry.description.fishing"));
+        registration.addIngredientInfo(ServantryServantWeaponRegister.TerraPrism.get(), Component.translatable("jei.servantry.description.terraprism"));
+        registration.addIngredientInfo(ServantryCurioRegister.SummonerEmblem.get(), Component.translatable("jei.servantry.description.drops_from_evokers"));
+        registration.addIngredientInfo(ServantryItemRegister.BlackLens.get(), Component.translatable("jei.servantry.description.drops_from_zombie"));
+        registration.addIngredientInfo(ServantryServantWeaponRegister.TempestStaff.get(), Component.translatable("jei.servantry.description.fishing"));
     }
 }

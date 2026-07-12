@@ -3,8 +3,8 @@ package first.servantry.client.screen;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.Servantry;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
-import first.servantry.register.BlockRegister;
-import first.servantry.register.MenuRegister;
+import first.servantry.register.ServantryBlockRegister;
+import first.servantry.register.ServantryMenuRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -69,7 +69,7 @@ public class MithrilAnvilGui {
             pose.pushPose();
             pose.translate(x + 29, y + 20, -300);
             pose.scale(4, 4, 4);
-            graphics.renderFakeItem(BlockRegister.MITHRIL_ANVIL.toStack(), 0, 0);
+            graphics.renderFakeItem(ServantryBlockRegister.MITHRIL_ANVIL.toStack(), 0, 0);
             pose.popPose();
             if (this.menu.selectedRecipe != null) {
                 var recipe = this.menu.selectedRecipe.value();
@@ -123,7 +123,7 @@ public class MithrilAnvilGui {
         private RecipeHolder<MithrilAnvilRecipe> selectedRecipe;
 
         public MithrilAnvilMenu(int containerId, Inventory playerInventory) {
-            super(MenuRegister.MITHRIL_ANVIL.get(), containerId);
+            super(ServantryMenuRegister.MITHRIL_ANVIL.get(), containerId);
             this.player = playerInventory.player;
             this.inputContainer = new TransientCraftingContainer(this, INPUT_SLOTS, 1);
 

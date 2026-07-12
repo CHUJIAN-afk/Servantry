@@ -1,8 +1,8 @@
 package first.servantry.api.common.attachment;
 
 import first.servantry.Servantry;
-import first.servantry.register.AttachmentRegister;
-import first.servantry.register.AttributeRegister;
+import first.servantry.register.ServantryAttachmentRegister;
+import first.servantry.register.ServantryAttributeRegister;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.neoforged.bus.api.EventPriority;
@@ -18,9 +18,9 @@ public class HealthData {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void healthRegenTick(EntityTickEvent.Post event) {
         if (event.getEntity() instanceof LivingEntity living && !living.level().isClientSide()) {
-            AttributeInstance instance = living.getAttribute(AttributeRegister.HealthRegen);
+            AttributeInstance instance = living.getAttribute(ServantryAttributeRegister.HealthRegen);
             if (instance != null && instance.getValue() != 0) {
-                float amount = living.getData(AttachmentRegister.HealthData).getAmount();
+                float amount = living.getData(ServantryAttachmentRegister.HealthData).getAmount();
                 amount += (float) (instance.getValue() / 20);
                 if (living.tickCount % 10 == 0) {
                     if (amount > 1) {
@@ -36,7 +36,7 @@ public class HealthData {
                         amount += damage;
                     }
                 }
-                living.getData(AttachmentRegister.HealthData).setAmount(amount);
+                living.getData(ServantryAttachmentRegister.HealthData).setAmount(amount);
             }
         }
     }

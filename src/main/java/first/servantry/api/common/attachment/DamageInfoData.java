@@ -1,32 +1,66 @@
 package first.servantry.api.common.attachment;
 
 import first.servantry.api.damageInfo.DamageInfo;
+import first.servantry.api.damageInfo.IDamageSourceCritical;
 import first.servantry.network.DamageInfoPayload;
-import first.servantry.register.AttachmentRegister;
+import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 伤害数字累积附件（挂载于 {@link net.minecraft.world.level.Level}）。
- * <p>
- * 服务端：单 tick 内通过链式 {@link DamageInfoBuilder} 累积伤害记录，
- * tick 末由 {@link first.servantry.common.event.Event#tick} 一次性取出并打包为
- * {@link DamageInfoPayload} 下发，随后清空。
- * </p>
- * <p>
- * 客户端：接收 {@link DamageInfoPayload} 后将 Entry 转为 {@link DamageInfo} 渲染数据，
- * 由客户端 tick 驱动生命周期衰减。
- * </p>
- */
 public class DamageInfoData {
+
+    public static void handler(LivingDamageEvent.Post event) {
+        DamageSource damageSource = event.getSource();
+        LivingEntity entity = event.getEntity();
+        Level level = entity.level();
+        if (!level.isClientSide() && damageSource.getEntity() instanceof Player) {
+            AABB box = entity.getBoundingBox();
+            RandomSource random = entity.getRandom();
+            Vec3 pos = box.getCenter()
+                    .add(0, box.getYsize() / 2, 0);
+            Vec3 velocity = pos.add(0, box.getYsize() / 2, 0)
+                    .offsetRandom(random, (float) (box.getXsize() + box.getZsize()))
+                    .subtract(pos)
+                    .normalize();
+            boolean critical = damageSource instanceof IDamageSourceCritical iDamageSourceCritical && iDamageSourceCritical.servantry$isCritical();
+            DamageInfoData.add(level)
+                    .damageType(damageSource.typeHolder().getRegisteredName())
+                    .damageAmount(event.getNewDamage())
+                    .pos(pos)
+                    .velocity(velocity.scale(random.nextInt(50, 70) * 0.01f))
+                    .critical(critical)
+                    .emit();
+        }
+    }
+
+    public static void handler(LevelTickEvent.Post event) {
+        Level level = event.getLevel();
+        if (!level.isClientSide()) {
+            DamageInfoData damageData = level.getData(ServantryAttachmentRegister.DamageInfoData);
+            if (damageData.size() > 0) {
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new DamageInfoPayload(damageData.drain()));
+            }
+        } else {
+            level.getData(ServantryAttachmentRegister.DamageInfoData).tick();
+        }
+    }
 
     /** 服务端：累积 Entry 待发包 */
     private final List<DamageInfoPayload.Entry> pendingEntries = new ArrayList<>();
@@ -164,7 +198,7 @@ public class DamageInfoData {
          */
         public void emit() {
             if (!level.isClientSide()) {
-                level.getData(AttachmentRegister.DamageInfoData)
+                level.getData(ServantryAttachmentRegister.DamageInfoData)
                         .addEntry(new DamageInfoPayload.Entry(damageType, damageAmount, x, y, z, vx, vy, vz, critical));
             }
         }

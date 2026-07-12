@@ -1,10 +1,10 @@
 package first.servantry.common.servant.goal.twins;
 
+import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.LaserProjectile;
 import first.servantry.common.servant.Twins;
-import first.servantry.register.SoundRegister;
+import first.servantry.register.ServantrySoundRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -51,7 +51,7 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         projectile.setDamage(servant.getDamage() * 1.1f);
         projectile.join(owner);
         ServerLevel level = (ServerLevel) owner.level();
-        level.playSound(null, start.x(), start.y(), start.z(), SoundRegister.Laser.get(), owner.getSoundSource());
+        level.playSound(null, start.x(), start.y(), start.z(), ServantrySoundRegister.Laser.get(), owner.getSoundSource());
         // 后坐力
         servant.applyForce(direction.scale(-0.1));
         ParticleHelper.create(level)

@@ -5,8 +5,8 @@ import first.servantry.api.entity.*;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.MobEffectRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
+import first.servantry.register.ServantryMobEffectRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -46,7 +46,7 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
                         .damageSource(source)
                         .damageAmount(getDamage())
                         .invincibleTime(20)
-                        .effect(new MobEffectInstance(MobEffectRegister.CursedFlame, 100, 0))
+                        .effect(new MobEffectInstance(ServantryMobEffectRegister.CursedFlame, 100, 0))
                         .apply();
             }
         }
@@ -63,7 +63,7 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.DemonFlameProjectile.get();
+        return ServantryAttachmentEntityRegister.DemonFlameProjectile.get();
     }
 
     @Override

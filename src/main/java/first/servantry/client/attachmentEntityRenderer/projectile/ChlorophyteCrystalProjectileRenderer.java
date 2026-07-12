@@ -8,7 +8,7 @@ import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.ChlorophyteCrystalProjectile;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class ChlorophyteCrystalProjectileRenderer extends AbstractAttachmentEntityRenderer<ChlorophyteCrystalProjectile> {
@@ -34,6 +34,6 @@ public class ChlorophyteCrystalProjectileRenderer extends AbstractAttachmentEnti
 
     @Override
     protected void renderEntity(ChlorophyteCrystalProjectile entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ChlorophyteCrystalProjectile> config) {
-        ModelRenderer.renderModel(ModelRegister.CHLOROPHYTE_CRYSTAL, poseStack, bufferSource);
+        ModelRenderer.renderModel(ServantryModelRegister.CHLOROPHYTE_CRYSTAL, poseStack, bufferSource);
     }
 }

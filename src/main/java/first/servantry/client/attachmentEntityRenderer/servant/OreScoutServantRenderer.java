@@ -7,7 +7,7 @@ import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.OreScout;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class OreScoutServantRenderer extends AbstractAttachmentEntityRenderer<OreScout> {
@@ -26,6 +26,6 @@ public class OreScoutServantRenderer extends AbstractAttachmentEntityRenderer<Or
 
     @Override
     protected void renderEntity(OreScout servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<OreScout> config) {
-        ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource);
+        ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 }

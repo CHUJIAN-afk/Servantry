@@ -4,7 +4,7 @@ import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.Ellipse;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.ZenithProjectile;
-import first.servantry.register.AttachmentRegister;
+import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -73,7 +73,7 @@ public class Zenith extends SwordItem {
      */
     private List<LivingEntity> collectTargets(Player player) {
         List<LivingEntity> result = new ArrayList<>();
-        TargetCache cache = player.getData(AttachmentRegister.TargetCache);
+        TargetCache cache = player.getData(ServantryAttachmentRegister.TargetCache);
 
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookDir = player.getLookAngle().normalize();

@@ -2,8 +2,8 @@ package first.servantry.api.common.attachment;
 
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.servant.Servant;
-import first.servantry.register.AttachmentRegister;
-import first.servantry.register.AttributeRegister;
+import first.servantry.register.ServantryAttachmentRegister;
+import first.servantry.register.ServantryAttributeRegister;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
@@ -67,7 +67,7 @@ public class TargetCache {
     }
 
     public float getServantSearchRange(Player player, float distance) {
-        AttributeInstance instance = player.getAttribute(AttributeRegister.ServantSearchRange);
+        AttributeInstance instance = player.getAttribute(ServantryAttributeRegister.ServantSearchRange);
         if (instance != null) {
             distance *= (float) instance.getValue();
         }
@@ -100,7 +100,7 @@ public class TargetCache {
         entities.clear();
         visibilityCache.clear();
         distanceCache.clear();
-        EntityData data = player.getData(AttachmentRegister.EntityData);
+        EntityData data = player.getData(ServantryAttachmentRegister.EntityData);
         if (data.isRunning()) {
             AABB box = player.getBoundingBox();
             Vec3 center = box.getCenter();

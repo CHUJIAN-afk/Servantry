@@ -10,7 +10,7 @@ import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.enchantedThrowingKnives.EnchantedThrowingKnivesAttackGoal;
 import first.servantry.common.servant.goal.enchantedThrowingKnives.EnchantedThrowingKnivesIdleGoal;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -177,6 +177,6 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return AttachmentEntityRegister.EnchantedThrowingKnives.get();
+        return ServantryAttachmentEntityRegister.EnchantedThrowingKnives.get();
     }
 }

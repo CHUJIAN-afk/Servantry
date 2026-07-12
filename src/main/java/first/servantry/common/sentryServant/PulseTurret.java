@@ -5,8 +5,8 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.common.projectile.DestructionBullet;
-import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.SoundRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
+import first.servantry.register.ServantrySoundRegister;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -65,12 +65,17 @@ public class PulseTurret extends MomentumServant implements IBlockCollision<Puls
         DestructionBullet projectile = new DestructionBullet(getDamageSource(), pos, direction);
         projectile.copyDamageData(this);
         projectile.join(owner);
-        owner.level().playSound(null, pos.x(), pos.y(), pos.z(), SoundRegister.BallistaShot.get(), owner.getSoundSource());
+        owner.level().playSound(null, pos.x(), pos.y(), pos.z(), ServantrySoundRegister.BallistaShot.get(), owner.getSoundSource());
     }
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.PulseTurret.get();
+        return ServantryAttachmentEntityRegister.PulseTurret.get();
+    }
+
+    @Override
+    public void dimensionChange() {
+        setRemove();
     }
 
     @Override

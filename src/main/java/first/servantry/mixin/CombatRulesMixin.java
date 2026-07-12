@@ -2,7 +2,7 @@ package first.servantry.mixin;
 
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.register.AttributeRegister;
+import first.servantry.register.ServantryAttributeRegister;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,7 +26,7 @@ public class CombatRulesMixin {
             Servant servant = servantDamageSource.getServant();
             armorValue -= servant.getArmorPierce();
             Player owner = servant.getOwner();
-            AttributeInstance instance = owner.getAttribute(AttributeRegister.ServantArmorPierce);
+            AttributeInstance instance = owner.getAttribute(ServantryAttributeRegister.ServantArmorPierce);
             if (instance != null) {
                 armorValue -= (float) instance.getValue();
             }

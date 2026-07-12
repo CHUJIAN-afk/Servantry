@@ -5,7 +5,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.common.projectile.Rain;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -41,8 +41,13 @@ public class Cloud extends MomentumServant implements IBlockCollision<Cloud> {
     }
 
     @Override
+    public void dimensionChange() {
+        setRemove();
+    }
+
+    @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.Cloud.get();
+        return ServantryAttachmentEntityRegister.Cloud.get();
     }
 
     @Override

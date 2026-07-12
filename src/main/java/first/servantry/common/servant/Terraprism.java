@@ -13,7 +13,7 @@ import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.terraprism.TerraprismAttackGoal;
 import first.servantry.common.servant.goal.terraprism.TerraprismIdleGoal;
 import first.servantry.common.servant.goal.terraprism.TerraprismPrepGoal;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -158,6 +158,6 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return AttachmentEntityRegister.TerraPrism.get();
+        return ServantryAttachmentEntityRegister.TerraPrism.get();
     }
 }

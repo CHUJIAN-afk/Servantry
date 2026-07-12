@@ -9,7 +9,7 @@ import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.servant.goal.twins.TwinsCursedFlameAttackGoal;
 import first.servantry.common.servant.goal.twins.TwinsIdleGoal;
 import first.servantry.common.servant.goal.twins.TwinsLaserAttackGoal;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -122,7 +122,7 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
 
     @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {
-        return AttachmentEntityRegister.Twins.get();
+        return ServantryAttachmentEntityRegister.Twins.get();
     }
 
     public void setOther(Twins twins) {

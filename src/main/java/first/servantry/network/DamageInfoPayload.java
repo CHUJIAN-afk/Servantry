@@ -4,7 +4,7 @@ import first.servantry.Servantry;
 import first.servantry.api.damageInfo.DamageInfo;
 import first.servantry.api.damageInfo.DamageInfoStyle;
 import first.servantry.api.damageInfo.DamageInfoStyleManager;
-import first.servantry.register.AttachmentRegister;
+import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -45,7 +45,7 @@ public record DamageInfoPayload(List<Entry> entries) implements CustomPacketPayl
         context.enqueueWork(() -> {
             Player player = context.player();
             Level level = player.level();
-            level.getData(AttachmentRegister.DamageInfoData).receive(payload.entries());
+            level.getData(ServantryAttachmentRegister.DamageInfoData).receive(payload.entries());
         });
     }
 

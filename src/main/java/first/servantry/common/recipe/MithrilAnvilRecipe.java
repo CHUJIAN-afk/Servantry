@@ -1,7 +1,7 @@
 package first.servantry.common.recipe;
 
 import first.servantry.Servantry;
-import first.servantry.register.MithrilAnvilRecipeRegister;
+import first.servantry.register.ServantryMithrilAnvilRecipeRegister;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Criterion;
@@ -75,12 +75,12 @@ public record MithrilAnvilRecipe(List<Ingredient> ingredients, List<Integer> cou
 
     @Override
     public @NotNull RecipeSerializer<? extends Recipe<CraftingInput>> getSerializer() {
-        return MithrilAnvilRecipeRegister.MITHRIL_ANVIL_SERIALIZER.get();
+        return ServantryMithrilAnvilRecipeRegister.MITHRIL_ANVIL_SERIALIZER.get();
     }
 
     @Override
     public @NotNull RecipeType<MithrilAnvilRecipe> getType() {
-        return MithrilAnvilRecipeRegister.MITHRIL_ANVIL_TYPE.get();
+        return ServantryMithrilAnvilRecipeRegister.MITHRIL_ANVIL_TYPE.get();
     }
 
     // ==================== 业务逻辑 ====================
@@ -125,7 +125,7 @@ public record MithrilAnvilRecipe(List<Ingredient> ingredients, List<Integer> cou
         return countInInventory(player, ingredients.get(index)) >= counts.get(index);
     }
 
-    // ==================== Builder ====================
+    // ==================== ServantWeaponItemBuilder ====================
 
     private boolean matchesItems(List<ItemStack> available) {
         for (int i = 0; i < ingredients.size(); i++) {

@@ -26,7 +26,7 @@ import java.util.List;
  * 粒子类型序列化复刻原版 {@code ClientboundLevelParticlesPacket}：先写
  * {@link net.minecraft.core.registries.BuiltInRegistries#PARTICLE_TYPE} 的注册表 id，
  * 再用该类型自有的 {@link ParticleType#streamCodec()} 编码具体参数，
- * 兼容原版与自定义粒子（如 {@link first.servantry.common.particle.GenericParticleOptions}）。
+ * 兼容原版与自定义粒子（如 {@link first.servantry.api.common.particle.GenericParticleOptions}）。
  * </p>
  *
  * @param entries 粒子记录列表

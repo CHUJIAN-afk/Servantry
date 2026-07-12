@@ -7,7 +7,7 @@ import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.StardustDragon;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 
@@ -43,13 +43,13 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
         int index = dragon.getSegmentIndex();
         ModelResourceLocation model;
         if (index == 0) {
-            model = ModelRegister.STARDUST_DRAGON_HEAD;
+            model = ServantryModelRegister.STARDUST_DRAGON_HEAD;
         } else if (index == total - 1) {
-            model = ModelRegister.STARDUST_DRAGON_BODY3;
+            model = ServantryModelRegister.STARDUST_DRAGON_BODY3;
         } else if (index % 2 == 0) {
-            model = ModelRegister.STARDUST_DRAGON_BODY1;
+            model = ServantryModelRegister.STARDUST_DRAGON_BODY1;
         } else {
-            model = ModelRegister.STARDUST_DRAGON_BODY2;
+            model = ServantryModelRegister.STARDUST_DRAGON_BODY2;
         }
         ModelRenderer.renderModel(model, poseStack, bufferSource);
     }

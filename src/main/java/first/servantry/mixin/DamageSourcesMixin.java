@@ -21,14 +21,7 @@ public class DamageSourcesMixin {
     private void playerAttack(Player player, CallbackInfoReturnable<DamageSource> cir) {
         if (player instanceof InfiniteShadow.InfiniteShadowFakePlayer infiniteShadowFakePlayer) {
             ServantDamageSource damageSource = infiniteShadowFakePlayer.getInfiniteShadow().getDamageSource();
-            ServantDamageSource source = new ServantDamageSource(
-                    damageSource.typeHolder(),
-                    infiniteShadowFakePlayer,
-                    damageSource.getEntity(),
-                    damageSource.getSourcePosition(),
-                    damageSource.getServant()
-            );
-            cir.setReturnValue(source);
+            cir.setReturnValue(new ServantDamageSource(damageSource.typeHolder(), infiniteShadowFakePlayer, damageSource.getEntity(), damageSource.getSourcePosition(), damageSource.getServant()));
         }
     }
 }

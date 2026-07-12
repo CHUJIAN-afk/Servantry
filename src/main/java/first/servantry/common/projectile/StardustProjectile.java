@@ -1,14 +1,14 @@
 package first.servantry.common.projectile;
 
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.projectile.AttachingProjectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.common.particle.GenericParticleBuilder;
-import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.MobEffectRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
+import first.servantry.register.ServantryMobEffectRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -68,9 +68,9 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
         attachTo(hit.hitPoint());
         DamageSource source = getDamageSource();
         if (source != null) {
-            MobEffectInstance existing = target.getEffect(MobEffectRegister.CellParasitism);
+            MobEffectInstance existing = target.getEffect(ServantryMobEffectRegister.CellParasitism);
             int amplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, 9);
-            MobEffectInstance effectInstance = new MobEffectInstance(MobEffectRegister.CellParasitism, 100, amplifier);
+            MobEffectInstance effectInstance = new MobEffectInstance(ServantryMobEffectRegister.CellParasitism, 100, amplifier);
             InvincibleData.attack(target)
                     .attacker(getUuid())
                     .damageSource(source)
@@ -157,7 +157,7 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
 
     @Override
     public AttachmentEntityType<? extends AttachingProjectile> getType() {
-        return AttachmentEntityRegister.StardustProjectile.get();
+        return ServantryAttachmentEntityRegister.StardustProjectile.get();
     }
 
     public void setChaseTarget(LivingEntity chaseTarget) {

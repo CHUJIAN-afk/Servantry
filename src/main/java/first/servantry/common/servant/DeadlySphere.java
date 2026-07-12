@@ -1,15 +1,15 @@
 package first.servantry.common.servant;
 
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.servant.goal.deadlysphere.DeadlySphereAttackGoal;
 import first.servantry.common.servant.goal.deadlysphere.DeadlySphereIdleGoal;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -132,7 +132,7 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
 
     @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {
-        return AttachmentEntityRegister.DeadlySphere.get();
+        return ServantryAttachmentEntityRegister.DeadlySphere.get();
     }
 
     public int getTrailTimer() {

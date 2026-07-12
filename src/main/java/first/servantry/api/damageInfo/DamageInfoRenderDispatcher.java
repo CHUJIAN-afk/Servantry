@@ -3,7 +3,7 @@ package first.servantry.api.damageInfo;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import first.servantry.api.common.attachment.DamageInfoData;
-import first.servantry.register.AttachmentRegister;
+import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -28,7 +28,7 @@ public class DamageInfoRenderDispatcher {
 
     public static void render(Level level, Camera camera, MultiBufferSource bufferSource, float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
-        DamageInfoData data = level.getData(AttachmentRegister.DamageInfoData);
+        DamageInfoData data = level.getData(ServantryAttachmentRegister.DamageInfoData);
         Map<ResourceLocation, List<DamageInfo>> infos = data.getActiveInfos();
         if (!infos.isEmpty()) {
             Vec3 camPos = camera.getPosition();

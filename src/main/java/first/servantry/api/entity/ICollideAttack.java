@@ -1,6 +1,6 @@
 package first.servantry.api.entity;
 
-import first.servantry.register.AttachmentRegister;
+import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -73,7 +73,7 @@ public interface ICollideAttack<T extends AttachmentEntity> {
 
         // 粗筛潜在目标从缓存
         List<LivingEntity> potentialTargets = entity.getOwner()
-                .getData(AttachmentRegister.TargetCache)
+                .getData(ServantryAttachmentRegister.TargetCache)
                 .getEntities();
 
         // 精确碰撞检测并收集碰撞点

@@ -8,7 +8,7 @@ import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.ShatteredStellarCoreProjectile;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class ShatteredStellarCoreProjectileRenderer extends AbstractAttachmentEntityRenderer<ShatteredStellarCoreProjectile> {
@@ -33,6 +33,6 @@ public class ShatteredStellarCoreProjectileRenderer extends AbstractAttachmentEn
 
     @Override
     protected void renderEntity(ShatteredStellarCoreProjectile projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ShatteredStellarCoreProjectile> config) {
-        ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource);
+        ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 }

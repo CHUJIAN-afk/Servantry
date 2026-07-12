@@ -5,8 +5,8 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.common.projectile.BlitzBall;
-import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.SoundRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
+import first.servantry.register.ServantrySoundRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -57,7 +57,7 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
                 if (task.tick(this)) {
                     Vec3 pos = getPos();
                     Level level = owner.level();
-                    level.playSound(null, pos.x(), pos.y(), pos.z(), SoundRegister.BallistaShot.get(), owner.getSoundSource());
+                    level.playSound(null, pos.x(), pos.y(), pos.z(), ServantrySoundRegister.BallistaShot.get(), owner.getSoundSource());
                 } else {
                     task = null;
                 }
@@ -115,7 +115,12 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.SuperPeashooter.get();
+        return ServantryAttachmentEntityRegister.SuperPeashooter.get();
+    }
+
+    @Override
+    public void dimensionChange() {
+        setRemove();
     }
 
     @Override

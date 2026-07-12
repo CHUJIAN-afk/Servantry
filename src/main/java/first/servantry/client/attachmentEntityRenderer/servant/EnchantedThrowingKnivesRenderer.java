@@ -8,7 +8,7 @@ import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.EnchantedThrowingKnives;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 /**
@@ -37,6 +37,6 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
 
     @Override
     protected void renderEntity(EnchantedThrowingKnives servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EnchantedThrowingKnives> config) {
-        ModelRenderer.renderModel(ModelRegister.ENCHANTED_THROWING_KNIVES, poseStack, bufferSource);
+        ModelRenderer.renderModel(ServantryModelRegister.ENCHANTED_THROWING_KNIVES, poseStack, bufferSource);
     }
 }

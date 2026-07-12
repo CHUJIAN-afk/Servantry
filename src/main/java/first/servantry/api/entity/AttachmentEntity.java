@@ -196,6 +196,10 @@ public abstract class AttachmentEntity {
         this.historyNodes.addFirst(node);
     }
 
+    public void dimensionChange() {
+
+    }
+
     // ===================== 历史轨迹 =====================
 
     /**

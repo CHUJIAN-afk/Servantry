@@ -1,12 +1,12 @@
 package first.servantry.common.servant;
 
+import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
-import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.ChlorophyteCrystalProjectile;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
@@ -112,6 +112,6 @@ public class ChlorophyteCrystal extends Servant {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.ChlorophyteCrystal.get();
+        return ServantryAttachmentEntityRegister.ChlorophyteCrystal.get();
     }
 }

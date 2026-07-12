@@ -1,12 +1,14 @@
 package first.servantry.api.common.attachment;
 
-import first.servantry.register.AttachmentRegister;
-import first.servantry.register.DamageRegister;
+import first.servantry.register.ServantryAttachmentRegister;
+import first.servantry.register.ServantryDamageRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +18,15 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InvincibleData {
+
+    public static void handler(LivingDamageEvent.Post event) {
+        DamageSource damageSource = event.getSource();
+        LivingEntity entity = event.getEntity();
+        Level level = entity.level();
+        if (!level.isClientSide() && damageSource.getEntity() instanceof Player attacker) {
+            InvincibleData.get(entity).recordHit(attacker.getUUID(), 100);
+        }
+    }
 
     private final Map<UUID, AtomicInteger> hurtHistory;
     private final Map<UUID, AtomicInteger> partialInvincibleFrames;
@@ -34,7 +45,7 @@ public class InvincibleData {
     }
 
     public static InvincibleData get(LivingEntity living) {
-        return living.getData(AttachmentRegister.InvincibleData);
+        return living.getData(ServantryAttachmentRegister.InvincibleData);
     }
 
     /**
@@ -133,7 +144,7 @@ public class InvincibleData {
                 if (canDamage) {
                     Level level = target.level();
                     if (damageSource == null) {
-                        damageSource = DamageRegister.getDamageSource(DamageTypes.GENERIC, level);
+                        damageSource = ServantryDamageRegister.getDamageSource(DamageTypes.GENERIC, level);
                     }
                     int invulnerableTime = target.invulnerableTime;
                     target.invulnerableTime = 0;
@@ -142,9 +153,6 @@ public class InvincibleData {
                     if (hurt) {
                         if (mobEffectInstance != null) {
                             target.addEffect(mobEffectInstance);
-                        }
-                        if (uuid != null) {
-                            invincibleData.recordHit(uuid, 100);
                         }
                         if (invincibleTime > 0) {
                             if (type == Type.PARTIAL && uuid != null) {

@@ -8,7 +8,7 @@ import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.StardustProjectile;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 /**
@@ -39,7 +39,7 @@ public class StardustProjectileRenderer extends AbstractAttachmentEntityRenderer
 
     @Override
     protected void renderEntity(StardustProjectile projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustProjectile> config) {
-        ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource);
+        ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 
 }

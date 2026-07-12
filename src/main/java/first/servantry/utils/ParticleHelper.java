@@ -1,8 +1,8 @@
 package first.servantry.utils;
 
 import first.servantry.api.common.attachment.BatchedParticlesData;
-import first.servantry.common.particle.GenericParticleBuilder;
-import first.servantry.register.AttachmentRegister;
+import first.servantry.api.common.particle.GenericParticleBuilder;
+import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -146,7 +146,7 @@ public class ParticleHelper {
         }
 
         boolean server = !level.isClientSide();
-        BatchedParticlesData batch = server ? level.getData(AttachmentRegister.BatchedParticles) : null;
+        BatchedParticlesData batch = server ? level.getData(ServantryAttachmentRegister.BatchedParticles) : null;
 
         if (count <= 0) {
             ParticleOptions options = genericBuilder != null ? genericBuilder.build() : particleType;

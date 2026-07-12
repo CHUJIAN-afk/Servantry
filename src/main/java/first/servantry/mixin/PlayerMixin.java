@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import first.servantry.api.damageInfo.IDamageSourceCritical;
-import first.servantry.register.AttachmentRegister;
+import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
@@ -39,8 +39,8 @@ public class PlayerMixin {
     private void tick(CallbackInfo ci) {
         Player player = (Player) (Object) this;
         if (!player.level().isClientSide()) {
-            player.getData(AttachmentRegister.TargetCache).update(player);
+            player.getData(ServantryAttachmentRegister.TargetCache).update(player);
         }
-        player.getData(AttachmentRegister.EntityData).tick(player);
+        player.getData(ServantryAttachmentRegister.EntityData).tick(player);
     }
 }

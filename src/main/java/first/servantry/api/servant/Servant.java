@@ -6,9 +6,10 @@ import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.register.AttachmentRegister;
-import first.servantry.register.DamageRegister;
+import first.servantry.register.ServantryAttachmentRegister;
+import first.servantry.register.ServantryDamageRegister;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.damagesource.DamageType;
@@ -117,11 +118,16 @@ public abstract class Servant extends AttachmentEntity {
         return false;
     }
 
+    @Override
+    public void dimensionChange() {
+        init(new PathNode(owner.getBoundingBox().getCenter(), 0, 0, 0));
+    }
+
     // ===================== 伤害来源 =====================
 
     /** 构造仆从专属伤害来源 */
     public ServantDamageSource getDamageSource() {
-        Holder<DamageType> holder = DamageRegister.getDamageTypeHolder(DamageRegister.Servant, owner.level());
+        Holder<DamageType> holder = ServantryDamageRegister.getDamageTypeHolder(ServantryDamageRegister.Servant, owner.level());
         return new ServantDamageSource(holder, null, owner, getCurrentPathNode().pos(), this);
     }
 
@@ -132,7 +138,7 @@ public abstract class Servant extends AttachmentEntity {
      */
     public int getOrder() {
         AttachmentEntityType<?> entityType = getType();
-        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = owner.getData(AttachmentRegister.EntityData).getGroups().get(EntityData.Type.Servant);
+        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = owner.getData(ServantryAttachmentRegister.EntityData).getGroups().get(EntityData.Type.Servant);
         List<AttachmentEntity> list = inner != null ? inner.get(entityType) : null;
         if (list != null) {
             int order = 0;
@@ -152,7 +158,7 @@ public abstract class Servant extends AttachmentEntity {
      * 获取目标仆从在其 AttachmentEntityType 分组中的未移除数量
      */
     public int getSameSize() {
-        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = owner.getData(AttachmentRegister.EntityData).getGroups().get(EntityData.Type.Servant);
+        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = owner.getData(ServantryAttachmentRegister.EntityData).getGroups().get(EntityData.Type.Servant);
         List<AttachmentEntity> list = inner != null ? inner.get(getType()) : null;
         int count = 0;
         if (list != null) {

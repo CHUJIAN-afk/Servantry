@@ -10,7 +10,7 @@ import net.minecraft.util.FastColor;
 import org.joml.Matrix4f;
 
 /**
- * 球体渲染器（链式 Builder）。
+ * 球体渲染器（链式 ServantWeaponItemBuilder）。
  * <p>
  * 以 PoseStack 原点为球心绘制多层同心球壳，通过 <b>alpha 梯度叠加</b>实现体积发光感：
  * 内层小而实（高 alpha，构成锐利核心），外层大而散（低 alpha，构成泛光边缘）。
@@ -51,7 +51,7 @@ public class SphereRenderer {
     }
 
     /**
-     * 创建 Builder 实例。
+     * 创建 ServantWeaponItemBuilder 实例。
      */
     public static SphereRenderer builder() {
         return new SphereRenderer();

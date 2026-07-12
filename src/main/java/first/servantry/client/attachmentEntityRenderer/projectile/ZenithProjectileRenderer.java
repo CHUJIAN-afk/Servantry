@@ -6,10 +6,10 @@ import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
+import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.PathNode;
-import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.ZenithProjectile;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -76,6 +76,6 @@ public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Z
                         .emit();
             }
         }
-        ModelRenderer.renderModel(ModelRegister.TERRAPRISM, poseStack, bufferSource);
+        ModelRenderer.renderModel(ServantryModelRegister.TERRAPRISM, poseStack, bufferSource);
     }
 }

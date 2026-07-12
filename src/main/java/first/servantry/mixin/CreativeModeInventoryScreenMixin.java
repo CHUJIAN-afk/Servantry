@@ -1,6 +1,6 @@
 package first.servantry.mixin;
 
-import first.servantry.register.CreativeTabRegister;
+import first.servantry.register.ServantryCreativeTabRegister;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.world.item.CreativeModeTab;
@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CreativeModeInventoryScreen.class)
-
 public class CreativeModeInventoryScreenMixin {
 
     @Shadow
@@ -29,9 +28,9 @@ public class CreativeModeInventoryScreenMixin {
             )
     )
     private void simulated$render(final GuiGraphics guiGraphics, final int mouseX, final int mouseY, final float partialTick, final CallbackInfo ci) {
-        if (selectedTab == CreativeTabRegister.Tab.get()) {
+        if (selectedTab == ServantryCreativeTabRegister.Tab.get()) {
             CreativeModeInventoryScreen screen = (CreativeModeInventoryScreen) (Object) this;
-            CreativeTabRegister.renderBanners(screen, guiGraphics, mouseX, mouseY, scrollOffs);
+            ServantryCreativeTabRegister.renderBanners(screen, guiGraphics, mouseX, mouseY, scrollOffs);
         }
     }
 }

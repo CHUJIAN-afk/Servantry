@@ -5,10 +5,10 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.common.projectile.CrossbowBoltProjectile;
-import first.servantry.register.ArmorSetRegister;
-import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.MobEffectRegister;
-import first.servantry.register.SoundRegister;
+import first.servantry.register.ServantryArmorSetRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
+import first.servantry.register.ServantryMobEffectRegister;
+import first.servantry.register.ServantrySoundRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -47,11 +47,11 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
                 aiming++;
                 if (cooldown < 0 && aiming > 10) {
                     cooldown = 53;
-                    boolean full = ArmorSetRegister.ValhallaKnight.value().full(owner);
+                    boolean full = ServantryArmorSetRegister.ValhallaKnight.value().full(owner);
                     if (full) {
                         cooldown -= 20;
                     }
-                    boolean hasEffect = owner.hasEffect(MobEffectRegister.BallistaPanicked);
+                    boolean hasEffect = owner.hasEffect(ServantryMobEffectRegister.BallistaPanicked);
                     if (hasEffect) {
                         cooldown -= 13;
                     }
@@ -83,6 +83,11 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
         level = buf.readInt();
     }
 
+    @Override
+    public void dimensionChange() {
+        setRemove();
+    }
+
     public int getLevel() {
         return level;
     }
@@ -96,19 +101,19 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
         Vec3 pos = getPos();
         CrossbowBoltProjectile projectile = new CrossbowBoltProjectile(getDamageSource(), pos, direction);
         projectile.copyDamageData(this);
-        if (ArmorSetRegister.ValhallaKnight.value().full(owner)) {
+        if (ServantryArmorSetRegister.ValhallaKnight.value().full(owner)) {
             projectile.setMaxPierceCount(6);
             projectile.setDamage(projectile.getDamage() * 1.33f);
             direction = direction.scale(1.33f);
         }
         projectile.setVelocity(direction.scale(2));
         projectile.join(owner);
-        owner.level().playSound(null, pos.x(), pos.y(), pos.z(), SoundRegister.BallistaShot.get(), owner.getSoundSource());
+        owner.level().playSound(null, pos.x(), pos.y(), pos.z(), ServantrySoundRegister.BallistaShot.get(), owner.getSoundSource());
     }
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.Ballista.get();
+        return ServantryAttachmentEntityRegister.Ballista.get();
     }
 
     @Override

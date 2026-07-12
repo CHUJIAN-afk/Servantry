@@ -6,10 +6,10 @@ import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
+import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.PathNode;
-import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.servant.StardustCell;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -61,7 +61,7 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
                     .offset(0.25)
                     .emit();
         }
-        ModelRenderer.renderModel(ModelRegister.STARDUST_CELL, poseStack, bufferSource);
+        ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 
 }

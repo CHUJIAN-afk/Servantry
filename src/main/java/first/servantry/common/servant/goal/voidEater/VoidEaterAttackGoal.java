@@ -1,15 +1,15 @@
 package first.servantry.common.servant.goal.voidEater;
 
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.CustomLaserProjectile;
 import first.servantry.common.projectile.GodFlameProjectile;
 import first.servantry.common.servant.VoidEater;
-import first.servantry.register.SoundRegister;
+import first.servantry.register.ServantrySoundRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -89,7 +89,7 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
                 double dot = servant.getLookAngle().dot(targetPos.subtract(servant.getPos()).normalize());
                 if (dot > 0 && Math.acos((float) Math.min(1, dot)) < Mth.DEG_TO_RAD * 30) {
                     Vec3 start = servant.getPos();
-                    owner.level().playSound(null, start.x(), start.y(), start.z(), SoundRegister.Laser.get(), owner.getSoundSource());
+                    owner.level().playSound(null, start.x(), start.y(), start.z(), ServantrySoundRegister.Laser.get(), owner.getSoundSource());
                     for (int i = 0; i < 9; i++) {
                         Vec3 direction = targetPos.offsetRandom(owner.getRandom(), 2f).subtract(servant.getPos()).normalize();
                         GodFlameProjectile projectile = new GodFlameProjectile(servant.getDamageSource(), start, direction.scale(3));

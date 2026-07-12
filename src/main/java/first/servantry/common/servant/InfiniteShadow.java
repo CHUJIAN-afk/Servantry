@@ -6,7 +6,7 @@ import com.mojang.authlib.GameProfile;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.servant.Servant;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
@@ -117,7 +117,7 @@ public class InfiniteShadow extends Terraprism {
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return AttachmentEntityRegister.InfiniteShadow.get();
+        return ServantryAttachmentEntityRegister.InfiniteShadow.get();
     }
 
     public static class InfiniteShadowFakePlayer extends FakePlayer {

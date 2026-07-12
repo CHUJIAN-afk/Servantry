@@ -35,7 +35,7 @@ public class RenderContext<T extends AttachmentEntity> {
         this.model = model;
     }
 
-    /** 创建 Builder 实例 */
+    /** 创建 ServantWeaponItemBuilder 实例 */
     public static <T extends AttachmentEntity> Builder<T> builder() {
         return new Builder<>();
     }
@@ -73,7 +73,7 @@ public class RenderContext<T extends AttachmentEntity> {
         float getBoost(T entity, float progress);
     }
 
-    // ===================== Builder =====================
+    // ===================== ServantWeaponItemBuilder =====================
 
     /** 视觉节点计算函数 */
     @FunctionalInterface

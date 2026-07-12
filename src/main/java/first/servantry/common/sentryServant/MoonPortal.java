@@ -1,16 +1,16 @@
 package first.servantry.common.sentryServant;
 
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.CustomLaserProjectile;
-import first.servantry.register.AttachmentEntityRegister;
-import first.servantry.register.MobEffectRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
+import first.servantry.register.ServantryMobEffectRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -139,7 +139,7 @@ public class MoonPortal extends Servant {
                             .damageSource(source)
                             .damageAmount(getDamage())
                             .invincibleTime(3)
-                            .effect(new MobEffectInstance(MobEffectRegister.MoonBite, 60))
+                            .effect(new MobEffectInstance(ServantryMobEffectRegister.MoonBite, 60))
                             .apply();
                     Vec3 hitPoint = living.getBoundingBox()
                             .getCenter();
@@ -172,6 +172,11 @@ public class MoonPortal extends Servant {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.MoonPortal.get();
+        return ServantryAttachmentEntityRegister.MoonPortal.get();
+    }
+
+    @Override
+    public void dimensionChange() {
+        setRemove();
     }
 }

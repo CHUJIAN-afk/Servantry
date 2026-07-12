@@ -2,14 +2,14 @@ package first.servantry.common.projectile;
 
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.common.particle.GenericParticleBuilder;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.damagesource.DamageSource;
@@ -95,6 +95,6 @@ public class RainbowCrystalProjectile extends Projectile {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.RainbowCrystalProjectile.get();
+        return ServantryAttachmentEntityRegister.RainbowCrystalProjectile.get();
     }
 }

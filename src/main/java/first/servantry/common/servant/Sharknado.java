@@ -1,15 +1,15 @@
 package first.servantry.common.servant;
 
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.common.particle.GenericParticleBuilder;
 import first.servantry.common.projectile.SharkDragonProjectile;
 import first.servantry.common.servant.goal.sharknado.SharknadoAttackGoal;
 import first.servantry.common.servant.goal.sharknado.SharknadoIdleGoal;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -89,7 +89,7 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
 
     @Override
     public AttachmentEntityType<Sharknado> getType() {
-        return AttachmentEntityRegister.Sharknado.get();
+        return ServantryAttachmentEntityRegister.Sharknado.get();
     }
 
     // ===================== ICollideAttack 实现 =====================

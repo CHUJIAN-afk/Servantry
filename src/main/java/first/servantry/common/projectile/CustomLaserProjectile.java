@@ -7,7 +7,7 @@ import first.servantry.api.entity.PathNode;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -100,7 +100,7 @@ public class CustomLaserProjectile extends Projectile implements ICollideAttack<
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.CustomLaserProjectile.get();
+        return ServantryAttachmentEntityRegister.CustomLaserProjectile.get();
     }
 
     @Override

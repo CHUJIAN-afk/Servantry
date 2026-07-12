@@ -1,7 +1,7 @@
 package first.servantry.dataGenerator.provider;
 
 import first.servantry.Servantry;
-import first.servantry.api.item.IServantWeapon;
+import first.servantry.api.item.IServantWeaponItem;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -29,7 +29,7 @@ public class ServantryItemModelProvider extends ItemModelProvider {
                         return;
                     }
                     switch (item) {
-                        case IServantWeapon<?> ignored -> handheldItem(item);
+                        case IServantWeaponItem<?> ignored -> handheldItem(item);
                         default -> basicItem(item);
                     }
                 });

@@ -2,7 +2,7 @@ package first.servantry.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import first.servantry.register.CreativeTabRegister;
+import first.servantry.register.ServantryCreativeTabRegister;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,11 +21,11 @@ public class CreativeModeTabMixin {
 
     @WrapMethod(method = "buildContents")
     private void simulated$buildContents(CreativeModeTab.ItemDisplayParameters parameters, Operation<Void> original) {
-        final CreativeModeTab self = (CreativeModeTab) (Object) this;
-        if (self == CreativeTabRegister.Tab.get()) {
-            final List<ItemStack> displayItems = new LinkedList<>();
-            final Set<ItemStack> searchItems = new LinkedHashSet<>();
-            CreativeTabRegister.processItems(displayItems::add, searchItems::add);
+        CreativeModeTab tab = (CreativeModeTab) (Object) this;
+        if (tab == ServantryCreativeTabRegister.Tab.get()) {
+            List<ItemStack> displayItems = new LinkedList<>();
+            Set<ItemStack> searchItems = new LinkedHashSet<>();
+            ServantryCreativeTabRegister.processItems(displayItems::add, searchItems::add);
             this.displayItems = displayItems;
             this.displayItemsSearchTab = searchItems;
             return;

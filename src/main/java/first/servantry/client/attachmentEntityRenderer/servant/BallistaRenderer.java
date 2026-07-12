@@ -7,7 +7,7 @@ import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.sentryServant.Ballista;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class BallistaRenderer extends AbstractAttachmentEntityRenderer<Ballista> {
@@ -24,6 +24,6 @@ public class BallistaRenderer extends AbstractAttachmentEntityRenderer<Ballista>
 
     @Override
     protected void renderEntity(Ballista entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Ballista> config) {
-        ModelRenderer.renderModel(ModelRegister.BALLISTA, poseStack, bufferSource);
+        ModelRenderer.renderModel(ServantryModelRegister.BALLISTA, poseStack, bufferSource);
     }
 }

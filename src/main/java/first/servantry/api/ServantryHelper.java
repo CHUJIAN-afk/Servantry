@@ -4,8 +4,8 @@ import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.servant.Servant;
-import first.servantry.register.AttachmentRegister;
-import first.servantry.register.AttributeRegister;
+import first.servantry.register.ServantryAttachmentRegister;
+import first.servantry.register.ServantryAttributeRegister;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 
@@ -19,7 +19,7 @@ public final class ServantryHelper {
 
     private ServantryHelper(Player player) {
         this.player = player;
-        this.entityData = player.getData(AttachmentRegister.EntityData);
+        this.entityData = player.getData(ServantryAttachmentRegister.EntityData);
     }
 
     public static ServantryHelper get(Player player) {
@@ -27,7 +27,7 @@ public final class ServantryHelper {
     }
 
     public TargetCache getTargetCache(){
-        return player.getData(AttachmentRegister.TargetCache);
+        return player.getData(ServantryAttachmentRegister.TargetCache);
     }
 
     public EntityData getEntityData() {
@@ -45,11 +45,11 @@ public final class ServantryHelper {
     public int getMaxCount(EntityData.Type type) {
         return switch (type) {
             case Servant -> {
-                AttributeInstance attributeInstance = player.getAttribute(AttributeRegister.ServantMaxCount);
+                AttributeInstance attributeInstance = player.getAttribute(ServantryAttributeRegister.ServantMaxCount);
                 yield attributeInstance != null ? (int) attributeInstance.getValue() : 0;
             }
             case SentryServant -> {
-                AttributeInstance attributeInstance = player.getAttribute(AttributeRegister.SentryServantMaxCount);
+                AttributeInstance attributeInstance = player.getAttribute(ServantryAttributeRegister.SentryServantMaxCount);
                 yield attributeInstance != null ? (int) attributeInstance.getValue() : 0;
             }
             default -> 0;

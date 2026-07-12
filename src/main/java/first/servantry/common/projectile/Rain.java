@@ -5,7 +5,7 @@ import first.servantry.api.entity.*;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -30,7 +30,7 @@ public class Rain extends Projectile implements IBlockCollision<Rain>, ICollideA
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.Rain.get();
+        return ServantryAttachmentEntityRegister.Rain.get();
     }
 
     @Override

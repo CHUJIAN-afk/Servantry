@@ -9,7 +9,7 @@ import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.Terraprism;
-import first.servantry.register.ModelRegister;
+import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
@@ -54,6 +54,6 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
     protected void renderEntity(Terraprism terraprism, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Terraprism> config) {
         int mColorRGB = terraprism.getColor(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true));
         int mr = (mColorRGB >> 16) & 0xFF, mg = (mColorRGB >> 8) & 0xFF, mb = mColorRGB & 0xFF;
-        ModelRenderer.renderModel(ModelRegister.TERRAPRISM, poseStack, type -> new TintedVertexConsumer(bufferSource.getBuffer(type), mr, mg, mb, 255));
+        ModelRenderer.renderModel(ServantryModelRegister.TERRAPRISM, poseStack, type -> new TintedVertexConsumer(bufferSource.getBuffer(type), mr, mg, mb, 255));
     }
 }

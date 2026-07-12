@@ -4,13 +4,11 @@
   "package": "first.servantry.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ClientEventMixin",
     "CombatRulesMixin",
     "CreativeModeTabMixin",
     "DamageSourceMixin",
     "DamageSourcesMixin",
     "LivingEntityMixin",
-    "MobEffectInstanceAccessor",
     "PlayerMixin"
   ],
   "injectors": {

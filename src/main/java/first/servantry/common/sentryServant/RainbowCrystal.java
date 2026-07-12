@@ -5,7 +5,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.common.projectile.RainbowCrystalProjectile;
-import first.servantry.register.AttachmentEntityRegister;
+import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.EasingCurve;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -66,6 +66,11 @@ public class RainbowCrystal extends Servant {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return AttachmentEntityRegister.RainbowCrystal.get();
+        return ServantryAttachmentEntityRegister.RainbowCrystal.get();
+    }
+
+    @Override
+    public void dimensionChange() {
+        setRemove();
     }
 }
