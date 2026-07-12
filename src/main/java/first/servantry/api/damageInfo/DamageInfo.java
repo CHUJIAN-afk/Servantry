@@ -183,9 +183,9 @@ public class DamageInfo {
         int b = baseColor & 0xFF;
 
         // 亮度叠加：向 255 方向提亮
-        r = Mth.lerpInt(weight, r, Math.min(255, (int) (r * 1.3f)));
-        g = Mth.lerpInt(weight, g, Math.min(255, (int) (g * 1.3f)));
-        b = Mth.lerpInt(weight, b, Math.min(255, (int) (b * 1.3f)));
+        r = Mth.lerpInt(weight, r, Math.min(255, (int) (r * 1.5f)));
+        g = Mth.lerpInt(weight, g, Math.min(255, (int) (g * 1.5f)));
+        b = Mth.lerpInt(weight, b, Math.min(255, (int) (b * 1.5f)));
 
         // 透明度：缓动淡入淡出
         float easedProgress = EasingCurve.EASE_IN_OUT_QUAD.apply(progress);
@@ -210,7 +210,7 @@ public class DamageInfo {
         float progress = Mth.lerp(partialTick, lastLife, life) / style.maxLife();
         progress = EasingCurve.EASE_IN_OUT_QUAD.apply(progress);
         if (progress < 0.1) {
-            return Mth.lerp(progress / 0.1f, 0.5f, 1.0f);
+            return Mth.lerp(Math.min(progress / 0.05f, 1), 0.5f, 1.0f);
         }
         if (progress > 0.9f) {
             return Mth.lerp((progress - 0.9f) / 0.1f, 1.0f, 0.0f);
