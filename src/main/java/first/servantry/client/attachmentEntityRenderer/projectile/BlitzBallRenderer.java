@@ -3,7 +3,7 @@ package first.servantry.client.attachmentEntityRenderer.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
-import first.servantry.api.client.render.laser.LightningRenderer;
+import first.servantry.api.client.render.renderer.LightningRenderer;
 import first.servantry.api.client.render.sphere.SphereRenderer;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.BlitzBall;

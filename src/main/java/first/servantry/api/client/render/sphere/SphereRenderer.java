@@ -2,6 +2,7 @@ package first.servantry.api.client.render.sphere;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import first.servantry.api.client.render.renderer.LaserRenderer;
 import first.servantry.api.client.renderType.TrailRenderType;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -14,7 +15,7 @@ import org.joml.Matrix4f;
  * <p>
  * 以 PoseStack 原点为球心绘制多层同心球壳，通过 <b>alpha 梯度叠加</b>实现体积发光感：
  * 内层小而实（高 alpha，构成锐利核心），外层大而散（低 alpha，构成泛光边缘）。
- * 多层标准半透明叠加即得到“实心核心 + 散开边缘”的视觉，思路与 {@link first.servantry.api.client.render.laser.LaserRenderer}
+ * 多层标准半透明叠加即得到“实心核心 + 散开边缘”的视觉，思路与 {@link LaserRenderer}
  * 一致，仅几何由圆柱改为球面。
  * </p>
  * <p>

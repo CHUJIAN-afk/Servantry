@@ -1,4 +1,4 @@
-package first.servantry.api.client.render.laser;
+package first.servantry.api.client.render.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
