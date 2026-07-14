@@ -37,6 +37,8 @@ public class ServantryCurioRegister {
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                     .build())
             .itemLanguage("Pygmy Necklace", "矮人项链")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 大力士甲虫 - 仆从栏+1，仆从击退+50%
@@ -52,6 +54,8 @@ public class ServantryCurioRegister {
                     .properties(properties -> properties.rarity(Rarity.RARE))
                     .build())
             .itemLanguage("Hercules Beetle", "大力士甲虫")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 学徒围巾 - 仆从数量+1，召唤伤害+10%
@@ -66,6 +70,8 @@ public class ServantryCurioRegister {
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                     .build())
             .itemLanguage("Apprentice's Scarf", "学徒围巾")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 女猎人圆盾 - 护甲+2，仆从数量+1
@@ -80,6 +86,8 @@ public class ServantryCurioRegister {
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                     .build())
             .itemLanguage("Huntress's Buckler", "女猎人圆盾")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 武僧腰带 - 召唤伤害+10%，仆从击退+50%
@@ -93,6 +101,8 @@ public class ServantryCurioRegister {
                     })
                     .build())
             .itemLanguage("Monk's Belt", "武僧腰带")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 侍卫护盾 - 护甲+2，召唤伤害+10%
@@ -107,6 +117,8 @@ public class ServantryCurioRegister {
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                     .build())
             .itemLanguage("Squire's Shield", "侍卫护盾")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 召唤师徽章 - 召唤伤害+15%
@@ -120,6 +132,8 @@ public class ServantryCurioRegister {
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                     .build())
             .itemLanguage("Summoner Emblem", "召唤师徽章")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 始源暗影焰
@@ -135,6 +149,8 @@ public class ServantryCurioRegister {
                     .build())
             .itemLanguage("Primordial Shadowflame", "始源暗影焰")
             .itemLanguageTooltip(1, "Servants inflict shadowflame on attack", "仆从攻击施加暗影焰")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 死灵卷轴 - 仆从栏+1，仆从伤害+10%
@@ -149,6 +165,8 @@ public class ServantryCurioRegister {
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                     .build())
             .itemLanguage("Necromantic Scroll", "死灵卷轴")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 威胁分析仪 - 加大仆从的索敌半径
@@ -162,6 +180,8 @@ public class ServantryCurioRegister {
                     .properties(properties -> properties.rarity(Rarity.EPIC))
                     .build())
             .itemLanguage("Threat Analyzer", "威胁分析仪")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 甲虫莎草纸 - 仆从栏+2，仆从伤害+15%，仆从击退+50%
@@ -182,6 +202,8 @@ public class ServantryCurioRegister {
                     .result(ServantryCurioRegister.PapyrusScarab)
                     .save(output))
             .itemLanguage("Papyrus Scarab", "甲虫莎草纸")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 万花筒
@@ -197,6 +219,8 @@ public class ServantryCurioRegister {
                     .build())
             .itemLanguage("Kaleidoscope", "万花筒")
             .itemLanguageTooltip(1, "Servant attacks have a 10% chance to critically strike", "仆从攻击时有 10% 概率造成暴击")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 灵魂浮雕 - 仆从攻击后随机获得灵魂增益（下位互斥）
@@ -219,6 +243,8 @@ public class ServantryCurioRegister {
             .itemLanguageTooltip(2, "Soul Might: +8% Servant Damage", "灵魂力量：+8% 仆从伤害")
             .itemLanguageTooltip(3, "Soul Defense: +2 Armor", "灵魂防御：+2 护甲")
             .itemLanguageTooltip(4, "Soul Recovery: +0.05 Regeneration", "灵魂恢复：+0.05 生命再生")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 神圣符文 - 仆从攻击后随机获得神圣增益（中位互斥）
@@ -242,6 +268,8 @@ public class ServantryCurioRegister {
             .itemLanguageTooltip(3, "Hallowed Might: +16% Servant Damage", "神圣之力：+16% 仆从伤害")
             .itemLanguageTooltip(4, "Hallowed Grace: +4 Armor", "神圣之佑：+4 护甲")
             .itemLanguageTooltip(5, "Hallowed Radiance: +0.1 Regeneration", "神圣之辉：+0.1 生命再生")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 幻魂神物 - 仆从攻击后随机获得幻魂增益（上位）
@@ -263,6 +291,8 @@ public class ServantryCurioRegister {
             .itemLanguageTooltip(3, "Phantasmal Might: +32% Servant Damage", "幻魂之力：+32% 仆从伤害")
             .itemLanguageTooltip(4, "Phantasmal Bulwark: +8 Armor", "幻魂坚盾：+8 护甲")
             .itemLanguageTooltip(5, "Phantasmal Rebirth: +0.2 Regeneration", "幻魂还生：+0.2 生命再生")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 猎魂徽记
@@ -276,6 +306,8 @@ public class ServantryCurioRegister {
                     .properties(properties -> properties.rarity(Rarity.EPIC))
                     .build())
             .itemLanguage("Hunt Soul Emblem", "猎魂徽记")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 蚀日尊戒
@@ -296,6 +328,8 @@ public class ServantryCurioRegister {
                     .build())
             .itemLanguage("Eclipse Ring", "蚀日尊戒")
             .itemLanguageTooltip(1, "Contains the power of the solar eclipse", "蕴含着日蚀之阴的力量")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     /**
      * 星尘碎片 - 仆从攻击时5%概率产生星尘细胞射弹
@@ -318,6 +352,8 @@ public class ServantryCurioRegister {
                     .build())
             .itemLanguage("MiniStardustCell Fragment", "星尘碎片")
             .itemLanguageTooltip(1, "Servant hits have a 5% chance to release a MiniStardustCell Cell", "仆从攻击时有 5% 概率释放星尘细胞")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
             .build();
     public static void register() {
     }

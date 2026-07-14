@@ -3,16 +3,21 @@ package first.servantry.register;
 import first.servantry.Servantry;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
+import first.servantry.dataGenerator.provider.ServantryItemModelProvider;
+import first.servantry.dataGenerator.provider.ServantryItemTagsProvider;
 import first.servantry.dataGenerator.provider.ServantryRecipeProvider;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.ArrayList;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -36,12 +41,16 @@ public class ServantryItemRegisterBuilder<T extends Item> {
     }
 
     public ServantryItemRegisterBuilder<T> recipe(Consumer<RecipeOutput> outputConsumer) {
-        ServantryRecipeProvider.RecipeGenerate.add(outputConsumer);
+        if (!FMLLoader.isProduction()) {
+            ServantryRecipeProvider.RecipeGenerate.add(outputConsumer);
+        }
         return this;
     }
 
     public ServantryItemRegisterBuilder<T> language(String key, String enDesc, String zhDesc) {
-        ServantryLanguageGenerateRegister.entry(key, enDesc, zhDesc);
+        if (!FMLLoader.isProduction()) {
+            ServantryLanguageGenerateRegister.entry(key, enDesc, zhDesc);
+        }
         return this;
     }
 
@@ -67,6 +76,29 @@ public class ServantryItemRegisterBuilder<T extends Item> {
             return language("block." + id.getNamespace() + "." + id.getPath(), en, zh);
         }
         return this;
+    }
+
+    public ServantryItemRegisterBuilder<T> itemTag(TagKey<Item> tagKey) {
+        if (!FMLLoader.isProduction()) {
+            ServantryItemTagsProvider.ItemTagsGenerate.computeIfAbsent(tagKey, key -> new ArrayList<>())
+                    .add(register);
+        }
+        return this;
+    }
+
+    public ServantryItemRegisterBuilder<T> itemModel(BiConsumer<ResourceLocation, ServantryItemModelProvider> consumer) {
+        if (!FMLLoader.isProduction()) {
+            ServantryItemModelProvider.ItemModelGenerate.put(register.getId(), consumer);
+        }
+        return this;
+    }
+
+    public static void basicModel(ResourceLocation location, ServantryItemModelProvider provider) {
+        provider.basicItem(location);
+    }
+
+    public static void handheldItem(ResourceLocation location, ServantryItemModelProvider provider) {
+        provider.handheldItem(location);
     }
 
     public <A extends AttachmentEntity> ServantryItemRegisterBuilder<T> servantLanguage(DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<A>> holder, String en, String zh) {

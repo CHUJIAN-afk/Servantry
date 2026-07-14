@@ -47,6 +47,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Survey Drone Remote", "矿勘无人机遥控器")
                     .servantLanguage(ServantryAttachmentEntityRegister.OreScout, "Survey Drone", "矿勘无人机")
                     .itemLanguageTooltip(1, "Summons up to 1 Survey Drone", "最多召唤1架矿勘无人机")
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 妖精铃铛
@@ -72,6 +74,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Fairy Bell", "妖精铃铛")
                     .servantLanguage(ServantryAttachmentEntityRegister.ScavengerFairy, "Scavenger Fairy", "拾荒妖精")
                     .itemLanguageTooltip(1, "Summons up to 1 Scavenger Fairy", "最多召唤1只拾荒妖精")
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 刃杖 - 召唤附魔飞刀群
@@ -101,6 +105,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Blade Staff", "刃杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.EnchantedThrowingKnives, "Enchanted Throwing Knives", "附魔飞刀")
                     .itemLanguageTooltip(1, "Don't let their small size fool you", "别被它们小小的个头给骗了")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 雨云法杖
@@ -124,6 +130,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Rain Cloud Staff", "雨云法杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.Cloud, "Rain Cloud", "雨云")
                     .itemLanguageTooltip(1, "Summons a cloud to rain down on your foes", "召唤云朵来向敌人降下大雨")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 魔眼法杖 - 召唤双子魔眼
@@ -163,6 +171,8 @@ public class ServantryServantWeaponRegister {
                             .save(output))
                     .itemLanguage("Optic Staff", "魔眼法杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.Twins, "Twins", "双子魔眼")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 致命球法杖 - 召唤致命球仆从
@@ -176,6 +186,8 @@ public class ServantryServantWeaponRegister {
                             .build())
                     .itemLanguage("Deadly Sphere Staff", "致命球法杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.DeadlySphere, "Deadly Sphere", "致命球")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 脉冲炮塔遥控装置
@@ -200,6 +212,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Pulse Turret Remote", "脉冲炮塔遥控装置")
                     .servantLanguage(ServantryAttachmentEntityRegister.PulseTurret, "Pulse Turret", "脉冲炮塔")
                     .itemLanguageTooltip(1, "At most one pulse turret can exist at a time", "最多召唤一个脉冲炮塔")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 暴风雨法杖 - 召唤鲨鱼龙卷
@@ -213,6 +227,8 @@ public class ServantryServantWeaponRegister {
                             .build())
                     .itemLanguage("Tempest Staff", "暴风雨法杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.Sharknado, "Sharknado", "鲨鱼龙卷")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 泰拉棱镜 - 召唤泰拉棱镜仆从
@@ -235,6 +251,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Terraprism", "泰拉棱镜")
                     .servantLanguage(ServantryAttachmentEntityRegister.TerraPrism, "Terraprism", "泰拉棱镜")
                     .itemLanguageTooltip(1, "A flawless blade once hailed as the Prism of the Earth", "曾被冠以大地棱彩美名的无暇之剑")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 弩车魔杖
@@ -258,6 +276,8 @@ public class ServantryServantWeaponRegister {
                             .build())
                     .itemLanguage("Ballista Rod", "弩车魔杖")
                     .itemLanguageTooltip(1, "A slow but high damage tower that shoots piercing bolts", "速度缓慢但伤害力极高的防御塔，可以射出穿透性箭矢")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 弩车手杖
@@ -281,6 +301,8 @@ public class ServantryServantWeaponRegister {
                             .build())
                     .itemLanguage("Ballista Cane", "弩车手杖")
                     .itemLanguageTooltip(1, "A slow but high damage tower that shoots piercing bolts", "速度缓慢但伤害力极高的防御塔，可以射出穿透性箭矢")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 弩车法杖
@@ -305,6 +327,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Ballista Staff", "弩车法杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.Ballista, "Ballista", "弩车")
                     .itemLanguageTooltip(1, "A slow but high damage tower that shoots piercing bolts", "速度缓慢但伤害力极高的防御塔，可以射出穿透性箭矢")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 缥缈星核法杖 - 召唤缥缈星核仆从
@@ -331,6 +355,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Ethereal Stellar Core Staff", "缥缈星核法杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.EtherealStellarCore, "Ethereal Stellar Core", "缥缈星核")
                     .itemLanguageTooltip(1, "Summons up to 9 Ethereal Stellar Cores", "最多召唤9个缥缈星核")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 星尘细胞杖 - 召唤星尘细胞仆从
@@ -349,6 +375,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("MiniStardustCell Cell Staff", "星尘细胞法杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.StardustCell, "MiniStardustCell Cell", "星尘细胞")
                     .itemLanguageTooltip(1, "Cultivate the most beautiful cellular infection", "培养最美丽的细胞感染")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 星尘龙杖 - 召唤星尘龙（多体节仆从）
@@ -399,6 +427,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("MiniStardustCell Dragon Staff", "星尘之龙法杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.StardustDragon, "MiniStardustCell Dragon", "星尘之龙")
                     .itemLanguageTooltip(1, "When you have a dragon, who needs a swarm?", "有了一条巨龙后，谁还需要一群仆从呢？")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 月亮传送门法杖
@@ -421,6 +451,8 @@ public class ServantryServantWeaponRegister {
                             .build())
                     .itemLanguage("Moon Portal Staff", "月亮传送门法杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.MoonPortal, "Moon Portal", "月亮传送门")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 七彩水晶法杖
@@ -444,6 +476,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Rainbow Crystal Staff", "七彩水晶法杖")
                     .servantLanguage(ServantryAttachmentEntityRegister.RainbowCrystal, "Rainbow Crystal", "七彩水晶")
                     .itemLanguageTooltip(1, "'The colors, Duke, the colors!'", "“公爵，多么缤纷的颜色！”")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 无限剑鞘
@@ -468,6 +502,8 @@ public class ServantryServantWeaponRegister {
                     .servantLanguage(ServantryAttachmentEntityRegister.InfiniteShadow, "Infinite Shadow", "无限之影")
                     .itemLanguageTooltip(1, "A scabbard that stores a blade of infinite potential", "蕴含无限可能之'剑'的剑鞘")
                     .itemLanguageTooltip(2, "Right-click an item to store, right-click an empty slot to retrieve", "右键物品存入，右键空格子取出")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 虚空吞噬者傀具
@@ -515,6 +551,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguageTooltip(1, "Contains the power to command miniature devourers", "蕴含掌控小型吞噬者的力量")
                     .itemLanguageTooltip(2, "The devourer uses the God Eater, Holy Incineration and Cosmic Maelstrom to attack", "吞噬者会使用噬神者，焚灭虔信之火和超宇宙狂涡攻击")
                     .itemLanguageTooltip(3, "While the devourer is present, all your attacks unleash God-Slaying Fury", "吞噬者在场时，你的所有攻击都会释放弑神怒焰")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
      * 雷云盆栽
@@ -539,6 +577,8 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Thundercloud Bonsai", "雷云盆栽")
                     .servantLanguage(ServantryAttachmentEntityRegister.SuperPeashooter, "Super Peashooter", "超级电能豌豆射手")
                     .itemLanguageTooltip(1, "Fires seven lightning balls at once, with a chance to fire a large number of scattered lightning balls at once", "一次发射七颗雷电球，有概率一次发射大量散射雷电球")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
 
     public static void register() {

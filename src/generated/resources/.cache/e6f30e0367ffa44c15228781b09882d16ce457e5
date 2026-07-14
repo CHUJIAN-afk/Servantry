@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-05T16:26:17.1886036	Item Models: servantry
+// 1.21.1	2026-07-14T17:11:34.3184487	Item Models: servantry
 d882c3a8d9d37b2217246221442c70da01b9ad66 assets/servantry/models/item/adamantite_ingot.json
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 1234a813c7da2a7cf22f8be7f86b6fd620074edc assets/servantry/models/item/ballista_cane.json
@@ -19,7 +19,7 @@ b7775d0c442951314368f5bd5eee94026fea0e85 assets/servantry/models/item/chlorophyt
 b6b116a53f2e376bf8551a4e870649901a95e8c4 assets/servantry/models/item/deadly_sphere_staff.json
 dc0a6e5413f68e538e253711659e4b377ac7fdb3 assets/servantry/models/item/eclipse_ring.json
 c8da49f0fd8ba0680c7b652f0f1a44522fbb39fd assets/servantry/models/item/ethereal_stellar_core_staff.json
-15fc10935aafeda458eea5a155401972e88c0a51 assets/servantry/models/item/fairy_bell.json
+e6653e19e1c5a194caf2b6d9e418c257fee47e38 assets/servantry/models/item/fairy_bell.json
 d082c820ba882bc343efb6ede305d956b9a77b6d assets/servantry/models/item/flinx_fur_coat.json
 3d6acfccd46ff3d7cdcb01db66aa82dba5cfb800 assets/servantry/models/item/forbidden_boots.json
 06b18239770eb894b02f7b7b16494554c1e0caf1 assets/servantry/models/item/forbidden_fragment.json
@@ -75,7 +75,7 @@ fafda36d2c091f80bb68451f3a2cd0339fec7e6c assets/servantry/models/item/stardust_c
 6bf5ea272e592d6c7cedf638bc63b828d81726b4 assets/servantry/models/item/stardust_helmet.json
 b42ac889b9bba23a99b34416010feaf3af62e4e1 assets/servantry/models/item/stardust_leggings.json
 fc85c4b0542a6c73088ae615248411c1c4b65365 assets/servantry/models/item/summoner_emblem.json
-75c26fe45aa01e14741954f8e79b3d8025015ff7 assets/servantry/models/item/survey_drone_remote.json
+84110ad4a16fd3489debb83c470cf5a77d576a92 assets/servantry/models/item/survey_drone_remote.json
 efdbf40b0d7ab4fe5b19b9ac565caf03ed858cfb assets/servantry/models/item/tempest_staff.json
 15c8f22cc643d21501adcfe2badf319b0b3b5039 assets/servantry/models/item/terraprism.json
 5480b2988d2d54b7637ea32ca855c38b9f3cf08d assets/servantry/models/item/threat_analyzer.json
@@ -89,4 +89,4 @@ e61a8853ce7f299baa1d9224d4c0438eb40d6ebd assets/servantry/models/item/valhalla_k
 9f7b8dc26eb543a6370fc8f4eaf9b45ad0ad42c5 assets/servantry/models/item/valhalla_knight_helmet.json
 4d7e51a0681e02486a7b09d828240d96761977c8 assets/servantry/models/item/valhalla_knight_leggings.json
 ce4ff35209200f3a6d883bd019c73d3764e66397 assets/servantry/models/item/void_eater_marionette.json
-71edace9d3b267806170ddc60284cababa8714b4 assets/servantry/models/item/zenith.json
+bffaa8805ea95db84b61d674cd6ed8cbbdaaad32 assets/servantry/models/item/zenith.json

@@ -4,11 +4,13 @@ import first.servantry.Servantry;
 import first.servantry.api.builder.AttributeArmorItemBuilder;
 import first.servantry.client.creativeTab.AnimInfo;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.registries.DeferredItem;
 
 public class ServantryArmorRegister {
@@ -29,6 +31,11 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.FlinxFurCoat)
                             .save(output))
                     .itemLanguage("Flinx Fur Coat", "小雪怪皮毛外套")
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 蜜蜂头饰 - +4% 仆从伤害，+1 仆从栏
@@ -45,6 +52,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.BeeHeadgear)
                             .save(output))
                     .itemLanguage("Bee Headgear", "蜜蜂头饰")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 蜜蜂胸甲 - +4% 仆从伤害，+1 仆从栏
@@ -61,6 +72,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.BeeChestplate)
                             .save(output))
                     .itemLanguage("Bee Breastplate", "蜜蜂胸甲")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 蜜蜂护胫 - +5% 仆从伤害
@@ -76,6 +91,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.BeeLeggings)
                             .save(output))
                     .itemLanguage("Bee Leggings", "蜜蜂护胫")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 蜜蜂靴 - 套装奖励部分
@@ -90,6 +109,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.BeeBoots)
                             .save(output))
                     .itemLanguage("Bee Boots", "蜜蜂靴")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 黑曜石头盔 - +8% 仆从伤害
@@ -105,6 +128,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ObsidianHelmet)
                             .save(output))
                     .itemLanguage("Obsidian Helmet", "黑曜石逃犯帽")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 黑曜石胸甲 - +1 仆从栏
@@ -120,6 +147,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ObsidianChestplate)
                             .save(output))
                     .itemLanguage("Obsidian Chestplate", "黑曜石风衣")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 黑曜石护腿 - +8% 仆从伤害
@@ -135,6 +166,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ObsidianLeggings)
                             .save(output))
                     .itemLanguage("Obsidian Leggings", "黑曜石裤")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 黑曜石靴子 - +8% 移动速度
@@ -150,6 +185,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ObsidianBoots)
                             .save(output))
                     .itemLanguage("Obsidian Boots", "黑曜石靴")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 蜘蛛面具 - +5% 仆从伤害，+1 仆从栏
@@ -166,6 +205,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.SpiderMask)
                             .save(output))
                     .itemLanguage("Spider Mask", "蜘蛛面具")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 蜘蛛胸甲 - +5% 仆从伤害，+1 仆从栏
@@ -182,6 +225,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.SpiderChestplate)
                             .save(output))
                     .itemLanguage("Spider Breastplate", "蜘蛛胸甲")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 蜘蛛护胫 - +6% 仆从伤害，+1 仆从栏
@@ -198,6 +245,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.SpiderLeggings)
                             .save(output))
                     .itemLanguage("Spider Greaves", "蜘蛛护胫")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 蜘蛛靴
@@ -213,6 +264,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.SpiderBoots)
                             .save(output))
                     .itemLanguage("Spider Boots", "蜘蛛靴")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 禁戒面具 - +15% 召唤伤害
@@ -229,6 +284,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ForbiddenMask)
                             .save(output))
                     .itemLanguage("Forbidden Mask", "禁戒面具")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 禁戒长袍 - +10%召唤伤害，+1 仆从栏
@@ -246,6 +305,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ForbiddenRobe)
                             .save(output))
                     .itemLanguage("Forbidden Robe", "禁戒长袍")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 禁戒裤 - +1 仆从栏
@@ -262,6 +325,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ForbiddenLeggings)
                             .save(output))
                     .itemLanguage("Forbidden Leggings", "禁戒裤")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 禁戒靴
@@ -278,6 +345,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ForbiddenBoots)
                             .save(output))
                     .itemLanguage("Forbidden Boots", "禁戒战靴")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 神圣头盔
@@ -294,6 +365,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.HallowedHelmet)
                             .save(output))
                     .itemLanguage("Hallowed Helmet", "神圣兜帽")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 神圣胸甲 - +14% 仆从伤害
@@ -309,6 +384,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.HallowedChestplate)
                             .save(output))
                     .itemLanguage("Hallowed Chestplate", "神圣板甲")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 神圣护腿 - +7% 仆从伤害
@@ -324,6 +403,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.HallowedLeggings)
                             .save(output))
                     .itemLanguage("Hallowed Leggings", "神圣护胫")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 神圣靴子 - +8% 移动速度
@@ -339,6 +422,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.HallowedBoots)
                             .save(output))
                     .itemLanguage("Hallowed Boots", "神圣战靴")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 叶绿面具 - +1 召唤栏，+10% 仆从伤害
@@ -355,6 +442,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ChlorophyteHelmet)
                             .save(output))
                     .itemLanguage("Chlorophyte Mask", "叶绿面具")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 叶绿板甲 - +6% 仆从伤害
@@ -370,6 +461,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ChlorophyteChestplate)
                             .save(output))
                     .itemLanguage("Chlorophyte Breastplate", "叶绿板甲")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 叶绿护胫 - +4% 仆从伤害
@@ -385,6 +480,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ChlorophyteLeggings)
                             .save(output))
                     .itemLanguage("Chlorophyte Leggings", "叶绿护胫")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 叶绿战靴 - +2% 仆从伤害
@@ -400,6 +499,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.ChlorophyteBoots)
                             .save(output))
                     .itemLanguage("Chlorophyte Boots", "叶绿战靴")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 英灵殿骑士头盔 - +2 哨兵栏，+10% 仆从伤害，+10% 原版伤害
@@ -413,6 +516,10 @@ public class ServantryArmorRegister {
                             .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Valhalla Knight Helmet", "英灵殿骑士头盔")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 英灵殿骑士胸甲 - +30% 仆从伤害，+0.4 生命再生
@@ -425,6 +532,10 @@ public class ServantryArmorRegister {
                             .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Valhalla Knight Chestplate", "英灵殿骑士胸甲")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 英灵殿骑士护腿 - +20% 仆从伤害，+20% 原版伤害
@@ -437,6 +548,10 @@ public class ServantryArmorRegister {
                             .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Valhalla Knight Leggings", "英灵殿骑士护腿")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 英灵殿骑士战靴 - +20% 移动速度
@@ -448,6 +563,10 @@ public class ServantryArmorRegister {
                             .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Valhalla Knight Boots", "英灵殿骑士战靴")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 提基面具 - +1 召唤栏，+10% 仆从伤害
@@ -460,6 +579,10 @@ public class ServantryArmorRegister {
                             .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Tiki Mask", "提基面具")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 提基胸甲 - +10% 仆从伤害
@@ -472,6 +595,10 @@ public class ServantryArmorRegister {
                             .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Tiki Chestplate", "提基胸甲")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 提基护腿 - +7% 仆从伤害
@@ -483,6 +610,10 @@ public class ServantryArmorRegister {
                             .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Tiki Leggings", "提基护腿")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 提基战靴 - +3% 仆从伤害
@@ -494,6 +625,10 @@ public class ServantryArmorRegister {
                             .properties(p -> p.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Tiki Boots", "提基战靴")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 阴森头盔 - +11% 仆从伤害
@@ -511,6 +646,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.SpookyHelmet)
                             .save(output))
                     .itemLanguage("Spooky Helmet", "阴森头盔")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 阴森胸甲 - +11% 仆从伤害
@@ -528,6 +667,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.SpookyChestplate)
                             .save(output))
                     .itemLanguage("Spooky Chestplate", "阴森胸甲")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 阴森护腿 - +8% 仆从伤害，+1 召唤栏
@@ -545,6 +688,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.SpookyLeggings)
                             .save(output))
                     .itemLanguage("Spooky Leggings", "阴森护腿")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 阴森战靴 - +4% 仆从伤害
@@ -561,6 +708,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.SpookyBoots)
                             .save(output))
                     .itemLanguage("Spooky Boots", "阴森战靴")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 星尘头盔 - +1 召唤栏，+16% 仆从伤害
@@ -580,6 +731,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.StardustHelmet)
                             .save(output))
                     .itemLanguage("MiniStardustCell Helmet", "星尘头盔")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 星尘板甲 - +22% 仆从伤害
@@ -598,6 +753,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.StardustChestplate)
                             .save(output))
                     .itemLanguage("MiniStardustCell Chestplate", "星尘板甲")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 星尘护腿 - +15% 仆从伤害
@@ -616,6 +775,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.StardustLeggings)
                             .save(output))
                     .itemLanguage("MiniStardustCell Leggings", "星尘护腿")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     /**
      * 星尘战靴 - +7% 仆从伤害
@@ -633,6 +796,10 @@ public class ServantryArmorRegister {
                             .result(ServantryArmorRegister.StardustBoots)
                             .save(output))
                     .itemLanguage("MiniStardustCell Boots", "星尘战靴")
+                    .itemTag(Tags.Items.ENCHANTABLES)
+                    .itemTag(Tags.Items.ARMORS)
+                    .itemTag(ItemTags.ARMOR_ENCHANTABLE)
+                    .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
 
     public static void register() {
