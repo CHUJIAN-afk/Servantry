@@ -5,7 +5,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.common.projectile.StardustProjectile;
+import first.servantry.common.projectile.MiniStardustCell;
 import first.servantry.common.servant.goal.stardustCell.StardustCellAttackGoal;
 import first.servantry.common.servant.goal.stardustCell.StardustCellIdleGoal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
@@ -91,7 +91,7 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
     public void shootExtraAtTarget(LivingEntity target){
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
-        StardustProjectile projectile = new StardustProjectile(getDamageSource(), start);
+        MiniStardustCell projectile = new MiniStardustCell(getDamageSource(), start);
         projectile.setDamage(getDamage() * 0.67f);
         projectile.setChaseTarget(target);
         projectile.join(owner);
@@ -122,7 +122,7 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
     public void shootAtTarget(LivingEntity target) {
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
-        StardustProjectile projectile = new StardustProjectile(getDamageSource(), start);
+        MiniStardustCell projectile = new MiniStardustCell(getDamageSource(), start);
         projectile.setDamage(getDamage());
         projectile.setChaseTarget(target);
         projectile.join(owner);

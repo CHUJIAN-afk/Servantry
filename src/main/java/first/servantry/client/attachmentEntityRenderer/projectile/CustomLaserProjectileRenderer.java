@@ -6,7 +6,7 @@ import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.laser.LaserRenderer;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
-import first.servantry.common.projectile.CustomLaserProjectile;
+import first.servantry.common.projectile.CustomLaser;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.AABB;
 
@@ -17,19 +17,19 @@ import net.minecraft.world.phys.AABB;
  * 替代旧的四叉面伪圆柱实现。
  * </p>
  */
-public class CustomLaserProjectileRenderer extends AbstractAttachmentEntityRenderer<CustomLaserProjectile> {
+public class CustomLaserProjectileRenderer extends AbstractAttachmentEntityRenderer<CustomLaser> {
 
     @Override
-    protected RenderContext<CustomLaserProjectile> createContext(CustomLaserProjectile laser) {
-        return RenderContext.<CustomLaserProjectile>builder()
-                .model(new ModelConfig<CustomLaserProjectile>()
+    protected RenderContext<CustomLaser> createContext(CustomLaser laser) {
+        return RenderContext.<CustomLaser>builder()
+                .model(new ModelConfig<CustomLaser>()
                                .alphaDistanceFactor(0)
                                .rotationOffset(180, 0, 0))
                 .build();
     }
 
     @Override
-    protected void renderEntity(CustomLaserProjectile entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<CustomLaserProjectile> config) {
+    protected void renderEntity(CustomLaser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<CustomLaser> config) {
         int color = entity.getColor();
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();

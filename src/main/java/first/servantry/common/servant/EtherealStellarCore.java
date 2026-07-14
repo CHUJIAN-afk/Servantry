@@ -4,7 +4,7 @@ import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
-import first.servantry.common.projectile.ShatteredStellarCoreProjectile;
+import first.servantry.common.projectile.ShatteredStellarCore;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -55,7 +55,7 @@ public class EtherealStellarCore extends Servant {
         for (int i = 0; i < count; i++) {
             Vec3 start = getPos();
             Vec3 direction = start.offsetRandom(random, 2f).subtract(start).normalize();
-            ShatteredStellarCoreProjectile projectile = new ShatteredStellarCoreProjectile(getDamageSource(), start.add(direction.scale(-0.75)), direction.scale(0.5f));
+            ShatteredStellarCore projectile = new ShatteredStellarCore(getDamageSource(), start.add(direction.scale(-0.75)), direction.scale(0.5f));
             projectile.setDamage(getDamage());
             projectile.setChaseTarget(target);
             projectile.join(owner);

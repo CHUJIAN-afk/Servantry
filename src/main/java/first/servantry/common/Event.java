@@ -151,7 +151,7 @@ public class Event {
             player.addEffect(new MobEffectInstance(ServantryMobEffectRegister.BallistaPanicked, 100));
         }
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player) {
-            if (ServantryArmorSetRegister.Hallowed.value().full(player)) {
+            if (ServantryArmorSetRegister.Hallowed.get().full(player)) {
                 target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
             }
             List<VoidEater> voidEaters = ServantryHelper.get(player).getEntityData().get(EntityData.Type.Servant, VoidEater.class);

@@ -17,13 +17,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class DemonFlameProjectile extends Projectile implements ICollideAttack<DemonFlameProjectile>, IBlockCollision<DemonFlameProjectile> {
+public class DemonFlame extends Projectile implements ICollideAttack<DemonFlame>, IBlockCollision<DemonFlame> {
 
-    public DemonFlameProjectile() {
+    public DemonFlame() {
         super();
     }
 
-    public DemonFlameProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
+    public DemonFlame(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
         setDrag(0.92f);
@@ -53,7 +53,7 @@ public class DemonFlameProjectile extends Projectile implements ICollideAttack<D
     }
 
     @Override
-    public boolean isValidCollisionTarget(DemonFlameProjectile entity, LivingEntity target) {
+    public boolean isValidCollisionTarget(DemonFlame entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
             return servant.isTarget(target);

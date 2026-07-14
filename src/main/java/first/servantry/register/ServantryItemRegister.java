@@ -2,7 +2,7 @@ package first.servantry.register;
 
 import first.servantry.Servantry;
 import first.servantry.client.creativeTab.AnimInfo;
-import first.servantry.common.item.Zenith;
+import first.servantry.common.item.ZenithItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -15,11 +15,11 @@ public class ServantryItemRegister {
     public static final TabGroup SWORD = new TabGroup(4, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
     public static final TabGroup BLOCK = new TabGroup(5, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
 
-    public static final DeferredItem<Zenith> Zenith =
-            ServantryItemRegisterBuilder.build(SWORD, "zenith", () -> new Zenith(Tiers.NETHERITE, new Item.Properties()
+    public static final DeferredItem<ZenithItem> Zenith =
+            ServantryItemRegisterBuilder.build(SWORD, "zenith", () -> new ZenithItem(Tiers.NETHERITE, new Item.Properties()
                             .rarity(Rarity.EPIC)
                             .stacksTo(1)))
-                    .itemLanguage("Zenith", "天顶剑")
+                    .itemLanguage("ZenithItem", "天顶剑")
                     .build();
     public static final DeferredItem<BlockItem> MithrilAnvil =
             ServantryItemRegisterBuilder.build(BLOCK, "mithril_anvil", () -> new BlockItem(ServantryBlockRegister.MITHRIL_ANVIL.get(), new Item.Properties()))
@@ -60,7 +60,7 @@ public class ServantryItemRegister {
                     .build();
     public static final DeferredItem<Item> Stardust =
             ServantryItemRegisterBuilder.build(MATERIAL, "stardust")
-                    .itemLanguage("Stardust", "星尘")
+                    .itemLanguage("MiniStardustCell", "星尘")
                     .build();
     public static final DeferredItem<Item> LuminiteIngot =
             ServantryItemRegisterBuilder.build(MATERIAL, "luminite_ingot")

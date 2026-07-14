@@ -3,7 +3,7 @@ package first.servantry.common.item;
 import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.Ellipse;
 import first.servantry.api.entity.PathNode;
-import first.servantry.common.projectile.ZenithProjectile;
+import first.servantry.common.projectile.Zenith;
 import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -26,9 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Zenith extends SwordItem {
+public class ZenithItem extends SwordItem {
 
-    public Zenith(Tier tier, Properties properties) {
+    public ZenithItem(Tier tier, Properties properties) {
         super(tier, properties);
     }
 
@@ -41,7 +41,7 @@ public class Zenith extends SwordItem {
                 Vec3 center = player.getPosition(1).add(0, player.getBbHeight() / 2, 0);
                 Vec3 startPos = center.add(lookAngle.scale(-1));
                 for (int i = 0; i < 3; i++) {
-                    ZenithProjectile projectile = new ZenithProjectile(damageSource);
+                    Zenith projectile = new Zenith(damageSource);
                     projectile.setDamage(19);
                     projectile.setKnockback(0.65f);
                     Vec3 endPos = computeEndPos(player);

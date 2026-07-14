@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ZenithProjectile extends Projectile implements ICollideAttack<ZenithProjectile> {
+public class Zenith extends Projectile implements ICollideAttack<Zenith> {
 
     public LivingEntity chaseTarget = null;
     public Vec3 direction = Vec3.ZERO;
@@ -22,11 +22,11 @@ public class ZenithProjectile extends Projectile implements ICollideAttack<Zenit
     public float lastProgress = 0;
     public float progress = 0;
 
-    public ZenithProjectile() {
+    public Zenith() {
         super();
     }
 
-    public ZenithProjectile(DamageSource damageSource) {
+    public Zenith(DamageSource damageSource) {
         super(Vec3.ZERO, null);
         setDamageSource(damageSource);
     }

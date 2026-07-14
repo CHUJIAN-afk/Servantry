@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMultimap;
 import first.servantry.Servantry;
 import first.servantry.api.item.CurioItem;
 import first.servantry.client.creativeTab.AnimInfo;
-import first.servantry.common.projectile.StardustProjectile;
+import first.servantry.common.projectile.MiniStardustCell;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
 import first.servantry.utils.CuriosUtil;
 import net.minecraft.core.Holder;
@@ -304,7 +304,7 @@ public class ServantryCurioRegister {
                     .onPostDamage((servant, owner, target) -> {
                         if (owner.getRandom().nextFloat() < 0.05f) {
                             Vec3 startPos = servant.getPos();
-                            StardustProjectile projectile = new StardustProjectile(servant.getDamageSource(), startPos);
+                            MiniStardustCell projectile = new MiniStardustCell(servant.getDamageSource(), startPos);
                             projectile.setDamage(servant.getDamage());
                             projectile.setVelocity(startPos.offsetRandom(owner.getRandom(), 1)
                                                            .subtract(startPos)
@@ -316,8 +316,8 @@ public class ServantryCurioRegister {
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))
                     .build())
-            .itemLanguage("Stardust Fragment", "星尘碎片")
-            .itemLanguageTooltip(1, "Servant hits have a 5% chance to release a Stardust Cell", "仆从攻击时有 5% 概率释放星尘细胞")
+            .itemLanguage("MiniStardustCell Fragment", "星尘碎片")
+            .itemLanguageTooltip(1, "Servant hits have a 5% chance to release a MiniStardustCell Cell", "仆从攻击时有 5% 概率释放星尘细胞")
             .build();
     public static void register() {
     }

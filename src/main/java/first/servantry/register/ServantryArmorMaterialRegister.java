@@ -9,6 +9,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.HashMap;
@@ -19,57 +20,57 @@ public class ServantryArmorMaterialRegister {
 
     private static final DeferredRegister<ArmorMaterial> Register = DeferredRegister.create(Registries.ARMOR_MATERIAL, Servantry.MODID);
 
-    public static final Holder<ArmorMaterial> Flinx = builder("flinx")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> Flinx = builder("flinx")
             .enchantmentValue(5)
             .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
             .build();
 
-    public static final Holder<ArmorMaterial> BeeArmorMaterial = builder("bee")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> BeeArmorMaterial = builder("bee")
             .enchantmentValue(5)
             .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
             .build();
 
-    public static final Holder<ArmorMaterial> ObsidianArmorMaterial = builder("obsidian")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> ObsidianArmorMaterial = builder("obsidian")
             .enchantmentValue(5)
             .sound(SoundEvents.ARMOR_EQUIP_IRON)
             .build();
 
-    public static final Holder<ArmorMaterial> SpiderArmorMaterial = builder("spider")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> SpiderArmorMaterial = builder("spider")
             .enchantmentValue(10)
             .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
             .build();
 
-    public static final Holder<ArmorMaterial> ForbiddenArmorMaterial = builder("forbidden")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> ForbiddenArmorMaterial = builder("forbidden")
             .enchantmentValue(15)
             .sound(SoundEvents.ARMOR_EQUIP_IRON)
             .build();
 
-    public static final Holder<ArmorMaterial> HallowedArmorMaterial = builder("hallowed")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> HallowedArmorMaterial = builder("hallowed")
             .enchantmentValue(35)
             .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
             .build();
 
-    public static final Holder<ArmorMaterial> ChlorophyteArmorMaterial = builder("chlorophyte")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> ChlorophyteArmorMaterial = builder("chlorophyte")
             .enchantmentValue(10)
             .sound(SoundEvents.ARMOR_EQUIP_IRON)
             .build();
 
-    public static final Holder<ArmorMaterial> ValhallaKnightArmorMaterial = builder("valhalla_knight")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> ValhallaKnightArmorMaterial = builder("valhalla_knight")
             .enchantmentValue(20)
             .sound(SoundEvents.ARMOR_EQUIP_IRON)
             .build();
 
-    public static final Holder<ArmorMaterial> TikiArmorMaterial = builder("tiki")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> TikiArmorMaterial = builder("tiki")
             .enchantmentValue(15)
             .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
             .build();
 
-    public static final Holder<ArmorMaterial> SpookyArmorMaterial = builder("spooky")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> SpookyArmorMaterial = builder("spooky")
             .enchantmentValue(10)
             .sound(SoundEvents.ARMOR_EQUIP_LEATHER)
             .build();
 
-    public static final Holder<ArmorMaterial> StardustArmorMaterial = builder("stardust")
+    public static final DeferredHolder<ArmorMaterial, ArmorMaterial> StardustArmorMaterial = builder("stardust")
             .enchantmentValue(25)
             .sound(SoundEvents.ARMOR_EQUIP_IRON)
             .build();
@@ -124,7 +125,7 @@ public class ServantryArmorMaterialRegister {
             return this;
         }
 
-        Holder<ArmorMaterial> build() {
+        DeferredHolder<ArmorMaterial, ArmorMaterial> build() {
             return Register.register(name, () -> new ArmorMaterial(
                     HashMap.newHashMap(4),
                     enchantmentValue,

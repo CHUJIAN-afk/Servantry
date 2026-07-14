@@ -5,20 +5,20 @@ import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.laser.LaserRenderer;
 import first.servantry.api.entity.PathNode;
-import first.servantry.common.projectile.GodFlameProjectile;
+import first.servantry.common.projectile.GodFlame;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.AABB;
 
-public class GodFlameProjectileRenderer extends AbstractAttachmentEntityRenderer<GodFlameProjectile> {
+public class GodFlameProjectileRenderer extends AbstractAttachmentEntityRenderer<GodFlame> {
 
     @Override
-    protected RenderContext<GodFlameProjectile> createContext(GodFlameProjectile projectile) {
-        return RenderContext.<GodFlameProjectile>builder()
+    protected RenderContext<GodFlame> createContext(GodFlame projectile) {
+        return RenderContext.<GodFlame>builder()
                 .build();
     }
 
     @Override
-    protected void renderEntity(GodFlameProjectile entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<GodFlameProjectile> config) {
+    protected void renderEntity(GodFlame entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<GodFlame> config) {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;

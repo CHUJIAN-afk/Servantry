@@ -18,34 +18,21 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class SharkDragonProjectile extends Projectile implements ICollideAttack<SharkDragonProjectile>, IBlockCollision<SharkDragonProjectile> {
+/**
+ * 激光射弹 - 高速直线飞行的红色激光束。
+ */
+public class Laser extends Projectile implements ICollideAttack<Laser>, IBlockCollision<Laser> {
 
-    public SharkDragonProjectile() {
+    public Laser() {
         super();
     }
 
-    public SharkDragonProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
+    public Laser(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
-        setDrag(1f);
-        setGravity(-0.002f);
-        setMaxLife(100);
-    }
-
-    @Override
-    public @NotNull AABB getBlockCollisionBox() {
-        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
-    }
-
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        currentPathNode = new PathNode(context.position(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
-        setRemove();
-    }
-
-    @Override
-    public @NotNull AABB getHitbox() {
-        return new AABB(-0.2, -0.2, -0.6, 0.2, 0.2, 0.6);
+        setDrag(1);
+        setMaxSpeed(4);
+        setMaxLife(34);
     }
 
     @Override
@@ -63,22 +50,39 @@ public class SharkDragonProjectile extends Projectile implements ICollideAttack<
                     .damageSource(source)
                     .damageAmount(getDamage())
                     .apply();
+            target.setRemainingFireTicks(Math.min(target.getRemainingFireTicks() + 20, 120));
         }
-        currentPathNode = new PathNode(hit.hitPoint().add(getVelocity().scale(0.5)), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        currentPathNode = new PathNode(hit.hitPoint(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
         setRemove();
     }
 
     @Override
-    public boolean isValidCollisionTarget(SharkDragonProjectile entity, LivingEntity target) {
+    public boolean isValidCollisionTarget(Laser entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
             return servant.isTarget(target);
         }
-        return false;
+        return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }
 
     @Override
-    public AttachmentEntityType<SharkDragonProjectile> getType() {
-        return ServantryAttachmentEntityRegister.SharkDragonProjectile.get();
+    public @NotNull AABB getHitbox() {
+        return new AABB(-0.03, -0.03, -1, 0.03, 0.03, 0);
+    }
+
+    @Override
+    public AttachmentEntityType<? extends Projectile> getType() {
+        return ServantryAttachmentEntityRegister.LaserProjectile.get();
+    }
+
+    @Override
+    public @NotNull AABB getBlockCollisionBox() {
+        return new AABB(-0.03, -0.03, -0.03, 0.03, 0.03, 0.03);
+    }
+
+    @Override
+    public void onBlockCollision(CollisionContext context) {
+        currentPathNode = new PathNode(context.position(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        setRemove();
     }
 }

@@ -4,7 +4,7 @@ import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
-import first.servantry.common.projectile.CrossbowBoltProjectile;
+import first.servantry.common.projectile.CrossbowBolt;
 import first.servantry.register.ServantryArmorSetRegister;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.register.ServantryMobEffectRegister;
@@ -99,7 +99,7 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
     public void fire() {
         Vec3 direction = getLookAngle();
         Vec3 pos = getPos();
-        CrossbowBoltProjectile projectile = new CrossbowBoltProjectile(getDamageSource(), pos, direction);
+        CrossbowBolt projectile = new CrossbowBolt(getDamageSource(), pos, direction);
         projectile.copyDamageData(this);
         if (ServantryArmorSetRegister.ValhallaKnight.value().full(owner)) {
             projectile.setMaxPierceCount(6);

@@ -7,21 +7,21 @@ import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
-import first.servantry.common.projectile.ChlorophyteCrystalProjectile;
+import first.servantry.common.projectile.ChlorophyteCrystal;
 import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-public class ChlorophyteCrystalProjectileRenderer extends AbstractAttachmentEntityRenderer<ChlorophyteCrystalProjectile> {
+public class ChlorophyteCrystalProjectileRenderer extends AbstractAttachmentEntityRenderer<ChlorophyteCrystal> {
 
     @Override
-    protected RenderContext<ChlorophyteCrystalProjectile> createContext(ChlorophyteCrystalProjectile crystal) {
-        return RenderContext.<ChlorophyteCrystalProjectile>builder()
-                .model(new ModelConfig<ChlorophyteCrystalProjectile>()
+    protected RenderContext<ChlorophyteCrystal> createContext(ChlorophyteCrystal crystal) {
+        return RenderContext.<ChlorophyteCrystal>builder()
+                .model(new ModelConfig<ChlorophyteCrystal>()
                         .rotationOffset(0, 90, 0)
                         .scale(0.5f)
                         .translateOffset(-0.5f, -0.5f, -0.5f)
                 )
-                .trail(new ConeTrailConfig<ChlorophyteCrystalProjectile>()
+                .trail(new ConeTrailConfig<ChlorophyteCrystal>()
                         .timer(crystal.getTrailDuration())
                         .colorRGB(0x1bff10)
                         .historyLength(4)
@@ -33,7 +33,7 @@ public class ChlorophyteCrystalProjectileRenderer extends AbstractAttachmentEnti
     }
 
     @Override
-    protected void renderEntity(ChlorophyteCrystalProjectile entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ChlorophyteCrystalProjectile> config) {
+    protected void renderEntity(ChlorophyteCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ChlorophyteCrystal> config) {
         ModelRenderer.renderModel(ServantryModelRegister.CHLOROPHYTE_CRYSTAL, poseStack, bufferSource);
     }
 }

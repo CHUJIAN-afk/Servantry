@@ -19,19 +19,19 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class CustomLaserProjectile extends Projectile implements ICollideAttack<CustomLaserProjectile> {
+public class CustomLaser extends Projectile implements ICollideAttack<CustomLaser> {
 
     private int color = 0;
     private float alpha = 1;
     private AABB hitbox = new AABB(0, 0, 0, 0, 0, 0);
-    private Consumer<CustomLaserProjectile> tickConsumer = null;
-    private BiConsumer<CustomLaserProjectile, List<HitContext>> hitConsumer = null;
+    private Consumer<CustomLaser> tickConsumer = null;
+    private BiConsumer<CustomLaser, List<HitContext>> hitConsumer = null;
 
-    public CustomLaserProjectile() {
+    public CustomLaser() {
         super();
     }
 
-    public CustomLaserProjectile(DamageSource damageSource, PathNode pathNode, int color) {
+    public CustomLaser(DamageSource damageSource, PathNode pathNode, int color) {
         super(pathNode.pos(), Vec3.directionFromRotation(pathNode.pitch(), pathNode.yaw()));
         this.color = color;
         setDamageSource(damageSource);
@@ -63,11 +63,11 @@ public class CustomLaserProjectile extends Projectile implements ICollideAttack<
         super.tick();
     }
 
-    public void setTickConsumer(Consumer<CustomLaserProjectile> tickConsumer) {
+    public void setTickConsumer(Consumer<CustomLaser> tickConsumer) {
         this.tickConsumer = tickConsumer;
     }
 
-    public void setHitConsumer(BiConsumer<CustomLaserProjectile, List<HitContext>> hitConsumer) {
+    public void setHitConsumer(BiConsumer<CustomLaser, List<HitContext>> hitConsumer) {
         this.hitConsumer = hitConsumer;
     }
 
@@ -109,7 +109,7 @@ public class CustomLaserProjectile extends Projectile implements ICollideAttack<
     }
 
     @Override
-    public boolean isValidCollisionTarget(CustomLaserProjectile entity, LivingEntity target) {
+    public boolean isValidCollisionTarget(CustomLaser entity, LivingEntity target) {
         if (damageSource instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
             return servant.isTarget(target);

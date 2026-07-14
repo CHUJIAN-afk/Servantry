@@ -579,7 +579,7 @@ public class ServantryArmorRegister {
                             .ingredient(ServantryItemRegister.LuminiteIngot, 8)
                             .result(ServantryArmorRegister.StardustHelmet)
                             .save(output))
-                    .itemLanguage("Stardust Helmet", "星尘头盔")
+                    .itemLanguage("MiniStardustCell Helmet", "星尘头盔")
                     .build();
     /**
      * 星尘板甲 - +22% 仆从伤害
@@ -597,7 +597,7 @@ public class ServantryArmorRegister {
                             .ingredient(ServantryItemRegister.LuminiteIngot, 16)
                             .result(ServantryArmorRegister.StardustChestplate)
                             .save(output))
-                    .itemLanguage("Stardust Chestplate", "星尘板甲")
+                    .itemLanguage("MiniStardustCell Chestplate", "星尘板甲")
                     .build();
     /**
      * 星尘护腿 - +15% 仆从伤害
@@ -615,7 +615,7 @@ public class ServantryArmorRegister {
                             .ingredient(ServantryItemRegister.LuminiteIngot, 12)
                             .result(ServantryArmorRegister.StardustLeggings)
                             .save(output))
-                    .itemLanguage("Stardust Leggings", "星尘护腿")
+                    .itemLanguage("MiniStardustCell Leggings", "星尘护腿")
                     .build();
     /**
      * 星尘战靴 - +7% 仆从伤害
@@ -632,7 +632,7 @@ public class ServantryArmorRegister {
                             .ingredient(ServantryItemRegister.LuminiteIngot, 8)
                             .result(ServantryArmorRegister.StardustBoots)
                             .save(output))
-                    .itemLanguage("Stardust Boots", "星尘战靴")
+                    .itemLanguage("MiniStardustCell Boots", "星尘战靴")
                     .build();
 
     public static void register() {

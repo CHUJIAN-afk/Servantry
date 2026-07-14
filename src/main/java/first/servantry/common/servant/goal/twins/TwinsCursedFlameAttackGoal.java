@@ -2,7 +2,7 @@ package first.servantry.common.servant.goal.twins;
 
 import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.projectile.DemonFlameProjectile;
+import first.servantry.common.projectile.DemonFlame;
 import first.servantry.common.servant.Twins;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.world.entity.LivingEntity;
@@ -49,9 +49,9 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                 wanderPos = servant.getWanderPos(wanderPos, targetPos, 4, 1);
                 double distance = servant.getPos().distanceTo(wanderPos);
                 servant.applyForce(wanderPos.subtract(servant.getPos()).normalize().scale(Math.min(distance * 0.04, 0.4)));
-                DemonFlameProjectile demonFlameProjectile = new DemonFlameProjectile(servant.getDamageSource(), servant.getPos(), targetPos.subtract(servant.getPos()).normalize());
-                demonFlameProjectile.copyDamageData(servant);
-                demonFlameProjectile.join(owner);
+                DemonFlame demonFlame = new DemonFlame(servant.getDamageSource(), servant.getPos(), targetPos.subtract(servant.getPos()).normalize());
+                demonFlame.copyDamageData(servant);
+                demonFlame.join(owner);
                 ParticleHelper.create(owner.level())
                         .generic(GenericParticleBuilder.create()
                                 .color(0x24d509)

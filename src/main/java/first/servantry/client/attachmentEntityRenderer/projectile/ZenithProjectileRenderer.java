@@ -8,7 +8,7 @@ import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
 import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.entity.PathNode;
-import first.servantry.common.projectile.ZenithProjectile;
+import first.servantry.common.projectile.Zenith;
 import first.servantry.register.ServantryModelRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.client.Minecraft;
@@ -19,18 +19,18 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 
-public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<ZenithProjectile> {
+public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
 
     @Override
-    protected RenderContext<ZenithProjectile> createContext(ZenithProjectile zenith) {
-        return RenderContext.<ZenithProjectile>builder()
-                .trail(new RibbonTrailConfig<ZenithProjectile>()
+    protected RenderContext<Zenith> createContext(Zenith zenith) {
+        return RenderContext.<Zenith>builder()
+                .trail(new RibbonTrailConfig<Zenith>()
                                .timer(0)
                                .colorRGB(0xffffff)
                                .historyLength(2)
                                .upOffset(1.32575f)
                 )
-                .model(new ModelConfig<ZenithProjectile>()
+                .model(new ModelConfig<Zenith>()
                                .scale(2)
                                .translateOffset(-0.5f, -0.5f, -0.5f)
                                .rotationOffset(0, 90, 45)
@@ -48,9 +48,9 @@ public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Z
     }
 
     @Override
-    protected void renderEntity(ZenithProjectile zenithProjectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ZenithProjectile> config) {
-        ArrayList<PathNode> pathNodes = zenithProjectile.getHistoryNodes();
-        Player owner = zenithProjectile.getOwner();
+    protected void renderEntity(Zenith zenith, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Zenith> config) {
+        ArrayList<PathNode> pathNodes = zenith.getHistoryNodes();
+        Player owner = zenith.getOwner();
         if (pathNodes.size() > 3 && !Minecraft.getInstance().isPaused()) {
             Vec3 velocity = visualNode.pos().subtract(pathNodes.get(2).pos());
             if (velocity.length() > 1) {

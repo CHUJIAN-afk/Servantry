@@ -16,15 +16,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CrossbowBoltProjectile extends Projectile implements IBlockCollision<CrossbowBoltProjectile>, ICollideAttack<CrossbowBoltProjectile> {
+public class CrossbowBolt extends Projectile implements IBlockCollision<CrossbowBolt>, ICollideAttack<CrossbowBolt> {
 
     private int maxPierceCount = 3;
     public final Set<LivingEntity> hitTargets = new HashSet<>();
 
-    public CrossbowBoltProjectile() {
+    public CrossbowBolt() {
     }
 
-    public CrossbowBoltProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
+    public CrossbowBolt(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
         setDrag(0.97f);
@@ -55,7 +55,7 @@ public class CrossbowBoltProjectile extends Projectile implements IBlockCollisio
     }
 
     @Override
-    public boolean isValidCollisionTarget(CrossbowBoltProjectile entity, LivingEntity target) {
+    public boolean isValidCollisionTarget(CrossbowBolt entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
             return servant.isTarget(target);

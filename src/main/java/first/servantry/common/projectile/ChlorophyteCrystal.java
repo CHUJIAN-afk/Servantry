@@ -20,13 +20,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class ChlorophyteCrystalProjectile extends Projectile implements ICollideAttack<ChlorophyteCrystalProjectile> {
+public class ChlorophyteCrystal extends Projectile implements ICollideAttack<ChlorophyteCrystal> {
 
-    public ChlorophyteCrystalProjectile() {
+    public ChlorophyteCrystal() {
         super();
     }
 
-    public ChlorophyteCrystalProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
+    public ChlorophyteCrystal(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
         setDrag(1f);
@@ -85,7 +85,7 @@ public class ChlorophyteCrystalProjectile extends Projectile implements ICollide
     }
 
     @Override
-    public boolean isValidCollisionTarget(ChlorophyteCrystalProjectile entity, LivingEntity target) {
+    public boolean isValidCollisionTarget(ChlorophyteCrystal entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
             return servant.isTarget(target);

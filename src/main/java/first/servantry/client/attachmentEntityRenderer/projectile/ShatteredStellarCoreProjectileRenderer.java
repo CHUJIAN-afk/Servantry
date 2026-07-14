@@ -7,16 +7,16 @@ import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.entity.PathNode;
-import first.servantry.common.projectile.ShatteredStellarCoreProjectile;
+import first.servantry.common.projectile.ShatteredStellarCore;
 import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-public class ShatteredStellarCoreProjectileRenderer extends AbstractAttachmentEntityRenderer<ShatteredStellarCoreProjectile> {
+public class ShatteredStellarCoreProjectileRenderer extends AbstractAttachmentEntityRenderer<ShatteredStellarCore> {
 
     @Override
-    protected RenderContext<ShatteredStellarCoreProjectile> createContext(ShatteredStellarCoreProjectile projectile) {
-        return RenderContext.<ShatteredStellarCoreProjectile>builder()
-                .trail(new ConeTrailConfig<ShatteredStellarCoreProjectile>()
+    protected RenderContext<ShatteredStellarCore> createContext(ShatteredStellarCore projectile) {
+        return RenderContext.<ShatteredStellarCore>builder()
+                .trail(new ConeTrailConfig<ShatteredStellarCore>()
                                .timer(15)
                                .colorRGB(0x8AE0FF)
                                .historyLength(4)
@@ -24,7 +24,7 @@ public class ShatteredStellarCoreProjectileRenderer extends AbstractAttachmentEn
                                .minRadiusRatio(0.025f)
                                .resolution(4)
                                .fadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 2.0)))
-                .model(new ModelConfig<ShatteredStellarCoreProjectile>()
+                .model(new ModelConfig<ShatteredStellarCore>()
                                .scale(0.15f)
                                .translateOffset(-0.5f, -0.5f, -0.2f)
                                .rotationOffset(0, 0, 45))
@@ -32,7 +32,7 @@ public class ShatteredStellarCoreProjectileRenderer extends AbstractAttachmentEn
     }
 
     @Override
-    protected void renderEntity(ShatteredStellarCoreProjectile projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ShatteredStellarCoreProjectile> config) {
+    protected void renderEntity(ShatteredStellarCore projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ShatteredStellarCore> config) {
         ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 }

@@ -6,7 +6,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.common.projectile.SharkDragonProjectile;
+import first.servantry.common.projectile.SharkDragon;
 import first.servantry.common.servant.goal.sharknado.SharknadoAttackGoal;
 import first.servantry.common.servant.goal.sharknado.SharknadoIdleGoal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
@@ -82,7 +82,7 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
     public void shootAtTarget(LivingEntity target) {
         Vec3 start = getPos();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
-        SharkDragonProjectile projectile = new SharkDragonProjectile(getDamageSource(), start, direction);
+        SharkDragon projectile = new SharkDragon(getDamageSource(), start, direction);
         projectile.copyDamageData(this);
         projectile.join(owner);
     }

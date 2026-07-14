@@ -18,13 +18,13 @@ import java.util.List;
 /**
  * 噬神火球 - 紫色高速火球射弹，造成20tick无敌帧。
  */
-public class GodFlameProjectile extends Projectile implements ICollideAttack<GodFlameProjectile> {
+public class GodFlame extends Projectile implements ICollideAttack<GodFlame> {
 
-    public GodFlameProjectile() {
+    public GodFlame() {
         super();
     }
 
-    public GodFlameProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
+    public GodFlame(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
         setDrag(1);
@@ -48,7 +48,7 @@ public class GodFlameProjectile extends Projectile implements ICollideAttack<God
     }
 
     @Override
-    public boolean isValidCollisionTarget(GodFlameProjectile entity, LivingEntity target) {
+    public boolean isValidCollisionTarget(GodFlame entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
             return servant.isTarget(target);

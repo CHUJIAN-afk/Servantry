@@ -3,16 +3,16 @@ package first.servantry.client.attachmentEntityRenderer.projectile;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
-import first.servantry.common.projectile.RainbowCrystalProjectile;
+import first.servantry.common.projectile.RainbowCrystal;
 import net.minecraft.client.Minecraft;
 
-public class RainbowCrystalProjectileRenderer extends AbstractAttachmentEntityRenderer<RainbowCrystalProjectile> {
+public class RainbowCrystalProjectileRenderer extends AbstractAttachmentEntityRenderer<RainbowCrystal> {
 
     @Override
-    protected RenderContext<RainbowCrystalProjectile> createContext(RainbowCrystalProjectile crystal) {
+    protected RenderContext<RainbowCrystal> createContext(RainbowCrystal crystal) {
         float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
-        return RenderContext.<RainbowCrystalProjectile>builder()
-                .trail(new ConeTrailConfig<RainbowCrystalProjectile>()
+        return RenderContext.<RainbowCrystal>builder()
+                .trail(new ConeTrailConfig<RainbowCrystal>()
                                .timer(15)
                                .colorRGB(crystal.getColor(partialTick))
                                .historyLength(16)

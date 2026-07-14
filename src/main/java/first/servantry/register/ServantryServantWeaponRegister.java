@@ -346,8 +346,8 @@ public class ServantryServantWeaponRegister {
                             .ingredient(ServantryItemRegister.Stardust, 18)
                             .result(ServantryServantWeaponRegister.StardustCellStaff)
                             .save(output))
-                    .itemLanguage("Stardust Cell Staff", "星尘细胞法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.StardustCell, "Stardust Cell", "星尘细胞")
+                    .itemLanguage("MiniStardustCell Cell Staff", "星尘细胞法杖")
+                    .servantLanguage(ServantryAttachmentEntityRegister.StardustCell, "MiniStardustCell Cell", "星尘细胞")
                     .itemLanguageTooltip(1, "Cultivate the most beautiful cellular infection", "培养最美丽的细胞感染")
                     .build();
     /**
@@ -396,8 +396,8 @@ public class ServantryServantWeaponRegister {
                             .ingredient(ServantryItemRegister.Stardust, 18)
                             .result(ServantryServantWeaponRegister.StardustDragonStaff)
                             .save(output))
-                    .itemLanguage("Stardust Dragon Staff", "星尘之龙法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.StardustDragon, "Stardust Dragon", "星尘之龙")
+                    .itemLanguage("MiniStardustCell Dragon Staff", "星尘之龙法杖")
+                    .servantLanguage(ServantryAttachmentEntityRegister.StardustDragon, "MiniStardustCell Dragon", "星尘之龙")
                     .itemLanguageTooltip(1, "When you have a dragon, who needs a swarm?", "有了一条巨龙后，谁还需要一群仆从呢？")
                     .build();
     /**

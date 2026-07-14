@@ -18,13 +18,13 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-public class RainbowCrystalProjectile extends Projectile {
+public class RainbowCrystal extends Projectile {
 
-    public RainbowCrystalProjectile(){
+    public RainbowCrystal(){
 
     }
 
-    public RainbowCrystalProjectile(DamageSource damageSource, PathNode pathNode) {
+    public RainbowCrystal(DamageSource damageSource, PathNode pathNode) {
         super(pathNode.pos(), Vec3.directionFromRotation(pathNode.pitch(), pathNode.yaw()));
         setDamageSource(damageSource);
         setDrag(1);

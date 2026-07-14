@@ -6,8 +6,8 @@ import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.projectile.CustomLaserProjectile;
-import first.servantry.common.projectile.GodFlameProjectile;
+import first.servantry.common.projectile.CustomLaser;
+import first.servantry.common.projectile.GodFlame;
 import first.servantry.common.servant.VoidEater;
 import first.servantry.register.ServantrySoundRegister;
 import first.servantry.utils.ParticleHelper;
@@ -22,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
 
-    private CustomLaserProjectile laser = null;
+    private CustomLaser laser = null;
     private AttackMode mode = AttackMode.GOD_DASH;
     private int combat = 0;
     private Vec3 prepPos = Vec3.ZERO;
@@ -92,7 +92,7 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
                     owner.level().playSound(null, start.x(), start.y(), start.z(), ServantrySoundRegister.Laser.get(), owner.getSoundSource());
                     for (int i = 0; i < 9; i++) {
                         Vec3 direction = targetPos.offsetRandom(owner.getRandom(), 2f).subtract(servant.getPos()).normalize();
-                        GodFlameProjectile projectile = new GodFlameProjectile(servant.getDamageSource(), start, direction.scale(3));
+                        GodFlame projectile = new GodFlame(servant.getDamageSource(), start, direction.scale(3));
                         projectile.copyDamageData(servant);
                         projectile.setDamage(servant.getDamage() * 0.5f);
                         projectile.join(owner);
@@ -124,7 +124,7 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
             }
         } else {
             if (laser == null || laser.isRemove()) {
-                laser = new CustomLaserProjectile(servant.getDamageSource(), servant.getCurrentPathNode(), 0x6f19d4);
+                laser = new CustomLaser(servant.getDamageSource(), servant.getCurrentPathNode(), 0x6f19d4);
                 laser.copyDamageData(servant);
                 laser.setDamage(servant.getDamage() * 2);
                 Player owner = servant.getOwner();

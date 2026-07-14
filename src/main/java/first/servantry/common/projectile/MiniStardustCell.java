@@ -24,15 +24,15 @@ import java.util.List;
 /**
  * 星细胞射弹 - 追踪目标并黏着施加寄生效果。
  */
-public class StardustProjectile extends AttachingProjectile implements ICollideAttack<StardustProjectile> {
+public class MiniStardustCell extends AttachingProjectile implements ICollideAttack<MiniStardustCell> {
 
     private LivingEntity chaseTarget;
 
-    public StardustProjectile() {
+    public MiniStardustCell() {
         super();
     }
 
-    public StardustProjectile(DamageSource damageSource, Vec3 startPos) {
+    public MiniStardustCell(DamageSource damageSource, Vec3 startPos) {
         super(startPos, Vec3.ZERO);
         setDamageSource(damageSource);
         setDrag(0.9f);
@@ -51,7 +51,7 @@ public class StardustProjectile extends AttachingProjectile implements ICollideA
     }
 
     @Override
-    public boolean isValidCollisionTarget(StardustProjectile entity, LivingEntity target) {
+    public boolean isValidCollisionTarget(MiniStardustCell entity, LivingEntity target) {
         DamageSource source = entity.getDamageSource();
         if (source instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();

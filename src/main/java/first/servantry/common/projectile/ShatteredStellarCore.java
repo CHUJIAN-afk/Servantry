@@ -19,15 +19,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class ShatteredStellarCoreProjectile extends Projectile implements ICollideAttack<ShatteredStellarCoreProjectile> {
+public class ShatteredStellarCore extends Projectile implements ICollideAttack<ShatteredStellarCore> {
 
     private LivingEntity chaseTarget = null;
 
-    public ShatteredStellarCoreProjectile() {
+    public ShatteredStellarCore() {
         super();
     }
 
-    public ShatteredStellarCoreProjectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
+    public ShatteredStellarCore(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
         setDrag(0.8f);
@@ -41,7 +41,7 @@ public class ShatteredStellarCoreProjectile extends Projectile implements IColli
     }
 
     @Override
-    public boolean isValidCollisionTarget(ShatteredStellarCoreProjectile entity, LivingEntity target) {
+    public boolean isValidCollisionTarget(ShatteredStellarCore entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
             if (servant != null) {
@@ -116,7 +116,7 @@ public class ShatteredStellarCoreProjectile extends Projectile implements IColli
     }
 
     @Override
-    public AttachmentEntityType<ShatteredStellarCoreProjectile> getType() {
+    public AttachmentEntityType<ShatteredStellarCore> getType() {
         return ServantryAttachmentEntityRegister.EternalNightLaserProjectile.get();
     }
 

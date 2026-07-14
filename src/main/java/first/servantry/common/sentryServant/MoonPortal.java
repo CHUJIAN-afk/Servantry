@@ -8,7 +8,7 @@ import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.common.projectile.CustomLaserProjectile;
+import first.servantry.common.projectile.CustomLaser;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.register.ServantryMobEffectRegister;
 import first.servantry.utils.ParticleHelper;
@@ -80,7 +80,7 @@ public class MoonPortal extends Servant {
             pathNodes.add(middlePathNode.lerp(endPathNode, progress));
         }
 
-        CustomLaserProjectile projectile = new CustomLaserProjectile(getDamageSource(), pathNodes.getFirst(), 0x00fdd6);
+        CustomLaser projectile = new CustomLaser(getDamageSource(), pathNodes.getFirst(), 0x00fdd6);
         projectile.setDamage(getDamage());
         projectile.setKnockback(getKnockback());
         projectile.setArmorPierce(getArmorPierce());

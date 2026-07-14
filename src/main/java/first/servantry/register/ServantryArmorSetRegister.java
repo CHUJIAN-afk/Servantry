@@ -6,17 +6,17 @@ import first.servantry.api.armorSet.ArmorSet;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.servant.ChlorophyteCrystal;
-import net.minecraft.core.Holder;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ServantryArmorSetRegister {
 
     private static final DeferredRegister<ArmorSet> Register = DeferredRegister.create(ServantryRegistries.ARMOR_SETS, Servantry.MODID);
 
-    public static final Holder<ArmorSet> Bee =
+    public static final DeferredHolder<ArmorSet, ArmorSet> Bee =
             Register.register("bee", () -> ArmorSet.builder(Servantry.rl("bee"))
                     .piece(ServantryArmorRegister.BeeHeadgear)
                     .piece(ServantryArmorRegister.BeeChestplate)
@@ -26,7 +26,7 @@ public class ServantryArmorSetRegister {
                     .build()
             );
 
-    public static final Holder<ArmorSet> Spider =
+    public static final DeferredHolder<ArmorSet, ArmorSet> Spider =
             Register.register("spider", () -> ArmorSet.builder(Servantry.rl("spider"))
                     .piece(ServantryArmorRegister.SpiderMask)
                     .piece(ServantryArmorRegister.SpiderChestplate)
@@ -36,7 +36,7 @@ public class ServantryArmorSetRegister {
                     .build()
             );
 
-    public static final Holder<ArmorSet> Forbidden =
+    public static final DeferredHolder<ArmorSet, ArmorSet> Forbidden =
             Register.register("forbidden", () -> ArmorSet.builder(Servantry.rl("forbidden"))
                     .piece(ServantryArmorRegister.ForbiddenMask)
                     .piece(ServantryArmorRegister.ForbiddenRobe)
@@ -46,7 +46,7 @@ public class ServantryArmorSetRegister {
                     .build()
             );
 
-    public static final Holder<ArmorSet> Obsidian =
+    public static final DeferredHolder<ArmorSet, ArmorSet> Obsidian =
             Register.register("obsidian", () -> ArmorSet.builder(Servantry.rl("obsidian"))
                     .piece(ServantryArmorRegister.ObsidianHelmet)
                     .piece(ServantryArmorRegister.ObsidianChestplate)
@@ -58,7 +58,7 @@ public class ServantryArmorSetRegister {
                     .build()
             );
 
-    public static final Holder<ArmorSet> Hallowed = Register.register("hallowed", () -> ArmorSet.builder(Servantry.rl("hallowed"))
+    public static final DeferredHolder<ArmorSet, ArmorSet> Hallowed = Register.register("hallowed", () -> ArmorSet.builder(Servantry.rl("hallowed"))
             .piece(ServantryArmorRegister.HallowedHelmet)
             .piece(ServantryArmorRegister.HallowedChestplate)
             .piece(ServantryArmorRegister.HallowedLeggings)
@@ -69,7 +69,7 @@ public class ServantryArmorSetRegister {
             .build()
     );
 
-    public static final Holder<ArmorSet> ValhallaKnight =
+    public static final DeferredHolder<ArmorSet, ArmorSet> ValhallaKnight =
             Register.register("valhalla_knight", () -> ArmorSet.builder(Servantry.rl("valhalla_knight"))
                     .piece(ServantryArmorRegister.ValhallaKnightHelmet)
                     .piece(ServantryArmorRegister.ValhallaKnightChestplate)
@@ -83,7 +83,7 @@ public class ServantryArmorSetRegister {
                     .build()
             );
 
-    public static final Holder<ArmorSet> Chlorophyte =
+    public static final DeferredHolder<ArmorSet, ArmorSet> Chlorophyte =
             Register.register("chlorophyte", () -> ArmorSet.builder(Servantry.rl("chlorophyte"))
                     .piece(ServantryArmorRegister.ChlorophyteHelmet)
                     .piece(ServantryArmorRegister.ChlorophyteChestplate)
@@ -101,7 +101,7 @@ public class ServantryArmorSetRegister {
                     .build()
             );
 
-    public static final Holder<ArmorSet> Spooky =
+    public static final DeferredHolder<ArmorSet, ArmorSet> Spooky =
             Register.register("spooky", () -> ArmorSet.builder(Servantry.rl("spooky"))
                     .piece(ServantryArmorRegister.SpookyHelmet)
                     .piece(ServantryArmorRegister.SpookyChestplate)
@@ -112,7 +112,7 @@ public class ServantryArmorSetRegister {
                     .build()
             );
 
-    public static final Holder<ArmorSet> Tiki =
+    public static final DeferredHolder<ArmorSet, ArmorSet> Tiki =
             Register.register("tiki", () -> ArmorSet.builder(Servantry.rl("tiki"))
                     .piece(ServantryArmorRegister.TikiHelmet)
                     .piece(ServantryArmorRegister.TikiChestplate)
@@ -123,7 +123,7 @@ public class ServantryArmorSetRegister {
                     .build()
             );
 
-    public static final Holder<ArmorSet> Stardust =
+    public static final DeferredHolder<ArmorSet, ArmorSet> Stardust =
             Register.register("stardust", () -> ArmorSet.builder(Servantry.rl("stardust"))
                     .piece(ServantryArmorRegister.StardustHelmet)
                     .piece(ServantryArmorRegister.StardustChestplate)

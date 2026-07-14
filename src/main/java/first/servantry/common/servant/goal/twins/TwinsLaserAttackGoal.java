@@ -2,7 +2,7 @@ package first.servantry.common.servant.goal.twins;
 
 import first.servantry.api.common.particle.GenericParticleBuilder;
 import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.projectile.LaserProjectile;
+import first.servantry.common.projectile.Laser;
 import first.servantry.common.servant.Twins;
 import first.servantry.register.ServantrySoundRegister;
 import first.servantry.utils.ParticleHelper;
@@ -47,7 +47,7 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         Vec3 start = servant.getPos();
         RandomSource random = owner.getRandom();
         Vec3 direction = target.getBoundingBox().getCenter().offsetRandom(random, shotCount < 5 ? 0.3f : 1).subtract(start).normalize();
-        LaserProjectile projectile = new LaserProjectile(servant.getDamageSource(), start, direction);
+        Laser projectile = new Laser(servant.getDamageSource(), start, direction);
         projectile.setDamage(servant.getDamage() * 1.1f);
         projectile.join(owner);
         ServerLevel level = (ServerLevel) owner.level();
