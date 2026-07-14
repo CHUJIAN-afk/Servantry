@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightRenderer;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
@@ -12,14 +13,14 @@ import first.servantry.common.servant.Terraprism;
 import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.Mth;
+import net.minecraft.util.FastColor;
 
 /**
  * 泰拉棱镜渲染器。
  * <p>
  * 使用丝带拖尾，渲染带色调渐变的棱镜模型。
  */
-public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terraprism> {
+public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terraprism> implements DynamicLightRenderer<Terraprism> {
 
     @Override
     protected RenderContext<Terraprism> createContext(Terraprism servant) {
@@ -31,29 +32,25 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
                                .segmentsPerNode(8)
                                .historyLength(5)
                                .upOffset(1.015f)
-                               .colorFunction((terraprism, progress, timeShift) -> {
-                                   float partialTick = Minecraft.getInstance()
-                                           .getTimer()
-                                           .getGameTimeDeltaPartialTick(true);
-                                   return terraprism.getColor(partialTick);
-                               }))
+                               .colorFunction((terraprism, progress, partialTick) -> terraprism.getColor(partialTick)))
                 .model(new ModelConfig<Terraprism>()
                                .scale(1.5f)
                                .translateOffset(-0.5f, -0.5f, -0.5f)
-                               .rotationOffset(0, 90, 45)
-                               .visualNodeFunction((terraprism, partialTick, rawNode) -> rawNode.lerp(terraprism.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, terraprism.idleBlendO, terraprism.idleBlend))))
+                               .rotationOffset(0, 90, 45))
                 .build();
     }
 
     @Override
-    protected void renderEntityModel(Terraprism terraprism, PoseStack poseStack, MultiBufferSource bufferSource, PathNode node, RenderContext<Terraprism> config) {
-        super.renderEntityModel(terraprism, poseStack, bufferSource, node, config);
+    public int getLuminance() {
+        return 8;
     }
 
     @Override
-    protected void renderEntity(Terraprism terraprism, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Terraprism> config) {
-        int mColorRGB = terraprism.getColor(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true));
-        int mr = (mColorRGB >> 16) & 0xFF, mg = (mColorRGB >> 8) & 0xFF, mb = mColorRGB & 0xFF;
-        ModelRenderer.renderModel(ServantryModelRegister.TERRAPRISM, poseStack, type -> new TintedVertexConsumer(bufferSource.getBuffer(type), mr, mg, mb, 255));
+    protected void render(Terraprism terraprism, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Terraprism> context) {
+        int color = terraprism.getColor(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true));
+        int red = FastColor.ARGB32.red(color);
+        int green = FastColor.ARGB32.green(color);
+        int blue = FastColor.ARGB32.blue(color);
+        ModelRenderer.renderModel(ServantryModelRegister.TERRAPRISM, poseStack, type -> new TintedVertexConsumer(bufferSource.getBuffer(type), red, green, blue, 255));
     }
 }

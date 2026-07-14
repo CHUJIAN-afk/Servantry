@@ -26,8 +26,8 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
     }
 
     @Override
-    protected void renderEntityModel(BlitzBall blitzBall, PoseStack poseStack, MultiBufferSource bufferSource, PathNode node, RenderContext<BlitzBall> config) {
-        super.renderEntityModel(blitzBall, poseStack, bufferSource, node, config);
+    protected void modelModify(BlitzBall blitzBall, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context) {
+        super.modelModify(blitzBall, poseStack, bufferSource, visualNode, context);
         Set<Integer> list = blitzBall.getIdList();
         Player owner = blitzBall.getOwner();
         Level level = owner.level();
@@ -38,9 +38,9 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
                 random.setSeed(blitzBall.hashCode() + living.hashCode());
                 AABB box = living.getBoundingBox();
                 LightningRenderer.builder()
-                        .from(node.pos())
+                        .from(visualNode.pos())
                         .to(box.getCenter().offsetRandom(random, (float) box.getSize() * 0.5f))
-                        .renderOrigin(node.pos())
+                        .renderOrigin(visualNode.pos())
                         .layers(1)
                         .segments(4)
                         .branches(0)
@@ -55,7 +55,7 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
     }
 
     @Override
-    protected void renderEntity(BlitzBall entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> config) {
+    protected void render(BlitzBall entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context) {
         SphereRenderer.builder()
                 .radius(0.25f)
                 .layers(3)

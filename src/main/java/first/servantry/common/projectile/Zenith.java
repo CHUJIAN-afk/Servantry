@@ -5,6 +5,7 @@ import first.servantry.api.entity.*;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -90,6 +91,18 @@ public class Zenith extends Projectile implements ICollideAttack<Zenith> {
 
     @Override
     protected void tickPhysics() {
+    }
+
+    @Override
+    public PathNode getRenderNode(float partialTick) {
+        PathNode renderNode = super.getRenderNode(partialTick);
+        if (chaseTarget != null && chaseTarget.isAlive()) {
+            updateDirection(chaseTarget, partialTick);
+        }
+        if (!direction.equals(Vec3.ZERO)) {
+            return getNode(Mth.lerp(partialTick, lastProgress, progress), partialTick);
+        }
+        return renderNode;
     }
 
     @Override

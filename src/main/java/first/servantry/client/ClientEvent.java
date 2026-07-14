@@ -44,20 +44,24 @@ public class ClientEvent {
         Minecraft minecraft = Minecraft.getInstance();
         ClientLevel clientLevel = minecraft.level;
         LocalPlayer player = minecraft.player;
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS || clientLevel == null || player == null) {
-            return;
-        }
-        OreScout scout = ServantryHelper.get(player).getEntityData().get(EntityData.Type.Servant, OreScout.class).stream().findAny().orElse(null);
-        if (scout != null) {
-            MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();
-            VertexConsumer innerConsumer = bufferSource.getBuffer(OreScoutHighlightRenderType.line());
-            Vec3 cameraPos = minecraft.gameRenderer.getMainCamera().getPosition();
-            PoseStack poseStack = event.getPoseStack();
-            for (BlockPos pos : scout.getHighlightedOres()) {
-                poseStack.pushPose();
-                poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
-                LevelRenderer.renderLineBox(poseStack, innerConsumer, 0, 0, 0, 1, 1, 1, 0.72F, 0.96F, 1.0F, 1.0F);
-                poseStack.popPose();
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS && clientLevel != null && player != null) {
+            List<OreScout> scouts = ServantryHelper.get(player)
+                    .getEntityData()
+                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.OreScout.get());
+            if (!scouts.isEmpty()) {
+                OreScout scout = scouts.getFirst();
+                MultiBufferSource bufferSource = minecraft.renderBuffers()
+                        .bufferSource();
+                VertexConsumer innerConsumer = bufferSource.getBuffer(OreScoutHighlightRenderType.line());
+                Vec3 cameraPos = minecraft.gameRenderer.getMainCamera()
+                        .getPosition();
+                PoseStack poseStack = event.getPoseStack();
+                for (BlockPos pos : scout.getHighlightedOres()) {
+                    poseStack.pushPose();
+                    poseStack.translate(pos.getX() - cameraPos.x, pos.getY() - cameraPos.y, pos.getZ() - cameraPos.z);
+                    LevelRenderer.renderLineBox(poseStack, innerConsumer, 0, 0, 0, 1, 1, 1, 0.72F, 0.96F, 1.0F, 1.0F);
+                    poseStack.popPose();
+                }
             }
         }
     }

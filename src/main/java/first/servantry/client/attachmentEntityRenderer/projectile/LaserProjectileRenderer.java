@@ -18,7 +18,7 @@ public class LaserProjectileRenderer extends AbstractAttachmentEntityRenderer<La
     }
 
     @Override
-    protected void renderEntity(Laser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Laser> config) {
+    protected void render(Laser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Laser> context) {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;

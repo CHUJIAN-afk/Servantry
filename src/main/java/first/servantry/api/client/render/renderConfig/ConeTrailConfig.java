@@ -58,8 +58,7 @@ public class ConeTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, 
     }
 
     @Override
-    public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource,
-                       float partialTick, PathNode visualNode, RenderType renderType) {
+    public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderType renderType) {
         RenderSetup<T> setup = beginRender(entity, poseStack, bufferSource, partialTick, visualNode, renderType);
         if (setup == null) {
             return;
@@ -80,7 +79,7 @@ public class ConeTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, 
         VertexConsumer consumer = setup.consumer;
         Matrix4f pose = setup.pose;
         T entity = setup.entity;
-        float timeShift = setup.timeShift;
+        float partialTick = setup.partialTick;
 
         float[] cosArr = getCosArray(resolution);
         float[] sinArr = getSinArray(resolution);
@@ -104,8 +103,8 @@ public class ConeTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, 
             float currRadius = maxRadius * (minRadiusRatio + (1 - minRadiusRatio) * currFade);
             float prevRadius = maxRadius * (minRadiusRatio + (1 - minRadiusRatio) * prevFade);
 
-            int currColor = colorFunction.getColor(entity, currProgress, timeShift);
-            int prevColor = colorFunction.getColor(entity, prevProgress, timeShift);
+            int currColor = colorFunction.getColor(entity, currProgress, partialTick);
+            int prevColor = colorFunction.getColor(entity, prevProgress, partialTick);
             // 旧版 alpha = round(fade * 200)，等价于 fade * (200/255) 后 pack
             int currARGB = packColor(currColor, currFade * (200f / 255f));
             int prevARGB = packColor(prevColor, prevFade * (200f / 255f));

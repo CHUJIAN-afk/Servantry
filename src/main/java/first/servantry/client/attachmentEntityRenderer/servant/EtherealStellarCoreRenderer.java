@@ -22,18 +22,12 @@ public class EtherealStellarCoreRenderer extends AbstractAttachmentEntityRendere
                                .scale(0.5f)
                                .translateOffset(-0.5f, -0.5f, -0.5f)
                                .alphaDistanceFactor(1.5f)
-                               .visualNodeFunction((entity, partialTick, rawNode) -> {
-                                   entity.getOwner().tickCount += 10;
-                                   PathNode idleState = entity.getInterpolatedIdleState(partialTick);
-                                   entity.getOwner().tickCount -= 10;
-                                   return idleState;
-                               })
                 )
                 .build();
     }
 
     @Override
-    protected void renderEntity(EtherealStellarCore servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EtherealStellarCore> config) {
+    protected void render(EtherealStellarCore servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EtherealStellarCore> context) {
         ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 }

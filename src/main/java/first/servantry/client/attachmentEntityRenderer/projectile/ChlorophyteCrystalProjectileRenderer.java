@@ -33,7 +33,7 @@ public class ChlorophyteCrystalProjectileRenderer extends AbstractAttachmentEnti
     }
 
     @Override
-    protected void renderEntity(ChlorophyteCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ChlorophyteCrystal> config) {
+    protected void render(ChlorophyteCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ChlorophyteCrystal> context) {
         ModelRenderer.renderModel(ServantryModelRegister.CHLOROPHYTE_CRYSTAL, poseStack, bufferSource);
     }
 }

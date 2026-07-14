@@ -59,7 +59,6 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
 
         VertexConsumer consumer = setup.consumer;
         Matrix4f pose = setup.pose;
-        float timeShift = setup.timeShift;
         Vec3 renderPos = setup.renderPos;
 
         int nodeCount = setup.nodeCount();
@@ -84,8 +83,8 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
             prevBase.set(0, 0, downOffset).rotate(prev.rot());
 
             // 颜色与亮度
-            int currColorRGB = colorFunction.getColor(entity, currProgress, timeShift);
-            int prevColorRGB = colorFunction.getColor(entity, prevProgress, timeShift);
+            int currColorRGB = colorFunction.getColor(entity, currProgress, setup.partialTick);
+            int prevColorRGB = colorFunction.getColor(entity, prevProgress, setup.partialTick);
             float currBright = tipBrightnessBoost.getBoost(entity, currProgress);
             float prevBright = tipBrightnessBoost.getBoost(entity, prevProgress);
             float currAlphaBoost = tipAlphaBoost.getBoost(entity, currProgress);

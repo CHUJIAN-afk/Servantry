@@ -1,7 +1,7 @@
 package first.servantry.utils;
 
 import first.servantry.api.common.attachment.BatchedParticlesData;
-import first.servantry.api.common.particle.GenericParticleBuilder;
+import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.level.Level;

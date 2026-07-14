@@ -38,7 +38,7 @@ public class StardustProjectileRenderer extends AbstractAttachmentEntityRenderer
     }
 
     @Override
-    protected void renderEntity(MiniStardustCell projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniStardustCell> config) {
+    protected void render(MiniStardustCell projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniStardustCell> context) {
         ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 

@@ -213,7 +213,7 @@ public class DamageInfo {
             return Mth.lerp(Math.min(progress / 0.05f, 1), 0.5f, 1.0f);
         }
         if (progress > 0.9f) {
-            return Mth.lerp((progress - 0.9f) / 0.1f, 1.0f, 0.5f);
+            return Mth.lerp((progress - 0.9f) / 0.1f, 1.0f, 0f);
         }
         return 1;
     }

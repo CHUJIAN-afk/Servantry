@@ -1,6 +1,6 @@
 package first.servantry.common.servant;
 
-import first.servantry.api.common.particle.GenericParticleBuilder;
+import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
@@ -93,6 +93,11 @@ public class EtherealStellarCore extends Servant {
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
         return ServantryAttachmentEntityRegister.EtherealStellarCore.get();
+    }
+
+    @Override
+    public PathNode getRenderNode(float partialTick) {
+        return getInterpolatedIdleState(partialTick);
     }
 
     /**

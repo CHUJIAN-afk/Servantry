@@ -18,7 +18,7 @@ public class DestructionBulletRenderer extends AbstractAttachmentEntityRenderer<
     }
 
     @Override
-    protected void renderEntity(DestructionBullet entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DestructionBullet> config) {
+    protected void render(DestructionBullet entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DestructionBullet> context) {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;

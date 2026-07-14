@@ -8,6 +8,7 @@
     "CreativeModeTabMixin",
     "DamageSourceMixin",
     "DamageSourcesMixin",
+    "LevelRendererAccessor",
     "LivingEntityMixin",
     "PlayerMixin"
   ],

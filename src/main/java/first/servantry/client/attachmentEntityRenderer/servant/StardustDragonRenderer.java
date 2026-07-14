@@ -38,7 +38,7 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
     }
 
     @Override
-    protected void renderEntity(StardustDragon dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustDragon> config) {
+    protected void render(StardustDragon dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustDragon> context) {
         int total = dragon.getTotalSegments();
         int index = dragon.getSegmentIndex();
         ModelResourceLocation model;

@@ -49,7 +49,6 @@ public class DropletTrailConfig<T extends AttachmentEntity> extends ConeTrailCon
         VertexConsumer consumer = setup.consumer;
         Matrix4f pose = setup.pose;
         T entity = setup.entity;
-        float timeShift = setup.timeShift;
 
         float[] cosArr = getCosArray(resolution);
         float[] sinArr = getSinArray(resolution);
@@ -59,7 +58,7 @@ public class DropletTrailConfig<T extends AttachmentEntity> extends ConeTrailCon
         // 头部半径必须与圆锥第一段（progress=0）的头部半径用同一公式，
         // 否则半球赤道与圆锥截面半径不一致，接缝处错位重合。
         float headRadius = maxRadius * (minRadiusRatio + (1 - minRadiusRatio) * headFade);
-        int headColor = colorFunction.getColor(entity, 0, timeShift);
+        int headColor = colorFunction.getColor(entity, 0, setup.partialTick);
         // 旧版 alpha = round(headFade * 200)
         int headARGB = packColor(headColor, headFade * (200f / 255f));
 

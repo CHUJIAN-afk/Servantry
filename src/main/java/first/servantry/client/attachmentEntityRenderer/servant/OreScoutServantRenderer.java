@@ -19,13 +19,12 @@ public class OreScoutServantRenderer extends AbstractAttachmentEntityRenderer<Or
                         .scale(0.4f)
                         .translateOffset(-0.5f, -0.5f, -0.5f)
                         .alphaDistanceFactor(1.6f)
-                        .visualNodeFunction((entity, partialTick, rawNode) -> entity.getInterpolatedIdleState(partialTick))
                 )
                 .build();
     }
 
     @Override
-    protected void renderEntity(OreScout servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<OreScout> config) {
+    protected void render(OreScout servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<OreScout> context) {
         ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
     }
 }

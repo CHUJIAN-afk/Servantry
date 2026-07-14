@@ -1,4 +1,4 @@
-package first.servantry.api.common.particle;
+package first.servantry.api.common.particle.genericParticle;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

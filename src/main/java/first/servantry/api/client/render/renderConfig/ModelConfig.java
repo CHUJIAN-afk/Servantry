@@ -1,6 +1,5 @@
 package first.servantry.api.client.render.renderConfig;
 
-import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.entity.AttachmentEntity;
 
 /**
@@ -54,13 +53,6 @@ public class ModelConfig<T extends AttachmentEntity> {
      */
     public float rollOffset = 0f;
 
-    // ===================== 视觉节点函数 =====================
-
-    /**
-     * 视觉节点插值函数
-     */
-    public RenderContext.VisualNodeFunction<T> visualNodeFunction = (entity, partialTick, rawNode) -> rawNode;
-
     // ===================== 透明度参数 =====================
 
     /**
@@ -90,11 +82,6 @@ public class ModelConfig<T extends AttachmentEntity> {
         this.yawOffset = yaw;
         this.pitchOffset = pitch;
         this.rollOffset = roll;
-        return this;
-    }
-
-    public ModelConfig<T> visualNodeFunction(RenderContext.VisualNodeFunction<T> function) {
-        this.visualNodeFunction = function;
         return this;
     }
 

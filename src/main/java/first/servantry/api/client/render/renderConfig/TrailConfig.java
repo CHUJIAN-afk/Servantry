@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.FastColor;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -51,7 +50,7 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
     public int colorRGB = 0xFF0000;
 
     /** 颜色函数 */
-    public RenderContext.ColorFunction<T> colorFunction = (entity, progress, timeShift) -> colorRGB;
+    public RenderContext.ColorFunction<T> colorFunction = (entity, progress, partialTick) -> colorRGB;
 
     /** 淡出函数 */
     public RenderContext.FadeFunction fadeOut = progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 1.5);
@@ -156,10 +155,8 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
         }
         VertexConsumer consumer = bufferSource.getBuffer(renderType);
         Matrix4f pose = poseStack.last().pose();
-        Player owner = entity.getOwner();
-        float timeShift = owner != null ? (owner.tickCount + partialTick) * TIME_SHIFT_SCALE : 0f;
         Vec3 renderPos = visualNode.pos();
-        return new RenderSetup<>(entity, consumer, pose, timeShift, renderPos, smoothNodes);
+        return new RenderSetup<>(entity, consumer, pose, partialTick, renderPos, smoothNodes);
     }
 
     /**
@@ -169,15 +166,15 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
         public final T entity;
         public final VertexConsumer consumer;
         public final Matrix4f pose;
-        public final float timeShift;
+        public final float partialTick;
         public final net.minecraft.world.phys.Vec3 renderPos;
         public final List<InterpolatedNode> smoothNodes;
 
-        RenderSetup(T entity, VertexConsumer consumer, Matrix4f pose, float timeShift, Vec3 renderPos, List<InterpolatedNode> smoothNodes) {
+        RenderSetup(T entity, VertexConsumer consumer, Matrix4f pose, float partialTick, Vec3 renderPos, List<InterpolatedNode> smoothNodes) {
             this.entity = entity;
             this.consumer = consumer;
             this.pose = pose;
-            this.timeShift = timeShift;
+            this.partialTick = partialTick;
             this.renderPos = renderPos;
             this.smoothNodes = smoothNodes;
         }

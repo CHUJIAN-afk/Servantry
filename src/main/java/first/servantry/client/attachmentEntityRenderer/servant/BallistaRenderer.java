@@ -23,7 +23,7 @@ public class BallistaRenderer extends AbstractAttachmentEntityRenderer<Ballista>
     }
 
     @Override
-    protected void renderEntity(Ballista entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Ballista> config) {
+    protected void render(Ballista entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Ballista> context) {
         ModelRenderer.renderModel(ServantryModelRegister.BALLISTA, poseStack, bufferSource);
     }
 }

@@ -35,7 +35,7 @@ public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
     }
 
     @Override
-    protected void renderEntity(Twins servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Twins> config) {
+    protected void render(Twins servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Twins> context) {
         if (servant.isLaserEye()) {
             ModelRenderer.renderModel(ServantryModelRegister.TWINS_LASER, poseStack, bufferSource);
         } else {

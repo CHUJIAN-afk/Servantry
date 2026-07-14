@@ -1,4 +1,4 @@
-package first.servantry.api.common.particle;
+package first.servantry.api.common.particle.genericParticle;
 
 import java.util.Random;
 

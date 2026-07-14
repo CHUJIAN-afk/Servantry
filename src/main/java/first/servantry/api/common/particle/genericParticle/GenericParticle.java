@@ -1,4 +1,4 @@
-package first.servantry.api.common.particle;
+package first.servantry.api.common.particle.genericParticle;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -10,8 +10,8 @@ import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -171,9 +171,8 @@ public class GenericParticle extends TextureSheetParticle {
      * </p>
      */
     private void renderQuad(VertexConsumer buffer, float cx, float cy, float cz, Quaternionf quaternion, float minX, float minY, float maxX, float maxY, float u0, float u1, float v0, float v1, int color, int light, int overlay) {
-        // 复用静态 Vector3f 避免 per-quad 分配，旋转后直接写顶点
-        Vector3f v = TMP_VEC;
-
+        // 复用 Vector3f 避免 per-quad 分配，旋转后直接写顶点
+        Vector3f v = new Vector3f();
         v.set(minX, minY, 0.0F).rotate(quaternion);
         buffer.addVertex(cx + v.x, cy + v.y, cz + v.z, color, u0, v0, overlay, light, 0.0F, 0.0F, 1.0F);
         v.set(maxX, minY, 0.0F).rotate(quaternion);
@@ -183,9 +182,6 @@ public class GenericParticle extends TextureSheetParticle {
         v.set(minX, maxY, 0.0F).rotate(quaternion);
         buffer.addVertex(cx + v.x, cy + v.y, cz + v.z, color, u0, v1, overlay, light, 0.0F, 0.0F, 1.0F);
     }
-
-    /** per-quad 旋转复用的临时 Vector3f（单线程渲染，安全复用） */
-    private static final Vector3f TMP_VEC = new Vector3f();
 
     /**
      * 自定义粒子渲染类型：NEW_ENTITY 格式 + entity translucent shader，使 BufferBuilder 走 fastFormat fast path。
@@ -204,7 +200,7 @@ public class GenericParticle extends TextureSheetParticle {
         public BufferBuilder begin(Tesselator tesselator, @NotNull TextureManager textureManager) {
             RenderSystem.depthMask(true);
             RenderSystem.setShader(GameRenderer::getRendertypeEntityTranslucentShader);
-            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
+            RenderSystem.setShaderTexture(0, ResourceLocation.withDefaultNamespace("textures/atlas/particles.png"));
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.NEW_ENTITY);

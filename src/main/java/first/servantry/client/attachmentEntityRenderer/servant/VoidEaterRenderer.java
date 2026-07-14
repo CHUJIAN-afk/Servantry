@@ -26,7 +26,7 @@ public class VoidEaterRenderer extends AbstractAttachmentEntityRenderer<VoidEate
     }
 
     @Override
-    protected void renderEntity(VoidEater dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<VoidEater> config) {
+    protected void render(VoidEater dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<VoidEater> context) {
         int total = dragon.getTotalSegments();
         int index = dragon.getSegmentIndex();
         ModelResourceLocation model;

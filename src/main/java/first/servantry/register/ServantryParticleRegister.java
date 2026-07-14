@@ -2,7 +2,7 @@ package first.servantry.register;
 
 import com.mojang.serialization.MapCodec;
 import first.servantry.Servantry;
-import first.servantry.api.common.particle.GenericParticleOptions;
+import first.servantry.api.common.particle.genericParticle.GenericParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;

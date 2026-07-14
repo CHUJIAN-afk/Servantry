@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -33,22 +32,20 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
                         .timer(timer)
                         .colorRGB(dominantColor)
                         .historyLength(4)
-                        .upOffset(1.015f)
-                        .colorFunction((shadow, progress, timeShift) -> dominantColor);
+                        .upOffset(1.015f);
             }
             return RenderContext.<InfiniteShadow>builder()
                     .trail(trailConfig)
                     .model(new ModelConfig<InfiniteShadow>()
                                    .scale(1.5f)
-                                   .rotationOffset(0, 90, -45)
-                                   .visualNodeFunction((shadow, partialTick, rawNode) -> rawNode.lerp(shadow.getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, shadow.idleBlendO, shadow.idleBlend))))
+                                   .rotationOffset(0, 90, -45))
                     .build();
         }
         return null;
     }
 
     @Override
-    protected void renderEntity(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> config) {
+    protected void render(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> context) {
         ItemStack itemStack = infiniteShadow.getItemStack();
         if (!itemStack.isEmpty()) {
             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();

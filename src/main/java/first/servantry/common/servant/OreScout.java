@@ -53,6 +53,11 @@ public class OreScout extends Servant {
         return Collections.unmodifiableList(highlightedOres);
     }
 
+    @Override
+    public PathNode getRenderNode(float partialTick) {
+        return getInterpolatedIdleState(partialTick);
+    }
+
     public PathNode getInterpolatedIdleState(float partialTick) {
         var owner = getOwner();
         double px = Mth.lerp(partialTick, owner.xo, owner.getX());

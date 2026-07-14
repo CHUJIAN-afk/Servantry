@@ -201,7 +201,7 @@ public class ServantryServantWeaponRegister {
                                 PulseTurret servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
-                                    if (servantryHelper.getEntityData().get(EntityData.Type.SentryServant, PulseTurret.class).isEmpty()) {
+                                    if (servantryHelper.getEntityData().get(EntityData.Type.SentryServant, ServantryAttachmentEntityRegister.PulseTurret.get()).isEmpty()) {
                                         servant.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
                                         servantryHelper.add(EntityData.Type.SentryServant, servant);
                                     }

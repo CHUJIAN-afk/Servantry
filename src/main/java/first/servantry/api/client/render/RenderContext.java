@@ -3,7 +3,6 @@ package first.servantry.api.client.render;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.TrailConfig;
 import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.PathNode;
 
 /**
  * 渲染上下文，封装附件实体渲染所需的所有参数和配置。
@@ -52,7 +51,7 @@ public class RenderContext<T extends AttachmentEntity> {
     /** 颜色计算函数 */
     @FunctionalInterface
     public interface ColorFunction<T extends AttachmentEntity> {
-        int getColor(T entity, float progress, float timeShift);
+        int getColor(T entity, float progress, float partialTick);
     }
 
     /** 淡出函数 */
@@ -71,14 +70,6 @@ public class RenderContext<T extends AttachmentEntity> {
     @FunctionalInterface
     public interface BrightnessBoostFunction<T extends AttachmentEntity> {
         float getBoost(T entity, float progress);
-    }
-
-    // ===================== ServantWeaponItemBuilder =====================
-
-    /** 视觉节点计算函数 */
-    @FunctionalInterface
-    public interface VisualNodeFunction<T extends AttachmentEntity> {
-        PathNode getVisualNode(T entity, float partialTick, PathNode rawNode);
     }
 
     /** 渲染上下文构建器 */

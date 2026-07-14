@@ -154,7 +154,7 @@ public class Event {
             if (ServantryArmorSetRegister.Hallowed.get().full(player)) {
                 target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
             }
-            List<VoidEater> voidEaters = ServantryHelper.get(player).getEntityData().get(EntityData.Type.Servant, VoidEater.class);
+            List<VoidEater> voidEaters = ServantryHelper.get(player).getEntityData().get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.VoidEater.get());
             if (!voidEaters.isEmpty()) {
                 target.addEffect(new MobEffectInstance(ServantryMobEffectRegister.GodSlayerInferno, 60));
             }
@@ -162,7 +162,7 @@ public class Event {
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player && target.isAlive()) {
             EntityData entityData = player.getData(ServantryAttachmentRegister.EntityData);
             if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof ChlorophyteCrystal)) {
-                List<ChlorophyteCrystal> crystals = entityData.get(EntityData.Type.ExtraServant, ChlorophyteCrystal.class);
+                List<ChlorophyteCrystal> crystals = entityData.get(EntityData.Type.ExtraServant, ServantryAttachmentEntityRegister.ChlorophyteCrystal.get());
                 for (ChlorophyteCrystal crystal : crystals) {
                     if (crystal.getExtraShootCooldown() <= 0) {
                         crystal.setExtraShootCooldown(16);
@@ -171,7 +171,7 @@ public class Event {
                 }
             }
             if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof StardustCell)) {
-                List<StardustCell> stardustCells = entityData.get(EntityData.Type.Servant, StardustCell.class);
+                List<StardustCell> stardustCells = entityData.get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.StardustCell.get());
                 for (StardustCell cell : stardustCells) {
                     if (cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
                         cell.setExtraShootCooldown(14);

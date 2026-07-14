@@ -6,7 +6,7 @@ import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
-import first.servantry.api.common.particle.GenericParticleBuilder;
+import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.StardustCell;
 import first.servantry.register.ServantryModelRegister;
@@ -41,8 +41,8 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
     }
 
     @Override
-    protected void renderEntity(StardustCell servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> config) {
-        if (config.hasTrail() && !Minecraft.getInstance().isPaused()) {
+    protected void render(StardustCell servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> context) {
+        if (context.hasTrail() && !Minecraft.getInstance().isPaused()) {
             int trailTimer = servant.getTrailTimer();
             ParticleHelper.create(servant.getOwner().level())
                     .generic(GenericParticleBuilder.create()

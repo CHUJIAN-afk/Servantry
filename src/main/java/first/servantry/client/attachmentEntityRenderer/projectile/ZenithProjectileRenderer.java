@@ -6,14 +6,13 @@ import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.RibbonTrailConfig;
-import first.servantry.api.common.particle.GenericParticleBuilder;
+import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.Zenith;
 import first.servantry.register.ServantryModelRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -33,22 +32,12 @@ public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Z
                 .model(new ModelConfig<Zenith>()
                                .scale(2)
                                .translateOffset(-0.5f, -0.5f, -0.5f)
-                               .rotationOffset(0, 90, 45)
-                               .visualNodeFunction((entity, partialTick, rawNode) -> {
-                                   if (entity.chaseTarget != null && entity.chaseTarget.isAlive()) {
-                                       entity.updateDirection(entity.chaseTarget, partialTick);
-                                   }
-                                   Vec3 direction = entity.direction;
-                                   if (!direction.equals(Vec3.ZERO)) {
-                                       return entity.getNode(Mth.lerp(partialTick, entity.lastProgress, entity.progress), partialTick);
-                                   }
-                                   return rawNode;
-                               }))
+                               .rotationOffset(0, 90, 45))
                 .build();
     }
 
     @Override
-    protected void renderEntity(Zenith zenith, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Zenith> config) {
+    protected void render(Zenith zenith, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Zenith> context) {
         ArrayList<PathNode> pathNodes = zenith.getHistoryNodes();
         Player owner = zenith.getOwner();
         if (pathNodes.size() > 3 && !Minecraft.getInstance().isPaused()) {

@@ -2,7 +2,7 @@ package first.servantry.common.projectile;
 
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.common.particle.GenericParticleBuilder;
+import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;

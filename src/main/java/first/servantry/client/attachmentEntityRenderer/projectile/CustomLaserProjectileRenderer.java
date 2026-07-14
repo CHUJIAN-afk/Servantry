@@ -29,7 +29,7 @@ public class CustomLaserProjectileRenderer extends AbstractAttachmentEntityRende
     }
 
     @Override
-    protected void renderEntity(CustomLaser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<CustomLaser> config) {
+    protected void render(CustomLaser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<CustomLaser> context) {
         int color = entity.getColor();
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();

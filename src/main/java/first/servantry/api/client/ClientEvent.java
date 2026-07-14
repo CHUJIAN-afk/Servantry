@@ -2,7 +2,7 @@ package first.servantry.api.client;
 
 import first.servantry.Servantry;
 import first.servantry.api.client.tooltip.TooltipHandler;
-import first.servantry.api.common.particle.provider.GenericParticleProvider;
+import first.servantry.api.common.particle.genericParticle.GenericParticleProvider;
 import first.servantry.api.damageInfo.DamageInfoStyleManager;
 import first.servantry.register.ServantryParticleRegister;
 import net.neoforged.api.distmarker.Dist;

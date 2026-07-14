@@ -1,10 +1,13 @@
 package first.servantry.client.attachmentEntityRenderer.projectile;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
+import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.RainbowCrystal;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 
 public class RainbowCrystalProjectileRenderer extends AbstractAttachmentEntityRenderer<RainbowCrystal> {
 
@@ -20,5 +23,10 @@ public class RainbowCrystalProjectileRenderer extends AbstractAttachmentEntityRe
                                .maxRadius((crystal.getLife() + partialTick) * 0.025f)
                                .resolution(4))
                 .build();
+    }
+
+    @Override
+    protected void render(RainbowCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<RainbowCrystal> context) {
+
     }
 }

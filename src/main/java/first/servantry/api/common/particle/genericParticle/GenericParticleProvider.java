@@ -1,7 +1,5 @@
-package first.servantry.api.common.particle.provider;
+package first.servantry.api.common.particle.genericParticle;
 
-import first.servantry.api.common.particle.GenericParticle;
-import first.servantry.api.common.particle.GenericParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;

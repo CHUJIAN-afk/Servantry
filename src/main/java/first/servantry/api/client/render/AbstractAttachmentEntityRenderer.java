@@ -2,6 +2,8 @@ package first.servantry.api.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
+import first.servantry.api.client.dynamicLight.DynamicLightRenderer;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.TrailConfig;
 import first.servantry.api.client.renderType.TrailRenderType;
@@ -25,50 +27,40 @@ import net.minecraft.world.phys.Vec3;
  */
 public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntity> implements IAttachmentEntityRenderer<T> {
 
-    // ===================== 核心抽象方法 =====================
-
     /**
      * 为指定附件实体创建渲染上下文
      */
     protected abstract RenderContext<T> createContext(T entity);
 
     /** 渲染附件实体本体 */
-    protected void renderEntity(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> config) {
-    }
-
-    // ===================== 主渲染入口 =====================
+    protected abstract void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context);
 
     @Override
-    public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode renderNode) {
-        RenderContext<T> config = createContext(entity);
-        if (config == null) return;
-
-        poseStack.pushPose();
-        PathNode visualNode = config.model.visualNodeFunction.getVisualNode(entity, partialTick, renderNode);
-
-        AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);
-        alphaBufferSource.setAlpha(calculateFirstPersonAlpha(config, visualNode, partialTick));
-
-        Vec3 offset = visualNode.pos().subtract(renderNode.pos());
-        poseStack.translate(offset.x, offset.y, offset.z);
-
-        if (config.hasTrail()) {
-            config.trail.render(entity, poseStack, alphaBufferSource, partialTick, visualNode, TrailRenderType.getTrail());
+    public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode visualNode) {
+        RenderContext<T> context = createContext(entity);
+        if (context != null) {
+            poseStack.pushPose();
+            AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);
+            alphaBufferSource.setAlpha(getAlphaModify(context, visualNode, partialTick));
+            if (context.hasTrail()) {
+                context.trail.render(entity, poseStack, alphaBufferSource, partialTick, visualNode, TrailRenderType.getTrail());
+            }
+            modelModify(entity, poseStack, alphaBufferSource, visualNode, context);
+            poseStack.popPose();
+            if (this instanceof DynamicLightRenderer<?>) {
+                @SuppressWarnings("unchecked") DynamicLightRenderer<T> dynamicLightRenderer = (DynamicLightRenderer<T>) this;
+                DynamicLightDispatcher.addLightSources(dynamicLightRenderer.getDynamicLight(entity, context, visualNode));
+            }
         }
-
-        renderEntityModel(entity, poseStack, alphaBufferSource, visualNode, config);
-        poseStack.popPose();
     }
 
-    // ===================== 模型渲染 =====================
-
-    protected void renderEntityModel(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode node, RenderContext<T> config) {
-        ModelConfig<T> model = config.model;
+    protected void modelModify(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context) {
+        ModelConfig<T> model = context.model;
         poseStack.pushPose();
 
-        poseStack.mulPose(Axis.YN.rotationDegrees(node.yaw()));
-        poseStack.mulPose(Axis.XP.rotationDegrees(node.pitch()));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(node.roll()));
+        poseStack.mulPose(Axis.YN.rotationDegrees(visualNode.yaw()));
+        poseStack.mulPose(Axis.XP.rotationDegrees(visualNode.pitch()));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(visualNode.roll()));
 
         poseStack.mulPose(Axis.YN.rotationDegrees(model.yawOffset));
         poseStack.mulPose(Axis.XP.rotationDegrees(model.pitchOffset));
@@ -77,13 +69,11 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         poseStack.scale(model.scale, model.scale, model.scale);
         poseStack.translate(model.translateX, model.translateY, model.translateZ);
 
-        renderEntity(entity, poseStack, bufferSource, node, config);
+        render(entity, poseStack, bufferSource, visualNode, context);
         poseStack.popPose();
     }
 
-    // ===================== 第一人称透明度计算 =====================
-
-    private float calculateFirstPersonAlpha(RenderContext<T> config, PathNode visualNode, float partialTick) {
+    protected float getAlphaModify(RenderContext<T> config, PathNode visualNode, float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
         Player player = minecraft.player;
         if (player == null || !minecraft.options.getCameraType().isFirstPerson()) {

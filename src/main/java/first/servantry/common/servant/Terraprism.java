@@ -130,6 +130,12 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         return Mth.hsvToRgb(hueShift, 0.75f - 0.35f * breathFactor, 1.0f);
     }
 
+    @Override
+    public PathNode getRenderNode(float partialTick) {
+        PathNode renderNode = super.getRenderNode(partialTick);
+        return renderNode.lerp(getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, idleBlendO, idleBlend));
+    }
+
     public PathNode getInterpolatedIdleState(float partialTick) {
         float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
         float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);

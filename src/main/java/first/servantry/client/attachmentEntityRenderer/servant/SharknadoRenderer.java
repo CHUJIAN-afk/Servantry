@@ -23,12 +23,7 @@ public class SharknadoRenderer extends AbstractAttachmentEntityRenderer<Sharknad
     }
 
     @Override
-    protected void renderEntityModel(Sharknado entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode node, RenderContext<Sharknado> config) {
-        super.renderEntityModel(entity, poseStack, bufferSource, node, config);
-    }
-
-    @Override
-    protected void renderEntity(Sharknado entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Sharknado> config) {
+    protected void render(Sharknado entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Sharknado> context) {
         ModelRenderer.renderModel(ServantryModelRegister.SHARKNADO, poseStack, bufferSource);
     }
 }

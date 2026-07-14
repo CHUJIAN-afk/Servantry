@@ -18,7 +18,7 @@ public class GodFlameProjectileRenderer extends AbstractAttachmentEntityRenderer
     }
 
     @Override
-    protected void renderEntity(GodFlame entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<GodFlame> config) {
+    protected void render(GodFlame entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<GodFlame> context) {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;

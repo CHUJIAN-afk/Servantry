@@ -30,13 +30,12 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
                 .model(new ModelConfig<EnchantedThrowingKnives>()
                                .scale(0.5f)
                                .translateOffset(-0.5f, -0.5f, -0.5f)
-                               .rotationOffset(0, 90, 0)
-                               .visualNodeFunction((knives, partialTick, rawNode) -> rawNode))
+                               .rotationOffset(0, 90, 0))
                 .build();
     }
 
     @Override
-    protected void renderEntity(EnchantedThrowingKnives servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EnchantedThrowingKnives> config) {
+    protected void render(EnchantedThrowingKnives servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EnchantedThrowingKnives> context) {
         ModelRenderer.renderModel(ServantryModelRegister.ENCHANTED_THROWING_KNIVES, poseStack, bufferSource);
     }
 }
