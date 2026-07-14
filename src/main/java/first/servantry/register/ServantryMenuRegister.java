@@ -11,12 +11,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ServantryMenuRegister {
 
-    private static final DeferredRegister<MenuType<?>> MENUS =
-            DeferredRegister.create(Registries.MENU, Servantry.MODID);
+    private static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, Servantry.MODID);
 
-    public static final DeferredHolder<MenuType<?>, MenuType<MithrilAnvilGui.MithrilAnvilMenu>> MITHRIL_ANVIL =
-            MENUS.register("mithril_anvil", () ->
-                    IMenuTypeExtension.create((id, inv, buf) -> new MithrilAnvilGui.MithrilAnvilMenu(id, inv)));
+    public static final DeferredHolder<MenuType<?>, MenuType<MithrilAnvilGui.MithrilAnvilMenu>> MITHRIL_ANVIL = MENUS.register("mithril_anvil", () -> IMenuTypeExtension.create((id, inv, buf) -> new MithrilAnvilGui.MithrilAnvilMenu(id, inv)));
 
     public static void register(IEventBus eventBus) {
         MENUS.register(eventBus);

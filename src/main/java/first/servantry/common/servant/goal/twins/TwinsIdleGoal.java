@@ -25,7 +25,7 @@ public class TwinsIdleGoal extends ServantGoal<Twins> {
         double distance = servant.getPos().distanceTo(wanderPos);
         servant.applyForce(wanderPos.subtract(servant.getPos()).normalize().scale(Math.min(distance * 0.02, 0.2)));
         servant.lookAtDirection(servant.getVelocity().normalize());
-        if (servant.getPos().distanceToSqr(owner.position()) > 32 * 32) {
+        if (servant.getPos().distanceToSqr(owner.position()) > 64 * 64) {
             servant.teleportTo(wanderPos);
         }
     }

@@ -69,47 +69,32 @@ public record BatchedParticlesPayload(List<Entry> entries) implements CustomPack
     public record Entry(ParticleOptions options, double x, double y, double z, double vx, double vy, double vz) {
 
         public static final StreamCodec<RegistryFriendlyByteBuf, Entry> STREAM_CODEC = StreamCodec.ofMember(
-                Entry::write,
-                Entry::read
+                (entry, buf) -> {
+                    ParticleType<?> type = entry.options.getType();
+                    buf.writeVarInt(BuiltInRegistries.PARTICLE_TYPE.getId(type));
+                    @SuppressWarnings("unchecked") StreamCodec<? super RegistryFriendlyByteBuf, ParticleOptions> streamCodec = (StreamCodec<? super RegistryFriendlyByteBuf, ParticleOptions>) type.streamCodec();
+                    streamCodec.encode(buf, entry.options);
+                    buf.writeDouble(entry.x);
+                    buf.writeDouble(entry.y);
+                    buf.writeDouble(entry.z);
+                    buf.writeDouble(entry.vx);
+                    buf.writeDouble(entry.vy);
+                    buf.writeDouble(entry.vz);
+                },
+                buf -> {
+                    int id = buf.readVarInt();
+                    ParticleType<?> type = BuiltInRegistries.PARTICLE_TYPE.byId(id);
+                    assert type != null;
+                    @SuppressWarnings("unchecked") StreamCodec<? super RegistryFriendlyByteBuf, ParticleOptions> streamCodec = (StreamCodec<? super RegistryFriendlyByteBuf, ParticleOptions>) type.streamCodec();
+                    ParticleOptions options1 = streamCodec.decode(buf);
+                    double x1 = buf.readDouble();
+                    double y1 = buf.readDouble();
+                    double z1 = buf.readDouble();
+                    double vx1 = buf.readDouble();
+                    double vy1 = buf.readDouble();
+                    double vz1 = buf.readDouble();
+                    return new Entry(options1, x1, y1, z1, vx1, vy1, vz1);
+                }
         );
-
-        // 写：先写粒子类型注册表 id，再用该类型自有 codec 编码具体参数，最后写位置/速度
-        private void write(RegistryFriendlyByteBuf buf) {
-            ParticleType<?> type = options.getType();
-            buf.writeVarInt(BuiltInRegistries.PARTICLE_TYPE.getId(type));
-            writeOptions(buf, type, options);
-            buf.writeDouble(x);
-            buf.writeDouble(y);
-            buf.writeDouble(z);
-            buf.writeDouble(vx);
-            buf.writeDouble(vy);
-            buf.writeDouble(vz);
-        }
-
-        // 读：先读类型 id 反查 ParticleType，再用其 codec 解码具体参数
-        private static Entry read(RegistryFriendlyByteBuf buf) {
-            int id = buf.readVarInt();
-            ParticleType<?> type = BuiltInRegistries.PARTICLE_TYPE.byId(id);
-            assert type != null;
-            ParticleOptions options = readOptions(buf, type);
-            double x = buf.readDouble();
-            double y = buf.readDouble();
-            double z = buf.readDouble();
-            double vx = buf.readDouble();
-            double vy = buf.readDouble();
-            double vz = buf.readDouble();
-            return new Entry(options, x, y, z, vx, vy, vz);
-        }
-
-        @SuppressWarnings("unchecked")
-        private static <T extends ParticleOptions> void writeOptions(RegistryFriendlyByteBuf buf, ParticleType<T> type, ParticleOptions options) {
-            StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec = type.streamCodec();
-            streamCodec.encode(buf, (T) options);
-        }
-
-        private static <T extends ParticleOptions> ParticleOptions readOptions(RegistryFriendlyByteBuf buf, ParticleType<T> type) {
-            StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec = type.streamCodec();
-            return streamCodec.decode(buf);
-        }
     }
 }

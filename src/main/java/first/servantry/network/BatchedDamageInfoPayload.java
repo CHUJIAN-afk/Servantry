@@ -1,6 +1,7 @@
 package first.servantry.network;
 
 import first.servantry.Servantry;
+import first.servantry.api.common.attachment.DamageInfoData;
 import first.servantry.api.damageInfo.DamageInfo;
 import first.servantry.api.damageInfo.DamageInfoStyle;
 import first.servantry.api.damageInfo.DamageInfoStyleManager;
@@ -15,8 +16,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,24 +29,40 @@ import java.util.List;
  *
  * @param entries 伤害数字记录列表
  */
-public record DamageInfoPayload(List<Entry> entries) implements CustomPacketPayload {
+public record BatchedDamageInfoPayload(List<Entry> entries) implements CustomPacketPayload {
 
-    public static final Type<DamageInfoPayload> TYPE = new Type<>(Servantry.rl("damage_info"));
+    public static final Type<BatchedDamageInfoPayload> TYPE = new Type<>(Servantry.rl("damage_info"));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, DamageInfoPayload> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<RegistryFriendlyByteBuf, BatchedDamageInfoPayload> STREAM_CODEC = StreamCodec.composite(
             Entry.STREAM_CODEC.apply(ByteBufCodecs.list()),
-            DamageInfoPayload::entries,
-            DamageInfoPayload::new
+            BatchedDamageInfoPayload::entries,
+            BatchedDamageInfoPayload::new
     );
 
     /**
      * 客户端处理：逐条转为 {@link DamageInfo} 写入客户端 Level 附件。
      */
-    public static void handleClient(DamageInfoPayload payload, IPayloadContext context) {
+    public static void handleClient(BatchedDamageInfoPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
             Level level = player.level();
-            level.getData(ServantryAttachmentRegister.DamageInfoData).receive(payload.entries());
+            DamageInfoData damageInfoData = level.getData(ServantryAttachmentRegister.DamageInfoData);
+            for (Entry entry : payload.entries()) {
+                DamageInfo info = null;
+                DamageInfoStyle style = DamageInfoStyleManager.INSTANCE.getStyle(ResourceLocation.parse(entry.damageType));
+                if (style != null) {
+                    info = new DamageInfo(style, entry.damageAmount, new Vec3(entry.x, entry.y, entry.z), new Vec3(entry.vx, entry.vy, entry.vz), entry.critical);
+                }
+                if (info != null) {
+                    Vec3 pos = info.getRenderPos(0);
+                    Vec3 eyePosition = player.getEyePosition(0);
+                    if (pos.distanceToSqr(eyePosition) < 64 * 64) {
+                        damageInfoData.getActiveInfos()
+                                .computeIfAbsent(info.getTexture(), key -> new ArrayList<>())
+                                .add(info);
+                    }
+                }
+            }
         });
     }
 
@@ -87,17 +104,5 @@ public record DamageInfoPayload(List<Entry> entries) implements CustomPacketPayl
                         buf.readBoolean()
                 )
         );
-
-        /** 转为客户端渲染数据：根据 damageType 查询样式重建 DamageInfo，样式未定义时返回 null */
-        @Nullable
-        public DamageInfo toDamageInfo() {
-            if (damageAmount >= 0.01) {
-                DamageInfoStyle style = DamageInfoStyleManager.INSTANCE.getStyle(ResourceLocation.parse(damageType));
-                if (style != null) {
-                    return new DamageInfo(style, damageAmount, new Vec3(x, y, z), new Vec3(vx, vy, vz), critical);
-                }
-            }
-            return null;
-        }
     }
 }

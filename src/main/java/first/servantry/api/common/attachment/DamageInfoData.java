@@ -2,10 +2,8 @@ package first.servantry.api.common.attachment;
 
 import first.servantry.api.damageInfo.DamageInfo;
 import first.servantry.api.damageInfo.IDamageSourceCritical;
-import first.servantry.network.DamageInfoPayload;
+import first.servantry.network.BatchedDamageInfoPayload;
 import first.servantry.register.ServantryAttachmentRegister;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -40,7 +38,7 @@ public class DamageInfoData {
                     .subtract(pos)
                     .normalize();
             boolean critical = damageSource instanceof IDamageSourceCritical iDamageSourceCritical && iDamageSourceCritical.servantry$isCritical();
-            DamageInfoData.add(level)
+            DamageInfoData.build(level)
                     .damageType(damageSource.typeHolder().getRegisteredName())
                     .damageAmount(event.getNewDamage())
                     .pos(pos)
@@ -55,7 +53,7 @@ public class DamageInfoData {
         if (!level.isClientSide()) {
             DamageInfoData damageData = level.getData(ServantryAttachmentRegister.DamageInfoData);
             if (damageData.size() > 0) {
-                PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new DamageInfoPayload(damageData.drain()));
+                PacketDistributor.sendToPlayersInDimension((ServerLevel) level, new BatchedDamageInfoPayload(damageData.drain()));
             }
         } else {
             level.getData(ServantryAttachmentRegister.DamageInfoData).tick();
@@ -63,7 +61,7 @@ public class DamageInfoData {
     }
 
     /** 服务端：累积 Entry 待发包 */
-    private final List<DamageInfoPayload.Entry> pendingEntries = new ArrayList<>();
+    private final List<BatchedDamageInfoPayload.Entry> pendingEntries = new ArrayList<>();
     /**
      * 客户端：持有活跃 DamageInfo 渲染列表
      */
@@ -74,18 +72,18 @@ public class DamageInfoData {
     // ===================== 服务端 =====================
 
     /** 开启一次链式伤害数字构建 */
-    public static DamageInfoBuilder add(net.minecraft.world.level.Level level) {
+    public static DamageInfoBuilder build(Level level) {
         return new DamageInfoBuilder(level);
     }
 
     /** 累积一条伤害记录 */
-    public void addEntry(DamageInfoPayload.Entry entry) {
+    public void addEntry(BatchedDamageInfoPayload.Entry entry) {
         pendingEntries.add(entry);
     }
 
     /** 取出并清空当前累积的所有伤害记录 */
-    public List<DamageInfoPayload.Entry> drain() {
-        List<DamageInfoPayload.Entry> snapshot = new ArrayList<>(pendingEntries);
+    public List<BatchedDamageInfoPayload.Entry> drain() {
+        List<BatchedDamageInfoPayload.Entry> snapshot = new ArrayList<>(pendingEntries);
         pendingEntries.clear();
         return snapshot;
     }
@@ -96,29 +94,6 @@ public class DamageInfoData {
     }
 
     // ===================== 客户端 =====================
-
-    /**
-     * 接收网络包中的伤害记录，转为渲染数据。
-     * <p>
-     * 若伤害类型未在 JSON 中定义且无 default，该条目将被跳过。
-     * </p>
-     */
-    public void receive(List<DamageInfoPayload.Entry> entries) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        if (player != null) {
-            for (DamageInfoPayload.Entry entry : entries) {
-                DamageInfo info = entry.toDamageInfo();
-                if (info != null) {
-                    Vec3 pos = info.getRenderPos(0);
-                    Vec3 eyePosition = player.getEyePosition(0);
-                    if (pos.distanceToSqr(eyePosition) < 64 * 64) {
-                        activeInfos.computeIfAbsent(info.getTexture(), key -> new ArrayList<>())
-                                .add(info);
-                    }
-                }
-            }
-        }
-    }
 
     /** 客户端 tick：驱动 DamageInfo 生命周期衰减，移除已过期的 */
     public void tick() {
@@ -197,9 +172,9 @@ public class DamageInfoData {
          * 将记录写入 Level 附件，客户端调用无效
          */
         public void emit() {
-            if (!level.isClientSide()) {
+            if (!level.isClientSide() && damageAmount >= 0.01) {
                 level.getData(ServantryAttachmentRegister.DamageInfoData)
-                        .addEntry(new DamageInfoPayload.Entry(damageType, damageAmount, x, y, z, vx, vy, vz, critical));
+                        .addEntry(new BatchedDamageInfoPayload.Entry(damageType, damageAmount, x, y, z, vx, vy, vz, critical));
             }
         }
     }

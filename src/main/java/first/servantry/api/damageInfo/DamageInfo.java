@@ -193,7 +193,7 @@ public class DamageInfo {
         if (easedProgress < 0.2f) {
             a = Mth.lerpInt(easedProgress / 0.2f, 51, 255); // 0.2*255=51
         } else if (easedProgress > 0.9f) {
-            a = Mth.lerpInt((easedProgress - 0.9f) / 0.1f, 255, 0);
+            a = Mth.lerpInt(Math.min(1, (easedProgress - 0.9f) / 0.05f), 255, 0);
         } else {
             a = 255;
         }
@@ -213,7 +213,7 @@ public class DamageInfo {
             return Mth.lerp(Math.min(progress / 0.05f, 1), 0.5f, 1.0f);
         }
         if (progress > 0.9f) {
-            return Mth.lerp((progress - 0.9f) / 0.1f, 1.0f, 0.0f);
+            return Mth.lerp((progress - 0.9f) / 0.1f, 1.0f, 0.5f);
         }
         return 1;
     }
