@@ -18,10 +18,10 @@ public class Servantry {
         ServantryDataComponentRegister.register(eventBus);
         ServantryAttachmentEntityRegister.register(eventBus);
         ServantryItemRegister.register();
-        ServantryServantWeaponRegister.register();
         ServantryArmorRegister.register();
         ServantryCurioRegister.register();
-        ServantryRegisters.getInstance().register(eventBus);
+        ServantryServantWeaponRegister.register();
+        ServantryItemRegisterBuilder.register(eventBus);
         ServantryMobEffectRegister.register(eventBus);
         ServantryParticleRegister.register(eventBus);
         ServantryPotionRegister.register(eventBus);

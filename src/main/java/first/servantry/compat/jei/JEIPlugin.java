@@ -20,8 +20,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -56,7 +56,7 @@ public class JEIPlugin implements IModPlugin {
         List<ArmorSet> armorSets = ServantryRegistries.ARMOR_SETS.stream().toList();
         for (ArmorSet armorSet : armorSets) {
             List<ItemStack> itemStackList = armorSet.items().stream()
-                    .map(DeferredHolder::get)
+                    .map(ItemLike::asItem)
                     .map(Item::getDefaultInstance)
                     .toList();
             registration.addItemStackInfo(itemStackList, Component.empty());

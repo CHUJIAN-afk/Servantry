@@ -12,13 +12,13 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.neoforged.neoforge.registries.DeferredItem;
 
 import java.util.*;
 import java.util.function.Consumer;
 
-public record ArmorSet(ResourceLocation id, List<DeferredItem<Item>> items, Multimap<Holder<Attribute>, AttributeModifier> modifiers, Consumer<Player> onStart, Consumer<Player> onRemove) {
+public record ArmorSet(ResourceLocation id, List<ItemLike> items, Multimap<Holder<Attribute>, AttributeModifier> modifiers, Consumer<Player> onStart, Consumer<Player> onRemove) {
 
     public static final Map<Player, Map<ArmorSet, Boolean>> CACHE = new WeakHashMap<>();
 
@@ -66,8 +66,8 @@ public record ArmorSet(ResourceLocation id, List<DeferredItem<Item>> items, Mult
                     .computeIfAbsent(this, set -> {
                         Iterable<ItemStack> armorSlots = player.getArmorSlots();
                         List<Item> target = new ArrayList<>();
-                        for (DeferredItem<Item> item : items) {
-                            target.add(item.get());
+                        for (ItemLike item : items) {
+                            target.add(item.asItem());
                         }
                         for (ItemStack armor : armorSlots) {
                             target.remove(armor.getItem());

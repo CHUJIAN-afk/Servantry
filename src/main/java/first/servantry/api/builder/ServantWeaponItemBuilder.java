@@ -136,7 +136,7 @@ public class ServantWeaponItemBuilder<T extends Servant> {
     /**
      * 构建武器物品。
      */
-    public Item build() {
+    public ServantWeaponItemItem build() {
         Item.Properties proper = new Item.Properties().stacksTo(1);
         if (properties != null) {
             properties.accept(proper);
@@ -144,7 +144,7 @@ public class ServantWeaponItemBuilder<T extends Servant> {
         return new ServantWeaponItemItem(proper);
     }
 
-    private class ServantWeaponItemItem extends Item implements IServantWeaponItem<T> {
+    public class ServantWeaponItemItem extends Item implements IServantWeaponItem<T> {
 
         public ServantWeaponItemItem(Properties p) {
             super(p);

@@ -1,19 +1,16 @@
 package first.servantry.register;
 
-import net.neoforged.fml.loading.FMLLoader;
+import oshi.util.tuples.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("SameParameterValue")
 public class ServantryLanguageGenerateRegister {
 
-    public static final List<LangEntry> LanguageGenerate = new ArrayList<>();
+    public static final Map<String, Pair<String, String>> LanguageGenerate = new HashMap<>();
 
     public static void init(){
-        
-
         // ================= 模组基础 =================
         entry("modid.servantry", "Servantry", "仆从学");
         entry("item.servantry.tooltip.set_bonus_title", "Set Rewards:", "套装奖励:");
@@ -54,7 +51,7 @@ public class ServantryLanguageGenerateRegister {
         entry(ServantryMobEffectRegister.GodSlayerInferno.get().getDescriptionId(), "God Slayer Inferno", "噬神怒焰");
         entry(ServantryMobEffectRegister.ArmorCrunch.get().getDescriptionId(), "Armor Crunch", "碎甲");
         // ===================== 药水类物品 =====================
-        potionEntry(ServantryPotionRegister.Obsession.getRegisteredName(), "Obsession", "着魔");
+        potionEntry(ServantryPotionRegister.Obsession.getId().getPath(), "Obsession", "着魔");
         // ===================== JEI 兼容 =====================
         entry("jei.servantry.description.sold", "Occasionally sold by Clerics", "牧师偶尔出售");
         entry("jei.servantry.description.terraprism", "Occasionally drops from Allays", "悦灵偶尔掉落");
@@ -65,9 +62,7 @@ public class ServantryLanguageGenerateRegister {
     }
 
     public static void entry(String key, String enDesc, String zhDesc) {
-        if (!FMLLoader.isProduction()) {
-            LanguageGenerate.add(new LangEntry(key, enDesc, zhDesc));
-        }
+        LanguageGenerate.put(key, new Pair<>(enDesc, zhDesc));
     }
 
     public static void potionEntry(String effectName, String enName, String zhName) {
@@ -77,19 +72,6 @@ public class ServantryLanguageGenerateRegister {
             entry("item.minecraft.splash_potion.effect." + suffix, "Splash Potion of " + enName, "喷溅型" + zhName + "药水");
             entry("item.minecraft.lingering_potion.effect." + suffix, "Lingering Potion of " + enName, "滞留型" + zhName + "药水");
             entry("item.minecraft.tipped_arrow.effect." + suffix, "Arrow of " + enName, zhName + "之箭");
-        }
-    }
-
-    public record LangEntry(String key, String enDesc, String zhDesc) {
-        public void build(String locale, BiConsumer<String, String> adder) {
-            if (key != null) {
-                if (enDesc != null && "en_us".equals(locale)) {
-                    adder.accept(key, enDesc);
-                }
-                if (zhDesc != null && "zh_cn".equals(locale)) {
-                    adder.accept(key, zhDesc);
-                }
-            }
         }
     }
 }

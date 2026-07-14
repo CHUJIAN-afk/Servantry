@@ -8,8 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.neoforged.neoforge.registries.DeferredItem;
+import net.minecraft.world.level.ItemLike;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -17,7 +16,7 @@ import java.util.function.Consumer;
 public final class ArmorSetBuilder {
 
     private final ResourceLocation id;
-    private final List<DeferredItem<Item>> items = new java.util.ArrayList<>();
+    private final List<ItemLike> items = new java.util.ArrayList<>();
     private final ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> modifiers = ImmutableMultimap.builder();
     private Consumer<Player> onStart = player -> {
     };
@@ -28,7 +27,7 @@ public final class ArmorSetBuilder {
         this.id = id;
     }
 
-    public ArmorSetBuilder piece(DeferredItem<Item> item) {
+    public ArmorSetBuilder piece(ItemLike item) {
         this.items.add(item);
         return this;
     }

@@ -17,8 +17,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.neoforge.registries.DeferredItem;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,9 +73,9 @@ public final class TooltipHandler {
         List<ArmorSet> list = ServantryRegistries.ARMOR_SETS.stream().toList();
         List<ArmorSet> target = new ArrayList<>();
         for (ArmorSet armorSet1 : list) {
-            List<DeferredItem<Item>> items1 = armorSet1.items();
-            for (DeferredItem<Item> itemDeferredItem1 : items1) {
-                if (item == itemDeferredItem1.get()) {
+            List<ItemLike> items1 = armorSet1.items();
+            for (ItemLike itemDeferredItem1 : items1) {
+                if (item == itemDeferredItem1.asItem()) {
                     target.add(armorSet1);
                     break;
                 }
@@ -84,15 +84,15 @@ public final class TooltipHandler {
         for (ArmorSet armorSet : target) {
             ResourceLocation id = armorSet.id();
             lines.add(Component.empty());
-            List<DeferredItem<Item>> items = armorSet.items();
+            List<ItemLike> items = armorSet.items();
             MutableComponent set = Component.empty();
             boolean full = player != null && armorSet.full(player);
             ChatFormatting descColor = full ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY;
-            for (DeferredItem<Item> itemDeferredItem : items) {
+            for (ItemLike itemDeferredItem : items) {
                 if (items.getFirst() == itemDeferredItem) {
                     set.append(Component.literal("[ ").withStyle(descColor));
                 }
-                Item piece = itemDeferredItem.get();
+                Item piece = itemDeferredItem.asItem();
                 ChatFormatting format = armors.contains(piece) ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY;
                 set.append(piece.getDescription().copy().withStyle(format)).append(Component.literal(" "));
                 if (items.getLast() == itemDeferredItem) {

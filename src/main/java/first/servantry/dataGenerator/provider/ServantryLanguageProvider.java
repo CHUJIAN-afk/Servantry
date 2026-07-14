@@ -3,6 +3,7 @@ package first.servantry.dataGenerator.provider;
 import first.servantry.register.ServantryLanguageGenerateRegister;
 import net.minecraft.data.PackOutput;
 import net.neoforged.neoforge.common.data.LanguageProvider;
+import oshi.util.tuples.Pair;
 
 public class ServantryLanguageProvider extends LanguageProvider {
 
@@ -16,6 +17,22 @@ public class ServantryLanguageProvider extends LanguageProvider {
     @Override
     protected void addTranslations() {
         ServantryLanguageGenerateRegister.init();
-        ServantryLanguageGenerateRegister.LanguageGenerate.forEach(langEntry -> langEntry.build(locale, this::add));
+        ServantryLanguageGenerateRegister.LanguageGenerate.entrySet()
+                .removeIf(entry -> {
+                    String key = entry.getKey();
+                    Pair<String, String> value = entry.getValue();
+                    String enDesc = value.getA();
+                    String zhDesc = value.getB();
+                    if (key != null) {
+                        if (enDesc != null && "en_us".equals(locale)) {
+                            add(key, enDesc);
+                        }
+                        if (zhDesc != null && "zh_cn".equals(locale)) {
+                            add(key, zhDesc);
+                            return true;
+                        }
+                    }
+                    return false;
+                });
     }
 }
