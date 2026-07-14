@@ -350,8 +350,8 @@ public class ServantryCurioRegister {
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))
                     .build())
-            .itemLanguage("MiniStardustCell Fragment", "星尘碎片")
-            .itemLanguageTooltip(1, "Servant hits have a 5% chance to release a MiniStardustCell Cell", "仆从攻击时有 5% 概率释放星尘细胞")
+            .itemLanguage("Stardust Fragment", "星尘碎片")
+            .itemLanguageTooltip(1, "Servant hits have a 5% chance to release a Stardust Cell", "仆从攻击时有 5% 概率释放星尘细胞")
             .itemModel(ServantryItemRegisterBuilder::basicModel)
             .itemTag(ServantryItemTagsRegister.Curio)
             .build();

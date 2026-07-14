@@ -20,7 +20,7 @@ public class ServantryItemRegister {
             ServantryItemRegisterBuilder.build(SWORD, "zenith", () -> new ZenithItem(Tiers.NETHERITE, new Item.Properties()
                             .rarity(Rarity.EPIC)
                             .stacksTo(1)))
-                    .itemLanguage("ZenithItem", "天顶剑")
+                    .itemLanguage("Zenith", "天顶剑")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .build();
     public static final DeferredItem<BlockItem> MithrilAnvil =
@@ -74,7 +74,7 @@ public class ServantryItemRegister {
                     .build();
     public static final DeferredItem<Item> Stardust =
             ServantryItemRegisterBuilder.build(MATERIAL, "stardust")
-                    .itemLanguage("MiniStardustCell", "星尘")
+                    .itemLanguage("Stardust", "星尘")
                     .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> LuminiteIngot =
