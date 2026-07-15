@@ -1,6 +1,7 @@
 package first.servantry.api.client.dynamicLight;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import first.servantry.api.entity.PathNode;
 import first.servantry.mixin.LevelRendererAccessor;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
@@ -9,6 +10,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
@@ -25,6 +27,39 @@ public class DynamicLightDispatcher {
     private static final Map<Vec3, Integer> LightSources = new HashMap<>();
     private static final Set<Long> LastUpdateSectionSet = new HashSet<>();
     private static volatile Map<Vec3, Integer> SnapshotLightSources = new HashMap<>();
+
+    public static void addLightSources(PathNode pathNode, AABB aabb, int light) {
+        Vec3 pos = pathNode.pos();
+        double minX = aabb.minX, maxX = aabb.maxX;
+        double minY = aabb.minY, maxY = aabb.maxY;
+        double minZ = aabb.minZ, maxZ = aabb.maxZ;
+
+        // Z轴方向最长，沿Z轴等间隔放置点光源（间隔≤0.5格）
+        double zLen = maxZ - minZ;
+        int count = Math.max(1, Mth.ceil(zLen / 0.5));
+        double step = zLen / count;
+
+        // 局部→世界旋转：先绕Y旋转yaw，再绕X旋转pitch，再绕Z旋转roll
+        float yawRad = (float) Math.toRadians(-pathNode.yaw());
+        float pitchRad = (float) Math.toRadians(pathNode.pitch());
+        double cosY = Math.cos(yawRad), sinY = Math.sin(yawRad);
+        double cosP = Math.cos(pitchRad), sinP = Math.sin(pitchRad);
+
+        for (int i = 0; i <= count; i++) {
+            double lz = minZ + step * i;
+
+            double lx = (minX + maxX) * 0.5;
+            double ly = (minY + maxY) * 0.5;
+
+            double rry = ly * cosP - lz * sinP;
+            double rrz = ly * sinP + lz * cosP;
+
+            double wwx = lx * cosY + rrz * sinY;
+            double wwz = -lx * sinY + rrz * cosY;
+
+            LightSources.put(pos.add(wwx, rry, wwz), light);
+        }
+    }
 
     public static void addLightSources(Map<Vec3, Integer> lightSources) {
         LightSources.putAll(lightSources);

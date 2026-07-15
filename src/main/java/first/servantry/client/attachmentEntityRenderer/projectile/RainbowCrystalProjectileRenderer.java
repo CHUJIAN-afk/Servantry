@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
@@ -26,7 +27,7 @@ public class RainbowCrystalProjectileRenderer extends AbstractAttachmentEntityRe
     }
 
     @Override
-    protected void render(RainbowCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<RainbowCrystal> context) {
-
+    protected void render(RainbowCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<RainbowCrystal> context, float partialTick) {
+        DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

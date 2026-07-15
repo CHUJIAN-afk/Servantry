@@ -83,7 +83,7 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.VoidEater.get(), new VoidEaterRenderer());
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Ballista.get(), new BallistaRenderer());
 
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.StardustProjectile.get(), new StardustProjectileRenderer());
+        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.StardustProjectile.get(), new MiniStardustProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.LaserProjectile.get(), new LaserProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.SharkDragonProjectile.get(), new SharkDragonProjectileRenderer());
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.EternalNightLaserProjectile.get(), new ShatteredStellarCoreProjectileRenderer());

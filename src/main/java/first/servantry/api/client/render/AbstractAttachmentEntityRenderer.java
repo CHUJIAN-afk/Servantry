@@ -2,8 +2,6 @@ package first.servantry.api.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
-import first.servantry.api.client.dynamicLight.DynamicLightRenderer;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.client.render.renderConfig.TrailConfig;
 import first.servantry.api.client.renderType.TrailRenderType;
@@ -33,7 +31,7 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
     protected abstract RenderContext<T> createContext(T entity);
 
     /** 渲染附件实体本体 */
-    protected abstract void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context);
+    protected abstract void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context, float partialTick);
 
     @Override
     public void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode visualNode) {
@@ -45,16 +43,12 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
             if (context.hasTrail()) {
                 context.trail.render(entity, poseStack, alphaBufferSource, partialTick, visualNode, TrailRenderType.getTrail());
             }
-            modelModify(entity, poseStack, alphaBufferSource, visualNode, context);
+            modelModify(entity, poseStack, alphaBufferSource, visualNode, context, partialTick);
             poseStack.popPose();
-            if (this instanceof DynamicLightRenderer<?>) {
-                @SuppressWarnings("unchecked") DynamicLightRenderer<T> dynamicLightRenderer = (DynamicLightRenderer<T>) this;
-                DynamicLightDispatcher.addLightSources(dynamicLightRenderer.getDynamicLight(entity, context, visualNode));
-            }
         }
     }
 
-    protected void modelModify(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context) {
+    protected void modelModify(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context, float partialTick) {
         ModelConfig<T> model = context.model;
         poseStack.pushPose();
 
@@ -69,7 +63,7 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         poseStack.scale(model.scale, model.scale, model.scale);
         poseStack.translate(model.translateX, model.translateY, model.translateZ);
 
-        render(entity, poseStack, bufferSource, visualNode, context);
+        render(entity, poseStack, bufferSource, visualNode, context, partialTick);
         poseStack.popPose();
     }
 

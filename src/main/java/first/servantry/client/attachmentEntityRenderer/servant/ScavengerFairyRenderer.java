@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
@@ -23,7 +24,7 @@ public class ScavengerFairyRenderer extends AbstractAttachmentEntityRenderer<Sca
     }
 
     @Override
-    protected void render(ScavengerFairy entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ScavengerFairy> context) {
-
+    protected void render(ScavengerFairy entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ScavengerFairy> context, float partialTick) {
+        DynamicLightDispatcher.addLightSources(visualNode.pos(), 12);
     }
 }

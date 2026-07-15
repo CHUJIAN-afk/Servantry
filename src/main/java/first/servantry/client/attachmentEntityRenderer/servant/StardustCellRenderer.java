@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
@@ -41,7 +42,7 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
     }
 
     @Override
-    protected void render(StardustCell servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> context) {
+    protected void render(StardustCell servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> context, float partialTick) {
         if (context.hasTrail() && !Minecraft.getInstance().isPaused()) {
             int trailTimer = servant.getTrailTimer();
             GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
@@ -62,6 +63,7 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
                     .emit();
         }
         ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
+        DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 
 }

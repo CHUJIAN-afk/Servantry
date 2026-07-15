@@ -32,7 +32,9 @@ public class ServantryItemRegisterBuilder<T extends Item> {
 
     public static <T extends Item> ServantryItemRegisterBuilder<T> build(TabGroup group, String name, Supplier<T> supplier) {
         DeferredItem<T> register = Register.register(name, supplier);
-        ServantryCreativeTabRegister.TabBuilder.computeIfAbsent(group, key -> new ArrayList<>()).add(register);
+        if (group != null) {
+            ServantryCreativeTabRegister.TabBuilder.computeIfAbsent(group, key -> new ArrayList<>()).add(register);
+        }
         return new ServantryItemRegisterBuilder<>(register);
     }
 

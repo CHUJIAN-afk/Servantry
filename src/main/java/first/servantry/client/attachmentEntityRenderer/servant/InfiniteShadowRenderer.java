@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
@@ -45,7 +46,7 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
     }
 
     @Override
-    protected void render(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> context) {
+    protected void render(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> context, float partialTick) {
         ItemStack itemStack = infiniteShadow.getItemStack();
         if (!itemStack.isEmpty()) {
             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
@@ -59,6 +60,7 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
                     infiniteShadow.getOwner().level(),
                     0
             );
+            DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
         }
     }
 }

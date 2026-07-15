@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderer.LightningRenderer;
@@ -26,8 +27,8 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
     }
 
     @Override
-    protected void modelModify(BlitzBall blitzBall, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context) {
-        super.modelModify(blitzBall, poseStack, bufferSource, visualNode, context);
+    protected void modelModify(BlitzBall blitzBall, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context, float partialTick) {
+        super.modelModify(blitzBall, poseStack, bufferSource, visualNode, context, partialTick);
         Set<Integer> list = blitzBall.getIdList();
         Player owner = blitzBall.getOwner();
         Level level = owner.level();
@@ -55,7 +56,7 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
     }
 
     @Override
-    protected void render(BlitzBall entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context) {
+    protected void render(BlitzBall entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context, float partialTick) {
         SphereRenderer.builder()
                 .radius(0.25f)
                 .layers(3)
@@ -64,5 +65,6 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
                 .alpha(0.75f)
                 .innerRatio(0.5f)
                 .render(poseStack, bufferSource);
+        DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

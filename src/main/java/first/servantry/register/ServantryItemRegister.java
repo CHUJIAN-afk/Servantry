@@ -13,16 +13,16 @@ import net.neoforged.neoforge.registries.DeferredItem;
 public class ServantryItemRegister {
 
     public static final TabGroup MATERIAL = new TabGroup(3, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
-    public static final TabGroup SWORD = new TabGroup(4, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
     public static final TabGroup BLOCK = new TabGroup(5, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
 
     public static final DeferredItem<ZenithItem> Zenith =
-            ServantryItemRegisterBuilder.build(SWORD, "zenith", () -> new ZenithItem(Tiers.NETHERITE, new Item.Properties()
+            ServantryItemRegisterBuilder.build(null, "zenith", () -> new ZenithItem(Tiers.NETHERITE, new Item.Properties()
                             .rarity(Rarity.EPIC)
                             .stacksTo(1)))
                     .itemLanguage("Zenith", "天顶剑")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .build();
+
     public static final DeferredItem<BlockItem> MithrilAnvil =
             ServantryItemRegisterBuilder.build(BLOCK, "mithril_anvil", () -> new BlockItem(ServantryBlockRegister.MITHRIL_ANVIL.get(), new Item.Properties()))
                     .itemLanguage("Mithril Anvil", "秘银砧")

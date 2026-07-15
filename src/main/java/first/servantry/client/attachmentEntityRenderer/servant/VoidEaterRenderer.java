@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
@@ -26,7 +27,7 @@ public class VoidEaterRenderer extends AbstractAttachmentEntityRenderer<VoidEate
     }
 
     @Override
-    protected void render(VoidEater dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<VoidEater> context) {
+    protected void render(VoidEater dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<VoidEater> context, float partialTick) {
         int total = dragon.getTotalSegments();
         int index = dragon.getSegmentIndex();
         ModelResourceLocation model;
@@ -40,5 +41,6 @@ public class VoidEaterRenderer extends AbstractAttachmentEntityRenderer<VoidEate
             model = ServantryModelRegister.STARDUST_DRAGON_BODY2;
         }
         ModelRenderer.renderModel(model, poseStack, bufferSource);
+        DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

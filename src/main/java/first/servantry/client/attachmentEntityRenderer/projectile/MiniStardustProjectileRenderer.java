@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
@@ -17,7 +18,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
  * 使用圆锥拖尾，渲染缩小版星尘细胞模型（0.25倍）。
  * </p>
  */
-public class StardustProjectileRenderer extends AbstractAttachmentEntityRenderer<MiniStardustCell> {
+public class MiniStardustProjectileRenderer extends AbstractAttachmentEntityRenderer<MiniStardustCell> {
 
     @Override
     protected RenderContext<MiniStardustCell> createContext(MiniStardustCell projectile) {
@@ -38,8 +39,9 @@ public class StardustProjectileRenderer extends AbstractAttachmentEntityRenderer
     }
 
     @Override
-    protected void render(MiniStardustCell projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniStardustCell> context) {
+    protected void render(MiniStardustCell projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniStardustCell> context, float partialTick) {
         ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
+        DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 
 }

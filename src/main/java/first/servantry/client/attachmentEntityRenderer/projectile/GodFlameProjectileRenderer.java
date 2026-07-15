@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderer.LaserRenderer;
@@ -18,7 +19,7 @@ public class GodFlameProjectileRenderer extends AbstractAttachmentEntityRenderer
     }
 
     @Override
-    protected void render(GodFlame entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<GodFlame> context) {
+    protected void render(GodFlame entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<GodFlame> context, float partialTick) {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;
@@ -31,5 +32,6 @@ public class GodFlameProjectileRenderer extends AbstractAttachmentEntityRenderer
                 .alpha(0.95f)
                 .innerRatio(0.35f)
                 .render(poseStack, bufferSource);
+        DynamicLightDispatcher.addLightSources(visualNode, hitbox, 8);
     }
 }

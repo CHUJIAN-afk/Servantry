@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
@@ -10,9 +11,6 @@ import first.servantry.common.servant.EtherealStellarCore;
 import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-/**
- * 永夜之眼渲染器 - 环绕仆从本体 + 激光射线渲染。
- */
 public class EtherealStellarCoreRenderer extends AbstractAttachmentEntityRenderer<EtherealStellarCore> {
 
     @Override
@@ -27,7 +25,8 @@ public class EtherealStellarCoreRenderer extends AbstractAttachmentEntityRendere
     }
 
     @Override
-    protected void render(EtherealStellarCore servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EtherealStellarCore> context) {
+    protected void render(EtherealStellarCore servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EtherealStellarCore> context, float partialTick) {
         ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
+        DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

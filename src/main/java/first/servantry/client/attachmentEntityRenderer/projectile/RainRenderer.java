@@ -18,7 +18,7 @@ public class RainRenderer extends AbstractAttachmentEntityRenderer<Rain> {
     }
 
     @Override
-    protected void render(Rain entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Rain> context) {
+    protected void render(Rain entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Rain> context, float partialTick) {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.25f;

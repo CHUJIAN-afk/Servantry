@@ -33,7 +33,7 @@ public class DeadlySphereRenderer extends AbstractAttachmentEntityRenderer<Deadl
     }
 
     @Override
-    protected void render(DeadlySphere entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DeadlySphere> context) {
+    protected void render(DeadlySphere entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DeadlySphere> context, float partialTick) {
 
     }
 }

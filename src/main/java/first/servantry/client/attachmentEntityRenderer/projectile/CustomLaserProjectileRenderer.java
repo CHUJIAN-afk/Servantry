@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
@@ -29,7 +30,7 @@ public class CustomLaserProjectileRenderer extends AbstractAttachmentEntityRende
     }
 
     @Override
-    protected void render(CustomLaser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<CustomLaser> context) {
+    protected void render(CustomLaser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<CustomLaser> context, float partialTick) {
         int color = entity.getColor();
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
@@ -43,5 +44,6 @@ public class CustomLaserProjectileRenderer extends AbstractAttachmentEntityRende
                 .alpha(entity.getAlpha())
                 .innerRatio(0.35f)
                 .render(poseStack, bufferSource);
+        DynamicLightDispatcher.addLightSources(visualNode, hitbox, 8);
     }
 }

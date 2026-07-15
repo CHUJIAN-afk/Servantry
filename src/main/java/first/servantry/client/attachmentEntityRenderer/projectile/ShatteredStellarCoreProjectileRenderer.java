@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
@@ -32,7 +33,8 @@ public class ShatteredStellarCoreProjectileRenderer extends AbstractAttachmentEn
     }
 
     @Override
-    protected void render(ShatteredStellarCore projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ShatteredStellarCore> context) {
+    protected void render(ShatteredStellarCore projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ShatteredStellarCore> context, float partialTick) {
         ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
+        DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

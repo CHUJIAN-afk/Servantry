@@ -1,6 +1,7 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
@@ -38,7 +39,7 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
     }
 
     @Override
-    protected void render(StardustDragon dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustDragon> context) {
+    protected void render(StardustDragon dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustDragon> context, float partialTick) {
         int total = dragon.getTotalSegments();
         int index = dragon.getSegmentIndex();
         ModelResourceLocation model;
@@ -52,6 +53,7 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
             model = ServantryModelRegister.STARDUST_DRAGON_BODY2;
         }
         ModelRenderer.renderModel(model, poseStack, bufferSource);
+        DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 
 }

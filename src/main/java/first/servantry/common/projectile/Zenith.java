@@ -1,9 +1,11 @@
 package first.servantry.common.projectile;
 
 import first.servantry.api.common.attachment.InvincibleData;
+import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.api.entity.*;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.register.ServantryAttachmentEntityRegister;
+import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -40,6 +42,26 @@ public class Zenith extends Projectile implements ICollideAttack<Zenith> {
             if (progress >= 1) {
                 setRemove();
             }
+        } else if (getHistoryNodes().size() > 2) {
+            ParticleHelper.create(owner.level())
+                    .generic(GenericParticleBuilder.create()
+                                     .centerColor(0xffffff)
+                                     .edgeColor(0xb7b7b7)
+                                     .lifetime(30)
+                                     .lifetimeRandom(5)
+                                     .spin(3)
+                                     .spinRandom(0.1F)
+                                     .friction(0.7F)
+                                     .scale(0.04f)
+                                     .scaleRandom(0.004f)
+                    )
+                    .pos(getPos())
+                    .offset(0.15)
+                    .velocity(getCurrentVelocity().normalize())
+                    .count(1)
+                    .speed(2)
+                    .spread(0.05)
+                    .emit();
         }
         lastProgress = progress;
         progress = Math.min(progress + (float) 1 / 14, 1);
