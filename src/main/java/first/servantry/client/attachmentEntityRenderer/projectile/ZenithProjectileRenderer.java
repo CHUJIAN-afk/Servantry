@@ -43,11 +43,11 @@ public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Z
         if (pathNodes.size() > 3 && !Minecraft.getInstance().isPaused()) {
             Vec3 velocity = visualNode.pos().subtract(pathNodes.get(2).pos());
             if (velocity.length() > 1) {
+                GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                                 .centerColor(0xffffff)
+                                 .edgeColor(0xb7b7b7);
                 ParticleHelper.create(owner.level())
-                        .generic(GenericParticleBuilder.create()
-                                         .color(0xffffff)
-                                         .edgeColor(0xb7b7b7)
-                                         .colorRandom(0.2F, 0.2F, 0.0F)
+                        .generic(genericParticleBuilder
                                          .lifetime(5)
                                          .lifetimeRandom(20)
                                          .spin(0.5f)

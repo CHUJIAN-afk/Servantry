@@ -20,75 +20,38 @@ import org.joml.Vector3f;
 
 /**
  * 通用粒子 - 自定义渲染中心色块和边缘色块。
+ * <p>
+ * 颜色为 RGB（不含透明度），透明度由粒子进度自动控制。
+ * 缩放通过 {@link #getProgress} 计算渲染进度，无冗余中间变量。
+ * </p>
  */
 public class GenericParticle extends TextureSheetParticle {
 
     private final SpriteSet spriteSet;
     private final float baseScale;
     private final float spinSpeed;
-
-    // 中心颜色插值
-    private final float startR, startG, startB;
-    private final float endR, endG, endB;
-
-    // 边缘颜色插值
-    private final float startEdgeR, startEdgeG, startEdgeB;
-    private final float endEdgeR, endEdgeG, endEdgeB;
-
-    // 平滑插值
-    private float prevScale;
-    private float currentScale;
+    private final int centerColor;
+    private final int edgeColor;
 
     public GenericParticle(ClientLevel level, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteSet, GenericParticleOptions options) {
         super(level, x, y, z, vx, vy, vz);
         this.spriteSet = spriteSet;
-
         this.xd = vx;
         this.yd = vy;
         this.zd = vz;
-
         this.friction = options.friction();
         this.gravity = 0.0F;
-
-        // 使用配置中的大小
         this.quadSize = options.scale();
         this.baseScale = this.quadSize;
-        this.prevScale = this.baseScale;
-        this.currentScale = this.baseScale;
-
         this.lifetime = options.lifetime();
-
-        // 中心颜色
-        int rgb = options.color();
-        this.rCol = ((rgb >> 16) & 0xFF) / 255.0F;
-        this.gCol = ((rgb >> 8) & 0xFF) / 255.0F;
-        this.bCol = (rgb & 0xFF) / 255.0F;
-        this.startR = this.rCol;
-        this.startG = this.gCol;
-        this.startB = this.bCol;
-
-        // 中心最终颜色
-        this.endR = ((options.endColor() >> 16) & 0xFF) / 255.0F;
-        this.endG = ((options.endColor() >> 8) & 0xFF) / 255.0F;
-        this.endB = (options.endColor() & 0xFF) / 255.0F;
-
-        // 边缘颜色
-        this.startEdgeR = ((options.edgeColor() >> 16) & 0xFF) / 255.0F;
-        this.startEdgeG = ((options.edgeColor() >> 8) & 0xFF) / 255.0F;
-        this.startEdgeB = (options.edgeColor() & 0xFF) / 255.0F;
-
-        // 边缘最终颜色
-        this.endEdgeR = ((options.endEdgeColor() >> 16) & 0xFF) / 255.0F;
-        this.endEdgeG = ((options.endEdgeColor() >> 8) & 0xFF) / 255.0F;
-        this.endEdgeB = (options.endEdgeColor() & 0xFF) / 255.0F;
-
-        this.alpha = 1.0F;
-
+        // 颜色（RGB直接存储）
+        this.centerColor = options.centerColor();
+        this.edgeColor = options.edgeColor();
         // 旋转
         this.spinSpeed = options.spinSpeed();
         this.roll = this.random.nextFloat() * Mth.TWO_PI;
         this.oRoll = this.roll;
-
+        this.alpha = 1F;
         this.setSpriteFromAge(spriteSet);
     }
 
@@ -96,20 +59,16 @@ public class GenericParticle extends TextureSheetParticle {
         return new GenericParticle(level, x, y, z, vx, vy, vz, spriteSet, options);
     }
 
+    private float getProgress(float partialTick) {
+        return (Mth.lerp(partialTick, age - 1, age)) / (float) this.lifetime;
+    }
+
     @Override
     public void tick() {
         super.tick();
         this.setSpriteFromAge(this.spriteSet);
-
-        this.prevScale = this.currentScale;
         this.oRoll = this.roll;
-
-        // 插值缩小
-        float progress = (float) this.age / (float) this.lifetime;
-        this.currentScale = this.baseScale * (1.0F - progress * progress);
-
-        // 更新旋转
-        this.roll += this.spinSpeed * (1 - progress);
+        this.roll += this.spinSpeed * (1 - getProgress(0));
     }
 
     @Override
@@ -119,22 +78,20 @@ public class GenericParticle extends TextureSheetParticle {
         float y = (float) (Mth.lerp(partialTick, this.yo, this.y) - cameraPos.y);
         float z = (float) (Mth.lerp(partialTick, this.zo, this.z) - cameraPos.z);
 
-        // 使用父类的 billboard 模式设置旋转
         Quaternionf quaternion = new Quaternionf();
         this.getFacingCameraMode().setRotation(quaternion, camera, partialTick);
         if (this.roll != 0.0F) {
             quaternion.rotateZ(Mth.lerp(partialTick, this.oRoll, this.roll));
         }
 
-        // 平滑插值缩放
-        float scale = Mth.lerp(partialTick, this.prevScale, this.currentScale);
+        float progress = getProgress(partialTick);
+        float scale = this.baseScale * (1.0F - (progress * progress));
+        // RGB → ARGB：透明度由进度控制（1=全不透明，0=全透明）
+        int alpha = 255;
+        int centerARGB = (alpha << 24) | centerColor;
+        int edgeARGB = (alpha << 24) | edgeColor;
 
-        // 颜色插值 → ARGB int（供 10 参数 fast path 使用）
-        float progress = (this.age + partialTick) / (float) this.lifetime;
-        int centerColor = packColor(Mth.lerp(progress, this.startR, this.endR), Mth.lerp(progress, this.startG, this.endG), Mth.lerp(progress, this.startB, this.endB), this.alpha);
-        int edgeColor = packColor(Mth.lerp(progress, this.startEdgeR, this.endEdgeR), Mth.lerp(progress, this.startEdgeG, this.endEdgeG), Mth.lerp(progress, this.startEdgeB, this.endEdgeB), this.alpha);
-
-        // 纹理坐标
+        // 纹理坐标（完整贴图范围）
         float u0 = this.sprite.getU0();
         float u1 = this.sprite.getU1();
         float v0 = this.sprite.getV0();
@@ -143,24 +100,19 @@ public class GenericParticle extends TextureSheetParticle {
         int light = getLightColor(partialTick);
         int overlay = OverlayTexture.NO_OVERLAY;
 
-        // 每个色块大小相同（scale x scale），形成十字形
-        // 中心色块
-        renderQuad(buffer, x, y, z, quaternion, -scale, -scale, scale, scale, u0, u1, v0, v1, centerColor, light, overlay);
+        // 贴图布局：6×3 像素，左右拼接两个 3×3
+        //   左侧 3×3：仅中心 (1,1) 有色 → 中心色块
+        //   右侧 3×3：上下左右 (1,0)(0,1)(2,1)(1,2) 有色 → 边缘色块
+        // 两次 quad 即可完成十字形渲染，顶点数从 20 降至 8
 
-        // 四个边缘色块，每个偏移 2*scale
-        // 上
-        renderQuad(buffer, x, y, z, quaternion, -scale, scale, scale, scale * 3, u0, u1, v0, v1, edgeColor, light, overlay);
-        // 下
-        renderQuad(buffer, x, y, z, quaternion, -scale, -scale * 3, scale, -scale, u0, u1, v0, v1, edgeColor, light, overlay);
-        // 左
-        renderQuad(buffer, x, y, z, quaternion, -scale * 3, -scale, -scale, scale, u0, u1, v0, v1, edgeColor, light, overlay);
-        // 右
-        renderQuad(buffer, x, y, z, quaternion, scale, -scale, scale * 3, scale, u0, u1, v0, v1, edgeColor, light, overlay);
-    }
+        float uHalf = (u0 + u1) / 2.0F;
+        float uStep = (u1 - u0) / 6.0F;
+        float vStep = (v1 - v0) / 3.0F;
 
-    /** 将 float 颜色分量打包为 ARGB int */
-    private static int packColor(float r, float g, float b, float a) {
-        return ((int) (Mth.clamp(a, 0, 1) * 255) << 24) | ((int) (Mth.clamp(r, 0, 1) * 255) << 16) | ((int) (Mth.clamp(g, 0, 1) * 255) << 8) | (int) (Mth.clamp(b, 0, 1) * 255);
+        // 中心色块：UV 映射到左侧 3×3 的中心像素 (1,1)→(2,2)
+        renderQuad(buffer, x, y, z, quaternion, -scale, -scale, scale, scale, u0 + uStep, u0 + uStep * 2, v0 + vStep, v0 + vStep * 2, centerARGB, light, overlay);
+        // 边缘色块：UV 映射到右侧 3×3 整体，中心像素透明自然形成十字
+        renderQuad(buffer, x, y, z, quaternion, -scale * 3, -scale * 3, scale * 3, scale * 3, uHalf, u1, v0, v1, edgeARGB, light, overlay);
     }
 
     /**
@@ -171,7 +123,6 @@ public class GenericParticle extends TextureSheetParticle {
      * </p>
      */
     private void renderQuad(VertexConsumer buffer, float cx, float cy, float cz, Quaternionf quaternion, float minX, float minY, float maxX, float maxY, float u0, float u1, float v0, float v1, int color, int light, int overlay) {
-        // 复用 Vector3f 避免 per-quad 分配，旋转后直接写顶点
         Vector3f v = new Vector3f();
         v.set(minX, minY, 0.0F).rotate(quaternion);
         buffer.addVertex(cx + v.x, cy + v.y, cz + v.z, color, u0, v0, overlay, light, 0.0F, 0.0F, 1.0F);
@@ -190,7 +141,7 @@ public class GenericParticle extends TextureSheetParticle {
      * BufferBuilder 对其 fastFormat=false，10 参数 addVertex 走慢路径。改用 NEW_ENTITY 后：
      * <ul>
      *   <li>fastFormat=true → 10 参数 addVertex 一次 beginVertex + 连续 memPut，跳过所有 beginElement</li>
-     *   <li>需匹配 rendertypeEntityTranslucent shader（支持 POSITION_COLOR_TEX_OVERLAY_LIGHT_NORMAL）</li>
+     *   <li>需匹配 renderTypeEntityTranslucent shader（支持 POSITION_COLOR_TEX_OVERLAY_LIGHT_NORMAL）</li>
      *   <li>纹理仍用粒子 atlas（Sampler0）</li>
      * </ul>
      * </p>

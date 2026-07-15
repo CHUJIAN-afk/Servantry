@@ -107,11 +107,11 @@ public class MoonPortal extends Servant {
             Vec3 hitPos = hit.getType() != HitResult.Type.MISS ? hit.getLocation() : end;
             laserProjectile.setHitbox(pos, hitPos, 0.15f);
             Vec3 direction = hitPos.offsetRandom(owner.getRandom(), 2).subtract(hitPos).normalize();
+            GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                             .centerColor(0x00fdd6)
+                             .edgeColor(0x00d4b0);
             ParticleHelper.create(owner.level())
-                    .generic(GenericParticleBuilder.create()
-                                     .color(0x00fdd6)
-                                     .edgeColor(0x00d4b0)
-                                     .colorRandom(0, 0.2F, 0.2F)
+                    .generic(genericParticleBuilder
                                      .lifetime(5)
                                      .lifetimeRandom(5)
                                      .spin(0.1f)
@@ -144,11 +144,11 @@ public class MoonPortal extends Servant {
                     Vec3 hitPoint = living.getBoundingBox()
                             .getCenter();
                     Vec3 direction = hitPoint.offsetRandom(owner.getRandom(), 2).subtract(hitPoint).normalize();
+                    GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                                     .centerColor(0x00fdd6)
+                                     .edgeColor(0x00d4b0);
                     ParticleHelper.create(owner.level())
-                            .generic(GenericParticleBuilder.create()
-                                             .color(0x00fdd6)
-                                             .edgeColor(0x00d4b0)
-                                             .colorRandom(0, 0.2F, 0.2F)
+                            .generic(genericParticleBuilder
                                              .lifetime(5)
                                              .lifetimeRandom(5)
                                              .spin(0.1f)

@@ -66,7 +66,7 @@ public class BlitzBall extends Projectile {
                 if (level.getEntity(id) instanceof LivingEntity living) {
                     ParticleHelper.create(owner.level())
                             .generic(GenericParticleBuilder.create()
-                                             .color(0x38ffec)
+                                             .centerColor(0x38ffec)
                                              .edgeColor(0x2fc1ae)
                                              .lifetime(5)
                                              .lifetimeRandom(5)
@@ -93,7 +93,7 @@ public class BlitzBall extends Projectile {
     public void onRemove() {
         ParticleHelper.create(owner.level())
                 .generic(GenericParticleBuilder.create()
-                                 .color(0x38ffec)
+                                 .centerColor(0x38ffec)
                                  .edgeColor(0x2fc1ae)
                                  .lifetime(5)
                                  .lifetimeRandom(5)

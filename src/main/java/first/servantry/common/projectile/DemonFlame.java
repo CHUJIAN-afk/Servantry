@@ -15,7 +15,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.UUID;
 
 public class DemonFlame extends Projectile implements ICollideAttack<DemonFlame>, IBlockCollision<DemonFlame> {
 
@@ -35,17 +34,13 @@ public class DemonFlame extends Projectile implements ICollideAttack<DemonFlame>
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
         if (source != null) {
-            UUID uuid = null;
-            if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
-                uuid = servant.getUuid();
-            }
             for (HitContext hitContext : hitContexts) {
                 LivingEntity target = hitContext.entity();
                 InvincibleData.attack(target)
-                        .attacker(uuid)
+                        .attacker(getUuid())
                         .damageSource(source)
                         .damageAmount(getDamage())
-                        .invincibleTime(20)
+                        .invincibleTime(10)
                         .effect(new MobEffectInstance(ServantryMobEffectRegister.CursedFlame, 100, 0))
                         .apply();
             }

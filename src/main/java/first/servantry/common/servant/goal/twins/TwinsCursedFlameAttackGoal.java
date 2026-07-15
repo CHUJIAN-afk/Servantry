@@ -52,11 +52,11 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                 DemonFlame demonFlame = new DemonFlame(servant.getDamageSource(), servant.getPos(), targetPos.subtract(servant.getPos()).normalize());
                 demonFlame.copyDamageData(servant);
                 demonFlame.join(owner);
+                GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                        .centerColor(0x24d509)
+                        .edgeColor(0x1FF109);
                 ParticleHelper.create(owner.level())
-                        .generic(GenericParticleBuilder.create()
-                                .color(0x24d509)
-                                .edgeColor(0x1FF109)
-                                .colorRandom(0.2f, 0f, 0.2f)
+                        .generic(genericParticleBuilder
                                 .lifetime(5)
                                 .lifetimeRandom(15)
                                 .spin(0.4f)

@@ -54,11 +54,11 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         level.playSound(null, start.x(), start.y(), start.z(), ServantrySoundRegister.Laser.get(), owner.getSoundSource());
         // 后坐力
         servant.applyForce(direction.scale(-0.1));
+        GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                .centerColor(0xb70700)
+                .edgeColor(0xFF0700);
         ParticleHelper.create(level)
-                .generic(GenericParticleBuilder.create()
-                        .color(0xb70700)
-                        .edgeColor(0xFF0700)
-                        .colorRandom(0, 0.2F, 0.2F)
+                .generic(genericParticleBuilder
                         .lifetime(5)
                         .lifetimeRandom(5)
                         .spin(0.1f)

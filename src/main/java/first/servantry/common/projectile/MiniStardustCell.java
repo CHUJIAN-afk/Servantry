@@ -132,11 +132,11 @@ public class MiniStardustCell extends AttachingProjectile implements ICollideAtt
             } else {
                 velocity = pos.subtract(pos.offsetRandom(random, 1f)).scale(0.5);
             }
+            GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                    .centerColor(0x2fb2e1)
+                    .edgeColor(0x33ccff);
             ParticleHelper.create(owner.level())
-                    .generic(GenericParticleBuilder.create()
-                            .color(0x2fb2e1)
-                            .edgeColor(0x33ccff)
-                            .colorRandom(0.2F, 0.2F, 0.0F)
+                    .generic(genericParticleBuilder
                             .lifetime(5)
                             .lifetimeRandom(25)
                             .spin(0.1f)

@@ -47,22 +47,16 @@ public class LevelRendererMixin {
                     target = "Lnet/minecraft/client/renderer/RenderBuffers;bufferSource()Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;"
             )
     )
-    private void renderLevel(
-            DeltaTracker deltaTracker,
-            boolean renderBlockOutline,
-            Camera camera,
-            GameRenderer gameRenderer,
-            LightTexture lightTexture,
-            Matrix4f frustumMatrix,
-            Matrix4f projectionMatrix,
-            CallbackInfo ci,
-            @Local PoseStack poseStack
-    ) {
+    private void renderLevel(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f frustumMatrix, Matrix4f projectionMatrix, CallbackInfo ci, @Local PoseStack poseStack) {
         assert level != null;
         MultiBufferSource.BufferSource bufferSource = renderBuffers.bufferSource();
         float partialTick = deltaTracker.getGameTimeDeltaPartialTick(true);
         AttachmentEntityRenderDispatcher.render(level.players(), camera, poseStack, bufferSource, partialTick);
         DamageInfoRenderDispatcher.render(level, camera, bufferSource, partialTick);
+    }
+
+    @Inject(method = "renderLevel", at = @At(value = "TAIL"))
+    private void renderLevel(DeltaTracker deltaTracker, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f frustumMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
         DynamicLightDispatcher.update((LevelRendererAccessor) this);
     }
 }

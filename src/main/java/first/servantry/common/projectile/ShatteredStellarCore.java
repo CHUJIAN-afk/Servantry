@@ -88,11 +88,11 @@ public class ShatteredStellarCore extends Projectile implements ICollideAttack<S
 
     @Override
     public void onRemove() {
+        GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                         .centerColor(0x2fb2e1)
+                         .edgeColor(0x33ccff);
         ParticleHelper.create(owner.level())
-                .generic(GenericParticleBuilder.create()
-                                 .color(0x2fb2e1)
-                                 .edgeColor(0x33ccff)
-                                 .colorRandom(0.2F, 0.2F, 0.0F)
+                .generic(genericParticleBuilder
                                  .lifetime(4)
                                  .lifetimeRandom(8)
                                  .spin(0.1f)

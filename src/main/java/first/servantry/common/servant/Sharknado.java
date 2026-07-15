@@ -49,11 +49,11 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
             }
             setDesiredRotation(getCurrentPathNode().yaw() + 25, getPitch(), getRoll());
             // 产生粒子
+            GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                    .centerColor(0x04c7e3)
+                    .edgeColor(0x047a95);
             ParticleHelper.create(owner.level())
-                    .generic(GenericParticleBuilder.create()
-                            .color(0x04c7e3)
-                            .edgeColor(0x047a95)
-                            .colorRandom(0, 0.1F, 0.2F)
+                    .generic(genericParticleBuilder
                             .lifetime(5)
                             .lifetimeRandom(10)
                             .spin(0.075f)

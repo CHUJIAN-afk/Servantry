@@ -39,7 +39,7 @@ public class DestructionBullet extends Projectile implements ICollideAttack<Dest
     public void onRemove() {
         ParticleHelper.create(owner.level())
                 .generic(GenericParticleBuilder.create()
-                                 .color(0xff3d00)
+                                 .centerColor(0xff3d00)
                                  .edgeColor(0xd22f00)
                                  .lifetime(5)
                                  .lifetimeRandom(5)
@@ -97,7 +97,7 @@ public class DestructionBullet extends Projectile implements ICollideAttack<Dest
                     .apply();
             ParticleHelper.create(owner.level())
                     .generic(GenericParticleBuilder.create()
-                                     .color(0xff3d00)
+                                     .centerColor(0xff3d00)
                                      .edgeColor(0xd22f00)
                                      .lifetime(5)
                                      .lifetimeRandom(5)

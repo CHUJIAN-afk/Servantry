@@ -71,11 +71,11 @@ public class ChlorophyteCrystal extends Servant {
         first.servantry.common.projectile.ChlorophyteCrystal projectile = new first.servantry.common.projectile.ChlorophyteCrystal(getDamageSource(), startPos, direction.scale(1.5));
         projectile.setDamage(getDamage());
         projectile.join(owner);
+        GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                .centerColor(0x1bff10)
+                .edgeColor(0x17b70e);
         ParticleHelper.create(owner.level())
-                .generic(GenericParticleBuilder.create()
-                        .color(0x1bff10)
-                        .edgeColor(0x17b70e)
-                        .colorRandom(0.2F, 0.2F, 0.0F)
+                .generic(genericParticleBuilder
                         .lifetime(4)
                         .lifetimeRandom(6)
                         .spin(0.5f)

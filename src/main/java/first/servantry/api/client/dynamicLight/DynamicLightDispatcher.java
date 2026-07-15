@@ -30,6 +30,10 @@ public class DynamicLightDispatcher {
         LightSources.putAll(lightSources);
     }
 
+    public static void addLightSources(Vec3 pos, int light) {
+        LightSources.put(pos, light);
+    }
+
     public static void update(LevelRendererAccessor levelRenderer) {
         Set<Long> updateSectionSet = new HashSet<>(LastUpdateSectionSet);
         LastUpdateSectionSet.clear();

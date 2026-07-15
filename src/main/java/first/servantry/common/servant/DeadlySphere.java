@@ -169,9 +169,8 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
 
             ParticleHelper.create(owner.level())
                     .generic(GenericParticleBuilder.create()
-                            .color(color)
+                            .centerColor(color)
                             .edgeColor(edgeColor)
-                            .colorRandom(0.15f)
                             .lifetime(10)
                             .lifetimeRandom(10)
                             .spin(0.1f)

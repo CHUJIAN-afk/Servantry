@@ -59,11 +59,11 @@ public class ChlorophyteCrystal extends Projectile implements ICollideAttack<Chl
                     .apply();
             Vec3 pos = getPos();
             Vec3 direction = getVelocity();
+            GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                    .centerColor(0x1bff10)
+                    .edgeColor(0x17b70e);
             ParticleHelper.create(owner.level())
-                    .generic(GenericParticleBuilder.create()
-                            .color(0x1bff10)
-                            .edgeColor(0x17b70e)
-                            .colorRandom(0.2F, 0.2F, 0.0F)
+                    .generic(genericParticleBuilder
                             .lifetime(6)
                             .lifetimeRandom(6)
                             .spin(0.1f)

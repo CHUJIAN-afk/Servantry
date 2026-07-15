@@ -173,11 +173,11 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
                                     .apply();
                             Vec3 hitPoint = living.getBoundingBox().getCenter();
                             Vec3 direction = hitPoint.offsetRandom(owner.getRandom(), 2).subtract(hitPoint).normalize();
+                            GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                                             .centerColor(0x841af3)
+                                             .edgeColor(0x6f19d4);
                             ParticleHelper.create(owner.level())
-                                    .generic(GenericParticleBuilder.create()
-                                                     .color(0x841af3)
-                                                     .edgeColor(0x6f19d4)
-                                                     .colorRandom(0, 0.2F, 0.2F)
+                                    .generic(genericParticleBuilder
                                                      .lifetime(5)
                                                      .lifetimeRandom(5)
                                                      .spin(0.1f)
@@ -199,7 +199,7 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
             }
             ParticleHelper.create(servant.getOwner().level())
                     .generic(GenericParticleBuilder.create()
-                                     .color(0x841af3)
+                                     .centerColor(0x841af3)
                                      .edgeColor(0x6f19d4)
                                      .lifetime(10)
                                      .lifetimeRandom(10)
