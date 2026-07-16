@@ -37,6 +37,7 @@ public class LivingEntityMixin {
             AttributeInstance instance = owner.getAttribute(ServantryAttributeRegister.ServantDamage);
             float scale = instance != null ? (float) instance.getValue() : 1;
             amount *= scale;
+            amount *= 0.85f + owner.getRandom().nextFloat() * 0.3f;
         }
         return original.call(source, amount);
     }

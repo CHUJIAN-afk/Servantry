@@ -36,7 +36,7 @@ public class ChlorophyteCrystal extends Servant {
                 shootCooldown = 13;
                 shootTarget(target);
             }
-            float bob = Mth.sin((owner.tickCount) * 0.12f) * 0.15f;
+            float bob = Mth.sin((tickCount) * 0.12f) * 0.15f;
             Vec3 targetPos = owner.getBoundingBox().getCenter().add(0, owner.getBbHeight() + bob, 0);
             Vec3 lerpXZ = currentPathNode.pos().lerp(targetPos, 0.8f);
             Vec3 lerpY = currentPathNode.pos().lerp(targetPos, 0.15f);
@@ -90,17 +90,6 @@ public class ChlorophyteCrystal extends Servant {
                 .speed(0.5)
                 .spread(0.5)
                 .emit();
-    }
-
-    public PathNode getInterpolatedIdleState(float partialTick) {
-        Player owner = getOwner();
-        double px = Mth.lerp(partialTick, owner.xo, owner.getX());
-        double py = Mth.lerp(partialTick, owner.yo, owner.getY());
-        double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
-        float bob = Mth.sin((owner.tickCount + partialTick) * 0.12f) * 0.05f;
-        Vec3 targetPos = new Vec3(px, py, pz).add(0, owner.getBbHeight() + 1.05f + bob, 0);
-        int i = isTarget(getTarget()) ? 30 : 15;
-        return new PathNode(targetPos, (owner.tickCount + partialTick) * i, 0, 0);
     }
 
     @Override

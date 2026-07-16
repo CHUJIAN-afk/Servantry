@@ -6,8 +6,8 @@ import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.servantry.common.servant.goal.MomentumServantIdleGoal;
 import first.servantry.common.servant.goal.twins.TwinsCursedFlameAttackGoal;
-import first.servantry.common.servant.goal.twins.TwinsIdleGoal;
 import first.servantry.common.servant.goal.twins.TwinsLaserAttackGoal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -46,7 +46,7 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     public void registerGoals(ServantGoalSelector goalSelector) {
         goalSelector.addGoal(0, new TwinsLaserAttackGoal(this));
         goalSelector.addGoal(0, new TwinsCursedFlameAttackGoal(this));
-        goalSelector.addGoal(2, new TwinsIdleGoal(this));
+        goalSelector.addGoal(1, new MomentumServantIdleGoal(this, 6, 0.01f, 64, false));
     }
 
     @Override

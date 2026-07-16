@@ -54,17 +54,19 @@ public class StardustCellAttackGoal extends ServantGoal<StardustCell> {
      * 计算光环锚点位置（用于攻击目标周围环绕）。
      */
     public Vec3 getHaloAnchorPos(LivingEntity target) {
-        Player owner = servant.getOwner();
+        int tickCount = servant.getTickCount();
+
         long seed = target.getId() * 31337L + servant.getOrder() * 1021L;
         Random rand = new Random(seed);
         double baseTheta = rand.nextDouble() * Math.PI * 2;
         double phi = Math.acos(1.0 - rand.nextDouble() * 1.4);
         double radius = 3.5 + rand.nextDouble() * 4.0;
         double rotationSpeed = (rand.nextDouble() * 0.02 + 0.01) * (rand.nextBoolean() ? 1 : -1);
-        double currentTheta = baseTheta + owner.tickCount * rotationSpeed;
+
+        double currentTheta = baseTheta + tickCount * rotationSpeed;
 
         double offsetX = radius * Math.sin(phi) * Math.cos(currentTheta);
-        double offsetY = radius * Math.cos(phi) + Math.sin(owner.tickCount * 0.05 + rand.nextDouble() * Math.PI) * 0.5;
+        double offsetY = radius * Math.cos(phi) + Math.sin(tickCount * 0.05 + rand.nextDouble() * Math.PI) * 0.5;
         double offsetZ = radius * Math.sin(phi) * Math.sin(currentTheta);
 
         Vec3 targetCenter = target.position().add(0, target.getBbHeight() / 2.0, 0);

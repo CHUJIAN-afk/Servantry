@@ -40,6 +40,8 @@ public class ServantryModelRegister {
     public static final ModelResourceLocation RAINBOW_CRYSTAL = standalone("rainbow_crystal");
     public static final ModelResourceLocation SCAVENGER_FAIRY = standalone("scavenger_fairy");
     public static final ModelResourceLocation SURVEY_DRONE = standalone("survey_drone");
+    public static final ModelResourceLocation HORNET = standalone("hornet");
+    public static final ModelResourceLocation HORNET_STINGER = standalone("hornet_stinger");
 
     private static ModelResourceLocation standalone(String path) {
         ModelResourceLocation location = ModelResourceLocation.standalone(Servantry.rl("servant/" + path));

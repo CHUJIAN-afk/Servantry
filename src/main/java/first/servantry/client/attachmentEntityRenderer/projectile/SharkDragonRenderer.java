@@ -24,7 +24,7 @@ public class SharkDragonRenderer extends AbstractAttachmentEntityRenderer<SharkD
 
     @Override
     protected void render(SharkDragon entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<SharkDragon> context, float partialTick) {
-        if (entity.getOwner().tickCount % 20 < 10) {
+        if (entity.getTickCount() % 20 < 10) {
             ModelRenderer.renderModel(ServantryModelRegister.SHARK_OPEN, poseStack, bufferSource);
         } else {
             ModelRenderer.renderModel(ServantryModelRegister.SHARK_CLOSE, poseStack, bufferSource);

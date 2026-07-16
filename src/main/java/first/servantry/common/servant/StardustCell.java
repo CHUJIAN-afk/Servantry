@@ -6,8 +6,8 @@ import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.projectile.MiniStardustCell;
+import first.servantry.common.servant.goal.MomentumServantIdleGoal;
 import first.servantry.common.servant.goal.stardustCell.StardustCellAttackGoal;
-import first.servantry.common.servant.goal.stardustCell.StardustCellIdleGoal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -52,7 +52,7 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
     @Override
     public void registerGoals(ServantGoalSelector goalSelector) {
         goalSelector.addGoal(0, new StardustCellAttackGoal(this));
-        goalSelector.addGoal(1, new StardustCellIdleGoal(this));
+        goalSelector.addGoal(1, new MomentumServantIdleGoal(this, 6, 0.01f, 64, false));
     }
 
     @Override

@@ -63,7 +63,7 @@ public class OreScout extends Servant {
         double px = Mth.lerp(partialTick, owner.xo, owner.getX());
         double py = Mth.lerp(partialTick, owner.yo, owner.getY());
         double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
-        float bob = Mth.sin((owner.tickCount + partialTick) * 0.12f) * 0.05f;
+        float bob = Mth.sin((tickCount + partialTick) * 0.12f) * 0.05f;
         Vec3 targetPos = new Vec3(px, py, pz).add(0, owner.getBbHeight() + 1.05f + bob, 0);
         return new PathNode(targetPos, 0, 0, 0);
     }

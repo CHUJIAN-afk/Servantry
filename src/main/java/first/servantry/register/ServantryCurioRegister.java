@@ -26,6 +26,17 @@ public class ServantryCurioRegister {
     public static final TabGroup ACCESSORY = new TabGroup(2, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
 
     /**
+     * 蜂巢背包
+     */
+    public static final DeferredItem<CurioItem> HivePack = ServantryItemRegisterBuilder.build(ACCESSORY, "hive_pack", () -> CurioItem.builder()
+                    .properties(properties -> properties.rarity(Rarity.EPIC))
+                    .build())
+            .itemLanguage("Hive Pack", "蜂巢背包")
+            .itemLanguageTooltip(1, "Increased power of hornet", "增加黄蜂的力量")
+            .itemModel(ServantryItemRegisterBuilder::basicModel)
+            .itemTag(ServantryItemTagsRegister.Curio)
+            .build();
+    /**
      * 矮人项链 - 仆从栏+1
      */
     public static final DeferredItem<CurioItem> PygmyNecklace = ServantryItemRegisterBuilder.build(ACCESSORY, "pygmy_necklace", () -> CurioItem.builder()
@@ -354,6 +365,7 @@ public class ServantryCurioRegister {
             .itemModel(ServantryItemRegisterBuilder::basicModel)
             .itemTag(ServantryItemTagsRegister.Curio)
             .build();
+
     public static void register() {
     }
 }

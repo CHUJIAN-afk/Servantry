@@ -23,6 +23,21 @@ public class ServantryServantWeaponRegister {
     public static final TabGroup SERVANT_WEAPON = new TabGroup(0, Servantry.rl("textures/item/banner/banner.png"), new AnimInfo(18, 3, 8));
 
     /**
+     * 黄蜂法杖
+     */
+    public static final DeferredItem<ServantWeaponItemBuilder<Hornet>.ServantWeaponItemItem> HornetStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "hornet_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Hornet)
+                            .damage(0.7f)
+                            .knockback(0.2f)
+                            .sound(ServantrySoundRegister.UseServantWeapon)
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .itemLanguage("Hornet Staff", "黄蜂法杖")
+                    .servantLanguage(ServantryAttachmentEntityRegister.Hornet, "Hornet", "黄蜂")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
+                    .build();
+    /**
      * 无人机
      */
     public static final DeferredItem<ServantWeaponItemBuilder<OreScout>.ServantWeaponItemItem> SurveyDroneRemote =

@@ -97,6 +97,8 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.BlitzBall.get(), new BlitzBallRenderer());
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Rain.get(), new RainRenderer());
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.DestructionBullet.get(), new DestructionBulletRenderer());
+        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Hornet.get(), new HornetRenderer());
+        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.HornetStinger.get(), new HornetStingerRenderer());
     }
 
     @SubscribeEvent

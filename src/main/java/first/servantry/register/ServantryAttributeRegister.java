@@ -27,13 +27,13 @@ public class ServantryAttributeRegister {
 
     private static final DeferredRegister<Attribute> Register = DeferredRegister.create(Registries.ATTRIBUTE, Servantry.MODID);
 
-    public static final DeferredHolder<Attribute, Attribute> HealthRegen = register("health_regen", 0, -1000, 1000);
+    public static final DeferredHolder<Attribute, Attribute> HealthRegen = register("health_regen", 0, -1000000, 1000000);
     public static final DeferredHolder<Attribute, Attribute> ServantMaxCount = register("servant_max_count", 1, 0, 1000);
     public static final DeferredHolder<Attribute, Attribute> SentryServantMaxCount = register("sentry_servant_max_count", 1, 0, 1000);
-    public static final DeferredHolder<Attribute, Attribute> ServantDamage = register("servant_damage", 1, 0, 1000);
-    public static final DeferredHolder<Attribute, Attribute> ServantKnockback = register("servant_knockback", 1, 0, 1000);
-    public static final DeferredHolder<Attribute, Attribute> ServantArmorPierce = register("servant_armor_pierce", 1, 0, 1000);
-    public static final DeferredHolder<Attribute, Attribute> ServantSearchRange = register("servant_search_range", 1, 0, 1000);
+    public static final DeferredHolder<Attribute, Attribute> ServantDamage = register("servant_damage", 1, 0, 1000000);
+    public static final DeferredHolder<Attribute, Attribute> ServantKnockback = register("servant_knockback", 1, 0, 10);
+    public static final DeferredHolder<Attribute, Attribute> ServantArmorPierce = register("servant_armor_pierce", 1, 0, 1000000);
+    public static final DeferredHolder<Attribute, Attribute> ServantSearchRange = register("servant_search_range", 1, 0, 10);
 
     private static DeferredHolder<Attribute, Attribute> register(String name, double defaultValue, double min, double max) {
         return Register.register(name, () -> new RangedAttribute(Servantry.rl(name).toString(), defaultValue, min, max).setSyncable(true));

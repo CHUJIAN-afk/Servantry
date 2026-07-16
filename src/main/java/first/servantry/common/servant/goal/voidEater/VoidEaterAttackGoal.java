@@ -85,7 +85,7 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
             }
         } else {
             Player owner = servant.getOwner();
-            if (owner.tickCount % 5 == 0) {
+            if (servant.getTickCount() % 5 == 0) {
                 double dot = servant.getLookAngle().dot(targetPos.subtract(servant.getPos()).normalize());
                 if (dot > 0 && Math.acos((float) Math.min(1, dot)) < Mth.DEG_TO_RAD * 30) {
                     Vec3 start = servant.getPos();

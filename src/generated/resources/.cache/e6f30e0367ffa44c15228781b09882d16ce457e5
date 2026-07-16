@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-14T17:11:34.3184487	Item Models: servantry
+// 1.21.1	2026-07-16T18:36:25.9963907	Item Models: servantry
 d882c3a8d9d37b2217246221442c70da01b9ad66 assets/servantry/models/item/adamantite_ingot.json
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 1234a813c7da2a7cf22f8be7f86b6fd620074edc assets/servantry/models/item/ballista_cane.json
@@ -33,6 +33,8 @@ d082c820ba882bc343efb6ede305d956b9a77b6d assets/servantry/models/item/flinx_fur_
 11647c9e666a6b9aa68a0ae3f43122fdf844cbf4 assets/servantry/models/item/hallowed_leggings.json
 ae3b4026162f5c6b5f934006ff516804cce135d1 assets/servantry/models/item/hallowed_rune.json
 67155e2663d25ff0a7099f7974e39fc1aa3233f1 assets/servantry/models/item/hercules_beetle.json
+b2d28e65ea6aa3530eedd02448dffa33856156d4 assets/servantry/models/item/hive_pack.json
+5b005c30d68dfec849d0d222aa08333694af8e5f assets/servantry/models/item/hornet_staff.json
 9869fe0f75a3df3d8d71a2ffe00163536a23eea5 assets/servantry/models/item/huntresses_buckler.json
 cea208bf9d779d07c2255c3502769ec0ceaca5e0 assets/servantry/models/item/hunt_soul_emblem.json
 e52c1be32d3dbb25348849e3b386749de9b09694 assets/servantry/models/item/infinite_scabbard.json

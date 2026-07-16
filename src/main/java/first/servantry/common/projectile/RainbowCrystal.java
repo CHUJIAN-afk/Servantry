@@ -82,7 +82,7 @@ public class RainbowCrystal extends Projectile {
     }
 
     public int getColor(float partialTick) {
-        float t = (float) ((Math.toRadians(getUuid().hashCode() + owner.tickCount + partialTick) % (Math.PI * 2)) / (Math.PI * 2));
+        float t = (float) ((Math.toRadians(getUuid().hashCode() + tickCount + partialTick) % (Math.PI * 2)) / (Math.PI * 2));
         float r = 0.5f + 0.5f * (float) Math.sin(t * Math.PI * 2);
         float g = 0.5f + 0.5f * (float) Math.sin(t * Math.PI * 2 - Math.PI * 2 / 3);
         float b = 0.5f + 0.5f * (float) Math.sin(t * Math.PI * 2 - Math.PI * 4 / 3);

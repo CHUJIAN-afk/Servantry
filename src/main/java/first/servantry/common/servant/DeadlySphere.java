@@ -7,8 +7,8 @@ import first.servantry.api.entity.IBlockCollision;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.servantry.common.servant.goal.MomentumServantIdleGoal;
 import first.servantry.common.servant.goal.deadlysphere.DeadlySphereAttackGoal;
-import first.servantry.common.servant.goal.deadlysphere.DeadlySphereIdleGoal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -38,7 +38,7 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
     @Override
     public void registerGoals(ServantGoalSelector goalSelector) {
         goalSelector.addGoal(0, new DeadlySphereAttackGoal(this));
-        goalSelector.addGoal(2, new DeadlySphereIdleGoal(this));
+        goalSelector.addGoal(1, new MomentumServantIdleGoal(this, 6, 0.01f, 64, false));
     }
 
     @Override

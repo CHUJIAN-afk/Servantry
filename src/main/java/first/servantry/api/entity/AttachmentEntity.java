@@ -22,6 +22,7 @@ public abstract class AttachmentEntity {
     protected float damage = 0;
     protected float knockback = 0;
     protected float armorPierce = 0;
+    protected int tickCount = 0;
 
     // ===================== 路径与轨迹 =====================
 
@@ -106,6 +107,7 @@ public abstract class AttachmentEntity {
             // 客户端：使用同步数据更新位置
             currentPathNode = clientTargetNode;
         }
+        tickCount++;
         // 更新历史轨迹
         this.historyNodes.addFirst(this.currentPathNode);
         if (this.historyNodes.size() > getHistoryNodesSize()) {
@@ -318,6 +320,10 @@ public abstract class AttachmentEntity {
     /** @return 所有者玩家 */
     public Player getOwner() {
         return owner;
+    }
+
+    public int getTickCount() {
+        return tickCount;
     }
 
     /**

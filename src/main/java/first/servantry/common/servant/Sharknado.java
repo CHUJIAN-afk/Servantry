@@ -7,8 +7,8 @@ import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.MomentumServant;
 import first.servantry.api.servant.ai.ServantGoalSelector;
 import first.servantry.common.projectile.SharkDragon;
+import first.servantry.common.servant.goal.MomentumServantIdleGoal;
 import first.servantry.common.servant.goal.sharknado.SharknadoAttackGoal;
-import first.servantry.common.servant.goal.sharknado.SharknadoIdleGoal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.world.entity.LivingEntity;
@@ -37,7 +37,7 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
     @Override
     public void registerGoals(ServantGoalSelector goalSelector) {
         goalSelector.addGoal(0, new SharknadoAttackGoal(this));
-        goalSelector.addGoal(1, new SharknadoIdleGoal(this));
+        goalSelector.addGoal(1, new MomentumServantIdleGoal(this, 6, 0.01f, 64, false));
     }
 
     @Override
