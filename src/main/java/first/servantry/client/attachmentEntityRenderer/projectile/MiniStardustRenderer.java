@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
  * 使用圆锥拖尾，渲染缩小版星尘细胞模型（0.25倍）。
  * </p>
  */
-public class MiniStardustProjectileRenderer extends AbstractAttachmentEntityRenderer<MiniStardustCell> {
+public class MiniStardustRenderer extends AbstractAttachmentEntityRenderer<MiniStardustCell> {
 
     @Override
     protected RenderContext<MiniStardustCell> createContext(MiniStardustCell projectile) {

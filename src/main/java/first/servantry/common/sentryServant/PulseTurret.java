@@ -63,7 +63,6 @@ public class PulseTurret extends MomentumServant implements IBlockCollision<Puls
         Vec3 pos = getPos();
         Vec3 direction = pos.add(getLookAngle()).offsetRandom(owner.getRandom(), 0.05f).subtract(getPos()).normalize();
         DestructionBullet projectile = new DestructionBullet(getDamageSource(), pos, direction);
-        projectile.copyDamageData(this);
         projectile.join(owner);
         owner.level().playSound(null, pos.x(), pos.y(), pos.z(), ServantrySoundRegister.BallistaShot.get(), owner.getSoundSource());
     }

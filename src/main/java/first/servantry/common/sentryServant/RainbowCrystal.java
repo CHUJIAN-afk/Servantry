@@ -54,10 +54,6 @@ public class RainbowCrystal extends Servant {
                 list.add(startPathNode.lerp(endPathNode, EasingCurve.EASE_IN_OUT_CUBIC.apply(progress)));
             }
             first.servantry.common.projectile.RainbowCrystal projectile = new first.servantry.common.projectile.RainbowCrystal(getDamageSource(), startPathNode);
-            projectile.setDamageSource(getDamageSource());
-            projectile.setDamage(getDamage());
-            projectile.setKnockback(getKnockback());
-            projectile.setArmorPierce(getArmorPierce());
             projectile.setPath(list);
             projectile.join(owner);
         }

@@ -93,7 +93,6 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
                     for (int i = 0; i < 9; i++) {
                         Vec3 direction = targetPos.offsetRandom(owner.getRandom(), 2f).subtract(servant.getPos()).normalize();
                         GodFlame projectile = new GodFlame(servant.getDamageSource(), start, direction.scale(3));
-                        projectile.copyDamageData(servant);
                         projectile.setDamage(servant.getDamage() * 0.5f);
                         projectile.join(owner);
                     }
@@ -125,7 +124,6 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
         } else {
             if (laser == null || laser.isRemove()) {
                 laser = new CustomLaser(servant.getDamageSource(), servant.getCurrentPathNode(), 0x6f19d4);
-                laser.copyDamageData(servant);
                 laser.setDamage(servant.getDamage() * 2);
                 Player owner = servant.getOwner();
                 laser.join(owner);

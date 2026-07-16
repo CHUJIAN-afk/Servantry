@@ -12,7 +12,7 @@ import first.servantry.common.projectile.ChlorophyteCrystal;
 import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-public class ChlorophyteCrystalProjectileRenderer extends AbstractAttachmentEntityRenderer<ChlorophyteCrystal> {
+public class ChlorophyteCrystalRenderer extends AbstractAttachmentEntityRenderer<ChlorophyteCrystal> {
 
     @Override
     protected RenderContext<ChlorophyteCrystal> createContext(ChlorophyteCrystal crystal) {

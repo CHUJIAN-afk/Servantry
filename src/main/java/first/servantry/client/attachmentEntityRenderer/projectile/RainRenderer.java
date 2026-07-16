@@ -3,7 +3,7 @@ package first.servantry.client.attachmentEntityRenderer.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
-import first.servantry.api.client.render.renderer.LaserRenderer;
+import first.servantry.api.client.render.renderer.LaserRendererHelper;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.Rain;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,7 +22,7 @@ public class RainRenderer extends AbstractAttachmentEntityRenderer<Rain> {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.25f;
-        LaserRenderer.builder()
+        LaserRendererHelper.builder()
                 .length(length)
                 .radius(width, width)
                 .layers(2)

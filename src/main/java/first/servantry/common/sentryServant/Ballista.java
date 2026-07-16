@@ -100,7 +100,6 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
         Vec3 direction = getLookAngle();
         Vec3 pos = getPos();
         CrossbowBolt projectile = new CrossbowBolt(getDamageSource(), pos, direction);
-        projectile.copyDamageData(this);
         if (ServantryArmorSetRegister.ValhallaKnight.value().full(owner)) {
             projectile.setMaxPierceCount(6);
             projectile.setDamage(projectile.getDamage() * 1.33f);

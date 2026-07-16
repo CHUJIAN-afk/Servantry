@@ -33,7 +33,6 @@ public class Cloud extends MomentumServant implements IBlockCollision<Cloud> {
                 cooldown = random.nextInt(2, 4);
                 Vec3 start = getPos().offsetRandom(random, 0.25f);
                 Rain rain = new Rain(getDamageSource(), start, new Vec3(0, -0.5, 0));
-                rain.copyDamageData(this);
                 rain.join(owner);
             }
         }

@@ -4,6 +4,7 @@ import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.PathNode;
+import first.servantry.api.servant.ServantDamageSource;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -128,12 +129,6 @@ public abstract class Projectile extends AttachmentEntity {
         }
     }
 
-    public void copyDamageData(AttachmentEntity entity) {
-        setDamage(entity.getDamage());
-        setKnockback(entity.getKnockback());
-        setArmorPierce(entity.getArmorPierce());
-    }
-
     @Override
     public void dimensionChange() {
         setRemove();
@@ -230,5 +225,11 @@ public abstract class Projectile extends AttachmentEntity {
 
     public void setDamageSource(DamageSource damageSource) {
         this.damageSource = damageSource;
+        if (damageSource instanceof ServantDamageSource servantDamageSource) {
+            AttachmentEntity entity = servantDamageSource.getServant();
+            setDamage(entity.getDamage());
+            setKnockback(entity.getKnockback());
+            setArmorPierce(entity.getArmorPierce());
+        }
     }
 }

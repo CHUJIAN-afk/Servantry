@@ -81,9 +81,6 @@ public class MoonPortal extends Servant {
         }
 
         CustomLaser projectile = new CustomLaser(getDamageSource(), pathNodes.getFirst(), 0x00fdd6);
-        projectile.setDamage(getDamage());
-        projectile.setKnockback(getKnockback());
-        projectile.setArmorPierce(getArmorPierce());
         projectile.setPath(pathNodes);
 
         projectile.setTickConsumer(laserProjectile -> {

@@ -10,7 +10,7 @@ import first.servantry.common.projectile.RainbowCrystal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-public class RainbowCrystalProjectileRenderer extends AbstractAttachmentEntityRenderer<RainbowCrystal> {
+public class RainbowCrystalRenderer extends AbstractAttachmentEntityRenderer<RainbowCrystal> {
 
     @Override
     protected RenderContext<RainbowCrystal> createContext(RainbowCrystal crystal) {

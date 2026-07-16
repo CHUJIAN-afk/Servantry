@@ -53,6 +53,7 @@ public class GenericParticle extends TextureSheetParticle {
         this.oRoll = this.roll;
         this.alpha = 1F;
         this.setSpriteFromAge(spriteSet);
+        this.hasPhysics = false;
     }
 
     public static GenericParticle createWithOptions(ClientLevel level, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteSet, GenericParticleOptions options) {

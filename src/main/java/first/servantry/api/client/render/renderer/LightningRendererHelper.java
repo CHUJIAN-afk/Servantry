@@ -15,12 +15,12 @@ import org.joml.Vector3f;
 /**
  * 雷电/闪电链渲染器（链式 ServantWeaponItemBuilder）。
  * <p>
- * 在两个绝对世界坐标点之间绘制带扭曲效果的闪电链。整体形态借鉴 {@link LaserRenderer} 的
+ * 在两个绝对世界坐标点之间绘制带扭曲效果的闪电链。整体形态借鉴 {@link LaserRendererHelper} 的
  * “多层 alpha 梯度叠加”思路：内层窄而亮（锐利核心），外层宽而散（泛光边缘），多层标准半透明
  * 叠加即得到“实心核心 + 散开边缘”的视觉。
  * </p>
  * <p>
- * 与 {@link LaserRenderer} 的差异：
+ * 与 {@link LaserRendererHelper} 的差异：
  * <ul>
  *   <li><b>坐标</b>：接收两个绝对世界坐标 {@code start}/{@code end}，以及 PoseStack 原点对应的
  *       世界坐标 {@code renderOrigin}。内部将世界点换算为相对原点的局部点后发射顶点，
@@ -38,7 +38,7 @@ import org.joml.Vector3f;
  * </p>
  *
  * <pre>{@code
- * LightningRenderer.builder()
+ * LightningRendererHelper.builder()
  *     .from(startWorld)          // 起点世界坐标
  *     .to(endWorld)              // 终点世界坐标
  *     .renderOrigin(originWorld) // PoseStack 原点对应的世界坐标（附件实体上下文传 visualNode.pos()）
@@ -53,7 +53,7 @@ import org.joml.Vector3f;
  *     .render(poseStack, bufferSource, randomSource);
  * }</pre>
  */
-public class LightningRenderer {
+public class LightningRendererHelper {
 
     // ===================== 参数 =====================
     private Vec3 start = Vec3.ZERO;
@@ -70,14 +70,14 @@ public class LightningRenderer {
     private float alpha = 0.9f;
     private float innerRatio = 0.25f;   // 最内层相对半径(0~1)
 
-    private LightningRenderer() {
+    private LightningRendererHelper() {
     }
 
     /**
      * 创建 ServantWeaponItemBuilder 实例。
      */
-    public static LightningRenderer builder() {
-        return new LightningRenderer();
+    public static LightningRendererHelper builder() {
+        return new LightningRendererHelper();
     }
 
     // -------------------- 链式参数 --------------------
@@ -85,7 +85,7 @@ public class LightningRenderer {
     /**
      * 闪电起点（绝对世界坐标）。
      */
-    public LightningRenderer from(Vec3 start) {
+    public LightningRendererHelper from(Vec3 start) {
         this.start = start;
         return this;
     }
@@ -93,7 +93,7 @@ public class LightningRenderer {
     /**
      * 闪电终点（绝对世界坐标）。
      */
-    public LightningRenderer to(Vec3 end) {
+    public LightningRendererHelper to(Vec3 end) {
         this.end = end;
         return this;
     }
@@ -105,7 +105,7 @@ public class LightningRenderer {
      * 在附件实体渲染上下文中传入 {@code visualNode.pos()}；其他场景按调用方 PoseStack 平移传入。
      * </p>
      */
-    public LightningRenderer renderOrigin(Vec3 renderOrigin) {
+    public LightningRendererHelper renderOrigin(Vec3 renderOrigin) {
         this.renderOrigin = renderOrigin;
         return this;
     }
@@ -113,7 +113,7 @@ public class LightningRenderer {
     /**
      * 同心壳层数，越多泛光越强（建议 3~8）。
      */
-    public LightningRenderer layers(int layers) {
+    public LightningRendererHelper layers(int layers) {
         this.layers = Math.max(1, layers);
         return this;
     }
@@ -121,7 +121,7 @@ public class LightningRenderer {
     /**
      * 沿轴向分段数，越多锯齿越细密（建议 8~24）。每段在垂直方向叠加随机位移形成扭曲。
      */
-    public LightningRenderer segments(int segments) {
+    public LightningRendererHelper segments(int segments) {
         this.segments = Math.max(2, segments);
         return this;
     }
@@ -129,7 +129,7 @@ public class LightningRenderer {
     /**
      * 分支数量（0=无分叉）。分支位置/方向/长度由 {@link RandomSource} 决定。
      */
-    public LightningRenderer branches(int branches) {
+    public LightningRendererHelper branches(int branches) {
         this.branches = Math.max(0, branches);
         return this;
     }
@@ -137,7 +137,7 @@ public class LightningRenderer {
     /**
      * 主链垂直扭曲幅度（相对主链长度的比例，0=直线）。
      */
-    public LightningRenderer jitter(float jitter) {
+    public LightningRendererHelper jitter(float jitter) {
         this.jitter = jitter;
         return this;
     }
@@ -145,7 +145,7 @@ public class LightningRenderer {
     /**
      * 分支长度（相对主链长度的比例）。
      */
-    public LightningRenderer branchLength(float branchLength) {
+    public LightningRendererHelper branchLength(float branchLength) {
         this.branchLength = branchLength;
         return this;
     }
@@ -153,7 +153,7 @@ public class LightningRenderer {
     /**
      * 两端半径：core 为最内层（核心），outer 为最外层（泛光边缘）。
      */
-    public LightningRenderer radius(float core, float outer) {
+    public LightningRendererHelper radius(float core, float outer) {
         this.radiusCore = core;
         this.radiusOuter = outer;
         return this;
@@ -162,7 +162,7 @@ public class LightningRenderer {
     /**
      * 颜色 ARGB（如 0xFFFFFFFF）。
      */
-    public LightningRenderer color(int argb) {
+    public LightningRendererHelper color(int argb) {
         this.colorRGB = argb;
         return this;
     }
@@ -170,7 +170,7 @@ public class LightningRenderer {
     /**
      * 整体基础透明度 0~1。
      */
-    public LightningRenderer alpha(float alpha) {
+    public LightningRendererHelper alpha(float alpha) {
         this.alpha = alpha;
         return this;
     }
@@ -178,7 +178,7 @@ public class LightningRenderer {
     /**
      * 最内层相对半径 0~1（内层越细，核心越锐利）。
      */
-    public LightningRenderer innerRatio(float ratio) {
+    public LightningRendererHelper innerRatio(float ratio) {
         this.innerRatio = Math.max(0f, Math.min(1f, ratio));
         return this;
     }

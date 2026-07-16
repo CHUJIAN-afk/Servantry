@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
-import first.servantry.api.client.render.renderer.LaserRenderer;
+import first.servantry.api.client.render.renderer.LaserRendererHelper;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.DestructionBullet;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,7 +23,7 @@ public class DestructionBulletRenderer extends AbstractAttachmentEntityRenderer<
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;
-        LaserRenderer.builder()
+        LaserRendererHelper.builder()
                 .length(length)
                 .radius(width, width)
                 .layers(2)

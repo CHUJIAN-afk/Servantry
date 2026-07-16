@@ -27,7 +27,7 @@ import org.joml.Matrix4f;
  * </p>
  *
  * <pre>{@code
- * LaserRenderer.builder()
+ * LaserRendererHelper.builder()
  *     .length(5.0f)
  *     .radius(0.15f, 0.05f)   // 近端半径, 远端半径
  *     .layers(4)
@@ -37,7 +37,7 @@ import org.joml.Matrix4f;
  *     .render(poseStack, bufferSource);
  * }</pre>
  */
-public class LaserRenderer {
+public class LaserRendererHelper {
 
     // ===================== 参数 =====================
     private float length = 1.0f;
@@ -49,14 +49,14 @@ public class LaserRenderer {
     private float alpha = 0.8f;
     private float innerRatio = 0.3f;    // 最内层相对半径(0~1)
 
-    private LaserRenderer() {
+    private LaserRendererHelper() {
     }
 
     /**
      * 创建 ServantWeaponItemBuilder 实例。
      */
-    public static LaserRenderer builder() {
-        return new LaserRenderer();
+    public static LaserRendererHelper builder() {
+        return new LaserRendererHelper();
     }
 
     // -------------------- 链式参数 --------------------
@@ -64,7 +64,7 @@ public class LaserRenderer {
     /**
      * 激光长度（沿 -Z 方向）。
      */
-    public LaserRenderer length(float length) {
+    public LaserRendererHelper length(float length) {
         this.length = length;
         return this;
     }
@@ -72,7 +72,7 @@ public class LaserRenderer {
     /**
      * 两端半径：start 为近端(z=0)，end 为远端(z=-length)。
      */
-    public LaserRenderer radius(float start, float end) {
+    public LaserRendererHelper radius(float start, float end) {
         this.radiusStart = start;
         this.radiusEnd = end;
         return this;
@@ -81,7 +81,7 @@ public class LaserRenderer {
     /**
      * 同心壳层数，越多体积雾感越强（建议 3~8）。
      */
-    public LaserRenderer layers(int layers) {
+    public LaserRendererHelper layers(int layers) {
         this.layers = Math.max(1, layers);
         return this;
     }
@@ -89,7 +89,7 @@ public class LaserRenderer {
     /**
      * 圆周分段数，越多越圆滑（建议 8~16）。
      */
-    public LaserRenderer segments(int segments) {
+    public LaserRendererHelper segments(int segments) {
         this.segments = Math.max(3, segments);
         return this;
     }
@@ -97,7 +97,7 @@ public class LaserRenderer {
     /**
      * 颜色 ARGB（如 0xFF5599FF）。
      */
-    public LaserRenderer color(int argb) {
+    public LaserRendererHelper color(int argb) {
         this.colorRGB = argb;
         return this;
     }
@@ -105,7 +105,7 @@ public class LaserRenderer {
     /**
      * 整体基础透明度 0~1。
      */
-    public LaserRenderer alpha(float alpha) {
+    public LaserRendererHelper alpha(float alpha) {
         this.alpha = alpha;
         return this;
     }
@@ -113,7 +113,7 @@ public class LaserRenderer {
     /**
      * 最内层相对半径 0~1（内层越细，核心越锐利）。
      */
-    public LaserRenderer innerRatio(float ratio) {
+    public LaserRendererHelper innerRatio(float ratio) {
         this.innerRatio = Math.max(0f, Math.min(1f, ratio));
         return this;
     }

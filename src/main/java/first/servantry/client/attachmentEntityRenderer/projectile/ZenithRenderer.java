@@ -11,7 +11,7 @@ import first.servantry.common.projectile.Zenith;
 import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-public class ZenithProjectileRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
+public class ZenithRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
 
     @Override
     protected RenderContext<Zenith> createContext(Zenith zenith) {

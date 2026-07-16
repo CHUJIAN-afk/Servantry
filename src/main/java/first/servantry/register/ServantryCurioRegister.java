@@ -339,7 +339,6 @@ public class ServantryCurioRegister {
                         if (owner.getRandom().nextFloat() < 0.05f) {
                             Vec3 startPos = servant.getPos();
                             MiniStardustCell projectile = new MiniStardustCell(servant.getDamageSource(), startPos);
-                            projectile.setDamage(servant.getDamage());
                             projectile.setVelocity(startPos.offsetRandom(owner.getRandom(), 1)
                                                            .subtract(startPos)
                                                            .normalize()

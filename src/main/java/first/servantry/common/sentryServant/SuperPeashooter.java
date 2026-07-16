@@ -69,16 +69,11 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
                 lookAtPos(box.getCenter());
                 if (task == null && cooldown < 0 && aiming > 10) {
                     RandomSource random = owner.getRandom();
-                    if (true) {
-                        cooldown = 0;
+                    cooldown = 20 + random.nextInt(2);
+                    if (random.nextInt(10) == 0) {
                         task = new ShootTask(225, 60, true);
                     } else {
-                        cooldown = 20 + random.nextInt(2);
-                        if (random.nextInt(10) == 0) {
-                            task = new ShootTask(225, 60, true);
-                        } else {
-                            task = new ShootTask(7, 7, false);
-                        }
+                        task = new ShootTask(7, 7, false);
                     }
                 }
             }
@@ -172,7 +167,6 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
                 // 沿朝向错位起点，避免同 tick 多发重叠
                 Vec3 start = pos.add(dir.scale(i * 0.25));
                 BlitzBall projectile = new BlitzBall(shooter.getDamageSource(), start, dir);
-                projectile.copyDamageData(shooter);
                 projectile.setVelocity(dir);
                 projectile.join(shooter.owner);
                 firedShots++;

@@ -4,13 +4,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
-import first.servantry.api.client.render.renderer.LaserRenderer;
+import first.servantry.api.client.render.renderer.LaserRendererHelper;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.Laser;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.AABB;
 
-public class LaserProjectileRenderer extends AbstractAttachmentEntityRenderer<Laser> {
+public class LaserRenderer extends AbstractAttachmentEntityRenderer<Laser> {
 
     @Override
     protected RenderContext<Laser> createContext(Laser laser) {
@@ -23,7 +23,7 @@ public class LaserProjectileRenderer extends AbstractAttachmentEntityRenderer<La
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;
-        LaserRenderer.builder()
+        LaserRendererHelper.builder()
                 .length(length)
                 .radius(width, width)
                 .layers(4)

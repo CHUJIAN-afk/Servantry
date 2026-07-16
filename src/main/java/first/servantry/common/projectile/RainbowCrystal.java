@@ -21,7 +21,7 @@ import java.util.List;
 public class RainbowCrystal extends Projectile {
 
     public RainbowCrystal(){
-
+        super();
     }
 
     public RainbowCrystal(DamageSource damageSource, PathNode pathNode) {

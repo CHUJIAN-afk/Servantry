@@ -10,7 +10,7 @@ import first.servantry.common.projectile.SharkDragon;
 import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-public class SharkDragonProjectileRenderer extends AbstractAttachmentEntityRenderer<SharkDragon> {
+public class SharkDragonRenderer extends AbstractAttachmentEntityRenderer<SharkDragon> {
 
     @Override
     protected RenderContext<SharkDragon> createContext(SharkDragon laser) {

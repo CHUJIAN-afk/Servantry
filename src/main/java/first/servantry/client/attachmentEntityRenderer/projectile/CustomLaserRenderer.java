@@ -5,7 +5,7 @@ import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
-import first.servantry.api.client.render.renderer.LaserRenderer;
+import first.servantry.api.client.render.renderer.LaserRendererHelper;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.CustomLaser;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -14,11 +14,11 @@ import net.minecraft.world.phys.AABB;
 /**
  * 自定义激光投射物渲染器。
  * <p>
- * 使用 {@link LaserRenderer} 多层同心壳 + 自定义着色器实现发光、流动、体积雾效果。
+ * 使用 {@link LaserRendererHelper} 多层同心壳 + 自定义着色器实现发光、流动、体积雾效果。
  * 替代旧的四叉面伪圆柱实现。
  * </p>
  */
-public class CustomLaserProjectileRenderer extends AbstractAttachmentEntityRenderer<CustomLaser> {
+public class CustomLaserRenderer extends AbstractAttachmentEntityRenderer<CustomLaser> {
 
     @Override
     protected RenderContext<CustomLaser> createContext(CustomLaser laser) {
@@ -35,7 +35,7 @@ public class CustomLaserProjectileRenderer extends AbstractAttachmentEntityRende
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;
-        LaserRenderer.builder()
+        LaserRendererHelper.builder()
                 .length(length)
                 .radius(width * 0.25F, width)
                 .layers(4)

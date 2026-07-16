@@ -30,35 +30,37 @@ public class DynamicLightDispatcher {
     private static volatile Map<Vec3, Integer> SnapshotLightSources = new HashMap<>();
 
     public static void addLightSources(PathNode pathNode, AABB aabb, int light) {
-        Vec3 pos = pathNode.pos();
-        double minX = aabb.minX, maxX = aabb.maxX;
-        double minY = aabb.minY, maxY = aabb.maxY;
-        double minZ = aabb.minZ, maxZ = aabb.maxZ;
+        if (ClientConfig.DynamicLight.isTrue()) {
+            Vec3 pos = pathNode.pos();
+            double minX = aabb.minX, maxX = aabb.maxX;
+            double minY = aabb.minY, maxY = aabb.maxY;
+            double minZ = aabb.minZ, maxZ = aabb.maxZ;
 
-        // Z轴方向最长，沿Z轴等间隔放置点光源（间隔≤0.5格）
-        double zLen = maxZ - minZ;
-        int count = Math.max(1, Mth.ceil(zLen / 0.5));
-        double step = zLen / count;
+            // Z轴方向最长，沿Z轴等间隔放置点光源（间隔≤0.5格）
+            double zLen = maxZ - minZ;
+            int count = Math.max(1, Mth.ceil(zLen / 0.5));
+            double step = zLen / count;
 
-        // 局部→世界旋转：先绕Y旋转yaw，再绕X旋转pitch，再绕Z旋转roll
-        float yawRad = (float) Math.toRadians(-pathNode.yaw());
-        float pitchRad = (float) Math.toRadians(pathNode.pitch());
-        double cosY = Math.cos(yawRad), sinY = Math.sin(yawRad);
-        double cosP = Math.cos(pitchRad), sinP = Math.sin(pitchRad);
+            // 局部→世界旋转：先绕Y旋转yaw，再绕X旋转pitch，再绕Z旋转roll
+            float yawRad = (float) Math.toRadians(-pathNode.yaw());
+            float pitchRad = (float) Math.toRadians(pathNode.pitch());
+            double cosY = Math.cos(yawRad), sinY = Math.sin(yawRad);
+            double cosP = Math.cos(pitchRad), sinP = Math.sin(pitchRad);
 
-        for (int i = 0; i <= count; i++) {
-            double lz = minZ + step * i;
+            for (int i = 0; i <= count; i++) {
+                double lz = minZ + step * i;
 
-            double lx = (minX + maxX) * 0.5;
-            double ly = (minY + maxY) * 0.5;
+                double lx = (minX + maxX) * 0.5;
+                double ly = (minY + maxY) * 0.5;
 
-            double rry = ly * cosP - lz * sinP;
-            double rrz = ly * sinP + lz * cosP;
+                double rry = ly * cosP - lz * sinP;
+                double rrz = ly * sinP + lz * cosP;
 
-            double wwx = lx * cosY + rrz * sinY;
-            double wwz = -lx * sinY + rrz * cosY;
+                double wwx = lx * cosY + rrz * sinY;
+                double wwz = -lx * sinY + rrz * cosY;
 
-            LightSources.put(pos.add(wwx, rry, wwz), light);
+                LightSources.put(pos.add(wwx, rry, wwz), light);
+            }
         }
     }
 

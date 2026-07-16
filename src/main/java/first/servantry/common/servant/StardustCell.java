@@ -123,7 +123,6 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
         MiniStardustCell projectile = new MiniStardustCell(getDamageSource(), start);
-        projectile.setDamage(getDamage());
         projectile.setChaseTarget(target);
         projectile.join(owner);
         // 后坐力

@@ -12,7 +12,7 @@ import first.servantry.common.projectile.ShatteredStellarCore;
 import first.servantry.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-public class ShatteredStellarCoreProjectileRenderer extends AbstractAttachmentEntityRenderer<ShatteredStellarCore> {
+public class ShatteredStellarCoreRenderer extends AbstractAttachmentEntityRenderer<ShatteredStellarCore> {
 
     @Override
     protected RenderContext<ShatteredStellarCore> createContext(ShatteredStellarCore projectile) {

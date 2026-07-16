@@ -69,7 +69,6 @@ public class ChlorophyteCrystal extends Servant {
         Vec3 direction = target.getBoundingBox().getCenter().subtract(getPos()).normalize();
         Vec3 startPos = getPos().add(direction.scale(0.25));
         first.servantry.common.projectile.ChlorophyteCrystal projectile = new first.servantry.common.projectile.ChlorophyteCrystal(getDamageSource(), startPos, direction.scale(1.5));
-        projectile.setDamage(getDamage());
         projectile.join(owner);
         GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                 .centerColor(0x1bff10)

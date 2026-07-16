@@ -50,7 +50,6 @@ public class TwinsCursedFlameAttackGoal extends ServantGoal<Twins> {
                 double distance = servant.getPos().distanceTo(wanderPos);
                 servant.applyForce(wanderPos.subtract(servant.getPos()).normalize().scale(Math.min(distance * 0.04, 0.4)));
                 DemonFlame demonFlame = new DemonFlame(servant.getDamageSource(), servant.getPos(), targetPos.subtract(servant.getPos()).normalize());
-                demonFlame.copyDamageData(servant);
                 demonFlame.join(owner);
                 GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                         .centerColor(0x24d509)

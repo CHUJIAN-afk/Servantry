@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
-import first.servantry.api.client.render.renderer.LightningRenderer;
+import first.servantry.api.client.render.renderer.LightningRendererHelper;
 import first.servantry.api.client.render.sphere.SphereRenderer;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.BlitzBall;
@@ -38,7 +38,7 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
                 RandomSource random = living.getRandom();
                 random.setSeed(blitzBall.hashCode() + living.hashCode());
                 AABB box = living.getBoundingBox();
-                LightningRenderer.builder()
+                LightningRendererHelper.builder()
                         .from(visualNode.pos())
                         .to(box.getCenter().offsetRandom(random, (float) box.getSize() * 0.5f))
                         .renderOrigin(visualNode.pos())
