@@ -59,10 +59,22 @@ public class ServantryLanguageGenerateRegister {
         entry("jei.servantry.description.drops_from_zombie", "Occasionally drops from Zombie", "僵尸偶尔掉落");
         entry("jei.servantry.description.fishing", "Occasionally obtained from fishing in the ocean during rain", "在海洋中雨天钓鱼时偶尔获得");
         entry("jei.servantry.description.ancient_city", "Occasionally found in Ancient City chests", "偶尔在远古城市宝箱中发现");
+        // ===================== 客户端配置 =====================
+        entry("servantry.configuration.title", "Servantry Configuration", "仆从学配置");
+        entry("servantry.configuration.section.servantry.client.toml", "Client", "客户端");
+        entry("servantry.configuration.section.servantry.client.toml.title", "Client Configuration", "客户端配置");
+        configEntry("dynamic_light", "Dynamic Light", "动态光照", "Enable Servantry dynamic lighting, which increases additional rendering performance cost", "启用仆从学动态光照，会增加额外的渲染性能消耗");
+        configEntry("alpha_modify", "Alpha Modify", "透明度修正", "Enable Servantry proximity alpha modification, making servants transparent at close range to avoid blocking view", "启用仆从学近距离透明度修正，近距离透明化避免遮挡视线");
+        configEntry("damage_info", "Damage Info", "伤害信息", "Enable Servantry high-performance damage info, with negligible impact on client rendering performance", "启用仆从学高性能伤害信息，几乎不会影响客户端的渲染性能");
     }
 
     public static void entry(String key, String enDesc, String zhDesc) {
         LanguageGenerate.put(key, new Pair<>(enDesc, zhDesc));
+    }
+
+    public static void configEntry(String configKey, String enName, String zhName, String enTooltip, String zhTooltip) {
+        entry("servantry.configuration." + configKey, enName, zhName);
+        entry("servantry.configuration." + configKey + ".tooltip", enTooltip, zhTooltip);
     }
 
     public static void potionEntry(String effectName, String enName, String zhName) {

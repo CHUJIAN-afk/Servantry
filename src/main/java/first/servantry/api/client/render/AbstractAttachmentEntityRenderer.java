@@ -7,6 +7,7 @@ import first.servantry.api.client.render.renderConfig.TrailConfig;
 import first.servantry.api.client.renderType.TrailRenderType;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.PathNode;
+import first.servantry.config.ClientConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.player.Player;
@@ -38,12 +39,15 @@ public abstract class AbstractAttachmentEntityRenderer<T extends AttachmentEntit
         RenderContext<T> context = createContext(entity);
         if (context != null) {
             poseStack.pushPose();
-            AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);
-            alphaBufferSource.setAlpha(getAlphaModify(context, visualNode, partialTick));
-            if (context.hasTrail()) {
-                context.trail.render(entity, poseStack, alphaBufferSource, partialTick, visualNode, TrailRenderType.getTrail());
+            if (ClientConfig.AlphaModify.isTrue()) {
+                AlphaBufferSource alphaBufferSource = new AlphaBufferSource(bufferSource);
+                alphaBufferSource.setAlpha(getAlphaModify(context, visualNode, partialTick));
+                bufferSource = alphaBufferSource;
             }
-            modelModify(entity, poseStack, alphaBufferSource, visualNode, context, partialTick);
+            if (context.hasTrail()) {
+                context.trail.render(entity, poseStack, bufferSource, partialTick, visualNode, TrailRenderType.getTrail());
+            }
+            modelModify(entity, poseStack, bufferSource, visualNode, context, partialTick);
             poseStack.popPose();
         }
     }

@@ -2,6 +2,7 @@ package first.servantry.api.client.dynamicLight;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import first.servantry.api.entity.PathNode;
+import first.servantry.config.ClientConfig;
 import first.servantry.mixin.LevelRendererAccessor;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
@@ -61,12 +62,10 @@ public class DynamicLightDispatcher {
         }
     }
 
-    public static void addLightSources(Map<Vec3, Integer> lightSources) {
-        LightSources.putAll(lightSources);
-    }
-
     public static void addLightSources(Vec3 pos, int light) {
-        LightSources.put(pos, light);
+        if (ClientConfig.DynamicLight.isTrue()) {
+            LightSources.put(pos, light);
+        }
     }
 
     public static void update(LevelRendererAccessor levelRenderer) {
@@ -84,7 +83,10 @@ public class DynamicLightDispatcher {
                     case 0 -> cx += dirX.getStepX();
                     case 1 -> cz += dirZ.getStepZ();
                     case 2 -> cx -= dirX.getStepX();
-                    case 3 -> { cz -= dirZ.getStepZ(); cy += dirY.getStepY(); }
+                    case 3 -> {
+                        cz -= dirZ.getStepZ();
+                        cy += dirY.getStepY();
+                    }
                 }
                 updateSectionSet.add(SectionPos.asLong(cx, cy, cz));
             }
