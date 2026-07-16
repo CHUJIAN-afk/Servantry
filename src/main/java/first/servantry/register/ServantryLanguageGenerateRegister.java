@@ -66,6 +66,7 @@ public class ServantryLanguageGenerateRegister {
         configEntry("dynamic_light", "Dynamic Light", "动态光照", "Enable Servantry dynamic lighting, which increases additional rendering performance cost", "启用仆从学动态光照，会增加额外的渲染性能消耗");
         configEntry("alpha_modify", "Alpha Modify", "透明度修正", "Enable Servantry proximity alpha modification, making servants transparent at close range to avoid blocking view", "启用仆从学近距离透明度修正，近距离透明化避免遮挡视线");
         configEntry("damage_info", "Damage Info", "伤害信息", "Enable Servantry high-performance damage info, with negligible impact on client rendering performance", "启用仆从学高性能伤害信息，几乎不会影响客户端的渲染性能");
+        configEntry("debug_mode", "Debug Mode", "调试模式", "Enable virtual entity debug strokes", "启用虚拟实体调试描边");
     }
 
     public static void entry(String key, String enDesc, String zhDesc) {

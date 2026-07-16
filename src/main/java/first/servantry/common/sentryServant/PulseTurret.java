@@ -1,5 +1,6 @@
 package first.servantry.common.sentryServant;
 
+import first.servantry.api.common.sound.Playable;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
@@ -60,11 +61,11 @@ public class PulseTurret extends MomentumServant implements IBlockCollision<Puls
     }
 
     public void fire() {
-        Vec3 pos = getPos();
-        Vec3 direction = pos.add(getLookAngle()).offsetRandom(owner.getRandom(), 0.05f).subtract(getPos()).normalize();
-        DestructionBullet projectile = new DestructionBullet(getDamageSource(), pos, direction);
+        Vec3 start = getPos();
+        Vec3 direction = start.add(getLookAngle()).offsetRandom(owner.getRandom(), 0.05f).subtract(getPos()).normalize();
+        DestructionBullet projectile = new DestructionBullet(getDamageSource(), start, direction);
         projectile.join(owner);
-        owner.level().playSound(null, pos.x(), pos.y(), pos.z(), ServantrySoundRegister.BallistaShot.get(), owner.getSoundSource());
+        Playable.play(ServantrySoundRegister.BallistaShot, owner.level(), start, owner.getSoundSource());
     }
 
     @Override

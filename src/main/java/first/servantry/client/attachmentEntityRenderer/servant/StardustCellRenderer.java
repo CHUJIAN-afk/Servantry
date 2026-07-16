@@ -45,11 +45,10 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
     protected void render(StardustCell servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> context, float partialTick) {
         if (context.hasTrail() && !Minecraft.getInstance().isPaused()) {
             int trailTimer = servant.getTrailTimer();
-            GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
-                    .centerColor(0x2fb2e1)
-                    .edgeColor(0x33ccff);
             ParticleHelper.create(servant.getOwner().level())
-                    .generic(genericParticleBuilder
+                    .generic(GenericParticleBuilder.create()
+                            .centerColor(0x2fb2e1)
+                            .edgeColor(0x33ccff)
                             .lifetime(7 - trailTimer)
                             .lifetimeRandom(4)
                             .spin(trailTimer * 0.25f)

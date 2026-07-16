@@ -12,5 +12,7 @@ public class ClientConfig {
 
     public static final ModConfigSpec.BooleanValue DamageInfo = Builder.define("damage_info", true);
 
+    public static final ModConfigSpec.BooleanValue DebugMode = Builder.define("debug_mode", false);
+
     public static final ModConfigSpec Spec = Builder.build();
 }

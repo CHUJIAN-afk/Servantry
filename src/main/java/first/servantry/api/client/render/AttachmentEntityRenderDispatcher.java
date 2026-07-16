@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import first.servantry.api.entity.*;
+import first.servantry.config.ClientConfig;
 import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -66,7 +67,9 @@ public class AttachmentEntityRenderDispatcher {
                 if (renderer != null) {
                     renderer.render(entity, poseStack, bufferSource, partialTick, packedLight, renderNode);
                 }
-                debugRender(poseStack, entity, showHitboxes, renderNode, debugConsumer);
+                if (ClientConfig.DebugMode.isTrue()) {
+                    debugRender(poseStack, entity, showHitboxes, renderNode, debugConsumer);
+                }
                 poseStack.popPose();
             }
         }

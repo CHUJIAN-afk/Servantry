@@ -1,5 +1,6 @@
 package first.servantry.common.sentryServant;
 
+import first.servantry.api.common.sound.Playable;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
@@ -98,8 +99,8 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
 
     public void fire() {
         Vec3 direction = getLookAngle();
-        Vec3 pos = getPos();
-        CrossbowBolt projectile = new CrossbowBolt(getDamageSource(), pos, direction);
+        Vec3 start = getPos();
+        CrossbowBolt projectile = new CrossbowBolt(getDamageSource(), start, direction);
         if (ServantryArmorSetRegister.ValhallaKnight.value().full(owner)) {
             projectile.setMaxPierceCount(6);
             projectile.setDamage(projectile.getDamage() * 1.33f);
@@ -107,7 +108,7 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
         }
         projectile.setVelocity(direction.scale(2));
         projectile.join(owner);
-        owner.level().playSound(null, pos.x(), pos.y(), pos.z(), ServantrySoundRegister.BallistaShot.get(), owner.getSoundSource());
+        Playable.play(ServantrySoundRegister.BallistaShot, owner.level(), start, owner.getSoundSource());
     }
 
     @Override

@@ -105,6 +105,7 @@ AttachmentEntity (api/entity/AttachmentEntity.java) — 抽象基类
 | 盘旋/悬停 | getWanderPos() 计算悬停位置，applyForce 飞向 |
 | 施加减益 | 射弹 .effect(new MobEffectInstance(...)) 或仆从 onCollisionAttack 中添加 |
 | 无朝向仆从 | `setDesiredRotation(currentPathNode.yaw() + 2, currentPathNode.pitch() + 2, currentPathNode.roll() + 2)` 在 tick() 中缓慢自旋，适用于不需要面向移动/目标方向的仆从 |
+| 无俯仰角仆从 | 重写 `lookAtDirection(Vec3)` 只设置 yaw，pitch 固定为 0：`setDesiredRotation(targetYaw, 0, getRoll())` |
 
 ### 复用模式
 

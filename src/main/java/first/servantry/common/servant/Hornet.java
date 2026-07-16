@@ -10,6 +10,7 @@ import first.servantry.common.servant.goal.hornet.HornetAttackGoal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.register.ServantryCurioRegister;
 import first.servantry.utils.CuriosUtil;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -75,10 +76,11 @@ public class Hornet extends MomentumServant implements IBlockCollision<Hornet> {
      * 装备蜂巢背包时冷却缩短。
      */
     public int getStingerCooldown() {
+        RandomSource random = owner.getRandom();
         if (CuriosUtil.isEquipped(owner, ServantryCurioRegister.HivePack.get())) {
-            return 12;
+            return 11 + random.nextIntBetweenInclusive(0, 2);
         }
-        return 15;
+        return 13 + random.nextIntBetweenInclusive(0, 4);
     }
 
     @Override

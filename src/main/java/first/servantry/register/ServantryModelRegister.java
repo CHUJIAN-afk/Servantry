@@ -21,6 +21,7 @@ public class ServantryModelRegister {
 
     private static final List<ModelResourceLocation> MODELS = new ArrayList<>();
 
+    public static final ModelResourceLocation TEST = standalone("stardust_cell");
     public static final ModelResourceLocation ENCHANTED_THROWING_KNIVES = standalone("enchanted_throwing_knives");
     public static final ModelResourceLocation STARDUST_CELL = standalone("stardust_cell");
     public static final ModelResourceLocation TERRAPRISM = standalone("terraprism");
@@ -42,6 +43,8 @@ public class ServantryModelRegister {
     public static final ModelResourceLocation SURVEY_DRONE = standalone("survey_drone");
     public static final ModelResourceLocation HORNET = standalone("hornet");
     public static final ModelResourceLocation HORNET_STINGER = standalone("hornet_stinger");
+    public static final ModelResourceLocation IMP = standalone("imp");
+    public static final ModelResourceLocation IMP_FIREBALL = standalone("imp_fireball");
 
     private static ModelResourceLocation standalone(String path) {
         ModelResourceLocation location = ModelResourceLocation.standalone(Servantry.rl("servant/" + path));

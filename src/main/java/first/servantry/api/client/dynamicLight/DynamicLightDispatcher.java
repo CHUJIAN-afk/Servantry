@@ -99,6 +99,33 @@ public class DynamicLightDispatcher {
         LastUpdateSectionSet.addAll(updateSectionSet);
     }
 
+    public static int getDynamicLight(BlockPos blockPos, int originalLight) {
+        Map<Vec3, Integer> lights = SnapshotLightSources;
+        if (!lights.isEmpty()) {
+            double maxLight = 0;
+            for (Map.Entry<Vec3, Integer> entry : lights.entrySet()) {
+                Vec3 pos = entry.getKey();
+                int luminance = entry.getValue();
+                double dx = blockPos.getX() - pos.x + 0.5;
+                double dy = blockPos.getY() - pos.y + 0.5;
+                double dz = blockPos.getZ() - pos.z + 0.5;
+                double distSq = dx * dx + dy * dy + dz * dz;
+                if (distSq <= MAX_RADIUS * MAX_RADIUS) {
+                    double contribution = luminance - Math.sqrt(distSq) / MAX_RADIUS * 15.0;
+                    if (contribution > maxLight) {
+                        maxLight = contribution;
+                    }
+                }
+            }
+            if (maxLight > 0 && maxLight > originalLight) {
+                int luminance = (int) (maxLight * 16.0);
+                originalLight &= 0xfff00000;
+                originalLight |= luminance & 0x000fffff;
+            }
+        }
+        return originalLight;
+    }
+
     public static int getDynamicLight(BlockAndTintGetter level, BlockState state, BlockPos blockPos, Operation<Integer> original) {
         Map<Vec3, Integer> lights = SnapshotLightSources;
         int originalLight = original.call(level, state, blockPos);

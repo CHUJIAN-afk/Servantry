@@ -2,6 +2,7 @@ package first.servantry.common.servant.goal.voidEater;
 
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
+import first.servantry.api.common.sound.Playable;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.servant.Servant;
 import first.servantry.api.servant.ServantDamageSource;
@@ -89,7 +90,7 @@ public class VoidEaterAttackGoal extends ServantGoal<VoidEater> {
                 double dot = servant.getLookAngle().dot(targetPos.subtract(servant.getPos()).normalize());
                 if (dot > 0 && Math.acos((float) Math.min(1, dot)) < Mth.DEG_TO_RAD * 30) {
                     Vec3 start = servant.getPos();
-                    owner.level().playSound(null, start.x(), start.y(), start.z(), ServantrySoundRegister.Laser.get(), owner.getSoundSource());
+                    Playable.play(ServantrySoundRegister.Laser, owner.level(), start, owner.getSoundSource());
                     for (int i = 0; i < 9; i++) {
                         Vec3 direction = targetPos.offsetRandom(owner.getRandom(), 2f).subtract(servant.getPos()).normalize();
                         GodFlame projectile = new GodFlame(servant.getDamageSource(), start, direction.scale(3));

@@ -2,6 +2,7 @@ package first.servantry.api.builder;
 
 import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
+import first.servantry.api.common.sound.Playable;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.item.IServantWeaponItem;
@@ -41,10 +42,7 @@ public class ServantWeaponItemBuilder<T extends Servant> {
                 } else {
                     iServantWeaponItem.remove(player);
                 }
-                SoundEvent soundEvent = iServantWeaponItem.getSoundEvent();
-                if (soundEvent != null) {
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), soundEvent, player.getSoundSource());
-                }
+                Playable.play(iServantWeaponItem.getSoundEvent(), level, player.position(), player.getSoundSource());
             }
         }
     }

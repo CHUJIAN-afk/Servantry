@@ -1,6 +1,7 @@
 package first.servantry.common.servant.goal.twins;
 
 import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
+import first.servantry.api.common.sound.Playable;
 import first.servantry.api.servant.ai.ServantGoal;
 import first.servantry.common.projectile.Laser;
 import first.servantry.common.servant.Twins;
@@ -51,7 +52,7 @@ public class TwinsLaserAttackGoal extends ServantGoal<Twins> {
         projectile.setDamage(servant.getDamage() * 1.1f);
         projectile.join(owner);
         ServerLevel level = (ServerLevel) owner.level();
-        level.playSound(null, start.x(), start.y(), start.z(), ServantrySoundRegister.Laser.get(), owner.getSoundSource());
+        Playable.play(ServantrySoundRegister.Laser, level, start, owner.getSoundSource());
         // 后坐力
         servant.applyForce(direction.scale(-0.1));
         GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()

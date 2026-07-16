@@ -1,5 +1,6 @@
 package first.servantry.common.sentryServant;
 
+import first.servantry.api.common.sound.Playable;
 import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.IBlockCollision;
@@ -10,7 +11,6 @@ import first.servantry.register.ServantrySoundRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -55,9 +55,7 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
             }
             if (task != null) {
                 if (task.tick(this)) {
-                    Vec3 pos = getPos();
-                    Level level = owner.level();
-                    level.playSound(null, pos.x(), pos.y(), pos.z(), ServantrySoundRegister.BallistaShot.get(), owner.getSoundSource());
+                    Playable.play(ServantrySoundRegister.BallistaShot, owner.level(), getPos(), owner.getSoundSource());
                 } else {
                     task = null;
                 }

@@ -38,6 +38,21 @@ public class ServantryServantWeaponRegister {
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
+     * 小鬼法杖
+     */
+    public static final DeferredItem<ServantWeaponItemBuilder<Imp>.ServantWeaponItemItem> ImpStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "imp_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Imp)
+                            .damage(1.7f)
+                            .knockback(0.2f)
+                            .sound(ServantrySoundRegister.UseImpStaff)
+                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .build())
+                    .itemLanguage("Imp Staff", "小鬼法杖")
+                    .servantLanguage(ServantryAttachmentEntityRegister.Imp, "Imp", "小鬼")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
+                    .build();
+    /**
      * 无人机
      */
     public static final DeferredItem<ServantWeaponItemBuilder<OreScout>.ServantWeaponItemItem> SurveyDroneRemote =
