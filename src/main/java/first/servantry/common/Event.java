@@ -148,7 +148,9 @@ public class Event {
         DamageSource damageSource = event.getSource();
         LivingEntity target = event.getEntity();
         if (!target.level().isClientSide() && target instanceof Player player) {
-            player.addEffect(new MobEffectInstance(ServantryMobEffectRegister.BallistaPanicked, 100));
+            if (ServantryArmorSetRegister.ValhallaKnight.get().full(player)) {
+                player.addEffect(new MobEffectInstance(ServantryMobEffectRegister.BallistaPanicked, 100));
+            }
         }
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player) {
             if (ServantryArmorSetRegister.Hallowed.get().full(player)) {

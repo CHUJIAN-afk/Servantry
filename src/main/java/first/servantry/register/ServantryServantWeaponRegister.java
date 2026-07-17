@@ -220,6 +220,21 @@ public class ServantryServantWeaponRegister {
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
     /**
+     * 外星法杖
+     */
+    public static final DeferredItem<ServantWeaponItemBuilder<UFO>.ServantWeaponItemItem> XenoStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "xeno_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.UFO)
+                            .damage(3.6f)
+                            .knockback(0.2f)
+                            .sound(ServantrySoundRegister.UseServantWeapon)
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .itemLanguage("Xeno Staff", "外星法杖")
+                    .servantLanguage(ServantryAttachmentEntityRegister.UFO, "UFO", "UFO")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
+                    .build();
+    /**
      * 脉冲炮塔遥控装置
      */
     public static final DeferredItem<ServantWeaponItemBuilder<PulseTurret>.ServantWeaponItemItem> PulseTurretRemote =
