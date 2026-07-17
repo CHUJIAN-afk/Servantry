@@ -21,6 +21,10 @@ import java.util.Set;
 
 /**
  * 动态光照调度器。
+ * <p>
+ * 双路径架构：
+ * - 方块路径：通过 BlockPos 级 packed light 修改（LevelRendererMixin），GPU 顶点插值实现跨方块平滑
+ * - 实体路径：直接用 Vec3 精确位置计算光照，天然无跳变
  */
 public class DynamicLightDispatcher {
 
@@ -99,65 +103,89 @@ public class DynamicLightDispatcher {
         LastUpdateSectionSet.addAll(updateSectionSet);
     }
 
-    public static int getDynamicLight(BlockPos blockPos, int originalLight) {
+    // ==================== 方块路径（BlockPos 级，GPU 顶点插值处理平滑） ====================
+
+    public static int getDynamicLight(BlockAndTintGetter level, BlockState state, BlockPos blockPos, Operation<Integer> original) {
         Map<Vec3, Integer> lights = SnapshotLightSources;
-        if (!lights.isEmpty()) {
-            double maxLight = 0;
-            for (Map.Entry<Vec3, Integer> entry : lights.entrySet()) {
-                Vec3 pos = entry.getKey();
-                int luminance = entry.getValue();
-                double dx = blockPos.getX() - pos.x + 0.5;
-                double dy = blockPos.getY() - pos.y + 0.5;
-                double dz = blockPos.getZ() - pos.z + 0.5;
-                double distSq = dx * dx + dy * dy + dz * dz;
-                if (distSq <= MAX_RADIUS * MAX_RADIUS) {
-                    double contribution = luminance - Math.sqrt(distSq) / MAX_RADIUS * 15.0;
-                    if (contribution > maxLight) {
-                        maxLight = contribution;
-                    }
-                }
-            }
+        int originalLight = original.call(level, state, blockPos);
+        if (!lights.isEmpty() && !level.getBlockState(blockPos).isSolidRender(level, blockPos)) {
+            double maxLight = computeRawBlockLightAtBlockPos(blockPos);
             if (maxLight > 0) {
-                int luminance = (int) (maxLight * 16.0);
-                int light = originalLight;
-                light &= 0xfff00000;
-                light |= luminance & 0x000fffff;
-                if (light > originalLight) {
-                    return light;
+                int blockLevel = LightTexture.block(originalLight);
+                if (maxLight > blockLevel) {
+                    int newBlockLight = Mth.clamp((int) Math.round(maxLight), 0, 15);
+                    return LightTexture.pack(newBlockLight, LightTexture.sky(originalLight));
                 }
             }
         }
         return originalLight;
     }
 
-    public static int getDynamicLight(BlockAndTintGetter level, BlockState state, BlockPos blockPos, Operation<Integer> original) {
+    // ==================== 实体路径（Vec3 精确计算，天然无跳变） ====================
+
+    /**
+     * 使用实体眼睛的精确 Vec3 位置计算动态光照。
+     * <p>
+     * 直接用连续坐标计算到光源的距离，无需截断为 BlockPos，
+     * 光照值随实体移动连续变化，天然消除跨方块跳变。
+     *
+     * @param eyePos       实体眼睛的连续世界坐标
+     * @param originalLight vanilla 原始 packed light
+     * @return 修改后的 packed light（仅 block-light 可能被提升，sky-light 保持不变）
+     */
+    public static int getDynamicLight(Vec3 eyePos, int originalLight) {
         Map<Vec3, Integer> lights = SnapshotLightSources;
-        int originalLight = original.call(level, state, blockPos);
-        if (!lights.isEmpty() && !level.getBlockState(blockPos).isSolidRender(level, blockPos)) {
-            double maxLight = 0;
-            for (Map.Entry<Vec3, Integer> entry : lights.entrySet()) {
-                Vec3 pos = entry.getKey();
-                int luminance = entry.getValue();
-                double dx = blockPos.getX() - pos.x + 0.5;
-                double dy = blockPos.getY() - pos.y + 0.5;
-                double dz = blockPos.getZ() - pos.z + 0.5;
-                double distSq = dx * dx + dy * dy + dz * dz;
-                if (distSq <= MAX_RADIUS * MAX_RADIUS) {
-                    double contribution = luminance - Math.sqrt(distSq) / MAX_RADIUS * 15.0;
-                    if (contribution > maxLight) {
-                        maxLight = contribution;
-                    }
-                }
-            }
-            if (maxLight > 0) {
-                int blockLevel = LightTexture.block(originalLight);
-                if (maxLight > blockLevel) {
-                    int luminance = (int) (maxLight * 16.0);
-                    originalLight &= 0xfff00000;
-                    originalLight |= luminance & 0x000fffff;
+        if (lights.isEmpty()) return originalLight;
+
+        double maxLight = 0;
+        for (Map.Entry<Vec3, Integer> entry : lights.entrySet()) {
+            Vec3 pos = entry.getKey();
+            int luminance = entry.getValue();
+            double dx = eyePos.x - pos.x;
+            double dy = eyePos.y - pos.y;
+            double dz = eyePos.z - pos.z;
+            double distSq = dx * dx + dy * dy + dz * dz;
+            if (distSq <= MAX_RADIUS * MAX_RADIUS) {
+                double contribution = luminance - Math.sqrt(distSq) / MAX_RADIUS * 15.0;
+                if (contribution > maxLight) {
+                    maxLight = contribution;
                 }
             }
         }
+        if (maxLight > 0) {
+            int blockLevel = LightTexture.block(originalLight);
+            if (maxLight > blockLevel) {
+                int newBlockLight = Mth.clamp((int) Math.round(maxLight), 0, 15);
+                return LightTexture.pack(newBlockLight, LightTexture.sky(originalLight));
+            }
+        }
         return originalLight;
+    }
+
+    // ==================== 核心计算 ====================
+
+    /**
+     * 计算指定 BlockPos 处的动态光照贡献（方块中心采样，供方块路径使用）。
+     */
+    private static double computeRawBlockLightAtBlockPos(BlockPos blockPos) {
+        Map<Vec3, Integer> lights = SnapshotLightSources;
+        if (lights.isEmpty()) return 0.0;
+
+        double maxLight = 0;
+        for (Map.Entry<Vec3, Integer> entry : lights.entrySet()) {
+            Vec3 pos = entry.getKey();
+            int luminance = entry.getValue();
+            double dx = blockPos.getX() - pos.x + 0.5;
+            double dy = blockPos.getY() - pos.y + 0.5;
+            double dz = blockPos.getZ() - pos.z + 0.5;
+            double distSq = dx * dx + dy * dy + dz * dz;
+            if (distSq <= MAX_RADIUS * MAX_RADIUS) {
+                double contribution = luminance - Math.sqrt(distSq) / MAX_RADIUS * 15.0;
+                if (contribution > maxLight) {
+                    maxLight = contribution;
+                }
+            }
+        }
+        return maxLight;
     }
 }
