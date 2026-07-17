@@ -8,6 +8,9 @@ import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.projectile.Projectile;
 import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.register.ServantryAttachmentEntityRegister;
+import first.servantry.register.ServantryCurioRegister;
+import first.servantry.utils.CuriosUtil;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -41,11 +44,13 @@ public class HornetStinger extends Projectile implements ICollideAttack<HornetSt
         DamageSource source = getDamageSource();
         if (source != null) {
             HitContext hit = hitContexts.getFirst();
+            boolean equipped = CuriosUtil.isEquipped(owner, ServantryCurioRegister.HivePack.get());
+            RandomSource random = getOwner().getRandom();
             InvincibleData.attack(hit.entity())
                     .attacker(getUuid())
                     .damageSource(source)
                     .damageAmount(getDamage())
-                    .effect(new MobEffectInstance(MobEffects.POISON, 80 + getOwner().getRandom().nextInt(61)))  // 4-7秒
+                    .effect(new MobEffectInstance(MobEffects.POISON, 80 + random.nextInt(60), equipped ? 1 : 0))
                     .apply();
         }
         setRemove();

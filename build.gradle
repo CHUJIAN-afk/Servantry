@@ -113,9 +113,9 @@ repositories {
 }
 
 dependencies {
-    implementation(jarJar("io.github.llamalad7:mixinextras-neoforge:0.5.0"))
     implementation "top.theillusivec4.curios:curios-neoforge:${curios_version}"
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    implementation "curse.maven:irisshaders-455508:6661598"
 
     compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:19.25.0.323")
 }

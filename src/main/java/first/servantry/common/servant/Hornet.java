@@ -68,6 +68,9 @@ public class Hornet extends MomentumServant implements IBlockCollision<Hornet> {
         Vec3 targetCenter = target.getBoundingBox().getCenter();
         Vec3 direction = targetCenter.subtract(startPos).normalize();
         HornetStinger stinger = new HornetStinger(getDamageSource(), startPos.add(direction.scale(-1)), direction);
+        if (CuriosUtil.isEquipped(owner, ServantryCurioRegister.HivePack.get())){
+            stinger.setDamage(stinger.getDamage() * 1.15f);
+        }
         stinger.join(owner);
     }
 

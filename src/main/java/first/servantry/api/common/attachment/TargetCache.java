@@ -147,13 +147,4 @@ public class TargetCache {
     public boolean isEmpty() {
         return entities.isEmpty();
     }
-
-    /**
-     * 获取缓存大小。
-     *
-     * @return 实体数量
-     */
-    public int size() {
-        return entities.size();
-    }
 }

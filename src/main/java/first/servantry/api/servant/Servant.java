@@ -5,10 +5,8 @@ import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.common.attachment.TargetCache;
 import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.register.ServantryAttachmentRegister;
 import first.servantry.register.ServantryDamageRegister;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -18,7 +16,6 @@ import net.minecraft.world.entity.Targeting;
 import net.minecraft.world.entity.monster.Enemy;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 仆从实体抽象基类，代表由玩家拥有、AI驱动、自主行动的战斗单位。
@@ -125,7 +122,9 @@ public abstract class Servant extends AttachmentEntity {
 
     // ===================== 伤害来源 =====================
 
-    /** 构造仆从专属伤害来源 */
+    /**
+     * 构造仆从专属伤害来源
+     */
     public ServantDamageSource getDamageSource() {
         Holder<DamageType> holder = ServantryDamageRegister.getDamageTypeHolder(ServantryDamageRegister.Servant, owner.level());
         return new ServantDamageSource(holder, null, owner, getCurrentPathNode().pos(), this);
@@ -137,38 +136,20 @@ public abstract class Servant extends AttachmentEntity {
      * 获取目标仆从在其 AttachmentEntityType 分组中的未移除顺序
      */
     public int getOrder() {
-        AttachmentEntityType<?> entityType = getType();
-        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = owner.getData(ServantryAttachmentRegister.EntityData).getGroups().get(EntityData.Type.Servant);
-        List<AttachmentEntity> list = inner != null ? inner.get(entityType) : null;
-        if (list != null) {
-            int order = 0;
-            for (AttachmentEntity attachmentEntity : list) {
-                if (attachmentEntity == this) {
-                    return order;
-                }
-                if (!attachmentEntity.isRemove()) {
-                    order++;
-                }
-            }
-        }
-        return -1;
+        return ServantryHelper.get(owner)
+                .getEntityData()
+                .get(EntityData.Type.Servant, getType())
+                .indexOf(this);
     }
 
     /**
      * 获取目标仆从在其 AttachmentEntityType 分组中的未移除数量
      */
     public int getSameSize() {
-        Map<AttachmentEntityType<?>, List<AttachmentEntity>> inner = owner.getData(ServantryAttachmentRegister.EntityData).getGroups().get(EntityData.Type.Servant);
-        List<AttachmentEntity> list = inner != null ? inner.get(getType()) : null;
-        int count = 0;
-        if (list != null) {
-            for (AttachmentEntity attachmentEntity : list) {
-                if (!attachmentEntity.isRemove()) {
-                    count++;
-                }
-            }
-        }
-        return count;
+        return ServantryHelper.get(owner)
+                .getEntityData()
+                .get(EntityData.Type.Servant, getType())
+                .size();
     }
 
     @Override

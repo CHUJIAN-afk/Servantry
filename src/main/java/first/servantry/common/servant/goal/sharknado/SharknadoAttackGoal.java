@@ -23,9 +23,9 @@ public class SharknadoAttackGoal extends ServantGoal<Sharknado> {
     public void tick() {
         LivingEntity target = servant.getTarget();
         Vec3 startPos = servant.getPos();
-        Vec3 targetPos = servant.calculateBezierPoint(0.75f, startPos, startPos.add(servant.getVelocity()), target.getBoundingBox().getCenter());
-        servant.applyForce(targetPos.subtract(startPos).normalize().scale(0.1));
-        if (startPos.distanceToSqr(target.getBoundingBox().getCenter()) > 3 && servant.getShootCooldown() <= 0) {
+        Vec3 targetPos = servant.calculateBezierPoint(0.4f, startPos, startPos.add(servant.getVelocity()), target.getBoundingBox().getCenter());
+        servant.applyForce(targetPos.subtract(startPos).normalize().scale(0.075));
+        if (servant.getShootCooldown() <= 0) {
             servant.shootAtTarget(target);
             servant.setShootCooldown(10 + servant.getOwner().getRandom().nextIntBetweenInclusive(-1, 1));
         }

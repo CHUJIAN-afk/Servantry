@@ -117,10 +117,14 @@ public class DynamicLightDispatcher {
                     }
                 }
             }
-            if (maxLight > 0 && maxLight > originalLight) {
+            if (maxLight > 0) {
                 int luminance = (int) (maxLight * 16.0);
-                originalLight &= 0xfff00000;
-                originalLight |= luminance & 0x000fffff;
+                int light = originalLight;
+                light &= 0xfff00000;
+                light |= luminance & 0x000fffff;
+                if (light > originalLight) {
+                    return light;
+                }
             }
         }
         return originalLight;

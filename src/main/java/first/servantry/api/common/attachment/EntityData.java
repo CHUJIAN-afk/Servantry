@@ -27,8 +27,8 @@ import java.util.*;
  */
 public class EntityData implements AttachmentSyncHandler<EntityData> {
 
-    private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> pendingAdd = new HashMap<>();
-    private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> groups = new HashMap<>();
+    private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> pendingAdd = new EnumMap<>(Type.class);
+    private final Map<Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> groups = new EnumMap<>(Type.class);
     private final List<AttachmentEntity> renderCache = new ArrayList<>();
     private ResourceKey<Level> dimension = null;
     private boolean changed = false;

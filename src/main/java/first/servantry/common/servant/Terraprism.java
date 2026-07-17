@@ -4,7 +4,6 @@ import first.servantry.api.ServantryHelper;
 import first.servantry.api.common.attachment.EntityData;
 import first.servantry.api.common.attachment.InvincibleData;
 import first.servantry.api.common.attachment.TargetCache;
-import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.ICollideAttack;
 import first.servantry.api.entity.PathNode;
@@ -136,6 +135,22 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         return renderNode.lerp(getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, idleBlendO, idleBlend));
     }
 
+    @Override
+    public int getOrder() {
+        return ServantryHelper.get(owner)
+                .getEntityData()
+                .get(EntityData.Type.Servant, Terraprism.class)
+                .indexOf(this);
+    }
+
+    @Override
+    public int getSameSize() {
+        return ServantryHelper.get(owner)
+                .getEntityData()
+                .get(EntityData.Type.Servant, Terraprism.class)
+                .size();
+    }
+
     public PathNode getInterpolatedIdleState(float partialTick) {
         float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
         float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);
@@ -145,15 +160,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         float backZ = (float) Math.cos(rad);
         float rightX = (float) Math.cos(rad);
         float rightZ = (float) -Math.sin(rad);
-        int order = 0;
-        for (AttachmentEntity entity : ServantryHelper.get(owner).getEntityData().get(EntityData.Type.Servant, Terraprism.class)) {
-            if (entity instanceof Terraprism terraprism) {
-                if (terraprism == this) {
-                    break;
-                }
-                order++;
-            }
-        }
+        int order = getOrder();
         double localZ = 0.75 + order * 0.12;
         double floatSpeed = 0.08 + order * 0.01;
         double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;

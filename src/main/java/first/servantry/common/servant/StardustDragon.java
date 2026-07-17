@@ -85,11 +85,10 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     protected void emitParticle() {
         if (!owner.level().isClientSide()) {
             if (owner.getRandom().nextFloat() < 0.2) {
-                GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
-                        .centerColor(0x2fb2e1)
-                        .edgeColor(0x33ccff);
                 ParticleHelper.create(owner.level())
-                        .generic(genericParticleBuilder
+                        .generic(GenericParticleBuilder.create()
+                                .centerColor(0x2fb2e1)
+                                .edgeColor(0x33ccff)
                                 .lifetime(5)
                                 .lifetimeRandom(25)
                                 .spin(0.1f)
