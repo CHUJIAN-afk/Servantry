@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-16T20:48:12.4857954	Item Models: servantry
+// 1.21.1	2026-07-17T22:59:06.8735108	Item Models: servantry
 d882c3a8d9d37b2217246221442c70da01b9ad66 assets/servantry/models/item/adamantite_ingot.json
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 1234a813c7da2a7cf22f8be7f86b6fd620074edc assets/servantry/models/item/ballista_cane.json
@@ -92,4 +92,5 @@ e61a8853ce7f299baa1d9224d4c0438eb40d6ebd assets/servantry/models/item/valhalla_k
 9f7b8dc26eb543a6370fc8f4eaf9b45ad0ad42c5 assets/servantry/models/item/valhalla_knight_helmet.json
 4d7e51a0681e02486a7b09d828240d96761977c8 assets/servantry/models/item/valhalla_knight_leggings.json
 ce4ff35209200f3a6d883bd019c73d3764e66397 assets/servantry/models/item/void_eater_marionette.json
+aa3a2d4dde5f896e398b911d653fc32ab3b78615 assets/servantry/models/item/xeno_staff.json
 bffaa8805ea95db84b61d674cd6ed8cbbdaaad32 assets/servantry/models/item/zenith.json

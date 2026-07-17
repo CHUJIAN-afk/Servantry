@@ -66,6 +66,8 @@ public class ServantryAttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Imp>> Imp = register("imp", Imp::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<UFO>> UFO = register("ufo", UFO::new);
+
     // ===================== 射弹类型 =====================
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniStardustCell>> StardustProjectile = register("stardust_projectile", MiniStardustCell::new);
