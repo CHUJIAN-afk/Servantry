@@ -30,7 +30,7 @@ public class Rain extends Projectile implements IBlockCollision<Rain>, ICollideA
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.Rain.get();
+        return ServantryAttachmentEntityRegister.RAIN.get();
     }
 
     @Override

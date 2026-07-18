@@ -63,7 +63,7 @@ public class GodFlame extends Projectile implements ICollideAttack<GodFlame> {
 
     @Override
     public AttachmentEntityType<? extends Projectile> getType() {
-        return ServantryAttachmentEntityRegister.GodFlameProjectile.get();
+        return ServantryAttachmentEntityRegister.GOD_FLAME.get();
     }
 
     @Override

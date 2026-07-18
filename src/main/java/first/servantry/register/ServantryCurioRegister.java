@@ -2,6 +2,7 @@ package first.servantry.register;
 
 import com.google.common.collect.ImmutableMultimap;
 import first.servantry.Servantry;
+import first.servantry.api.damageInfo.IDamageSourceCritical;
 import first.servantry.api.item.CurioItem;
 import first.servantry.client.creativeTab.AnimInfo;
 import first.servantry.common.projectile.MiniStardustCell;
@@ -155,7 +156,7 @@ public class ServantryCurioRegister {
                         builder.put(ServantryAttributeRegister.ServantMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
                         return builder.build();
                     })
-                    .onPostDamage((servant, owner, target) -> target.addEffect(new MobEffectInstance(ServantryMobEffectRegister.Shadowflame, 60, 0)))
+                    .onPostDamage((servant, owner, target, damageSource) -> target.addEffect(new MobEffectInstance(ServantryMobEffectRegister.Shadowflame, 60, 0)))
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                     .build())
             .itemLanguage("Primordial Shadowflame", "始源暗影焰")
@@ -220,9 +221,11 @@ public class ServantryCurioRegister {
      * 万花筒
      */
     public static final DeferredItem<CurioItem> Kaleidoscope = ServantryItemRegisterBuilder.build(ACCESSORY, "kaleidoscope", () -> CurioItem.builder()
-                    .onPreDamage((servant, owner, target, damage) -> {
-                        if (owner.getRandom().nextFloat() < 0.1f) {
-                            return damage * 1.5f;
+                    .onPreDamage((servant, owner, target, damage, damageSource) -> {
+                        RandomSource random = owner.getRandom();
+                        if (random.nextFloat() < 0.1f) {
+                            ((IDamageSourceCritical) damageSource).servantry$setCritical(true);
+                            return damage * 2f;
                         }
                         return damage;
                     })
@@ -237,7 +240,7 @@ public class ServantryCurioRegister {
      * 灵魂浮雕 - 仆从攻击后随机获得灵魂增益（下位互斥）
      */
     public static final DeferredItem<CurioItem> SoulRelief = ServantryItemRegisterBuilder.build(ACCESSORY, "soul_relief", () -> CurioItem.builder()
-                    .onPostDamage((servant, owner, target) -> {
+                    .onPostDamage((servant, owner, target, damageSource) -> {
                         if (!CuriosUtil.isEquipped(owner, ServantryCurioRegister.HallowedRune.get()) && !CuriosUtil.isEquipped(owner, ServantryCurioRegister.PhantasmalRelic.get())) {
                             List<Holder<MobEffect>> effects = new ArrayList<>();
                             effects.add(ServantryMobEffectRegister.SoulMight);
@@ -261,7 +264,7 @@ public class ServantryCurioRegister {
      * 神圣符文 - 仆从攻击后随机获得神圣增益（中位互斥）
      */
     public static final DeferredItem<CurioItem> HallowedRune = ServantryItemRegisterBuilder.build(ACCESSORY, "hallowed_rune", () -> CurioItem.builder()
-                    .onPostDamage((servant, owner, target) -> {
+                    .onPostDamage((servant, owner, target, damageSource) -> {
                         if (!CuriosUtil.isEquipped(owner, ServantryCurioRegister.PhantasmalRelic.get())) {
                             List<Holder<MobEffect>> effects = new ArrayList<>();
                             effects.add(ServantryMobEffectRegister.HallowedMight);
@@ -286,7 +289,7 @@ public class ServantryCurioRegister {
      * 幻魂神物 - 仆从攻击后随机获得幻魂增益（上位）
      */
     public static final DeferredItem<CurioItem> PhantasmalRelic = ServantryItemRegisterBuilder.build(ACCESSORY, "phantasmal_relic", () -> CurioItem.builder()
-                    .onPostDamage((servant, owner, target) -> {
+                    .onPostDamage((servant, owner, target, damageSource) -> {
                         List<Holder<MobEffect>> effects = new ArrayList<>();
                         effects.add(ServantryMobEffectRegister.PhantasmalMight);
                         effects.add(ServantryMobEffectRegister.PhantasmalBulwark);
@@ -346,7 +349,7 @@ public class ServantryCurioRegister {
      * 星尘碎片 - 仆从攻击时5%概率产生星尘细胞射弹
      */
     public static final DeferredItem<CurioItem> StardustFragment = ServantryItemRegisterBuilder.build(ACCESSORY, "stardust_fragment", () -> CurioItem.builder()
-                    .onPostDamage((servant, owner, target) -> {
+                    .onPostDamage((servant, owner, target, damageSource) -> {
                         if (owner.getRandom().nextFloat() < 0.05f) {
                             Vec3 startPos = servant.getPos();
                             MiniStardustCell projectile = new MiniStardustCell(servant.getDamageSource(), startPos);

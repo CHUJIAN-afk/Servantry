@@ -108,7 +108,7 @@ public class SuperPeashooter extends MomentumServant implements IBlockCollision<
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.SuperPeashooter.get();
+        return ServantryAttachmentEntityRegister.SUPER_PEASHOOTER.get();
     }
 
     @Override

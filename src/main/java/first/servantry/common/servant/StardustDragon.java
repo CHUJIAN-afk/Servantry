@@ -116,7 +116,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         if (isHead()) {
             List<StardustDragon> dragons = ServantryHelper.get(owner)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.StardustDragon.get());
+                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
             for (StardustDragon dragon : dragons) {
                 dragon.setRemove();
             }
@@ -127,7 +127,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     public StardustDragon getHead() {
         List<StardustDragon> dragons = ServantryHelper.get(owner)
                 .getEntityData()
-                .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.StardustDragon.get());
+                .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
         if (!dragons.isEmpty()) {
             return dragons.getFirst();
         }
@@ -143,7 +143,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         if (!isHead()) {
             List<StardustDragon> dragons = ServantryHelper.get(owner)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.StardustDragon.get());
+                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
             int index = segmentIndex - 1;
             if (index >= 0 && index < dragons.size()) {
                 return dragons.get(index);
@@ -157,7 +157,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
         if (segmentIndex < totalSegments - 1) {
             List<StardustDragon> dragons = ServantryHelper.get(owner)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.StardustDragon.get());
+                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
             int index = segmentIndex + 1;
             if (index >= 0 && index < dragons.size()) {
                 return dragons.get(index);
@@ -229,7 +229,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {
-        return ServantryAttachmentEntityRegister.StardustDragon.get();
+        return ServantryAttachmentEntityRegister.STARDUST_DRAGON.get();
     }
 
     public int getSegmentIndex() {

@@ -70,7 +70,7 @@ public class PulseTurret extends MomentumServant implements IBlockCollision<Puls
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.PulseTurret.get();
+        return ServantryAttachmentEntityRegister.PULSE_TURRET.get();
     }
 
     @Override

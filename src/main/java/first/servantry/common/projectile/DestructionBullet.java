@@ -120,6 +120,6 @@ public class DestructionBullet extends Projectile implements ICollideAttack<Dest
 
     @Override
     public AttachmentEntityType<? extends Projectile> getType() {
-        return ServantryAttachmentEntityRegister.DestructionBullet.get();
+        return ServantryAttachmentEntityRegister.DESTRUCTION_BULLET.get();
     }
 }

@@ -96,7 +96,7 @@ public class ServantryArmorSetRegister {
                         crystal.setKnockback(1);
                         ServantryHelper.get(player).add(EntityData.Type.ExtraServant, crystal);
                     })
-                    .onRemove(player -> ServantryHelper.get(player).getEntityData().remove(EntityData.Type.ExtraServant, ServantryAttachmentEntityRegister.ChlorophyteCrystal.get()))
+                    .onRemove(player -> ServantryHelper.get(player).getEntityData().remove(EntityData.Type.ExtraServant, ServantryAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))
                     .tooltip(1, "Summons a powerful leaf crystal to shoot at nearby enemies", "召唤强大的叶状水晶来射击附近的敌人")
                     .build()
             );

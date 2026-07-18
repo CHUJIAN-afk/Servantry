@@ -58,7 +58,7 @@ public class DemonFlame extends Projectile implements ICollideAttack<DemonFlame>
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.DemonFlameProjectile.get();
+        return ServantryAttachmentEntityRegister.DEMON_FLAME.get();
     }
 
     @Override

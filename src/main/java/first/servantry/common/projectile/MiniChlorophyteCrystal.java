@@ -95,7 +95,7 @@ public class MiniChlorophyteCrystal extends Projectile implements ICollideAttack
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.MiniChlorophyteCrystalProjectile.get();
+        return ServantryAttachmentEntityRegister.MINI_CHLOROPHYTE_CRYSTAL.get();
     }
 
     @Override

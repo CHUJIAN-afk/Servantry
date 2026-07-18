@@ -132,7 +132,7 @@ public class DeadlySphere extends MomentumServant implements ICollideAttack<Dead
 
     @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {
-        return ServantryAttachmentEntityRegister.DeadlySphere.get();
+        return ServantryAttachmentEntityRegister.DEADLY_SPHERE.get();
     }
 
     public int getTrailTimer() {

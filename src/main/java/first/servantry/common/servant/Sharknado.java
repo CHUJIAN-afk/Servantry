@@ -88,7 +88,7 @@ public class Sharknado extends MomentumServant implements ICollideAttack<Sharkna
 
     @Override
     public AttachmentEntityType<Sharknado> getType() {
-        return ServantryAttachmentEntityRegister.Sharknado.get();
+        return ServantryAttachmentEntityRegister.SHARKNADO.get();
     }
 
     // ===================== ICollideAttack 实现 =====================

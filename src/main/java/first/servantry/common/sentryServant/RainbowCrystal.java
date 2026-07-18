@@ -62,7 +62,7 @@ public class RainbowCrystal extends Servant {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.RainbowCrystal.get();
+        return ServantryAttachmentEntityRegister.RAINBOW_CRYSTAL.get();
     }
 
     @Override

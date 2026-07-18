@@ -47,7 +47,7 @@ public class ClientEvent {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS && clientLevel != null && player != null) {
             List<OreScout> scouts = ServantryHelper.get(player)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.OreScout.get());
+                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.ORE_SCOUT.get());
             if (!scouts.isEmpty()) {
                 OreScout scout = scouts.getFirst();
                 MultiBufferSource bufferSource = minecraft.renderBuffers()

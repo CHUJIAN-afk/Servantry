@@ -8,6 +8,7 @@ import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.utils.CuriosUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -42,16 +43,15 @@ public class CurioItem extends Item implements ICurioItem {
     public static void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
         if (event.getSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                Player owner = servant.getOwner();
-                if (!owner.level().isClientSide()) {
-                    List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
-                    for (CurioItem curioItem : curiosItemList) {
-                        if (curioItem.preDamageCallback != null) {
-                            float result = curioItem.preDamageCallback.apply(servant, owner, event.getEntity(), event.getNewDamage());
-                            if (result != event.getNewDamage()) {
-                                event.setNewDamage(result);
-                            }
+            Player owner = servant.getOwner();
+            if (!owner.level().isClientSide()) {
+                List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
+                for (CurioItem curioItem : curiosItemList) {
+                    PreDamageCallback callback = curioItem.preDamageCallback;
+                    if (callback != null) {
+                        float result = callback.apply(servant, owner, event.getEntity(), event.getNewDamage(), servantDamageSource);
+                        if (result != event.getNewDamage()) {
+                            event.setNewDamage(result);
                         }
                     }
                 }
@@ -63,14 +63,13 @@ public class CurioItem extends Item implements ICurioItem {
     public static void onLivingDamageEventPost(LivingDamageEvent.Post event) {
         if (event.getSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                Player owner = servant.getOwner();
-                if (!owner.level().isClientSide()) {
-                    List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
-                    for (CurioItem curioItem : curiosItemList) {
-                        if (curioItem.postDamageCallback != null) {
-                            curioItem.postDamageCallback.accept(servant, owner, event.getEntity());
-                        }
+            Player owner = servant.getOwner();
+            if (!owner.level().isClientSide()) {
+                List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
+                for (CurioItem curioItem : curiosItemList) {
+                    PostDamageCallback callback = curioItem.postDamageCallback;
+                    if (callback != null) {
+                        callback.accept(servant, owner, event.getEntity(), servantDamageSource);
                     }
                 }
             }
@@ -83,12 +82,12 @@ public class CurioItem extends Item implements ICurioItem {
 
     @FunctionalInterface
     public interface PreDamageCallback {
-        float apply(Servant servant, Player player, LivingEntity target, float damage);
+        float apply(Servant servant, Player player, LivingEntity target, float damage, DamageSource damageSource);
     }
 
     @FunctionalInterface
     public interface PostDamageCallback {
-        void accept(Servant servant, Player owner, LivingEntity target);
+        void accept(Servant servant, Player owner, LivingEntity target, DamageSource damageSource);
     }
 
     @Override

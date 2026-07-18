@@ -26,14 +26,14 @@ public class ServantryServantWeaponRegister {
      * 黄蜂法杖
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Hornet>.ServantWeaponItemItem> HornetStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "hornet_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Hornet)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "hornet_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.HORNET)
                             .damage(0.7f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .itemLanguage("Hornet Staff", "黄蜂法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.Hornet, "Hornet", "黄蜂")
+                    .servantLanguage(ServantryAttachmentEntityRegister.HORNET, "Hornet", "黄蜂")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
@@ -41,14 +41,14 @@ public class ServantryServantWeaponRegister {
      * 小鬼法杖
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Imp>.ServantWeaponItemItem> ImpStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "imp_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Imp)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "imp_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.IMP)
                             .damage(1.7f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseImpStaff)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Imp Staff", "小鬼法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.Imp, "Imp", "小鬼")
+                    .servantLanguage(ServantryAttachmentEntityRegister.IMP, "Imp", "小鬼")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
@@ -56,7 +56,7 @@ public class ServantryServantWeaponRegister {
      * 无人机
      */
     public static final DeferredItem<ServantWeaponItemBuilder<OreScout>.ServantWeaponItemItem> SurveyDroneRemote =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "survey_drone_remote", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.OreScout)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "survey_drone_remote", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.ORE_SCOUT)
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player) -> {
                                 OreScout servant = weapon.createServant(player);
@@ -79,7 +79,7 @@ public class ServantryServantWeaponRegister {
                             .result(ServantryServantWeaponRegister.SurveyDroneRemote)
                             .save(output))
                     .itemLanguage("Survey Drone Remote", "矿勘无人机遥控器")
-                    .servantLanguage(ServantryAttachmentEntityRegister.OreScout, "Survey Drone", "矿勘无人机")
+                    .servantLanguage(ServantryAttachmentEntityRegister.ORE_SCOUT, "Survey Drone", "矿勘无人机")
                     .itemLanguageTooltip(1, "Summons up to 1 Survey Drone", "最多召唤1架矿勘无人机")
                     .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -88,7 +88,7 @@ public class ServantryServantWeaponRegister {
      * 妖精铃铛
      */
     public static final DeferredItem<ServantWeaponItemBuilder<ScavengerFairy>.ServantWeaponItemItem> FairyBell =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "fairy_bell", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.ScavengerFairy)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "fairy_bell", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.SCAVENGER_FAIRY)
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player) -> {
                                 ScavengerFairy servant = weapon.createServant(player);
@@ -110,7 +110,7 @@ public class ServantryServantWeaponRegister {
                             .result(ServantryServantWeaponRegister.FairyBell)
                             .save(output))
                     .itemLanguage("Fairy Bell", "妖精铃铛")
-                    .servantLanguage(ServantryAttachmentEntityRegister.ScavengerFairy, "Scavenger Fairy", "拾荒妖精")
+                    .servantLanguage(ServantryAttachmentEntityRegister.SCAVENGER_FAIRY, "Scavenger Fairy", "拾荒妖精")
                     .itemLanguageTooltip(1, "Summons up to 1 Scavenger Fairy", "最多召唤1只拾荒妖精")
                     .itemModel(ServantryItemRegisterBuilder::basicModel)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -119,7 +119,7 @@ public class ServantryServantWeaponRegister {
      * 刃杖 - 召唤附魔飞刀群
      */
     public static final DeferredItem<ServantWeaponItemBuilder<EnchantedThrowingKnives>.ServantWeaponItemItem> BladeStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "blade_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.EnchantedThrowingKnives)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "blade_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES)
                             .damage(0.6f)
                             .armorPierce(7.5f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
@@ -141,7 +141,7 @@ public class ServantryServantWeaponRegister {
                             .result(ServantryServantWeaponRegister.BladeStaff)
                             .save(output))
                     .itemLanguage("Blade Staff", "刃杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.EnchantedThrowingKnives, "Enchanted Throwing Knives", "附魔飞刀")
+                    .servantLanguage(ServantryAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES, "Enchanted Throwing Knives", "附魔飞刀")
                     .itemLanguageTooltip(1, "Don't let their small size fool you", "别被它们小小的个头给骗了")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -150,7 +150,7 @@ public class ServantryServantWeaponRegister {
      * 雨云法杖
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Cloud>.ServantWeaponItemItem> RainCloudStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "rain_cloud_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Cloud)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "rain_cloud_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.CLOUD)
                             .damage(3f)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseCloudStaff)
@@ -166,7 +166,7 @@ public class ServantryServantWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemLanguage("Rain Cloud Staff", "雨云法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.Cloud, "Rain Cloud", "雨云")
+                    .servantLanguage(ServantryAttachmentEntityRegister.CLOUD, "Rain Cloud", "雨云")
                     .itemLanguageTooltip(1, "Summons a cloud to rain down on your foes", "召唤云朵来向敌人降下大雨")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -175,7 +175,7 @@ public class ServantryServantWeaponRegister {
      * 魔眼法杖 - 召唤双子魔眼
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Twins>.ServantWeaponItemItem> OpticStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "optic_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Twins)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "optic_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.TWINS)
                             .damage(2.4f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseTerraprism)
@@ -208,7 +208,7 @@ public class ServantryServantWeaponRegister {
                             .result(ServantryServantWeaponRegister.OpticStaff)
                             .save(output))
                     .itemLanguage("Optic Staff", "魔眼法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.Twins, "Twins", "双子魔眼")
+                    .servantLanguage(ServantryAttachmentEntityRegister.TWINS, "Twins", "双子魔眼")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
@@ -216,14 +216,14 @@ public class ServantryServantWeaponRegister {
      * 致命球法杖 - 召唤致命球仆从
      */
     public static final DeferredItem<ServantWeaponItemBuilder<DeadlySphere>.ServantWeaponItemItem> DeadlySphereStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "deadly_sphere_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.DeadlySphere)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "deadly_sphere_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.DEADLY_SPHERE)
                             .damage(5.5f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Deadly Sphere Staff", "致命球法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.DeadlySphere, "Deadly Sphere", "致命球")
+                    .servantLanguage(ServantryAttachmentEntityRegister.DEADLY_SPHERE, "Deadly Sphere", "致命球")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
@@ -246,7 +246,7 @@ public class ServantryServantWeaponRegister {
      * 脉冲炮塔遥控装置
      */
     public static final DeferredItem<ServantWeaponItemBuilder<PulseTurret>.ServantWeaponItemItem> PulseTurretRemote =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "pulse_turret_remote", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.PulseTurret)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "pulse_turret_remote", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.PULSE_TURRET)
                             .damage(15f)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
@@ -255,7 +255,7 @@ public class ServantryServantWeaponRegister {
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
                                     EntityData entityData = servantryHelper.getEntityData();
-                                    List<PulseTurret> pulseTurrets = entityData.get(EntityData.Type.SentryServant, ServantryAttachmentEntityRegister.PulseTurret.get());
+                                    List<PulseTurret> pulseTurrets = entityData.get(EntityData.Type.SentryServant, ServantryAttachmentEntityRegister.PULSE_TURRET.get());
                                     if (pulseTurrets.isEmpty()) {
                                         servant.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
                                         servantryHelper.add(EntityData.Type.SentryServant, servant);
@@ -265,7 +265,7 @@ public class ServantryServantWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemLanguage("Pulse Turret Remote", "脉冲炮塔遥控装置")
-                    .servantLanguage(ServantryAttachmentEntityRegister.PulseTurret, "Pulse Turret", "脉冲炮塔")
+                    .servantLanguage(ServantryAttachmentEntityRegister.PULSE_TURRET, "Pulse Turret", "脉冲炮塔")
                     .itemLanguageTooltip(1, "At most one pulse turret can exist at a time", "最多召唤一个脉冲炮塔")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -274,14 +274,14 @@ public class ServantryServantWeaponRegister {
      * 暴风雨法杖 - 召唤鲨鱼龙卷
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Sharknado>.ServantWeaponItemItem> TempestStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "tempest_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Sharknado)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "tempest_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.SHARKNADO)
                             .damage(5f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
                     .itemLanguage("Tempest Staff", "暴风雨法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.Sharknado, "Sharknado", "鲨鱼龙卷")
+                    .servantLanguage(ServantryAttachmentEntityRegister.SHARKNADO, "Sharknado", "鲨鱼龙卷")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
@@ -289,7 +289,7 @@ public class ServantryServantWeaponRegister {
      * 泰拉棱镜 - 召唤泰拉棱镜仆从
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Terraprism>.ServantWeaponItemItem> TerraPrism =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "terraprism", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.TerraPrism)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "terraprism", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.TERRA_PRISM)
                             .damage(9f)
                             .knockback(0.4f)
                             .sound(ServantrySoundRegister.UseTerraprism)
@@ -304,7 +304,7 @@ public class ServantryServantWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemLanguage("Terraprism", "泰拉棱镜")
-                    .servantLanguage(ServantryAttachmentEntityRegister.TerraPrism, "Terraprism", "泰拉棱镜")
+                    .servantLanguage(ServantryAttachmentEntityRegister.TERRA_PRISM, "Terraprism", "泰拉棱镜")
                     .itemLanguageTooltip(1, "A flawless blade once hailed as the Prism of the Earth", "曾被冠以大地棱彩美名的无暇之剑")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -313,7 +313,7 @@ public class ServantryServantWeaponRegister {
      * 弩车魔杖
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItemItem> BallistaRod =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_rod", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Ballista)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_rod", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.BALLISTA)
                             .damage(3f)
                             .knockback(0.47f)
                             .sentryServant()
@@ -338,7 +338,7 @@ public class ServantryServantWeaponRegister {
      * 弩车手杖
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItemItem> BallistaCane =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_cane", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Ballista)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_cane", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.BALLISTA)
                             .damage(7.4f)
                             .knockback(0.47f)
                             .sentryServant()
@@ -363,7 +363,7 @@ public class ServantryServantWeaponRegister {
      * 弩车法杖
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItemItem> BallistaStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Ballista)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.BALLISTA)
                             .damage(15.6f)
                             .knockback(0.47f)
                             .sentryServant()
@@ -380,7 +380,7 @@ public class ServantryServantWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemLanguage("Ballista Staff", "弩车法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.Ballista, "Ballista", "弩车")
+                    .servantLanguage(ServantryAttachmentEntityRegister.BALLISTA, "Ballista", "弩车")
                     .itemLanguageTooltip(1, "A slow but high damage tower that shoots piercing bolts", "速度缓慢但伤害力极高的防御塔，可以射出穿透性箭矢")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -389,7 +389,7 @@ public class ServantryServantWeaponRegister {
      * 缥缈星核法杖 - 召唤缥缈星核仆从
      */
     public static final DeferredItem<ServantWeaponItemBuilder<EtherealStellarCore>.ServantWeaponItemItem> EtherealStellarCoreStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ethereal_stellar_core_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.EtherealStellarCore)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ethereal_stellar_core_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.ETHEREAL_STELLAR_CORE)
                             .damage(5.0f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
@@ -412,7 +412,7 @@ public class ServantryServantWeaponRegister {
                             .result(ServantryServantWeaponRegister.EtherealStellarCoreStaff)
                             .save(output))
                     .itemLanguage("Ethereal Stellar Core Staff", "缥缈星核法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.EtherealStellarCore, "Ethereal Stellar Core", "缥缈星核")
+                    .servantLanguage(ServantryAttachmentEntityRegister.ETHEREAL_STELLAR_CORE, "Ethereal Stellar Core", "缥缈星核")
                     .itemLanguageTooltip(1, "Summons up to 9 Ethereal Stellar Cores", "最多召唤9个缥缈星核")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -421,7 +421,7 @@ public class ServantryServantWeaponRegister {
      * 星尘细胞杖 - 召唤星尘细胞仆从
      */
     public static final DeferredItem<ServantWeaponItemBuilder<StardustCell>.ServantWeaponItemItem> StardustCellStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "stardust_cell_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.StardustCell)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "stardust_cell_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.STARDUST_CELL)
                             .damage(6f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
@@ -432,7 +432,7 @@ public class ServantryServantWeaponRegister {
                             .result(ServantryServantWeaponRegister.StardustCellStaff)
                             .save(output))
                     .itemLanguage("Stardust Cell Staff", "星尘细胞法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.StardustCell, "Stardust Cell", "星尘细胞")
+                    .servantLanguage(ServantryAttachmentEntityRegister.STARDUST_CELL, "Stardust Cell", "星尘细胞")
                     .itemLanguageTooltip(1, "Cultivate the most beautiful cellular infection", "培养最美丽的细胞感染")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -441,7 +441,7 @@ public class ServantryServantWeaponRegister {
      * 星尘龙杖 - 召唤星尘龙（多体节仆从）
      */
     public static final DeferredItem<ServantWeaponItemBuilder<StardustDragon>.ServantWeaponItemItem> StardustDragonStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "stardust_dragon_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.StardustDragon)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "stardust_dragon_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.STARDUST_DRAGON)
                             .damage(4f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
@@ -450,7 +450,7 @@ public class ServantryServantWeaponRegister {
                                 if (helper.canSummon(EntityData.Type.Servant, 1)) {
                                     List<StardustDragon> existing = helper
                                             .getEntityData()
-                                            .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.StardustDragon.get());
+                                            .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
                                             StardustDragon servant = weapon.createServant(player);
@@ -484,7 +484,7 @@ public class ServantryServantWeaponRegister {
                             .result(ServantryServantWeaponRegister.StardustDragonStaff)
                             .save(output))
                     .itemLanguage("Stardust Dragon Staff", "星尘之龙法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.StardustDragon, "Stardust Dragon", "星尘之龙")
+                    .servantLanguage(ServantryAttachmentEntityRegister.STARDUST_DRAGON, "Stardust Dragon", "星尘之龙")
                     .itemLanguageTooltip(1, "When you have a dragon, who needs a swarm?", "有了一条巨龙后，谁还需要一群仆从呢？")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -493,7 +493,7 @@ public class ServantryServantWeaponRegister {
      * 月亮传送门法杖
      */
     public static final DeferredItem<ServantWeaponItemBuilder<MoonPortal>.ServantWeaponItemItem> MoonPortalStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "moon_portal_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.MoonPortal)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "moon_portal_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.MOON_PORTAL)
                             .damage(10)
                             .knockback(0.75f)
                             .sentryServant()
@@ -509,7 +509,7 @@ public class ServantryServantWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemLanguage("Moon Portal Staff", "月亮传送门法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.MoonPortal, "Moon Portal", "月亮传送门")
+                    .servantLanguage(ServantryAttachmentEntityRegister.MOON_PORTAL, "Moon Portal", "月亮传送门")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
@@ -517,7 +517,7 @@ public class ServantryServantWeaponRegister {
      * 七彩水晶法杖
      */
     public static final DeferredItem<ServantWeaponItemBuilder<RainbowCrystal>.ServantWeaponItemItem> RainbowCrystalStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "rainbow_crystal_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.RainbowCrystal)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "rainbow_crystal_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.RAINBOW_CRYSTAL)
                             .damage(13)
                             .knockback(0.75f)
                             .sentryServant()
@@ -533,7 +533,7 @@ public class ServantryServantWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemLanguage("Rainbow Crystal Staff", "七彩水晶法杖")
-                    .servantLanguage(ServantryAttachmentEntityRegister.RainbowCrystal, "Rainbow Crystal", "七彩水晶")
+                    .servantLanguage(ServantryAttachmentEntityRegister.RAINBOW_CRYSTAL, "Rainbow Crystal", "七彩水晶")
                     .itemLanguageTooltip(1, "'The colors, Duke, the colors!'", "“公爵，多么缤纷的颜色！”")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -542,7 +542,7 @@ public class ServantryServantWeaponRegister {
      * 无限剑鞘
      */
     public static final DeferredItem<ServantWeaponItemBuilder<InfiniteShadow>.ServantWeaponItemItem> InfiniteScabbard =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "infinite_scabbard", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.InfiniteShadow)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "infinite_scabbard", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.INFINITE_SHADOW)
                             .sound(ServantrySoundRegister.UseTerraprism)
                             .summon((weapon, player) -> {
                                 InfiniteShadow servant = weapon.createServant(player);
@@ -558,7 +558,7 @@ public class ServantryServantWeaponRegister {
                                     .component(ServantryDataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
                             .build())
                     .itemLanguage("Infinite Scabbard", "无限剑鞘")
-                    .servantLanguage(ServantryAttachmentEntityRegister.InfiniteShadow, "Infinite Shadow", "无限之影")
+                    .servantLanguage(ServantryAttachmentEntityRegister.INFINITE_SHADOW, "Infinite Shadow", "无限之影")
                     .itemLanguageTooltip(1, "A scabbard that stores a blade of infinite potential", "蕴含无限可能之'剑'的剑鞘")
                     .itemLanguageTooltip(2, "Right-click an item to store, right-click an empty slot to retrieve", "右键物品存入，右键空格子取出")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
@@ -568,7 +568,7 @@ public class ServantryServantWeaponRegister {
      * 虚空吞噬者傀具
      */
     public static final DeferredItem<ServantWeaponItemBuilder<VoidEater>.ServantWeaponItemItem> VoidEaterMarionette =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "void_eater_marionette", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.VoidEater)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "void_eater_marionette", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.VOID_EATER)
                             .damage(11f)
                             .knockback(0.5f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
@@ -576,7 +576,7 @@ public class ServantryServantWeaponRegister {
                                 ServantryHelper helper = ServantryHelper.get(player);
                                 if (helper.canSummon(EntityData.Type.Servant, 1)) {
                                     List<VoidEater> existing = helper.getEntityData()
-                                            .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.VoidEater.get());
+                                            .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
                                             VoidEater servant = weapon.createServant(player);
@@ -606,7 +606,7 @@ public class ServantryServantWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemLanguage("Void Eater Marionette", "虚空吞噬者傀具")
-                    .servantLanguage(ServantryAttachmentEntityRegister.VoidEater, "Void Eater", "虚空吞噬者")
+                    .servantLanguage(ServantryAttachmentEntityRegister.VOID_EATER, "Void Eater", "虚空吞噬者")
                     .itemLanguageTooltip(1, "Contains the power to command miniature devourers", "蕴含掌控小型吞噬者的力量")
                     .itemLanguageTooltip(2, "The devourer uses the God Eater, Holy Incineration and Cosmic Maelstrom to attack", "吞噬者会使用噬神者，焚灭虔信之火和超宇宙狂涡攻击")
                     .itemLanguageTooltip(3, "While the devourer is present, all your attacks unleash God-Slaying Fury", "吞噬者在场时，你的所有攻击都会释放弑神怒焰")
@@ -617,7 +617,7 @@ public class ServantryServantWeaponRegister {
      * 雷云盆栽
      */
     public static final DeferredItem<ServantWeaponItemBuilder<SuperPeashooter>.ServantWeaponItemItem> ThundercloudBonsai =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "thundercloud_bonsai", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.SuperPeashooter)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "thundercloud_bonsai", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.SUPER_PEASHOOTER)
                             .damage(12f)
                             .knockback(0)
                             .sentryServant()
@@ -634,7 +634,7 @@ public class ServantryServantWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemLanguage("Thundercloud Bonsai", "雷云盆栽")
-                    .servantLanguage(ServantryAttachmentEntityRegister.SuperPeashooter, "Super Peashooter", "超级电能豌豆射手")
+                    .servantLanguage(ServantryAttachmentEntityRegister.SUPER_PEASHOOTER, "Super Peashooter", "超级电能豌豆射手")
                     .itemLanguageTooltip(1, "Fires seven lightning balls at once, with a chance to fire a large number of scattered lightning balls at once", "一次发射七颗雷电球，有概率一次发射大量散射雷电球")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
@@ -643,7 +643,7 @@ public class ServantryServantWeaponRegister {
      * 玉米加农炮
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Cannon>.ServantWeaponItemItem> CornCannon =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "corn_cannon", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Cannon)
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "corn_cannon", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.CANNON)
                             .damage(6400f)
                             .armorPierce(3600f)
                             .sentryServant()
@@ -660,8 +660,31 @@ public class ServantryServantWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemLanguage("Corn Cannon", "玉米加农炮")
-                    .servantLanguage(ServantryAttachmentEntityRegister.Cannon, "Cannon", "玉米加农炮")
+                    .servantLanguage(ServantryAttachmentEntityRegister.CANNON, "Cannon", "玉米加农炮")
                     .itemLanguageTooltip(1, "Uses 2 Sentry Servant slots", "占用 2 哨戒仆从栏")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
+                    .build();
+    /**
+     * 死魂灵巫术单元
+     */
+    public static final DeferredItem<ServantWeaponItemBuilder<NecroSpirit>.ServantWeaponItemItem> NecroSpiritStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "necro_spirit_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.NECRO_SPIRIT)
+                            .damage(700f)
+                            .sound(ServantrySoundRegister.UseServantWeapon)
+                            .summon((weapon, player) -> {
+                                NecroSpirit servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servant.getSameSize() < 1 && servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
+                                    servant.init(servant.getInterpolatedIdleState(1.0f));
+                                    servantryHelper.add(EntityData.Type.Servant, servant);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .itemLanguage("Necro Spirit Staff", "死魂灵巫术单元")
+                    .servantLanguage(ServantryAttachmentEntityRegister.NECRO_SPIRIT, "Necro Spirit", "死魂灵")
+                    .itemLanguageTooltip(1, "Summons up to 1 Necro Spirit", "最多召唤1个死魂灵")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();

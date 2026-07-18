@@ -117,7 +117,7 @@ public class InfiniteShadow extends Terraprism {
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return ServantryAttachmentEntityRegister.InfiniteShadow.get();
+        return ServantryAttachmentEntityRegister.INFINITE_SHADOW.get();
     }
 
     public static class InfiniteShadowFakePlayer extends FakePlayer {

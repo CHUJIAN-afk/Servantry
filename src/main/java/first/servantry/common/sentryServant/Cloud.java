@@ -46,7 +46,7 @@ public class Cloud extends MomentumServant implements IBlockCollision<Cloud> {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.Cloud.get();
+        return ServantryAttachmentEntityRegister.CLOUD.get();
     }
 
     @Override

@@ -36,7 +36,7 @@ public class OreScout extends Servant {
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return ServantryAttachmentEntityRegister.OreScout.get();
+        return ServantryAttachmentEntityRegister.ORE_SCOUT.get();
     }
 
     @Override

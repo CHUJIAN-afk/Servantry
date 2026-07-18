@@ -88,6 +88,6 @@ public class Hornet extends MomentumServant implements IBlockCollision<Hornet> {
 
     @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {
-        return ServantryAttachmentEntityRegister.Hornet.get();
+        return ServantryAttachmentEntityRegister.HORNET.get();
     }
 }

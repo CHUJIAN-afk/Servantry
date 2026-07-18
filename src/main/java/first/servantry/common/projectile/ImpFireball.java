@@ -93,6 +93,6 @@ public class ImpFireball extends Projectile implements ICollideAttack<ImpFirebal
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.ImpFireball.get();
+        return ServantryAttachmentEntityRegister.IMP_FIREBALL.get();
     }
 }

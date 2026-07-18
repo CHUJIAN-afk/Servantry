@@ -120,6 +120,6 @@ public class Corn extends Projectile implements ICollideAttack<Corn>, IBlockColl
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.CornProjectile.get();
+        return ServantryAttachmentEntityRegister.CORN.get();
     }
 }
