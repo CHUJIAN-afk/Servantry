@@ -18,13 +18,13 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-public class RainbowCrystal extends Projectile {
+public class MiniRainbowCrystal extends Projectile {
 
-    public RainbowCrystal(){
+    public MiniRainbowCrystal(){
         super();
     }
 
-    public RainbowCrystal(DamageSource damageSource, PathNode pathNode) {
+    public MiniRainbowCrystal(DamageSource damageSource, PathNode pathNode) {
         super(pathNode.pos(), Vec3.directionFromRotation(pathNode.pitch(), pathNode.yaw()));
         setDamageSource(damageSource);
         setDrag(1);
@@ -95,6 +95,6 @@ public class RainbowCrystal extends Projectile {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.RainbowCrystalProjectile.get();
+        return ServantryAttachmentEntityRegister.MiniRainbowCrystalProjectile.get();
     }
 }

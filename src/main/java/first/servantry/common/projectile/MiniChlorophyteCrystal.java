@@ -20,13 +20,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class ChlorophyteCrystal extends Projectile implements ICollideAttack<ChlorophyteCrystal> {
+public class MiniChlorophyteCrystal extends Projectile implements ICollideAttack<MiniChlorophyteCrystal> {
 
-    public ChlorophyteCrystal() {
+    public MiniChlorophyteCrystal() {
         super();
     }
 
-    public ChlorophyteCrystal(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
+    public MiniChlorophyteCrystal(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
         super(startPos, direction);
         setDamageSource(damageSource);
         setDrag(1f);
@@ -85,7 +85,7 @@ public class ChlorophyteCrystal extends Projectile implements ICollideAttack<Chl
     }
 
     @Override
-    public boolean isValidCollisionTarget(ChlorophyteCrystal entity, LivingEntity target) {
+    public boolean isValidCollisionTarget(MiniChlorophyteCrystal entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
             Servant servant = servantDamageSource.getServant();
             return servant.isTarget(target);
@@ -95,7 +95,7 @@ public class ChlorophyteCrystal extends Projectile implements ICollideAttack<Chl
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.ChlorophyteCrystalProjectile.get();
+        return ServantryAttachmentEntityRegister.MiniChlorophyteCrystalProjectile.get();
     }
 
     @Override

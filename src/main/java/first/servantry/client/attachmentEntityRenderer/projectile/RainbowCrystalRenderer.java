@@ -6,17 +6,17 @@ import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ConeTrailConfig;
 import first.servantry.api.entity.PathNode;
-import first.servantry.common.projectile.RainbowCrystal;
+import first.servantry.common.projectile.MiniRainbowCrystal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-public class RainbowCrystalRenderer extends AbstractAttachmentEntityRenderer<RainbowCrystal> {
+public class RainbowCrystalRenderer extends AbstractAttachmentEntityRenderer<MiniRainbowCrystal> {
 
     @Override
-    protected RenderContext<RainbowCrystal> createContext(RainbowCrystal crystal) {
+    protected RenderContext<MiniRainbowCrystal> createContext(MiniRainbowCrystal crystal) {
         float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
-        return RenderContext.<RainbowCrystal>builder()
-                .trail(new ConeTrailConfig<RainbowCrystal>()
+        return RenderContext.<MiniRainbowCrystal>builder()
+                .trail(new ConeTrailConfig<MiniRainbowCrystal>()
                                .timer(15)
                                .colorRGB(crystal.getColor(partialTick))
                                .historyLength(16)
@@ -27,7 +27,7 @@ public class RainbowCrystalRenderer extends AbstractAttachmentEntityRenderer<Rai
     }
 
     @Override
-    protected void render(RainbowCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<RainbowCrystal> context, float partialTick) {
+    protected void render(MiniRainbowCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniRainbowCrystal> context, float partialTick) {
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

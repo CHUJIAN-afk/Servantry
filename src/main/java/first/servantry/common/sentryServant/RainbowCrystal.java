@@ -4,6 +4,7 @@ import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
+import first.servantry.common.projectile.MiniRainbowCrystal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.EasingCurve;
 import net.minecraft.world.entity.LivingEntity;
@@ -53,7 +54,7 @@ public class RainbowCrystal extends Servant {
                 float progress = (float) j / 9;
                 list.add(startPathNode.lerp(endPathNode, EasingCurve.EASE_IN_OUT_CUBIC.apply(progress)));
             }
-            first.servantry.common.projectile.RainbowCrystal projectile = new first.servantry.common.projectile.RainbowCrystal(getDamageSource(), startPathNode);
+            MiniRainbowCrystal projectile = new MiniRainbowCrystal(getDamageSource(), startPathNode);
             projectile.setPath(list);
             projectile.join(owner);
         }

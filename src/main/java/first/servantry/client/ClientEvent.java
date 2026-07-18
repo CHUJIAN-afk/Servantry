@@ -5,11 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Either;
 import first.servantry.Servantry;
 import first.servantry.api.ServantryHelper;
-import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
 import first.servantry.api.common.attachment.EntityData;
-import first.servantry.client.attachmentEntityRenderer.projectile.*;
-import first.servantry.client.attachmentEntityRenderer.projectile.ChlorophyteCrystalRenderer;
-import first.servantry.client.attachmentEntityRenderer.servant.*;
 import first.servantry.client.renderType.OreScoutHighlightRenderType;
 import first.servantry.client.screen.MithrilAnvilGui;
 import first.servantry.client.tooltip.ScabbardTooltipComponent;
@@ -33,7 +29,10 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 
 import java.util.List;
 
@@ -65,45 +64,6 @@ public class ClientEvent {
                 }
             }
         }
-    }
-
-    @SubscribeEvent
-    public static void register(EntityRenderersEvent.RegisterRenderers event) {
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.TerraPrism.get(), new TerraprismRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.EnchantedThrowingKnives.get(), new EnchantedThrowingKnivesRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.StardustCell.get(), new StardustCellRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.StardustDragon.get(), new StardustDragonRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Twins.get(), new TwinsRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Sharknado.get(), new SharknadoRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.InfiniteShadow.get(), new InfiniteShadowRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.DeadlySphere.get(), new DeadlySphereRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.EtherealStellarCore.get(), new EtherealStellarCoreRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.OreScout.get(), new OreScoutServantRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.ScavengerFairy.get(), new ScavengerFairyRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.ChlorophyteCrystal.get(), new first.servantry.client.attachmentEntityRenderer.servant.ChlorophyteCrystalRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.VoidEater.get(), new VoidEaterRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Ballista.get(), new BallistaRenderer());
-
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.StardustProjectile.get(), new MiniStardustRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.LaserProjectile.get(), new LaserRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.DemonFlameProjectile.get(), new DemonFlameRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.SharkDragonProjectile.get(), new SharkDragonRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.EternalNightLaserProjectile.get(), new ShatteredStellarCoreRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.ChlorophyteCrystalProjectile.get(), new ChlorophyteCrystalRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.ZenithProjectile.get(), new ZenithRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.CustomLaserProjectile.get(), new CustomLaserRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.RainbowCrystalProjectile.get(), new RainbowCrystalRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.GodFlameProjectile.get(), new GodFlameRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.BlitzBall.get(), new BlitzBallRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Rain.get(), new RainRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.DestructionBullet.get(), new DestructionBulletRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Hornet.get(), new HornetRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.HornetStinger.get(), new HornetStingerRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Imp.get(), new ImpRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.ImpFireball.get(), new ImpFireballRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.UFO.get(), new UFORenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Cannon.get(), new CannonRenderer());
-        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.CornProjectile.get(), new CornRenderer());
     }
 
     @SubscribeEvent

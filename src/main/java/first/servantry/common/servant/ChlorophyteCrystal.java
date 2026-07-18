@@ -5,6 +5,7 @@ import first.servantry.api.entity.AttachmentEntity;
 import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.servant.Servant;
+import first.servantry.common.projectile.MiniChlorophyteCrystal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -68,7 +69,7 @@ public class ChlorophyteCrystal extends Servant {
         Player owner = getOwner();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(getPos()).normalize();
         Vec3 startPos = getPos().add(direction.scale(0.25));
-        first.servantry.common.projectile.ChlorophyteCrystal projectile = new first.servantry.common.projectile.ChlorophyteCrystal(getDamageSource(), startPos, direction.scale(1.5));
+        MiniChlorophyteCrystal projectile = new MiniChlorophyteCrystal(getDamageSource(), startPos, direction.scale(1.5));
         projectile.join(owner);
         GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                 .centerColor(0x1bff10)
