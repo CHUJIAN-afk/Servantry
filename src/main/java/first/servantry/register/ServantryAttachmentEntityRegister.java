@@ -68,6 +68,8 @@ public class ServantryAttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<UFO>> UFO = register("ufo", UFO::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cannon>> Cannon = register("cannon", Cannon::new);
+
     // ===================== 射弹类型 =====================
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniStardustCell>> StardustProjectile = register("stardust_projectile", MiniStardustCell::new);
@@ -101,6 +103,8 @@ public class ServantryAttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<HornetStinger>> HornetStinger = register("hornet_stinger", HornetStinger::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ImpFireball>> ImpFireball = register("imp_fireball", ImpFireball::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Corn>> CornProjectile = register("corn_projectile", Corn::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, () -> new AttachmentEntityType<>(supplier));

@@ -102,6 +102,8 @@ public class ClientEvent {
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Imp.get(), new ImpRenderer());
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.ImpFireball.get(), new ImpFireballRenderer());
         AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.UFO.get(), new UFORenderer());
+        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.Cannon.get(), new CannonRenderer());
+        AttachmentEntityRenderDispatcher.register(ServantryAttachmentEntityRegister.CornProjectile.get(), new CornRenderer());
     }
 
     @SubscribeEvent

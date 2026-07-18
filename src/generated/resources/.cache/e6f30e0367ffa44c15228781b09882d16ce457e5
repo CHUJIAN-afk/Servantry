@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-17T22:59:06.8735108	Item Models: servantry
+// 1.21.1	2026-07-18T17:54:49.4284448	Item Models: servantry
 d882c3a8d9d37b2217246221442c70da01b9ad66 assets/servantry/models/item/adamantite_ingot.json
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 1234a813c7da2a7cf22f8be7f86b6fd620074edc assets/servantry/models/item/ballista_cane.json
@@ -16,6 +16,7 @@ a9966bc150a99ef688964afe5fb09e6dc1d430eb assets/servantry/models/item/chlorophyt
 a85463accb4d2f867da7b4285551e835dcc2fe8e assets/servantry/models/item/chlorophyte_helmet.json
 4548711e362b3fe6ed34e49548f114965838e481 assets/servantry/models/item/chlorophyte_ingot.json
 b7775d0c442951314368f5bd5eee94026fea0e85 assets/servantry/models/item/chlorophyte_leggings.json
+313dd647f510fd85a42881671611edaacd04dd52 assets/servantry/models/item/corn_cannon.json
 b6b116a53f2e376bf8551a4e870649901a95e8c4 assets/servantry/models/item/deadly_sphere_staff.json
 dc0a6e5413f68e538e253711659e4b377ac7fdb3 assets/servantry/models/item/eclipse_ring.json
 c8da49f0fd8ba0680c7b652f0f1a44522fbb39fd assets/servantry/models/item/ethereal_stellar_core_staff.json

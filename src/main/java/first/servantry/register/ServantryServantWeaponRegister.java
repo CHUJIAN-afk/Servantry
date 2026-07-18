@@ -639,6 +639,32 @@ public class ServantryServantWeaponRegister {
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();
+    /**
+     * 玉米加农炮
+     */
+    public static final DeferredItem<ServantWeaponItemBuilder<Cannon>.ServantWeaponItemItem> CornCannon =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "corn_cannon", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.Cannon)
+                            .damage(6400f)
+                            .armorPierce(3600f)
+                            .sentryServant()
+                            .sound(ServantrySoundRegister.UseBallistaStaff)
+                            .summon((weapon, player) -> {
+                                Cannon servant = weapon.createServant(player);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servantryHelper.canSummon(EntityData.Type.SentryServant, 2)) {
+                                    servant.setSlotCost(2);
+                                    servant.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
+                                    servantryHelper.add(EntityData.Type.SentryServant, servant);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .build())
+                    .itemLanguage("Corn Cannon", "玉米加农炮")
+                    .servantLanguage(ServantryAttachmentEntityRegister.Cannon, "Cannon", "玉米加农炮")
+                    .itemLanguageTooltip(1, "Uses 2 Sentry Servant slots", "占用 2 哨戒仆从栏")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
+                    .build();
 
     public static void register() {
     }
