@@ -42,7 +42,7 @@ public class ScavengerFairy extends Servant {
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return ServantryAttachmentEntityRegister.ScavengerFairy.get();
+        return ServantryAttachmentEntityRegister.SCAVENGER_FAIRY.get();
     }
     
     @Override
@@ -69,8 +69,7 @@ public class ScavengerFairy extends Servant {
         float rightX = Mth.cos(rad);
         float rightZ = -Mth.sin(rad);
         float bob = Mth.sin((tickCount + partialTick) * 0.16f) * 0.035f;
-        Vec3 pos = new Vec3(px, py, pz)
-                .add(rightX * 0.35 + backX * 0.12, owner.getBbHeight() + 0.45 + bob, rightZ * 0.35 + backZ * 0.12);
+        Vec3 pos = new Vec3(px, py, pz).add(rightX * 0.35 + backX * 0.12, owner.getBbHeight() + 0.45 + bob, rightZ * 0.35 + backZ * 0.12);
         return new PathNode(pos, playerYaw, 0, 0);
     }
 

@@ -79,6 +79,6 @@ public class SharkDragon extends Projectile implements ICollideAttack<SharkDrago
 
     @Override
     public AttachmentEntityType<SharkDragon> getType() {
-        return ServantryAttachmentEntityRegister.SharkDragonProjectile.get();
+        return ServantryAttachmentEntityRegister.SHARK_DRAGON.get();
     }
 }

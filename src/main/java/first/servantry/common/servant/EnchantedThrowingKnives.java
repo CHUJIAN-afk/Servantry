@@ -183,6 +183,6 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return ServantryAttachmentEntityRegister.EnchantedThrowingKnives.get();
+        return ServantryAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES.get();
     }
 }

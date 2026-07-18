@@ -93,6 +93,6 @@ public class Imp extends MomentumServant implements IBlockCollision<Imp> {
 
     @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {
-        return ServantryAttachmentEntityRegister.Imp.get();
+        return ServantryAttachmentEntityRegister.IMP.get();
     }
 }

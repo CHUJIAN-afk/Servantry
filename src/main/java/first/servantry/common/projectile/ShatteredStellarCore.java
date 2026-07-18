@@ -117,7 +117,7 @@ public class ShatteredStellarCore extends Projectile implements ICollideAttack<S
 
     @Override
     public AttachmentEntityType<ShatteredStellarCore> getType() {
-        return ServantryAttachmentEntityRegister.EternalNightLaserProjectile.get();
+        return ServantryAttachmentEntityRegister.SHATTERED_STELLAR_CORE.get();
     }
 
     public void setChaseTarget(LivingEntity chaseTarget) {

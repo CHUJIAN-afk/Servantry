@@ -71,11 +71,10 @@ public class ChlorophyteCrystal extends Servant {
         Vec3 startPos = getPos().add(direction.scale(0.25));
         MiniChlorophyteCrystal projectile = new MiniChlorophyteCrystal(getDamageSource(), startPos, direction.scale(1.5));
         projectile.join(owner);
-        GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
-                .centerColor(0x1bff10)
-                .edgeColor(0x17b70e);
         ParticleHelper.create(owner.level())
-                .generic(genericParticleBuilder
+                .generic(GenericParticleBuilder.create()
+                        .centerColor(0x1bff10)
+                        .edgeColor(0x17b70e)
                         .lifetime(4)
                         .lifetimeRandom(6)
                         .spin(0.5f)
@@ -100,6 +99,6 @@ public class ChlorophyteCrystal extends Servant {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.ChlorophyteCrystal.get();
+        return ServantryAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get();
     }
 }

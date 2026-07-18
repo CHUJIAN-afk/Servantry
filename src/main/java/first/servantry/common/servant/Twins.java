@@ -122,7 +122,7 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
 
     @Override
     public AttachmentEntityType<? extends MomentumServant> getType() {
-        return ServantryAttachmentEntityRegister.Twins.get();
+        return ServantryAttachmentEntityRegister.TWINS.get();
     }
 
     public void setOther(Twins twins) {

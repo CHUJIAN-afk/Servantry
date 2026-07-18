@@ -108,7 +108,7 @@ public class Zenith extends Projectile implements ICollideAttack<Zenith> {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.ZenithProjectile.get();
+        return ServantryAttachmentEntityRegister.ZENITH.get();
     }
 
     @Override

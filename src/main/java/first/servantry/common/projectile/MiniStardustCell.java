@@ -157,7 +157,7 @@ public class MiniStardustCell extends AttachingProjectile implements ICollideAtt
 
     @Override
     public AttachmentEntityType<? extends AttachingProjectile> getType() {
-        return ServantryAttachmentEntityRegister.StardustProjectile.get();
+        return ServantryAttachmentEntityRegister.MINI_STARDUST_CELL.get();
     }
 
     public void setChaseTarget(LivingEntity chaseTarget) {

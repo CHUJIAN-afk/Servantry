@@ -72,7 +72,7 @@ public class Laser extends Projectile implements ICollideAttack<Laser>, IBlockCo
 
     @Override
     public AttachmentEntityType<? extends Projectile> getType() {
-        return ServantryAttachmentEntityRegister.LaserProjectile.get();
+        return ServantryAttachmentEntityRegister.LASER.get();
     }
 
     @Override

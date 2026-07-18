@@ -92,7 +92,7 @@ public class EtherealStellarCore extends Servant {
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return ServantryAttachmentEntityRegister.EtherealStellarCore.get();
+        return ServantryAttachmentEntityRegister.ETHEREAL_STELLAR_CORE.get();
     }
 
     @Override

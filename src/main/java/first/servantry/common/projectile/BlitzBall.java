@@ -114,7 +114,7 @@ public class BlitzBall extends Projectile {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.BlitzBall.get();
+        return ServantryAttachmentEntityRegister.BLITZ_BALL.get();
     }
 
     @Override

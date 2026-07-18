@@ -95,6 +95,6 @@ public class MiniRainbowCrystal extends Projectile {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.MiniRainbowCrystalProjectile.get();
+        return ServantryAttachmentEntityRegister.MINI_RAINBOW_CRYSTAL.get();
     }
 }

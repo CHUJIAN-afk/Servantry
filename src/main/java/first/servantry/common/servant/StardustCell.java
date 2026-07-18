@@ -158,7 +158,7 @@ public class StardustCell extends MomentumServant implements IBlockCollision<Sta
 
     @Override
     public AttachmentEntityType<StardustCell> getType() {
-        return ServantryAttachmentEntityRegister.StardustCell.get();
+        return ServantryAttachmentEntityRegister.STARDUST_CELL.get();
     }
 
     public int getShootCooldown() {

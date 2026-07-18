@@ -81,6 +81,6 @@ public class HornetStinger extends Projectile implements ICollideAttack<HornetSt
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.HornetStinger.get();
+        return ServantryAttachmentEntityRegister.HORNET_STINGER.get();
     }
 }

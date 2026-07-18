@@ -71,7 +71,7 @@ public interface IServantWeaponItem<T extends Servant> {
             if (armor_pierce > 0) {
                 toolTips.add(Component.literal(String.format("%.1f ", armor_pierce)).withStyle(ChatFormatting.BLUE).append(Component.translatable("item.servantry.tooltip.armor_pierce").withStyle(ChatFormatting.GRAY)));
             }
-            if (type == ServantryAttachmentEntityRegister.InfiniteShadow.get()){
+            if (type == ServantryAttachmentEntityRegister.INFINITE_SHADOW.get()){
                 ScabbardContainer container = itemStack.getComponents().getOrDefault(ServantryDataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
                 if (!container.isEmpty()) {
                     toolTips.add(Component.translatable("item.servantry.tooltip.summon", container.itemStack().getDisplayName()).withStyle(ChatFormatting.GRAY));

@@ -113,7 +113,7 @@ public class Ballista extends MomentumServant implements IBlockCollision<Ballist
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.Ballista.get();
+        return ServantryAttachmentEntityRegister.BALLISTA.get();
     }
 
     @Override

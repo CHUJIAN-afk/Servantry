@@ -100,7 +100,7 @@ public class CustomLaser extends Projectile implements ICollideAttack<CustomLase
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.CustomLaserProjectile.get();
+        return ServantryAttachmentEntityRegister.CUSTOM_LASER.get();
     }
 
     @Override

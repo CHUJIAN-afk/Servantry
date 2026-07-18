@@ -169,7 +169,7 @@ public class MoonPortal extends Servant {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.MoonPortal.get();
+        return ServantryAttachmentEntityRegister.MOON_PORTAL.get();
     }
 
     @Override

@@ -177,6 +177,6 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
     @Override
     public AttachmentEntityType<? extends Servant> getType() {
-        return ServantryAttachmentEntityRegister.TerraPrism.get();
+        return ServantryAttachmentEntityRegister.TERRA_PRISM.get();
     }
 }

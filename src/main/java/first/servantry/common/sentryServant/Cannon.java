@@ -76,7 +76,7 @@ public class Cannon extends MomentumServant implements IBlockCollision<Cannon> {
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.Cannon.get();
+        return ServantryAttachmentEntityRegister.CANNON.get();
     }
 
     @Override

@@ -35,7 +35,7 @@ public class CrossbowBolt extends Projectile implements IBlockCollision<Crossbow
 
     @Override
     public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.CrossbowBoltProjectile.get();
+        return ServantryAttachmentEntityRegister.CROSSBOW_BOLT.get();
     }
 
     @Override

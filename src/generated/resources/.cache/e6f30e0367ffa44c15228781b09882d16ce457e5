@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-18T17:54:49.4284448	Item Models: servantry
+// 1.21.1	2026-07-18T19:36:09.5236227	Item Models: servantry
 d882c3a8d9d37b2217246221442c70da01b9ad66 assets/servantry/models/item/adamantite_ingot.json
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 1234a813c7da2a7cf22f8be7f86b6fd620074edc assets/servantry/models/item/ballista_cane.json
@@ -46,6 +46,7 @@ be3b3c6977845aaeecb84bd5abf299be09738e1a assets/servantry/models/item/mithril_an
 27453db8a210e9975f578f4d7faf6a0dc3d184e3 assets/servantry/models/item/monks_belt.json
 5343591d07bd6a6d05f6a81142d12f1fcb0ddc73 assets/servantry/models/item/moon_portal_staff.json
 cd35e7ca8216678ea8d40290aa5ea6479fedc66c assets/servantry/models/item/necromantic_scroll.json
+f35d6e77174f3d08ca971ab2f4835f05b2fd3b08 assets/servantry/models/item/necro_spirit_staff.json
 f478ea06525209959303abd83e616649ef9b2f20 assets/servantry/models/item/obsidian_boots.json
 ce5f24d0b6cb1d96d841edc87c591c04940470b7 assets/servantry/models/item/obsidian_chestplate.json
 1124c6f111d664bf1fc584e0a269dbed0699ad75 assets/servantry/models/item/obsidian_helmet.json
