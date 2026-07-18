@@ -22,6 +22,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,11 +61,15 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
             TargetCache targetCache = helper.getTargetCache();
             if (!targetCache.isEmpty()) {
                 float searchRange = targetCache.getServantSearchRange(this.getOwner(), this.getSearchDistance());
-                List<LivingEntity> targets = targetCache.getEntities()
-                        .stream()
-                        .filter(living -> targetCache.getDistance(owner, living) < searchRange)
-                        .filter(this::isTarget)
-                        .toList();
+                List<LivingEntity> targets = new ArrayList<>();
+                List<LivingEntity> entities = targetCache.getEntities();
+                for (LivingEntity living : entities) {
+                    if (targetCache.getDistance(owner, living) < searchRange) {
+                        if (isTarget(living)) {
+                            targets.add(living);
+                        }
+                    }
+                }
                 return targetCache.getNewTarget(this, targets, 0, true);
             }
         }

@@ -105,8 +105,8 @@ public class EtherealStellarCore extends Servant {
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
         Player owner = getOwner();
-        int total = Math.max(1, getSameSize());
-        int order = getOrder();
+        int total = Math.max(1, getSameSizeCache());
+        int order = getOrderCache();
         float angle = (owner.tickCount + partialTick) * 0.02f + (order * Mth.TWO_PI / total);
         float radius = 1.5f;
 

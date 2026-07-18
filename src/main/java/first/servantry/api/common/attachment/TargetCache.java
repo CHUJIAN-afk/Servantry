@@ -1,20 +1,32 @@
 package first.servantry.api.common.attachment;
 
 import first.servantry.api.entity.AttachmentEntity;
+import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.servant.Servant;
 import first.servantry.register.ServantryAttachmentRegister;
 import first.servantry.register.ServantryAttributeRegister;
+import it.unimi.dsi.fastutil.ints.Int2BooleanOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.*;
+import java.util.function.IntToDoubleFunction;
 
 /**
  * 目标缓存，存储玩家周围的实体列表。
@@ -25,14 +37,22 @@ import java.util.*;
  */
 public class TargetCache {
 
+    private static final double MAX_DISTANCE_SQ = 128.0 * 128.0;
+    private static final int MAX_STEPS = 128;
+    private static final double EPSILON = 1.0E-7;
+
     /**
      * 缓存的实体列表
      */
     private final List<LivingEntity> entities = new ArrayList<>();
+    private final Int2BooleanOpenHashMap visibilityCache = new Int2BooleanOpenHashMap();
+    private final Int2FloatOpenHashMap distanceCache = new Int2FloatOpenHashMap();
 
-    private final Map<Integer, Boolean> visibilityCache = new HashMap<>();
+    // ==================== Chunk 缓存（每tick预加载） ====================
 
-    private final Map<Integer, Float> distanceCache = new HashMap<>();
+    private ServerLevel cachedLevel;
+    private final Long2ObjectOpenHashMap<LevelChunk> chunkCache = new Long2ObjectOpenHashMap<>();
+    private final BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
     public LivingEntity getNewTarget(Servant servant, List<LivingEntity> targets, float ownerWarningDistance, boolean selfCenter) {
         Player owner = servant.getOwner();
@@ -57,13 +77,13 @@ public class TargetCache {
     }
 
     public float getDistance(Servant servant, LivingEntity living) {
-        Integer key = servant.getUuid().hashCode() + living.getUUID().hashCode();
-        return distanceCache.computeIfAbsent(key, k -> (float) servant.getPos().distanceTo(living.getBoundingBox().getCenter()));
+        int key = servant.getUuid().hashCode() + living.getUUID().hashCode();
+        return distanceCache.computeIfAbsent(key,  (IntToDoubleFunction)(k -> (float) servant.getPos().distanceTo(living.getBoundingBox().getCenter())));
     }
 
     public float getDistance(Player player, LivingEntity living) {
-        Integer key = player.getUUID().hashCode() + living.getUUID().hashCode();
-        return distanceCache.computeIfAbsent(key, k -> (float) player.getBoundingBox().getCenter().distanceTo(living.getBoundingBox().getCenter()));
+        int key = player.getUUID().hashCode() + living.getUUID().hashCode();
+        return distanceCache.computeIfAbsent(key, (IntToDoubleFunction)(k -> (float) player.getEyePosition().distanceTo(living.getBoundingBox().getCenter())));
     }
 
     public float getServantSearchRange(Player player, float distance) {
@@ -77,18 +97,148 @@ public class TargetCache {
     //此缓存不能被共享，极易卡顿
     public boolean isVisibility(Servant servant, LivingEntity living) {
         Integer key = servant.getUuid().hashCode() + living.getUUID().hashCode();
-        return visibilityCache.computeIfAbsent(key, k -> {
-            Level level = living.level();
-            AABB box = living.getBoundingBox();
-            ClipContext context = new ClipContext(servant.getPos(), box.getCenter(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, living);
-            BlockHitResult clip = level.clip(context);
-            return clip.getType() == HitResult.Type.MISS;
-        });
+        return visibilityCache.computeIfAbsent(key, k -> hasLineOfSight(servant.getPos(), living.getBoundingBox().getCenter()));
     }
 
     public boolean isVisibility(Player player, LivingEntity living) {
         Integer key = player.getUUID().hashCode() + living.getUUID().hashCode();
-        return visibilityCache.computeIfAbsent(key, k -> player.hasLineOfSight(living));
+        return visibilityCache.computeIfAbsent(key, k -> hasLineOfSight(player.getBoundingBox().getCenter(), living.getBoundingBox().getCenter()));
+    }
+
+    /**
+     * DDA 光线步进视线检测，使用预加载的 chunk 缓存。
+     *
+     * @param from 起点坐标
+     * @param to   终点坐标
+     * @return true = 无遮挡（可见）
+     */
+    private boolean hasLineOfSight(Vec3 from, Vec3 to) {
+        if (cachedLevel == null) {
+            return false;
+        }
+        if (from.distanceToSqr(to) > MAX_DISTANCE_SQ) {
+            return false;
+        }
+
+        double startX = Mth.lerp(-EPSILON, from.x, to.x);
+        double startY = Mth.lerp(-EPSILON, from.y, to.y);
+        double startZ = Mth.lerp(-EPSILON, from.z, to.z);
+        double endX = Mth.lerp(-EPSILON, to.x, from.x);
+        double endY = Mth.lerp(-EPSILON, to.y, from.y);
+        double endZ = Mth.lerp(-EPSILON, to.z, from.z);
+
+        int curX = Mth.floor(endX);
+        int curY = Mth.floor(endY);
+        int curZ = Mth.floor(endZ);
+
+        double dx = startX - endX;
+        double dy = startY - endY;
+        double dz = startZ - endZ;
+
+        int stepX = Mth.sign(dx);
+        int stepY = Mth.sign(dy);
+        int stepZ = Mth.sign(dz);
+
+        double tDeltaX = stepX == 0 ? Double.MAX_VALUE : (double) stepX / dx;
+        double tDeltaY = stepY == 0 ? Double.MAX_VALUE : (double) stepY / dy;
+        double tDeltaZ = stepZ == 0 ? Double.MAX_VALUE : (double) stepZ / dz;
+
+        double tMaxX = tDeltaX * (stepX > 0 ? 1.0 - Mth.frac(endX) : Mth.frac(endX));
+        double tMaxY = tDeltaY * (stepY > 0 ? 1.0 - Mth.frac(endY) : Mth.frac(endY));
+        double tMaxZ = tDeltaZ * (stepZ > 0 ? 1.0 - Mth.frac(endZ) : Mth.frac(endZ));
+
+        ServerLevel level = cachedLevel;
+        int minBuildHeight = level.getMinBuildHeight();
+        int maxBuildHeight = level.getMaxBuildHeight();
+
+        // 局部缓存：同一条射线内复用 chunk/section 引用
+        long lastChunkKey = Long.MIN_VALUE;
+        LevelChunk chunk = null;
+        int lastSectionY = Integer.MIN_VALUE;
+        LevelChunkSection section = null;
+
+        for (int steps = 0; steps < MAX_STEPS; steps++) {
+            if (tMaxX > 1.0 && tMaxY > 1.0 && tMaxZ > 1.0) {
+                return true;
+            }
+
+            // 步进
+            if (tMaxX < tMaxY) {
+                if (tMaxX < tMaxZ) {
+                    curX += stepX;
+                    tMaxX += tDeltaX;
+                } else {
+                    curZ += stepZ;
+                    tMaxZ += tDeltaZ;
+                }
+            } else {
+                if (tMaxY < tMaxZ) {
+                    curY += stepY;
+                    tMaxY += tDeltaY;
+                } else {
+                    curZ += stepZ;
+                    tMaxZ += tDeltaZ;
+                }
+            }
+
+            // 高度裁剪
+            if (curY < minBuildHeight || curY >= maxBuildHeight) {
+                continue;
+            }
+
+            // 从缓存取 chunk，未命中则加载并写入缓存
+            int chunkX = SectionPos.blockToSectionCoord(curX);
+            int chunkZ = SectionPos.blockToSectionCoord(curZ);
+            long chunkKey = ChunkPos.asLong(chunkX, chunkZ);
+            if (chunkKey != lastChunkKey) {
+                chunk = chunkCache.get(chunkKey);
+                if (chunk == null) {
+                    chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
+                    if (chunk != null) {
+                        chunkCache.put(chunkKey, chunk);
+                    }
+                }
+                lastChunkKey = chunkKey;
+                lastSectionY = Integer.MIN_VALUE;
+            }
+
+            if (chunk == null) {
+                return false;
+            }
+
+            // 缓存 Section
+            int sectionY = chunk.getSectionIndex(curY);
+            if (sectionY != lastSectionY) {
+                section = chunk.getSection(sectionY);
+                lastSectionY = sectionY;
+            }
+
+            if (section == null || section.hasOnlyAir()) {
+                continue;
+            }
+
+            BlockState blockState = section.getBlockState(curX & 15, curY & 15, curZ & 15);
+
+            if (!blockState.canOcclude()) {
+                continue;
+            }
+
+            if (blockState.isCollisionShapeFullBlock(level, mutablePos.set(curX, curY, curZ))) {
+                return false;
+            }
+
+            VoxelShape voxelShape = blockState.getCollisionShape(level, mutablePos);
+            if (voxelShape.isEmpty()) {
+                continue;
+            }
+
+            BlockHitResult hitResult = voxelShape.clip(from, to, mutablePos);
+            if (hitResult != null) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -100,32 +250,49 @@ public class TargetCache {
         entities.clear();
         visibilityCache.clear();
         distanceCache.clear();
+        chunkCache.clear();
         EntityData data = player.getData(ServantryAttachmentRegister.EntityData);
         if (data.isRunning()) {
+            Level level = player.level();
+            if (level instanceof ServerLevel serverLevel) {
+                cachedLevel = serverLevel;
+            } else {
+                cachedLevel = null;
+                return;
+            }
             AABB box = player.getBoundingBox();
             Vec3 center = box.getCenter();
-            Vec3 maxVec3 = data.getGroups()
-                    .values()
-                    .stream()
-                    .map(Map::values)
-                    .flatMap(Collection::stream)
-                    .flatMap(Collection::stream)
-                    .map(AttachmentEntity::getPos)
-                    .max(Comparator.comparingDouble(center::distanceToSqr))
-                    .orElse(null);
+            Vec3 maxVec3 = null;
+            float maxDistance = 0;
+            Map<EntityData.Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> groups = data.getGroups();
+            Set<Map.Entry<EntityData.Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>>> entries = groups.entrySet();
+            for (Map.Entry<EntityData.Type, Map<AttachmentEntityType<?>, List<AttachmentEntity>>> entry : entries) {
+                Map<AttachmentEntityType<?>, List<AttachmentEntity>> entryValue = entry.getValue();
+                Collection<List<AttachmentEntity>> values = entryValue.values();
+                for (List<AttachmentEntity> value : values) {
+                    for (AttachmentEntity entity : value) {
+                        Vec3 pos = entity.getPos();
+                        if (pos.distanceToSqr(center) > maxDistance) {
+                            maxVec3 = pos;
+                        }
+                    }
+                }
+            }
             double distance;
             if (maxVec3 != null) {
                 distance = getServantSearchRange(player, Math.max(32, (float) maxVec3.distanceTo(center) + 4));
             } else {
                 distance = getServantSearchRange(player, 32);
             }
-            List<LivingEntity> result = player.level()
-                    .getEntitiesOfClass(LivingEntity.class, box.inflate(distance))
-                    .stream()
-                    .filter(LivingEntity::isAlive)
-                    .filter(living -> !player.equals(living))
-                    .filter(living -> getDistance(player, living) <= distance)
-                    .toList();
+            List<LivingEntity> result = new ArrayList<>();
+            List<LivingEntity> livingEntityList = level.getEntitiesOfClass(LivingEntity.class, box.inflate(distance));
+            for (LivingEntity living : livingEntityList) {
+                if (living != player && living.isAlive()) {
+                    if (getDistance(player, living) <= distance) {
+                        result.add(living);
+                    }
+                }
+            }
             entities.addAll(result);
         }
     }

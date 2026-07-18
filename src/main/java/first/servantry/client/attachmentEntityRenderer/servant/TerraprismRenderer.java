@@ -27,7 +27,7 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
                 .trail(new RibbonTrailConfig<Terraprism>()
                                .timer(servant.attacking ? servant.trailTimer : 0)
                                .colorRGB(0xFFFFFF)
-                               .segmentsPerNode(8)
+                               .segmentsPerNode(4)
                                .historyLength(5)
                                .upOffset(1.015f)
                                .colorFunction((terraprism, progress, partialTick) -> terraprism.getColor(partialTick)))

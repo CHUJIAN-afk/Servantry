@@ -19,6 +19,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -115,12 +116,17 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
         TargetCache targetCache = helper.getTargetCache();
         if (!targetCache.isEmpty()) {
             float searchRange = targetCache.getServantSearchRange(this.getOwner(), this.getSearchDistance());
-            List<LivingEntity> targets = targetCache.getEntities()
-                    .stream()
-                    .filter(living -> attacking || targetCache.isVisibility(owner, living))
-                    .filter(living -> targetCache.getDistance(owner, living) < searchRange)
-                    .filter(this::isTarget)
-                    .toList();
+            List<LivingEntity> targets = new ArrayList<>();
+            List<LivingEntity> entities = targetCache.getEntities();
+            for (LivingEntity living : entities) {
+                if ((attacking || targetCache.isVisibility(owner, living))) {
+                    if (targetCache.getDistance(owner, living) < searchRange) {
+                        if (isTarget(living)) {
+                            targets.add(living);
+                        }
+                    }
+                }
+            }
             return targetCache.getNewTarget(this, targets, 8, false);
         }
         return null;
@@ -156,8 +162,8 @@ public class EnchantedThrowingKnives extends Servant implements ICollideAttack<E
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
         Player owner = getOwner();
-        int total = Math.max(1, getSameSize());
-        int order = getOrder();
+        int total = Math.max(1, getSameSizeCache());
+        int order = getOrderCache();
         float angle = (owner.tickCount + partialTick) * 0.05f + (order * Mth.TWO_PI / total);
         float radius = 1.2f + (total > 4 ? (total - 4) * 0.025f : 0f);
 

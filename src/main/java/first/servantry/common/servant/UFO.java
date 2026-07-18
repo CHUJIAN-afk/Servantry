@@ -43,6 +43,9 @@ public class UFO extends MomentumServant {
         if (!level.isClientSide()) {
             if (trailTimer > 0) {
                 trailTimer--;
+                if (trailTimer == 0) {
+                    setVelocity(getCurrentVelocity().scale(0.25));
+                }
             }
             PathNode current = getCurrentPathNode();
             setDesiredRotation(current.yaw() + 16, 0, 0);

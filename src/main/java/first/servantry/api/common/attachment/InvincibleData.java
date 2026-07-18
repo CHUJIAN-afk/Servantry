@@ -2,6 +2,7 @@ package first.servantry.api.common.attachment;
 
 import first.servantry.register.ServantryAttachmentRegister;
 import first.servantry.register.ServantryDamageRegister;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -12,10 +13,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class InvincibleData {
 
@@ -28,20 +26,28 @@ public class InvincibleData {
         }
     }
 
-    private final Map<UUID, AtomicInteger> hurtHistory;
-    private final Map<UUID, AtomicInteger> partialInvincibleFrames;
-    private final AtomicInteger globalInvincibleFrames;
+    private final Long2IntOpenHashMap hurtHistory;
+    private final Long2IntOpenHashMap partialInvincibleFrames;
+    private int globalInvincibleFrames;
 
     public InvincibleData() {
-        this.hurtHistory = new HashMap<>();
-        this.partialInvincibleFrames = new HashMap<>();
-        this.globalInvincibleFrames = new AtomicInteger(0);
+        this.hurtHistory = new Long2IntOpenHashMap();
+        this.partialInvincibleFrames = new Long2IntOpenHashMap();
+        this.globalInvincibleFrames = 0;
     }
 
     public void tick() {
-        hurtHistory.values().removeIf(time -> time.addAndGet(-1) < 0);
-        partialInvincibleFrames.values().removeIf(time -> time.addAndGet(-1) < 0);
-        globalInvincibleFrames.addAndGet(-1);
+        if (!hurtHistory.isEmpty()) {
+            hurtHistory.replaceAll((k, v) -> v - 1);
+            hurtHistory.values().removeIf(v -> v <= 0);
+        }
+        if (!partialInvincibleFrames.isEmpty()) {
+            partialInvincibleFrames.replaceAll((k, v) -> v - 1);
+            partialInvincibleFrames.values().removeIf(v -> v <= 0);
+        }
+        if (globalInvincibleFrames > 0) {
+            globalInvincibleFrames--;
+        }
     }
 
     public static InvincibleData get(LivingEntity living) {
@@ -52,14 +58,14 @@ public class InvincibleData {
      * 是否被指定 UUID 攻击过（hurtHistory 中存在记录）
      */
     public boolean hasAttack(UUID uuid) {
-        return hurtHistory.containsKey(uuid);
+        return hurtHistory.containsKey(uuid.getMostSignificantBits());
     }
 
     /**
-     * 直接写入一条攻击历史记录（不造成伤害），用于同步“曾攻击过”标记
+     * 直接写入一条攻击历史记录（不造成伤害），用于同步"曾攻击过"标记
      */
     public void recordHit(@NotNull UUID uuid, int ticks) {
-        hurtHistory.put(uuid, new AtomicInteger(ticks));
+        hurtHistory.put(uuid.getMostSignificantBits(), ticks);
     }
 
     /**
@@ -136,9 +142,10 @@ public class InvincibleData {
                 InvincibleData invincibleData = InvincibleData.get(target);
                 boolean canDamage = uuid == null;
                 if (!canDamage) {
+                    long uuidKey = uuid.getMostSignificantBits();
                     canDamage = switch (type) {
-                        case PARTIAL -> !invincibleData.partialInvincibleFrames.containsKey(uuid);
-                        case GLOBAL -> invincibleData.globalInvincibleFrames.get() <= 0;
+                        case PARTIAL -> !invincibleData.partialInvincibleFrames.containsKey(uuidKey);
+                        case GLOBAL -> invincibleData.globalInvincibleFrames <= 0;
                     };
                 }
                 if (canDamage) {
@@ -156,9 +163,9 @@ public class InvincibleData {
                         }
                         if (invincibleTime > 0) {
                             if (type == Type.PARTIAL && uuid != null) {
-                                invincibleData.partialInvincibleFrames.put(uuid, new AtomicInteger(invincibleTime));
+                                invincibleData.partialInvincibleFrames.put(uuid.getMostSignificantBits(), invincibleTime);
                             } else {
-                                invincibleData.globalInvincibleFrames.set(invincibleTime);
+                                invincibleData.globalInvincibleFrames = invincibleTime;
                             }
                         }
                     }

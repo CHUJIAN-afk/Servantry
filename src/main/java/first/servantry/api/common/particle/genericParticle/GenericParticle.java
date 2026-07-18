@@ -3,6 +3,7 @@ package first.servantry.api.common.particle.genericParticle;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
@@ -153,6 +154,8 @@ public class GenericParticle extends TextureSheetParticle {
             RenderSystem.depthMask(true);
             RenderSystem.setShader(GameRenderer::getRendertypeEntityTranslucentShader);
             RenderSystem.setShaderTexture(0, ResourceLocation.withDefaultNamespace("textures/atlas/particles.png"));
+            // entity translucent shader 需要 Sampler2 = 光照贴图，否则采样到残留纹理导致粒子闪烁变黑
+            Minecraft.getInstance().gameRenderer.lightTexture().turnOnLightLayer();
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.NEW_ENTITY);

@@ -61,9 +61,13 @@ public class ServantryServantWeaponRegister {
                             .summon((weapon, player) -> {
                                 OreScout servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                                if (servant.getSameSize() < 1 && servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
-                                    servantryHelper.add(EntityData.Type.Servant, servant);
-                                    servant.init(servant.getInterpolatedIdleState(1.0f));
+                                if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
+                                    EntityData entityData = servantryHelper.getEntityData();
+                                    List<OreScout> oreScouts = entityData.get(EntityData.Type.Servant, weapon.getType());
+                                    if (oreScouts.isEmpty()) {
+                                        servantryHelper.add(EntityData.Type.Servant, servant);
+                                        servant.init(servant.getInterpolatedIdleState(1.0f));
+                                    }
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
@@ -89,9 +93,13 @@ public class ServantryServantWeaponRegister {
                             .summon((weapon, player) -> {
                                 ScavengerFairy servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                                if (servant.getSameSize() < 1 && servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
-                                    servant.init(servant.getInterpolatedIdleState(1.0f));
-                                    servantryHelper.add(EntityData.Type.Servant, servant);
+                                if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
+                                    EntityData entityData = servantryHelper.getEntityData();
+                                    List<ScavengerFairy> fairies = entityData.get(EntityData.Type.Servant, weapon.getType());
+                                    if (fairies.isEmpty()) {
+                                        servant.init(servant.getInterpolatedIdleState(1.0f));
+                                        servantryHelper.add(EntityData.Type.Servant, servant);
+                                    }
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
@@ -246,7 +254,9 @@ public class ServantryServantWeaponRegister {
                                 PulseTurret servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
-                                    if (servantryHelper.getEntityData().get(EntityData.Type.SentryServant, ServantryAttachmentEntityRegister.PulseTurret.get()).isEmpty()) {
+                                    EntityData entityData = servantryHelper.getEntityData();
+                                    List<PulseTurret> pulseTurrets = entityData.get(EntityData.Type.SentryServant, ServantryAttachmentEntityRegister.PulseTurret.get());
+                                    if (pulseTurrets.isEmpty()) {
                                         servant.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
                                         servantryHelper.add(EntityData.Type.SentryServant, servant);
                                     }
@@ -380,15 +390,19 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<EtherealStellarCore>.ServantWeaponItemItem> EtherealStellarCoreStaff =
             ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ethereal_stellar_core_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.EtherealStellarCore)
-                            .damage(10.0f)
+                            .damage(5.0f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player) -> {
                                 EtherealStellarCore servant = weapon.createServant(player);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                                if (servant.getSameSize() < 9 && servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
-                                    servant.init(servant.getInterpolatedIdleState(1.0f));
-                                    servantryHelper.add(EntityData.Type.Servant, servant);
+                                if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
+                                    EntityData entityData = servantryHelper.getEntityData();
+                                    List<EtherealStellarCore> etherealStellarCores = entityData.get(EntityData.Type.Servant, weapon.getType());
+                                    if (etherealStellarCores.size() < 9) {
+                                        servant.init(servant.getInterpolatedIdleState(1.0f));
+                                        servantryHelper.add(EntityData.Type.Servant, servant);
+                                    }
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC))

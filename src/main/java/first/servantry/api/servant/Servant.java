@@ -15,6 +15,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Targeting;
 import net.minecraft.world.entity.monster.Enemy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +29,8 @@ public abstract class Servant extends AttachmentEntity {
     private LivingEntity target = null;
     private int slotCost = 1;
     private boolean targetChange = false;
+    private int order = 0;
+    private int sameSize = 1;
 
     public Servant() {
         super();
@@ -77,12 +80,17 @@ public abstract class Servant extends AttachmentEntity {
             TargetCache targetCache = helper.getTargetCache();
             if (!targetCache.isEmpty()) {
                 float searchRange = targetCache.getServantSearchRange(this.getOwner(), distance);
-                List<LivingEntity> targets = targetCache.getEntities()
-                        .stream()
-                        .filter(living -> isTarget(living))
-                        .filter(living -> targetCache.getDistance(owner, living) < searchRange)
-                        .filter(living -> targetCache.isVisibility(owner, living))
-                        .toList();
+                List<LivingEntity> targets = new ArrayList<>();
+                List<LivingEntity> entities = targetCache.getEntities();
+                for (LivingEntity living : entities) {
+                    if (targetCache.isVisibility(owner, living)) {
+                        if (targetCache.getDistance(owner, living) < searchRange) {
+                            if (isTarget(living)) {
+                                targets.add(living);
+                            }
+                        }
+                    }
+                }
                 return targetCache.getNewTarget(this, targets, 0, true);
             }
         }
@@ -133,6 +141,13 @@ public abstract class Servant extends AttachmentEntity {
     // ===================== 排序 =====================
 
     /**
+     * 获取目标仆从在其 AttachmentEntityType 分组中的未移除顺序缓存
+     */
+    public int getOrderCache() {
+        return order;
+    }
+
+    /**
      * 获取目标仆从在其 AttachmentEntityType 分组中的未移除顺序
      */
     public int getOrder() {
@@ -140,6 +155,13 @@ public abstract class Servant extends AttachmentEntity {
                 .getEntityData()
                 .get(EntityData.Type.Servant, getType())
                 .indexOf(this);
+    }
+
+    /**
+     * 获取目标仆从在其 AttachmentEntityType 分组中的未移除数量缓存
+     */
+    public int getSameSizeCache() {
+        return sameSize;
     }
 
     /**
@@ -156,12 +178,16 @@ public abstract class Servant extends AttachmentEntity {
     public void writeBase(RegistryFriendlyByteBuf buf) {
         super.writeBase(buf);
         buf.writeInt(slotCost);
+        buf.writeInt(order);
+        buf.writeInt(sameSize);
     }
 
     @Override
     public void readBase(RegistryFriendlyByteBuf buf) {
         super.readBase(buf);
         slotCost = buf.readInt();
+        order = buf.readInt();
+        sameSize = buf.readInt();
     }
 
     // ===================== 目标访问器 =====================
@@ -184,4 +210,12 @@ public abstract class Servant extends AttachmentEntity {
     }
 
     public ServantGoalSelector getGoalSelector() { return goalSelector; }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public void setSameSize(int sameSize) {
+        this.sameSize = sameSize;
+    }
 }

@@ -56,7 +56,7 @@ public class StardustCellAttackGoal extends ServantGoal<StardustCell> {
     public Vec3 getHaloAnchorPos(LivingEntity target) {
         int tickCount = servant.getTickCount();
 
-        long seed = target.getId() * 31337L + servant.getOrder() * 1021L;
+        long seed = target.getId() * 31337L + servant.getOrderCache() * 1021L;
         Random rand = new Random(seed);
         double baseTheta = rand.nextDouble() * Math.PI * 2;
         double phi = Math.acos(1.0 - rand.nextDouble() * 1.4);

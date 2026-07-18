@@ -92,7 +92,15 @@ public class EntityData implements AttachmentSyncHandler<EntityData> {
                     Type type = entry.getKey();
                     for (List<AttachmentEntity> value : entry.getValue().values()) {
                         for (AttachmentEntity attachmentEntity : value) {
-                            groups.computeIfAbsent(type, key1 -> new HashMap<>()).computeIfAbsent(attachmentEntity.getType(), key -> new ArrayList<>()).add(attachmentEntity);
+                            List<AttachmentEntity> entities = groups.computeIfAbsent(type, key1 -> new HashMap<>())
+                                    .computeIfAbsent(attachmentEntity.getType(), key -> new ArrayList<>());
+                            entities.add(attachmentEntity);
+                            for (AttachmentEntity entity : entities) {
+                                if (entity instanceof Servant servant) {
+                                    servant.setOrder(servant.getOrder());
+                                    servant.setSameSize(servant.getSameSize());
+                                }
+                            }
                         }
                     }
                 }

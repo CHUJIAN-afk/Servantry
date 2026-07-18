@@ -14,19 +14,7 @@ import org.joml.Vector3f;
  * 圆锥拖尾配置。
  * <p>
  * 适用于球状、圆形、能量弹、魔法球等实体。
- * </p>
- * <pre>{@code
- * 效果示意：
- *     ╭──╮
- *    ╱    ╲
- *   │      │
- *    ╲    ╱
- *     ╰──╯
- * 头→尾
- * }</pre>
- *
- * <p>
- * 圆锥主体渲染抽为 {@link #renderConeBody(RenderSetup)}，供子类（如 {@link DropletTrailConfig}）复用。
+ * 使用 10 参数 addVertex 快速路径 + matrix.transformPosition 预变换。
  * </p>
  *
  * @param <T> 实体类型
@@ -72,12 +60,10 @@ public class ConeTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, 
      * 半径 = maxRadius × (minRadiusRatio + (1 - minRadiusRatio) × fadeOut(progress))，
      * 头粗尾细；颜色与透明度由 {@link #colorFunction} / {@link #fadeOut} 决定。
      * </p>
-     *
-     * @param setup 渲染样板产物（含 entity/consumer/pose/timeShift/renderPos/smoothNodes）
      */
     protected void renderConeBody(RenderSetup<T> setup) {
         VertexConsumer consumer = setup.consumer;
-        Matrix4f pose = setup.pose;
+        Matrix4f matrix = setup.matrix;
         T entity = setup.entity;
         float partialTick = setup.partialTick;
 
@@ -105,12 +91,15 @@ public class ConeTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, 
 
             int currColor = colorFunction.getColor(entity, currProgress, partialTick);
             int prevColor = colorFunction.getColor(entity, prevProgress, partialTick);
-            // 旧版 alpha = round(fade * 200)，等价于 fade * (200/255) 后 pack
             int currARGB = packColor(currColor, currFade * (200f / 255f));
             int prevARGB = packColor(prevColor, prevFade * (200f / 255f));
 
-            Vec3 currRel = curr.pos().subtract(renderPos);
-            Vec3 prevRel = prev.pos().subtract(renderPos);
+            float crx = (float)(curr.pos().x - renderPos.x);
+            float cry = (float)(curr.pos().y - renderPos.y);
+            float crz = (float)(curr.pos().z - renderPos.z);
+            float prx = (float)(prev.pos().x - renderPos.x);
+            float pry = (float)(prev.pos().y - renderPos.y);
+            float prz = (float)(prev.pos().z - renderPos.z);
 
             for (int j = 0; j < resolution; j++) {
                 float cos1 = cosArr[j], sin1 = sinArr[j];
@@ -121,11 +110,11 @@ public class ConeTrailConfig<T extends AttachmentEntity> extends TrailConfig<T, 
                 prevV1.set(cos1 * prevRadius, sin1 * prevRadius, 0).rotate(prev.rot());
                 prevV2.set(cos2 * prevRadius, sin2 * prevRadius, 0).rotate(prev.rot());
 
-                emitQuad(consumer, pose,
-                        (float) currRel.x + currV1.x, (float) currRel.y + currV1.y, (float) currRel.z + currV1.z, currARGB,
-                        (float) currRel.x + currV2.x, (float) currRel.y + currV2.y, (float) currRel.z + currV2.z, currARGB,
-                        (float) prevRel.x + prevV2.x, (float) prevRel.y + prevV2.y, (float) prevRel.z + prevV2.z, prevARGB,
-                        (float) prevRel.x + prevV1.x, (float) prevRel.y + prevV1.y, (float) prevRel.z + prevV1.z, prevARGB);
+                emitQuad(consumer, matrix,
+                        crx + currV1.x, cry + currV1.y, crz + currV1.z, currARGB,
+                        crx + currV2.x, cry + currV2.y, crz + currV2.z, currARGB,
+                        prx + prevV2.x, pry + prevV2.y, prz + prevV2.z, prevARGB,
+                        prx + prevV1.x, pry + prevV1.y, prz + prevV1.z, prevARGB);
             }
         }
     }

@@ -26,6 +26,10 @@ import java.util.Map;
  * 使用模板方法模式，将渲染逻辑封装在配置类中，子类实现具体渲染。
  * 基类提供共享能力：平滑节点构建、圆周缓存、颜色打包、样板化的渲染上下文与四边形发射。
  * </p>
+ * <p>
+ * 优化：绕过 PoseStack，直接构造 Matrix4f 并使用 10 参数 addVertex 快速路径，
+ * 每四边形从 24 次方法调用降至 4 次。
+ * </p>
  *
  * @param <T>    实体类型
  * @param <SELF> 配置类自身类型（用于链式调用）
@@ -146,6 +150,7 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
      * 渲染样板：一次性算好子类所需的全部上下文。
      * <p>
      * 子类 {@code render} 开头调用此方法，若返回 {@code null}（节点不足）则直接 return。
+     * 直接从 PoseStack 取出 Matrix4f，绕过后续所有 PoseStack 操作。
      * </p>
      */
     protected final RenderSetup<T> beginRender(T entity, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, PathNode visualNode, RenderType renderType) {
@@ -154,9 +159,9 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
             return null;
         }
         VertexConsumer consumer = bufferSource.getBuffer(renderType);
-        Matrix4f pose = poseStack.last().pose();
+        Matrix4f matrix = new Matrix4f(poseStack.last().pose());
         Vec3 renderPos = visualNode.pos();
-        return new RenderSetup<>(entity, consumer, pose, partialTick, renderPos, smoothNodes);
+        return new RenderSetup<>(entity, consumer, matrix, partialTick, renderPos, smoothNodes);
     }
 
     /**
@@ -165,15 +170,15 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
     protected static final class RenderSetup<T extends AttachmentEntity> {
         public final T entity;
         public final VertexConsumer consumer;
-        public final Matrix4f pose;
+        public final Matrix4f matrix;
         public final float partialTick;
-        public final net.minecraft.world.phys.Vec3 renderPos;
+        public final Vec3 renderPos;
         public final List<InterpolatedNode> smoothNodes;
 
-        RenderSetup(T entity, VertexConsumer consumer, Matrix4f pose, float partialTick, Vec3 renderPos, List<InterpolatedNode> smoothNodes) {
+        RenderSetup(T entity, VertexConsumer consumer, Matrix4f matrix, float partialTick, Vec3 renderPos, List<InterpolatedNode> smoothNodes) {
             this.entity = entity;
             this.consumer = consumer;
-            this.pose = pose;
+            this.matrix = matrix;
             this.partialTick = partialTick;
             this.renderPos = renderPos;
             this.smoothNodes = smoothNodes;
@@ -189,9 +194,6 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
 
     /**
      * 将 RGB 颜色与 alpha 打包为 ARGB 顶点色。
-     *
-     * @param rgb   RGB 颜色（仅低 24 位有效）
-     * @param alpha 0~1 透明度
      */
     protected static int packColor(int rgb, float alpha) {
         int a = clampByte(alpha * 255f);
@@ -200,10 +202,6 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
 
     /**
      * 将 RGB 颜色与 alpha、亮度增强打包为 ARGB 顶点色。
-     *
-     * @param rgb         RGB 颜色
-     * @param alpha       0~1 透明度
-     * @param brightness  RGB 亮度系数（>1 会被钳到 255）
      */
     protected static int packColor(int rgb, float alpha, float brightness) {
         int a = clampByte(alpha * 255f);
@@ -215,14 +213,6 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
 
     // ===================== 平滑节点构建 =====================
 
-    /**
-     * 构建平滑节点列表。
-     * <p>
-     * 对末端节点（最旧历史节点）使用 partialTick 向前一个节点插值，
-     * 使末端在帧间平滑移动，消除逻辑帧边界导致的末端突变。
-     * 其余节点保持原始值不变。
-     * </p>
-     */
     protected List<InterpolatedNode> buildSmoothNodes(T entity, PathNode visualNode, float partialTick) {
         ArrayList<PathNode> history = new ArrayList<>(entity.getHistoryNodes());
         history.set(0, visualNode);
@@ -286,55 +276,29 @@ public abstract class TrailConfig<T extends AttachmentEntity, SELF extends Trail
                 .rotateZ((float) Math.toRadians(roll));
     }
 
-    // ===================== 四边形发射 =====================
+    // ===================== 四边形发射（10 参数快速路径） =====================
 
     /**
-     * 发射一个四边形（float 坐标版本）。
-     * <p>
-     * 调用顺序：addVertex → setColor → setUv → setOverlay → setLight → setNormal（触发提交）。
-     * </p>
+     * 发射一个四边形（float 坐标版本，10 参数 addVertex 快速路径）。
      */
-    protected void emitQuad(VertexConsumer consumer, Matrix4f pose,
+    protected void emitQuad(VertexConsumer consumer, Matrix4f matrix,
                             float x1, float y1, float z1, int c1,
                             float x2, float y2, float z2, int c2,
                             float x3, float y3, float z3, int c3,
                             float x4, float y4, float z4, int c4) {
-        consumer.addVertex(pose, x1, y1, z1).setColor(c1).setUv(0, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-        consumer.addVertex(pose, x2, y2, z2).setColor(c2).setUv(1, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-        consumer.addVertex(pose, x3, y3, z3).setColor(c3).setUv(1, 1)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-        consumer.addVertex(pose, x4, y4, z4).setColor(c4).setUv(0, 1)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-    }
-
-    /**
-     * 发射一个四边形（{@link Vector3f} 顶点版本，可读性更好）。
-     * <p>
-     * 顶点顺序：v1 → v2 → v3 → v4（逆时针）。
-     * </p>
-     */
-    protected void emitQuad(VertexConsumer consumer, Matrix4f pose,
-                            Vector3f v1, int c1,
-                            Vector3f v2, int c2,
-                            Vector3f v3, int c3,
-                            Vector3f v4, int c4) {
-        consumer.addVertex(pose, v1.x, v1.y, v1.z).setColor(c1).setUv(0, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-        consumer.addVertex(pose, v2.x, v2.y, v2.z).setColor(c2).setUv(1, 0)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-        consumer.addVertex(pose, v3.x, v3.y, v3.z).setColor(c3).setUv(1, 1)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
-        consumer.addVertex(pose, v4.x, v4.y, v4.z).setColor(c4).setUv(0, 1)
-                .setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightTexture.FULL_BRIGHT).setNormal(1, 0, 0);
+        Vector3f v = new Vector3f();
+        matrix.transformPosition(x1, y1, z1, v);
+        consumer.addVertex(v.x, v.y, v.z, c1, 0, 0, OverlayTexture.NO_OVERLAY, LightTexture.FULL_BRIGHT, 1, 0, 0);
+        matrix.transformPosition(x2, y2, z2, v);
+        consumer.addVertex(v.x, v.y, v.z, c2, 1, 0, OverlayTexture.NO_OVERLAY, LightTexture.FULL_BRIGHT, 1, 0, 0);
+        matrix.transformPosition(x3, y3, z3, v);
+        consumer.addVertex(v.x, v.y, v.z, c3, 1, 1, OverlayTexture.NO_OVERLAY, LightTexture.FULL_BRIGHT, 1, 0, 0);
+        matrix.transformPosition(x4, y4, z4, v);
+        consumer.addVertex(v.x, v.y, v.z, c4, 0, 1, OverlayTexture.NO_OVERLAY, LightTexture.FULL_BRIGHT, 1, 0, 0);
     }
 
     // ===================== 插值节点记录 =====================
 
-    /**
-     * 插值节点记录
-     */
     public record InterpolatedNode(Vec3 pos, Quaternionf rot) {
     }
 

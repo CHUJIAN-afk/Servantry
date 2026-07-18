@@ -20,6 +20,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,12 +51,17 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         TargetCache targetCache = helper.getTargetCache();
         if (!targetCache.isEmpty()) {
             float searchRange = targetCache.getServantSearchRange(this.getOwner(), this.getSearchDistance());
-            List<LivingEntity> targets = targetCache.getEntities()
-                    .stream()
-                    .filter(living -> attacking || targetCache.isVisibility(owner, living))
-                    .filter(living -> targetCache.getDistance(owner, living) < searchRange)
-                    .filter(this::isTarget)
-                    .toList();
+            List<LivingEntity> targets = new ArrayList<>();
+            List<LivingEntity> entities = targetCache.getEntities();
+            for (LivingEntity living : entities) {
+                if ((attacking || targetCache.isVisibility(owner, living))) {
+                    if (targetCache.getDistance(owner, living) < searchRange) {
+                        if (isTarget(living)) {
+                            targets.add(living);
+                        }
+                    }
+                }
+            }
             return targetCache.getNewTarget(this, targets, 8, false);
         }
         return null;
@@ -122,8 +128,8 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
     }
 
     public int getColor(float partialTick) {
-        int order = getOrder();
-        int total = Math.max(1, getSameSize());
+        int order = getOrderCache();
+        int total = Math.max(1, getSameSizeCache());
         float hueShift = ((float) order / total + (owner.tickCount + partialTick) * 0.015f) % 1.0f;
         float breathFactor = 0.5f + 0.5f * Mth.sin(hueShift * Mth.TWO_PI);
         return Mth.hsvToRgb(hueShift, 0.75f - 0.35f * breathFactor, 1.0f);
@@ -160,7 +166,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
         float backZ = (float) Math.cos(rad);
         float rightX = (float) Math.cos(rad);
         float rightZ = (float) -Math.sin(rad);
-        int order = getOrder();
+        int order = getOrderCache();
         double localZ = 0.75 + order * 0.12;
         double floatSpeed = 0.08 + order * 0.01;
         double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;

@@ -15,6 +15,7 @@ import org.joml.Vector3f;
  * 丝带拖尾配置。
  * <p>
  * 适用于剑状、刀锋、扁平物体、有明显方向性的实体。
+ * 使用 10 参数 addVertex 快速路径 + matrix.transformPosition 预变换。
  * </p>
  *
  * @param <T> 实体类型
@@ -58,7 +59,7 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
         }
 
         VertexConsumer consumer = setup.consumer;
-        Matrix4f pose = setup.pose;
+        Matrix4f matrix = setup.matrix;
         Vec3 renderPos = setup.renderPos;
 
         int nodeCount = setup.nodeCount();
@@ -66,8 +67,6 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
         // 复用向量
         Vector3f currTip = new Vector3f(), currBase = new Vector3f();
         Vector3f prevTip = new Vector3f(), prevBase = new Vector3f();
-        Vector3f currTipPos = new Vector3f(), currBasePos = new Vector3f();
-        Vector3f prevTipPos = new Vector3f(), prevBasePos = new Vector3f();
 
         for (int i = 0; i < nodeCount - 1; i++) {
             InterpolatedNode curr = setup.smoothNodes.get(i);
@@ -98,19 +97,19 @@ public class RibbonTrailConfig<T extends AttachmentEntity> extends TrailConfig<T
             int prevTipColor = packColor(prevColorRGB, prevScale * 0.1f * prevAlphaBoost, prevBright);
             int prevBaseColor = packColor(prevColorRGB, Math.max(0f, 1f - prevProgress * 2.5f) * 0.04f * prevAlphaBoost, prevBright);
 
-            // 四个顶点位置 = 节点相对位置 + 偏移
-            Vector3f currRel = toVec(curr.pos()).sub(toVec(renderPos));
-            Vector3f prevRel = toVec(prev.pos()).sub(toVec(renderPos));
-            currTipPos.set(currRel).add(currTip);
-            currBasePos.set(currRel).add(currBase);
-            prevTipPos.set(prevRel).add(prevTip);
-            prevBasePos.set(prevRel).add(prevBase);
+            // 本地坐标 = 节点相对位置 + 偏移，直接传给 emitQuad 内部变换
+            float crx = (float)(curr.pos().x - renderPos.x);
+            float cry = (float)(curr.pos().y - renderPos.y);
+            float crz = (float)(curr.pos().z - renderPos.z);
+            float prx = (float)(prev.pos().x - renderPos.x);
+            float pry = (float)(prev.pos().y - renderPos.y);
+            float prz = (float)(prev.pos().z - renderPos.z);
 
-            emitQuad(consumer, pose, currTipPos, currTipColor, currBasePos, currBaseColor, prevBasePos, prevBaseColor, prevTipPos, prevTipColor);
+            emitQuad(consumer, matrix,
+                    crx + currTip.x, cry + currTip.y, crz + currTip.z, currTipColor,
+                    crx + currBase.x, cry + currBase.y, crz + currBase.z, currBaseColor,
+                    prx + prevBase.x, pry + prevBase.y, prz + prevBase.z, prevBaseColor,
+                    prx + prevTip.x, pry + prevTip.y, prz + prevTip.z, prevTipColor);
         }
-    }
-
-    private static Vector3f toVec(Vec3 v) {
-        return new Vector3f((float) v.x, (float) v.y, (float) v.z);
     }
 }
