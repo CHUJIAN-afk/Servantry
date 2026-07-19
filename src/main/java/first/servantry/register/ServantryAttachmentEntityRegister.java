@@ -98,43 +98,46 @@ public class ServantryAttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cannon>> CANNON =
             register("cannon", Cannon::new, CannonRenderer::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<first.servantry.common.servant.NecroSpirit>> NECRO_SPIRIT =
-            register("necro_spirit", first.servantry.common.servant.NecroSpirit::new, NecroSpiritRenderer::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<NecroSpirit>> NECRO_SPIRIT =
+            register("necro_spirit", NecroSpirit::new, NecroSpiritRenderer::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<LaserMinigun>> LASER_MINIGUN =
+            register("laser_minigun", LaserMinigun::new, LaserMinigunRenderer::new);
 
     // ===================== 射弹类型 =====================
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniStardustCell>> MINI_STARDUST_CELL =
-            register("miniStardustCell", MiniStardustCell::new, MiniStardustRenderer::new);
+            register("mini_stardust_cell", MiniStardustCell::new, MiniStardustRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Laser>> LASER =
-            register("laser_projectile", Laser::new, LaserRenderer::new);
+            register("laser", Laser::new, LaserRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DemonFlame>> DEMON_FLAME =
-            register("demon_flame_projectile", DemonFlame::new, DemonFlameRenderer::new);
+            register("demon_flame", DemonFlame::new, DemonFlameRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SharkDragon>> SHARK_DRAGON =
-            register("shark_dragon_projectile", SharkDragon::new, SharkDragonRenderer::new);
+            register("shark_dragon", SharkDragon::new, SharkDragonRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ShatteredStellarCore>> SHATTERED_STELLAR_CORE =
-            register("eternal_night_laser_projectile", ShatteredStellarCore::new, ShatteredStellarCoreRenderer::new);
+            register("shattered_stellar_core", ShatteredStellarCore::new, ShatteredStellarCoreRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniChlorophyteCrystal>> MINI_CHLOROPHYTE_CRYSTAL =
-            register("chlorophyte_crystal_projectile", MiniChlorophyteCrystal::new, MiniChlorophyteCrystalRenderer::new);
+            register("mini_chlorophyte_crystal", MiniChlorophyteCrystal::new, MiniChlorophyteCrystalRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Zenith>> ZENITH =
-            register("zenith_projectile", Zenith::new, ZenithRenderer::new);
+            register("zenith", Zenith::new, ZenithRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CustomLaser>> CUSTOM_LASER =
-            register("custom_laser_projectile", CustomLaser::new, CustomLaserRenderer::new);
+            register("custom_laser", CustomLaser::new, CustomLaserRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniRainbowCrystal>> MINI_RAINBOW_CRYSTAL =
-            register("rainbow_crystal_projectile", MiniRainbowCrystal::new, RainbowCrystalRenderer::new);
+            register("mini_rainbow_crystal", MiniRainbowCrystal::new, RainbowCrystalRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CrossbowBolt>> CROSSBOW_BOLT =
-            register("crossbow_bolt_projectile", CrossbowBolt::new, null);
+            register("crossbow_bolt", CrossbowBolt::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<GodFlame>> GOD_FLAME =
-            register("god_flame_projectile", GodFlame::new, GodFlameRenderer::new);
+            register("god_flame", GodFlame::new, GodFlameRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<BlitzBall>> BLITZ_BALL =
             register("blitz_ball", BlitzBall::new, BlitzBallRenderer::new);
@@ -152,10 +155,13 @@ public class ServantryAttachmentEntityRegister {
             register("imp_fireball", ImpFireball::new, ImpFireballRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Corn>> CORN =
-            register("corn_projectile", Corn::new, CornRenderer::new);
+            register("corn", Corn::new, CornRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniNecroSpirit>> MINI_NECRO_SPIRIT =
-            register("necro_spirit_projectile", MiniNecroSpirit::new, NecroSpiritProjectileRenderer::new);
+            register("mini_necro_spirit", MiniNecroSpirit::new, NecroSpiritProjectileRenderer::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ElectricLaser>> ELECTRIC_LASER =
+            register("electric_laser", ElectricLaser::new, ElectricLaserRenderer::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier, @Nullable Supplier<IAttachmentEntityRenderer<T>> renderer) {
         AttachmentEntityType<T> type = new AttachmentEntityType<>(supplier);

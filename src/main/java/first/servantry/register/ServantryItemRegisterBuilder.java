@@ -19,6 +19,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ServantryItemRegisterBuilder<T extends Item> {
@@ -32,6 +33,14 @@ public class ServantryItemRegisterBuilder<T extends Item> {
 
     public static <T extends Item> ServantryItemRegisterBuilder<T> build(TabGroup group, String name, Supplier<T> supplier) {
         DeferredItem<T> register = Register.register(name, supplier);
+        if (group != null) {
+            ServantryCreativeTabRegister.TabBuilder.computeIfAbsent(group, key -> new ArrayList<>()).add(register);
+        }
+        return new ServantryItemRegisterBuilder<>(register);
+    }
+
+    public static <T extends Item> ServantryItemRegisterBuilder<T> build(TabGroup group, String name, Function<ResourceLocation, T> function) {
+        DeferredItem<T> register = Register.register(name, function);
         if (group != null) {
             ServantryCreativeTabRegister.TabBuilder.computeIfAbsent(group, key -> new ArrayList<>()).add(register);
         }

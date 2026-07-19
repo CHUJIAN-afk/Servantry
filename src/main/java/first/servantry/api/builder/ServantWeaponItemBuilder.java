@@ -7,6 +7,7 @@ import first.servantry.api.entity.AttachmentEntityType;
 import first.servantry.api.entity.PathNode;
 import first.servantry.api.item.IServantWeaponItem;
 import first.servantry.api.servant.Servant;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -17,9 +18,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import org.apache.commons.lang3.function.TriConsumer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -38,7 +40,7 @@ public class ServantWeaponItemBuilder<T extends Servant> {
             player.swing(InteractionHand.MAIN_HAND, true);
             if (!level.isClientSide()) {
                 if (!player.isShiftKeyDown()) {
-                    iServantWeaponItem.summon(player);
+                    iServantWeaponItem.summon(player, itemStack);
                 } else {
                     iServantWeaponItem.remove(player);
                 }
@@ -47,14 +49,15 @@ public class ServantWeaponItemBuilder<T extends Servant> {
         }
     }
 
+    private final ResourceLocation location;
     private final Supplier<AttachmentEntityType<T>> typeSupplier;
     private boolean sentryServant = false;
     private float damage = 0;
     private float knockback = 0;
     private float armorPierce = 0;
     private Supplier<SoundEvent> soundEventSupplier = () -> null;
-    private BiConsumer<IServantWeaponItem<T>, Player> summonAction = (weapon, player) -> {
-        T servant = weapon.createServant(player);
+    private TriConsumer<@NotNull IServantWeaponItem<T>, @NotNull Player, @Nullable ItemStack> summonAction = (weapon, player, itemStack) -> {
+        T servant = weapon.createServant(player, itemStack);
         ServantryHelper servantryHelper = ServantryHelper.get(player);
         if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
             AABB box = player.getBoundingBox();
@@ -66,7 +69,8 @@ public class ServantWeaponItemBuilder<T extends Servant> {
     private Consumer<Player> onRemove = null;
     private Consumer<Item.Properties> properties = null;
 
-    public ServantWeaponItemBuilder(@NotNull Supplier<AttachmentEntityType<T>> typeSupplier) {
+    public ServantWeaponItemBuilder(ResourceLocation location, @NotNull Supplier<AttachmentEntityType<T>> typeSupplier) {
+        this.location = location;
         this.typeSupplier = typeSupplier;
     }
 
@@ -113,7 +117,7 @@ public class ServantWeaponItemBuilder<T extends Servant> {
     /**
      * 完整重写召唤逻辑，weapon 可调用 createServant 构建实例。
      */
-    public ServantWeaponItemBuilder<T> summon(BiConsumer<IServantWeaponItem<T>, Player> action) {
+    public ServantWeaponItemBuilder<T> summon(TriConsumer<IServantWeaponItem<T>, Player, ItemStack> action) {
         this.summonAction = action;
         return this;
     }
@@ -134,22 +138,22 @@ public class ServantWeaponItemBuilder<T extends Servant> {
     /**
      * 构建武器物品。
      */
-    public ServantWeaponItemItem build() {
+    public ServantWeaponItem build() {
         Item.Properties proper = new Item.Properties().stacksTo(1);
         if (properties != null) {
             properties.accept(proper);
         }
-        return new ServantWeaponItemItem(proper);
+        return new ServantWeaponItem(proper);
     }
 
-    public class ServantWeaponItemItem extends Item implements IServantWeaponItem<T> {
+    public class ServantWeaponItem extends Item implements IServantWeaponItem<T> {
 
-        public ServantWeaponItemItem(Properties p) {
-            super(p);
+        public ServantWeaponItem(Properties properties) {
+            super(properties);
         }
 
         @Override
-        public AttachmentEntityType<T> getType() {
+        public @NotNull AttachmentEntityType<T> getType() {
             return typeSupplier.get();
         }
 
@@ -159,32 +163,32 @@ public class ServantWeaponItemBuilder<T extends Servant> {
         }
 
         @Override
-        public float getDamage() {
-            return damage;
-        }
-
-        @Override
-        public float getArmorPierce() {
-            return armorPierce;
-        }
-
-        @Override
-        public float getKnockback() {
-            return knockback;
-        }
-
-        @Override
         public SoundEvent getSoundEvent() {
             return soundEventSupplier.get();
         }
 
         @Override
-        public void summon(Player player) {
-            summonAction.accept(this, player);
+        public void summon(@NotNull Player player, @Nullable ItemStack itemStack) {
+            summonAction.accept(this, player, itemStack);
         }
 
         @Override
-        public void remove(Player player) {
+        public float getServantDamage(@Nullable Player player,@Nullable ItemStack itemStack) {
+            return damage;
+        }
+
+        @Override
+        public float getServantKnockback(@Nullable Player player,@Nullable ItemStack itemStack) {
+            return knockback;
+        }
+
+        @Override
+        public float getServantArmorPierce(@Nullable Player player, @Nullable ItemStack itemStack) {
+            return armorPierce;
+        }
+
+        @Override
+        public void remove(@NotNull Player player) {
             if (onRemove != null) {
                 onRemove.accept(player);
             } else {

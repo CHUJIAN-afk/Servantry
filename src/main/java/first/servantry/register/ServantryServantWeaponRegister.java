@@ -25,8 +25,8 @@ public class ServantryServantWeaponRegister {
     /**
      * 黄蜂法杖
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<Hornet>.ServantWeaponItemItem> HornetStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "hornet_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.HORNET)
+    public static final DeferredItem<ServantWeaponItemBuilder<Hornet>.ServantWeaponItem> HornetStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "hornet_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.HORNET)
                             .damage(0.7f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
@@ -40,8 +40,8 @@ public class ServantryServantWeaponRegister {
     /**
      * 小鬼法杖
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<Imp>.ServantWeaponItemItem> ImpStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "imp_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.IMP)
+    public static final DeferredItem<ServantWeaponItemBuilder<Imp>.ServantWeaponItem> ImpStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "imp_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.IMP)
                             .damage(1.7f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseImpStaff)
@@ -55,11 +55,11 @@ public class ServantryServantWeaponRegister {
     /**
      * 无人机
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<OreScout>.ServantWeaponItemItem> SurveyDroneRemote =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "survey_drone_remote", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.ORE_SCOUT)
+    public static final DeferredItem<ServantWeaponItemBuilder<OreScout>.ServantWeaponItem> SurveyDroneRemote =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "survey_drone_remote", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.ORE_SCOUT)
                             .sound(ServantrySoundRegister.UseServantWeapon)
-                            .summon((weapon, player) -> {
-                                OreScout servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                OreScout servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     EntityData entityData = servantryHelper.getEntityData();
@@ -87,11 +87,11 @@ public class ServantryServantWeaponRegister {
     /**
      * 妖精铃铛
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<ScavengerFairy>.ServantWeaponItemItem> FairyBell =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "fairy_bell", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.SCAVENGER_FAIRY)
+    public static final DeferredItem<ServantWeaponItemBuilder<ScavengerFairy>.ServantWeaponItem> FairyBell =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "fairy_bell", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.SCAVENGER_FAIRY)
                             .sound(ServantrySoundRegister.UseServantWeapon)
-                            .summon((weapon, player) -> {
-                                ScavengerFairy servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                ScavengerFairy servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     EntityData entityData = servantryHelper.getEntityData();
@@ -118,18 +118,20 @@ public class ServantryServantWeaponRegister {
     /**
      * 刃杖 - 召唤附魔飞刀群
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<EnchantedThrowingKnives>.ServantWeaponItemItem> BladeStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "blade_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES)
+    public static final DeferredItem<ServantWeaponItemBuilder<EnchantedThrowingKnives>.ServantWeaponItem> BladeStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "blade_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES)
                             .damage(0.6f)
                             .armorPierce(7.5f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
-                            .summon((weapon, player) -> {
-                                EnchantedThrowingKnives servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                EnchantedThrowingKnives servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     PathNode idle = servant.getInterpolatedIdleState(1.0f);
-                                    Vec3 center = player.getBoundingBox().getCenter();
-                                    servant.init(new PathNode(new Vec3(center.x(), idle.pos().y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
+                                    Vec3 center = player.getBoundingBox()
+                                            .getCenter();
+                                    servant.init(new PathNode(new Vec3(center.x(), idle.pos()
+                                            .y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
                                     servantryHelper.add(EntityData.Type.Servant, servant);
                                 }
                             })
@@ -149,16 +151,17 @@ public class ServantryServantWeaponRegister {
     /**
      * 雨云法杖
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<Cloud>.ServantWeaponItemItem> RainCloudStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "rain_cloud_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.CLOUD)
+    public static final DeferredItem<ServantWeaponItemBuilder<Cloud>.ServantWeaponItem> RainCloudStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "rain_cloud_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.CLOUD)
                             .damage(3f)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseCloudStaff)
-                            .summon((weapon, player) -> {
-                                Cloud cloud = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                Cloud cloud = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
-                                    cloud.init(new PathNode(player.getBoundingBox().getCenter(), 0, 0, 0));
+                                    cloud.init(new PathNode(player.getBoundingBox()
+                                                                    .getCenter(), 0, 0, 0));
                                     cloud.setVelocity(player.getLookAngle());
                                     servantryHelper.add(EntityData.Type.SentryServant, cloud);
                                 }
@@ -174,19 +177,21 @@ public class ServantryServantWeaponRegister {
     /**
      * 魔眼法杖 - 召唤双子魔眼
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<Twins>.ServantWeaponItemItem> OpticStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "optic_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.TWINS)
+    public static final DeferredItem<ServantWeaponItemBuilder<Twins>.ServantWeaponItem> OpticStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "optic_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.TWINS)
                             .damage(2.4f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseTerraprism)
-                            .summon((weapon, player) -> {
+                            .summon((weapon, player, itemStack) -> {
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     RandomSource random = player.getRandom();
-                                    PathNode pathNode = new PathNode(player.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0);
+                                    PathNode pathNode = new PathNode(player.getBoundingBox()
+                                                                             .getCenter()
+                                                                             .offsetRandom(random, 2), 0, 0, 0);
                                     Twins laserEye = null;
                                     for (int i = 0; i < 2; i++) {
-                                        Twins twins = weapon.createServant(player);
+                                        Twins twins = weapon.createServant(player, itemStack);
                                         if (i == 0) {
                                             twins.setLaserEye(true);
                                             laserEye = twins;
@@ -215,8 +220,8 @@ public class ServantryServantWeaponRegister {
     /**
      * 致命球法杖 - 召唤致命球仆从
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<DeadlySphere>.ServantWeaponItemItem> DeadlySphereStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "deadly_sphere_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.DEADLY_SPHERE)
+    public static final DeferredItem<ServantWeaponItemBuilder<DeadlySphere>.ServantWeaponItem> DeadlySphereStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "deadly_sphere_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.DEADLY_SPHERE)
                             .damage(5.5f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
@@ -230,8 +235,8 @@ public class ServantryServantWeaponRegister {
     /**
      * 外星法杖
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<UFO>.ServantWeaponItemItem> XenoStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "xeno_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.UFO)
+    public static final DeferredItem<ServantWeaponItemBuilder<UFO>.ServantWeaponItem> XenoStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "xeno_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.UFO)
                             .damage(3.6f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
@@ -245,19 +250,20 @@ public class ServantryServantWeaponRegister {
     /**
      * 脉冲炮塔遥控装置
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<PulseTurret>.ServantWeaponItemItem> PulseTurretRemote =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "pulse_turret_remote", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.PULSE_TURRET)
+    public static final DeferredItem<ServantWeaponItemBuilder<PulseTurret>.ServantWeaponItem> PulseTurretRemote =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "pulse_turret_remote", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.PULSE_TURRET)
                             .damage(15f)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
-                            .summon((weapon, player) -> {
-                                PulseTurret servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                PulseTurret servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
                                     EntityData entityData = servantryHelper.getEntityData();
                                     List<PulseTurret> pulseTurrets = entityData.get(EntityData.Type.SentryServant, ServantryAttachmentEntityRegister.PULSE_TURRET.get());
                                     if (pulseTurrets.isEmpty()) {
-                                        servant.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
+                                        servant.init(new PathNode(player.position()
+                                                                          .add(0, 1, 0), 0, 0, 0));
                                         servantryHelper.add(EntityData.Type.SentryServant, servant);
                                     }
                                 }
@@ -273,8 +279,8 @@ public class ServantryServantWeaponRegister {
     /**
      * 暴风雨法杖 - 召唤鲨鱼龙卷
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<Sharknado>.ServantWeaponItemItem> TempestStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "tempest_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.SHARKNADO)
+    public static final DeferredItem<ServantWeaponItemBuilder<Sharknado>.ServantWeaponItem> TempestStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "tempest_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.SHARKNADO)
                             .damage(5f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
@@ -288,13 +294,13 @@ public class ServantryServantWeaponRegister {
     /**
      * 泰拉棱镜 - 召唤泰拉棱镜仆从
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<Terraprism>.ServantWeaponItemItem> TerraPrism =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "terraprism", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.TERRA_PRISM)
+    public static final DeferredItem<ServantWeaponItemBuilder<Terraprism>.ServantWeaponItem> TerraPrism =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "terraprism", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.TERRA_PRISM)
                             .damage(9f)
                             .knockback(0.4f)
                             .sound(ServantrySoundRegister.UseTerraprism)
-                            .summon((weapon, player) -> {
-                                Terraprism servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                Terraprism servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     servant.init(servant.getInterpolatedIdleState(1));
@@ -312,18 +318,19 @@ public class ServantryServantWeaponRegister {
     /**
      * 弩车魔杖
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItemItem> BallistaRod =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_rod", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.BALLISTA)
+    public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItem> BallistaRod =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_rod", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.BALLISTA)
                             .damage(3f)
                             .knockback(0.47f)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
-                            .summon((weapon, player) -> {
-                                Ballista servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                Ballista servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
                                     servant.setLevel(1);
-                                    servant.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
+                                    servant.init(new PathNode(player.position()
+                                                                      .add(0, 1, 0), 0, 1, 0));
                                     servantryHelper.add(EntityData.Type.SentryServant, servant);
                                 }
                             })
@@ -337,18 +344,19 @@ public class ServantryServantWeaponRegister {
     /**
      * 弩车手杖
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItemItem> BallistaCane =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_cane", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.BALLISTA)
+    public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItem> BallistaCane =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_cane", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.BALLISTA)
                             .damage(7.4f)
                             .knockback(0.47f)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
-                            .summon((weapon, player) -> {
-                                Ballista servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                Ballista servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
                                     servant.setLevel(2);
-                                    servant.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
+                                    servant.init(new PathNode(player.position()
+                                                                      .add(0, 1, 0), 0, 0, 0));
                                     servantryHelper.add(EntityData.Type.SentryServant, servant);
                                 }
                             })
@@ -362,18 +370,19 @@ public class ServantryServantWeaponRegister {
     /**
      * 弩车法杖
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItemItem> BallistaStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.BALLISTA)
+    public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItem> BallistaStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ballista_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.BALLISTA)
                             .damage(15.6f)
                             .knockback(0.47f)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
-                            .summon((weapon, player) -> {
-                                Ballista servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                Ballista servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
                                     servant.setLevel(3);
-                                    servant.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
+                                    servant.init(new PathNode(player.position()
+                                                                      .add(0, 1, 0), 0, 1, 0));
                                     servantryHelper.add(EntityData.Type.SentryServant, servant);
                                 }
                             })
@@ -388,13 +397,13 @@ public class ServantryServantWeaponRegister {
     /**
      * 缥缈星核法杖 - 召唤缥缈星核仆从
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<EtherealStellarCore>.ServantWeaponItemItem> EtherealStellarCoreStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ethereal_stellar_core_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.ETHEREAL_STELLAR_CORE)
+    public static final DeferredItem<ServantWeaponItemBuilder<EtherealStellarCore>.ServantWeaponItem> EtherealStellarCoreStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "ethereal_stellar_core_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.ETHEREAL_STELLAR_CORE)
                             .damage(5.0f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
-                            .summon((weapon, player) -> {
-                                EtherealStellarCore servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                EtherealStellarCore servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     EntityData entityData = servantryHelper.getEntityData();
@@ -420,8 +429,8 @@ public class ServantryServantWeaponRegister {
     /**
      * 星尘细胞杖 - 召唤星尘细胞仆从
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<StardustCell>.ServantWeaponItemItem> StardustCellStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "stardust_cell_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.STARDUST_CELL)
+    public static final DeferredItem<ServantWeaponItemBuilder<StardustCell>.ServantWeaponItem> StardustCellStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "stardust_cell_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.STARDUST_CELL)
                             .damage(6f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
@@ -440,12 +449,12 @@ public class ServantryServantWeaponRegister {
     /**
      * 星尘龙杖 - 召唤星尘龙（多体节仆从）
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<StardustDragon>.ServantWeaponItemItem> StardustDragonStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "stardust_dragon_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.STARDUST_DRAGON)
+    public static final DeferredItem<ServantWeaponItemBuilder<StardustDragon>.ServantWeaponItem> StardustDragonStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "stardust_dragon_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.STARDUST_DRAGON)
                             .damage(4f)
                             .knockback(0.2f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
-                            .summon((weapon, player) -> {
+                            .summon((weapon, player, itemStack) -> {
                                 ServantryHelper helper = ServantryHelper.get(player);
                                 if (helper.canSummon(EntityData.Type.Servant, 1)) {
                                     List<StardustDragon> existing = helper
@@ -453,17 +462,18 @@ public class ServantryServantWeaponRegister {
                                             .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
-                                            StardustDragon servant = weapon.createServant(player);
+                                            StardustDragon servant = weapon.createServant(player, itemStack);
                                             servant.setSegmentIndex(i);
                                             if (i < 2) {
                                                 servant.setSlotCost(0);
                                             }
                                             servant.setTotalSegments(3);
-                                            servant.init(new PathNode(player.position().add(0, 3, -i * servant.getSegmentDistance()), 0, 0, 0));
+                                            servant.init(new PathNode(player.position()
+                                                                              .add(0, 3, -i * servant.getSegmentDistance()), 0, 0, 0));
                                             helper.add(EntityData.Type.Servant, servant);
                                         }
                                     } else {
-                                        StardustDragon servant = weapon.createServant(player);
+                                        StardustDragon servant = weapon.createServant(player, itemStack);
                                         servant.setSegmentIndex(existing.size());
                                         servant.setTotalSegments(existing.size() + 1);
                                         for (StardustDragon dragon : existing) {
@@ -471,7 +481,9 @@ public class ServantryServantWeaponRegister {
                                         }
                                         StardustDragon last = existing.getLast();
                                         PathNode pathNode = last.getCurrentPathNode();
-                                        Vec3 pos = pathNode.pos().add(last.getLookAngle().scale(-servant.getSegmentDistance()));
+                                        Vec3 pos = pathNode.pos()
+                                                .add(last.getLookAngle()
+                                                             .scale(-servant.getSegmentDistance()));
                                         servant.init(new PathNode(pos, pathNode.yaw(), pathNode.pitch(), pathNode.roll()));
                                         helper.add(EntityData.Type.Servant, servant);
                                     }
@@ -492,17 +504,18 @@ public class ServantryServantWeaponRegister {
     /**
      * 月亮传送门法杖
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<MoonPortal>.ServantWeaponItemItem> MoonPortalStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "moon_portal_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.MOON_PORTAL)
+    public static final DeferredItem<ServantWeaponItemBuilder<MoonPortal>.ServantWeaponItem> MoonPortalStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "moon_portal_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.MOON_PORTAL)
                             .damage(10)
                             .knockback(0.75f)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseMoonPortalStaff)
-                            .summon((weapon, player) -> {
-                                MoonPortal servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                MoonPortal servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
-                                    servant.init(new PathNode(player.position().add(0, 2, 0), 0, 0, 0));
+                                    servant.init(new PathNode(player.position()
+                                                                      .add(0, 2, 0), 0, 0, 0));
                                     servantryHelper.add(EntityData.Type.SentryServant, servant);
                                 }
                             })
@@ -516,17 +529,18 @@ public class ServantryServantWeaponRegister {
     /**
      * 七彩水晶法杖
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<RainbowCrystal>.ServantWeaponItemItem> RainbowCrystalStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "rainbow_crystal_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.RAINBOW_CRYSTAL)
+    public static final DeferredItem<ServantWeaponItemBuilder<RainbowCrystal>.ServantWeaponItem> RainbowCrystalStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "rainbow_crystal_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.RAINBOW_CRYSTAL)
                             .damage(13)
                             .knockback(0.75f)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseMoonPortalStaff)
-                            .summon((weapon, player) -> {
-                                RainbowCrystal servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                RainbowCrystal servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
-                                    servant.init(new PathNode(player.position().add(0, 2, 0), 0, 0, 0));
+                                    servant.init(new PathNode(player.position()
+                                                                      .add(0, 2, 0), 0, 0, 0));
                                     servantryHelper.add(EntityData.Type.SentryServant, servant);
                                 }
                             })
@@ -541,13 +555,15 @@ public class ServantryServantWeaponRegister {
     /**
      * 无限剑鞘
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<InfiniteShadow>.ServantWeaponItemItem> InfiniteScabbard =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "infinite_scabbard", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.INFINITE_SHADOW)
+    public static final DeferredItem<ServantWeaponItemBuilder<InfiniteShadow>.ServantWeaponItem> InfiniteScabbard =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "infinite_scabbard", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.INFINITE_SHADOW)
                             .sound(ServantrySoundRegister.UseTerraprism)
-                            .summon((weapon, player) -> {
-                                InfiniteShadow servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                InfiniteShadow servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
-                                ScabbardContainer container = player.getMainHandItem().getComponents().getOrDefault(ServantryDataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                                ScabbardContainer container = player.getMainHandItem()
+                                        .getComponents()
+                                        .getOrDefault(ServantryDataComponentRegister.SCABBARD.get(), ScabbardContainer.EMPTY);
                                 if (servantryHelper.canSummon(EntityData.Type.Servant, 1) && !container.isEmpty()) {
                                     servant.setItemStack(container.itemStack());
                                     servant.init(servant.getInterpolatedIdleState(1));
@@ -555,7 +571,7 @@ public class ServantryServantWeaponRegister {
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC)
-                                    .component(ServantryDataComponentRegister.Scabbard, ScabbardContainer.EMPTY))
+                                    .component(ServantryDataComponentRegister.SCABBARD, ScabbardContainer.EMPTY))
                             .build())
                     .itemLanguage("Infinite Scabbard", "无限剑鞘")
                     .servantLanguage(ServantryAttachmentEntityRegister.INFINITE_SHADOW, "Infinite Shadow", "无限之影")
@@ -567,29 +583,30 @@ public class ServantryServantWeaponRegister {
     /**
      * 虚空吞噬者傀具
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<VoidEater>.ServantWeaponItemItem> VoidEaterMarionette =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "void_eater_marionette", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.VOID_EATER)
+    public static final DeferredItem<ServantWeaponItemBuilder<VoidEater>.ServantWeaponItem> VoidEaterMarionette =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "void_eater_marionette", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.VOID_EATER)
                             .damage(11f)
                             .knockback(0.5f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
-                            .summon((weapon, player) -> {
+                            .summon((weapon, player, itemStack) -> {
                                 ServantryHelper helper = ServantryHelper.get(player);
                                 if (helper.canSummon(EntityData.Type.Servant, 1)) {
                                     List<VoidEater> existing = helper.getEntityData()
                                             .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
-                                            VoidEater servant = weapon.createServant(player);
+                                            VoidEater servant = weapon.createServant(player, itemStack);
                                             servant.setSegmentIndex(i);
                                             if (i < 2) {
                                                 servant.setSlotCost(0);
                                             }
                                             servant.setTotalSegments(3);
-                                            servant.init(new PathNode(player.position().add(0, 3, -i * servant.getSegmentDistance()), 0, 0, 0));
+                                            servant.init(new PathNode(player.position()
+                                                                              .add(0, 3, -i * servant.getSegmentDistance()), 0, 0, 0));
                                             helper.add(EntityData.Type.Servant, servant);
                                         }
                                     } else {
-                                        VoidEater servant = weapon.createServant(player);
+                                        VoidEater servant = weapon.createServant(player, itemStack);
                                         servant.setSegmentIndex(existing.size());
                                         servant.setTotalSegments(existing.size() + 1);
                                         for (VoidEater dragon : existing) {
@@ -597,7 +614,9 @@ public class ServantryServantWeaponRegister {
                                         }
                                         VoidEater last = existing.getLast();
                                         PathNode pathNode = last.getCurrentPathNode();
-                                        Vec3 pos = pathNode.pos().add(last.getLookAngle().scale(-servant.getSegmentDistance()));
+                                        Vec3 pos = pathNode.pos()
+                                                .add(last.getLookAngle()
+                                                             .scale(-servant.getSegmentDistance()));
                                         servant.init(new PathNode(pos, pathNode.yaw(), pathNode.pitch(), pathNode.roll()));
                                         helper.add(EntityData.Type.Servant, servant);
                                     }
@@ -616,18 +635,19 @@ public class ServantryServantWeaponRegister {
     /**
      * 雷云盆栽
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<SuperPeashooter>.ServantWeaponItemItem> ThundercloudBonsai =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "thundercloud_bonsai", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.SUPER_PEASHOOTER)
+    public static final DeferredItem<ServantWeaponItemBuilder<SuperPeashooter>.ServantWeaponItem> ThundercloudBonsai =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "thundercloud_bonsai", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.SUPER_PEASHOOTER)
                             .damage(12f)
                             .knockback(0)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseMoonPortalStaff)
-                            .summon((weapon, player) -> {
-                                SuperPeashooter servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                SuperPeashooter servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 1)) {
                                     servant.setLevel(3);
-                                    servant.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
+                                    servant.init(new PathNode(player.position()
+                                                                      .add(0, 1, 0), 0, 1, 0));
                                     servantryHelper.add(EntityData.Type.SentryServant, servant);
                                 }
                             })
@@ -642,18 +662,19 @@ public class ServantryServantWeaponRegister {
     /**
      * 玉米加农炮
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<Cannon>.ServantWeaponItemItem> CornCannon =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "corn_cannon", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.CANNON)
+    public static final DeferredItem<ServantWeaponItemBuilder<Cannon>.ServantWeaponItem> CornCannon =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "corn_cannon", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.CANNON)
                             .damage(6400f)
                             .armorPierce(3600f)
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
-                            .summon((weapon, player) -> {
-                                Cannon servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                Cannon servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servantryHelper.canSummon(EntityData.Type.SentryServant, 2)) {
                                     servant.setSlotCost(2);
-                                    servant.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
+                                    servant.init(new PathNode(player.position()
+                                                                      .add(0, 1, 0), 0, 0, 0));
                                     servantryHelper.add(EntityData.Type.SentryServant, servant);
                                 }
                             })
@@ -668,12 +689,12 @@ public class ServantryServantWeaponRegister {
     /**
      * 死魂灵巫术单元
      */
-    public static final DeferredItem<ServantWeaponItemBuilder<NecroSpirit>.ServantWeaponItemItem> NecroSpiritStaff =
-            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "necro_spirit_staff", () -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.NECRO_SPIRIT)
+    public static final DeferredItem<ServantWeaponItemBuilder<NecroSpirit>.ServantWeaponItem> NecroSpiritStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "necro_spirit_staff", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.NECRO_SPIRIT)
                             .damage(700f)
                             .sound(ServantrySoundRegister.UseServantWeapon)
-                            .summon((weapon, player) -> {
-                                NecroSpirit servant = weapon.createServant(player);
+                            .summon((weapon, player, itemStack) -> {
+                                NecroSpirit servant = weapon.createServant(player, itemStack);
                                 ServantryHelper servantryHelper = ServantryHelper.get(player);
                                 if (servant.getSameSize() < 1 && servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
                                     servant.init(servant.getInterpolatedIdleState(1.0f));
@@ -685,6 +706,29 @@ public class ServantryServantWeaponRegister {
                     .itemLanguage("Necro Spirit Staff", "死魂灵巫术单元")
                     .servantLanguage(ServantryAttachmentEntityRegister.NECRO_SPIRIT, "Necro Spirit", "死魂灵")
                     .itemLanguageTooltip(1, "Summons up to 1 Necro Spirit", "最多召唤1个死魂灵")
+                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemTag(ServantryItemTagsRegister.ServantWeapon)
+                    .build();
+    /**
+     * 激光机枪 - 召唤激光机枪仆从（最多1个）
+     */
+    public static final DeferredItem<ServantWeaponItemBuilder<LaserMinigun>.ServantWeaponItem> LaserMinigunStaff =
+            ServantryItemRegisterBuilder.build(SERVANT_WEAPON, "laser_minigun", location -> new ServantWeaponItemBuilder<>(location, ServantryAttachmentEntityRegister.LASER_MINIGUN)
+                            .damage(6f)
+                            .knockback(0.2f)
+                            .sound(ServantrySoundRegister.UseServantWeapon)
+                            .summon((weapon, player, itemStack) -> {
+                                LaserMinigun servant = weapon.createServant(player, itemStack);
+                                ServantryHelper servantryHelper = ServantryHelper.get(player);
+                                if (servant.getSameSize() < 1 && servantryHelper.canSummon(EntityData.Type.Servant, 1)) {
+                                    servant.init(servant.getInterpolatedIdleState(1.0f));
+                                    servantryHelper.add(EntityData.Type.Servant, servant);
+                                }
+                            })
+                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .build())
+                    .itemLanguage("Laser Minigun", "激光机枪")
+                    .servantLanguage(ServantryAttachmentEntityRegister.LASER_MINIGUN, "Laser Minigun", "激光机枪")
                     .itemModel(ServantryItemRegisterBuilder::handheldItem)
                     .itemTag(ServantryItemTagsRegister.ServantWeapon)
                     .build();

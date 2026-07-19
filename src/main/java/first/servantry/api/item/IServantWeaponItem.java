@@ -16,6 +16,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,26 +30,32 @@ public interface IServantWeaponItem<T extends Servant> {
     /**
      * 获取此武器对应的仆从类型。
      */
-    AttachmentEntityType<T> getType();
+    @NotNull AttachmentEntityType<T> getType();
 
     /**
      * 是否是哨兵。
      */
     boolean isSentryServant();
 
-    /** 获取仆从伤害值。 */
-    float getDamage();
-
-    /** 获取仆从击退力度。 */
-    float getKnockback();
-
-    /** 获取仆从护甲穿透。 */
-    float getArmorPierce();
-
     /**
      * 处理仆从召唤逻辑。
      */
-    void summon(Player player);
+    void summon(@NotNull Player player, @Nullable ItemStack itemStack);
+
+    /**
+     * 获取仆从伤害值。
+     */
+    float getServantDamage(@Nullable Player player, @Nullable ItemStack itemStack);
+
+    /**
+     * 获取仆从击退力度。
+     */
+    float getServantKnockback(@Nullable Player player, @Nullable ItemStack itemStack);
+
+    /**
+     * 获取仆从护甲穿透。
+     */
+    float getServantArmorPierce(@Nullable Player player, @Nullable ItemStack itemStack);
 
     default List<Component> getTooltips(ItemStack itemStack, Player player) {
         List<Component> toolTips = new ArrayList<>();
@@ -55,24 +63,24 @@ public interface IServantWeaponItem<T extends Servant> {
         ResourceLocation location = ServantryRegistries.ATTACHMENT_ENTITY_TYPES.getKey(type);
         if (location != null) {
             String key = "servant." + location.getNamespace() + "." + location.getPath();
-            float damage = getDamage();
+            float damage = getServantDamage(player, itemStack);
             if (damage > 0) {
                 AttributeInstance attribute = player.getAttribute(ServantryAttributeRegister.ServantDamage);
                 damage = attribute != null ? (float) (damage * attribute.getValue()) : damage;
                 toolTips.add(Component.literal(String.format("%.1f ", damage)).withStyle(ChatFormatting.BLUE).append(Component.translatable("item.servantry.tooltip.damage").withStyle(ChatFormatting.GRAY)));
             }
-            float knockback = getKnockback();
+            float knockback = getServantKnockback(player, itemStack);
             if (knockback > 0) {
                 AttributeInstance attribute = player.getAttribute(ServantryAttributeRegister.ServantKnockback);
                 knockback = attribute != null ? (float) (knockback * attribute.getValue()) : knockback;
                 toolTips.add(Component.literal(String.format("%.1f ", knockback)).withStyle(ChatFormatting.BLUE).append(Component.translatable("item.servantry.tooltip.knockback").withStyle(ChatFormatting.GRAY)));
             }
-            float armor_pierce = getArmorPierce();
+            float armor_pierce = getServantArmorPierce(player, itemStack);
             if (armor_pierce > 0) {
                 toolTips.add(Component.literal(String.format("%.1f ", armor_pierce)).withStyle(ChatFormatting.BLUE).append(Component.translatable("item.servantry.tooltip.armor_pierce").withStyle(ChatFormatting.GRAY)));
             }
             if (type == ServantryAttachmentEntityRegister.INFINITE_SHADOW.get()){
-                ScabbardContainer container = itemStack.getComponents().getOrDefault(ServantryDataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                ScabbardContainer container = itemStack.getComponents().getOrDefault(ServantryDataComponentRegister.SCABBARD.get(), ScabbardContainer.EMPTY);
                 if (!container.isEmpty()) {
                     toolTips.add(Component.translatable("item.servantry.tooltip.summon", container.itemStack().getDisplayName()).withStyle(ChatFormatting.GRAY));
                 }
@@ -98,21 +106,20 @@ public interface IServantWeaponItem<T extends Servant> {
     /**
      * 构建一个已初始化属性的仆从实例。
      */
-    default T createServant(Player player) {
+    default T createServant(@NotNull Player player, @Nullable ItemStack itemStack) {
         T servant = getType().factory().get();
         servant.setOwner(player);
-        servant.setDamage(getDamage());
-        servant.setKnockback(getKnockback());
-        servant.setArmorPierce(getArmorPierce());
+        servant.setDamage(getServantDamage(player, itemStack));
+        servant.setKnockback(getServantKnockback(player, itemStack));
+        servant.setArmorPierce(getServantArmorPierce(player, itemStack));
         return servant;
     }
 
     /**
      * 移除玩家拥有的此类型仆从。
      */
-    default void remove(Player player) {
+    default void remove(@NotNull Player player) {
         EntityData entityData = ServantryHelper.get(player).getEntityData();
-        entityData.remove(EntityData.Type.Servant, getType());
-        entityData.remove(EntityData.Type.SentryServant, getType());
+        entityData.remove(isSentryServant() ? EntityData.Type.SentryServant : EntityData.Type.Servant, getType());
     }
 }

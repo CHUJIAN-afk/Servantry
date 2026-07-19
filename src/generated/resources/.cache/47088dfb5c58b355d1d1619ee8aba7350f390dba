@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-18T19:36:09.5215917	Tags for minecraft:item mod id servantry
+// 1.21.1	2026-07-18T23:37:21.0408281	Tags for minecraft:item mod id servantry
 3ded1ab5f2f005cb7ffce365b53df248e33f9f74 data/curios/tags/item/curio.json
 59ea50be477cac875d119968df76418890224c88 data/c/tags/item/armors.json
 59ea50be477cac875d119968df76418890224c88 data/c/tags/item/enchantables.json
@@ -12,4 +12,4 @@
 997f5faab1bad55d226832310276502a908a153c data/minecraft/tags/item/foot_armor.json
 57030484d800a2d118feb7ab6890ca91d384da4f data/minecraft/tags/item/head_armor.json
 36bf3a96216431f3bffdc098b08171daa377dddc data/minecraft/tags/item/leg_armor.json
-018c561b1c455c268c6c5f554da2c591a20d0b39 data/servantry/tags/item/servant_weapon.json
+bc786e78d05088a42153ae606117acaf520d35b8 data/servantry/tags/item/servant_weapon.json

@@ -80,7 +80,7 @@ public class ClientEvent {
     public static void renderSoulItemTooltipHandler(RenderTooltipEvent.GatherComponents event) {
         ItemStack itemStack = event.getItemStack();
         if (itemStack.is(ServantryServantWeaponRegister.InfiniteScabbard.get())) {
-            ScabbardContainer scabbard = itemStack.getOrDefault(ServantryDataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+            ScabbardContainer scabbard = itemStack.getOrDefault(ServantryDataComponentRegister.SCABBARD.get(), ScabbardContainer.EMPTY);
             if (!scabbard.isEmpty()) {
                 List<Either<FormattedText, TooltipComponent>> tooltipElements = event.getTooltipElements();
                 tooltipElements.add(1, Either.right(new ScabbardTooltipComponent(scabbard.itemStack())));

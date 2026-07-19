@@ -1,4 +1,4 @@
-// 1.21.1	2026-07-18T19:36:09.5236227	Item Models: servantry
+// 1.21.1	2026-07-18T23:37:21.043772	Item Models: servantry
 d882c3a8d9d37b2217246221442c70da01b9ad66 assets/servantry/models/item/adamantite_ingot.json
 bc1d27d81807c9239b1c6e90352607d4b14ee405 assets/servantry/models/item/apprentices_scarf.json
 1234a813c7da2a7cf22f8be7f86b6fd620074edc assets/servantry/models/item/ballista_cane.json
@@ -41,6 +41,7 @@ cea208bf9d779d07c2255c3502769ec0ceaca5e0 assets/servantry/models/item/hunt_soul_
 0b8946606fc32b358a802c7299b6236eb3015ef1 assets/servantry/models/item/imp_staff.json
 e52c1be32d3dbb25348849e3b386749de9b09694 assets/servantry/models/item/infinite_scabbard.json
 c1236a40737c3e6e388351085abc976a1b254bd7 assets/servantry/models/item/kaleidoscope.json
+2845cda388d53d04a18e668a9a89dcae1a473d23 assets/servantry/models/item/laser_minigun.json
 e8907da275517d12c7b0b6eaed3b12a35337caa8 assets/servantry/models/item/luminite_ingot.json
 be3b3c6977845aaeecb84bd5abf299be09738e1a assets/servantry/models/item/mithril_anvil.json
 27453db8a210e9975f578f4d7faf6a0dc3d184e3 assets/servantry/models/item/monks_belt.json

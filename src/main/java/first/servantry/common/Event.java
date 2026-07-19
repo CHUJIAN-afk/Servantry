@@ -58,15 +58,15 @@ public class Event {
             if (carried.is(ServantryServantWeaponRegister.InfiniteScabbard.get())) {
                 Slot slot = event.getSlot();
                 Player player = event.getPlayer();
-                ScabbardContainer scabbard = carried.getOrDefault(ServantryDataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                ScabbardContainer scabbard = carried.getOrDefault(ServantryDataComponentRegister.SCABBARD.get(), ScabbardContainer.EMPTY);
                 if (!stackedOn.isEmpty() && scabbard.isEmpty()) {
-                    carried.set(ServantryDataComponentRegister.Scabbard.get(), new ScabbardContainer(stackedOn.copy()));
+                    carried.set(ServantryDataComponentRegister.SCABBARD.get(), new ScabbardContainer(stackedOn.copy()));
                     slot.set(ItemStack.EMPTY);
                     player.playSound(SoundEvents.ARMOR_EQUIP_LEATHER.value(), 1.0F, 1.2F);
                     event.setCanceled(true);
                 } else if (stackedOn.isEmpty() && !scabbard.isEmpty()) {
                     slot.set(scabbard.itemStack().copy());
-                    carried.set(ServantryDataComponentRegister.Scabbard.get(), ScabbardContainer.EMPTY);
+                    carried.set(ServantryDataComponentRegister.SCABBARD.get(), ScabbardContainer.EMPTY);
                     player.playSound(SoundEvents.ARMOR_EQUIP_LEATHER.value(), 1.0F, 0.9F);
                     event.setCanceled(true);
                 }
