@@ -19,6 +19,7 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
     private boolean firstStrike = true;
     private boolean lastEllipse = false;
+    private boolean flipRoll = false;
     private Vec3 lastTargetPos = Vec3.ZERO;
 
     public TerraprismAttackGoal(Terraprism servant) {
@@ -53,12 +54,13 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
                 firstStrike = false;
                 lastEllipse = false;
             } else {
-                if (servant.getOwner().getRandom().nextDouble() < 0.5) {
+                if (servant.getOwner().getRandom().nextDouble() < 0.75 && !flipRoll) {
                     planEllipseSlash();
                     lastEllipse = true;
                 } else {
                     planHourglassSlash();
                     lastEllipse = false;
+                    flipRoll = false;
                 }
             }
         }
@@ -91,6 +93,9 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
 
     /**
      * 规划椭圆斩击攻击路径。
+     * <p>
+     * 50%概率后半段翻滚：以终点和初始位置的镜像点构成同平面椭圆，剑尖朝心，形成自然翻滚。
+     * </p>
      */
     private void planEllipseSlash() {
         // 目标头顶4格、半径4格的圆上，选择离startPos最近的位置
@@ -123,11 +128,33 @@ public class TerraprismAttackGoal extends ServantGoal<Terraprism> {
             }
         }
         int attackTicks = duration - prepTicks;
-        for (int i = 0; i < attackTicks; i++) {
+        int halfTicks = attackTicks / 2;
+
+        for (int i = 0; i < halfTicks; i++) {
             float progress = (float) i / attackTicks;
-            Vec3 point = ellipse.getPoint(EasingCurve.LINEAR.apply(progress));
+            Vec3 point = ellipse.getPoint(progress);
             Vec3 tipDir = point.subtract(ellipse.getCenter()).normalize();
             nodes.add(servant.getEulerNode(point, tipDir, planeNormal));
+        }
+
+        flipRoll = servant.getOwner().getRandom().nextDouble() < 0.25;
+        Ellipse flipEllipse = null;
+        if (flipRoll) {
+            Vec3 mirrorPos = lastTargetPos.add(lastTargetPos.x - attackPrepPos.x, attackPrepPos.y - lastTargetPos.y, lastTargetPos.z - attackPrepPos.z);
+            flipEllipse = new Ellipse(lastTargetPos, mirrorPos, planeNormal.scale(-1), 0.6f);
+        }
+
+        for (int i = halfTicks; i < attackTicks; i++) {
+            float progress = (float) i / attackTicks;
+            if (flipRoll && flipEllipse != null) {
+                Vec3 point = flipEllipse.getPoint(progress);
+                Vec3 tipDir = flipEllipse.getCenter().subtract(point).normalize();
+                nodes.add(servant.getEulerNode(point, tipDir, planeNormal));
+            } else {
+                Vec3 point = ellipse.getPoint(progress);
+                Vec3 tipDir = point.subtract(ellipse.getCenter()).normalize();
+                nodes.add(servant.getEulerNode(point, tipDir, planeNormal));
+            }
         }
         servant.setPath(nodes);
     }
