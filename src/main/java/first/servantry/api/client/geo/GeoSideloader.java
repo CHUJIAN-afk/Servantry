@@ -8,11 +8,9 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animation.Animation;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.state.BoneSnapshot;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
-import software.bernie.geckolib.constant.DataTickets;
+import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoRenderer;
 
@@ -21,58 +19,61 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Geo 外挂渲染器（单例），独立于 GeckoLib 的 Entity/Item/BlockEntity 渲染体系。
+ * Geo 外挂渲染器，独立于 GeckoLib 的 Entity/Item/BlockEntity 渲染体系。
  * <p>
- * 设计原则与 {@code GeoEntityRenderer} 一致：渲染器是单例，状态在每帧渲染后重置。
- * 通过向 {@link DummyGeoAnimatable} 注入伪 tick 值来精确控制动画进度，
- * 而非依赖游戏实体的真实时间流逝。
+ * 使用自定义 {@link GeoAnimationSampler} 直接采样关键帧写入 {@link GeoBone}，
+ * 完全绕开 GeckoLib 的 {@code AnimationController}/{@code handleAnimations} 管线。
+ * <p>
+ * 渲染器无跨帧状态，每帧创建新实例即可。动画进度由调用方精确注入，
+ * 不同实例间互不污染。渲染前后均 reset 共享 bone 状态，防止交叉污染。
  * <p>
  * 使用方式：
  * <pre>{@code
- * // 1. 获取单例（按 ResourceLocation 缓存）
- * GeoSideloader sideloader = GeoSideloader.getGeoSideloader(
- *     ResourceLocation.fromNamespaceAndPath("servantry", "test_boss"));
- *
- * // 2. 每帧设置动画与进度后渲染
- * sideloader.setAnimation("attack_1", 0.5f);
- * sideloader.render(poseStack, bufferSource, partialTick, packedLight);
+ * // 每帧创建实例，设置动画与进度后渲染
+ * GeoSideloader.create(Servantry.rl("laser_minigun"))
+ *     .setAnimation("shooting", tickProgress)
+ *     .render(poseStack, bufferSource, partialTick, packedLight);
  * }</pre>
  */
 public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
+
+    private static final DummyGeoAnimatable DUMMY = new DummyGeoAnimatable();
 
     /**
      * 当前使用的 Geo 模型定义
      */
     private final GeoAttachmentModel geoModel;
     /**
-     * 空 Animatable 壳，承载动画控制器与注入 tick
+     * 自定义关键帧采样器
      */
-    private final DummyGeoAnimatable dummyAnimatable;
+    private final GeoAnimationSampler sampler;
     /**
-     * 当前帧要播放的动画名，渲染后自动重置为 null
+     * 当前帧要播放的动画名
      */
     private String currentAnimationName;
     /**
-     * 当前帧动画进度 [0,1]，渲染后自动重置为 0
+     * 当前帧动画进度（tick 域）
      */
     private float progress = 0f;
     /**
-     * 本帧需要隐藏的骨骼名集合，渲染后自动清空
+     * 本帧需要隐藏的骨骼名集合
      */
     private final Set<String> hiddenBones = new HashSet<>();
 
     private GeoSideloader(GeoAttachmentModel geoModel) {
         this.geoModel = geoModel;
-        this.dummyAnimatable = new DummyGeoAnimatable();
+        this.sampler = new GeoAnimationSampler(geoModel.getAnimationResource(DUMMY));
     }
 
     /**
-     * 获取或创建指定资源位置的 Sideloader 单例。
+     * 创建与指定资源位置绑定的 Sideloader 实例。
+     * <p>
+     * 无缓存、无跨帧状态，每帧调用即可。
      *
      * @param location 模型资源定位，命名空间+路径对应 geo/texture/animation 文件
-     * @return 与该 location 绑定的 Sideloader 实例
+     * @return 全新的 Sideloader 实例
      */
-    public static GeoSideloader getGeoSideloader(ResourceLocation location) {
+    public static GeoSideloader create(ResourceLocation location) {
         return new GeoSideloader(new GeoAttachmentModel(location));
     }
 
@@ -80,10 +81,10 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
 
     /**
      * 设置当前帧要播放的动画及进度。
-     * 必须在 {@link #render} 之前调用，每帧结束后状态自动重置。
+     * 必须在 {@link #render} 之前调用。
      *
      * @param animationName animation.json 中定义的动画名称
-     * @param progress      动画进度，0=起始 1=结束（循环动画会自动循环）
+     * @param progress      动画进度（tick 域，0=起始，递增推进）
      */
     public GeoSideloader setAnimation(String animationName, float progress) {
         this.currentAnimationName = animationName;
@@ -92,7 +93,7 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
     }
 
     /**
-     * 隐藏指定骨骼（包含其子骨骼）。必须在 {@link #render} 之前调用，每帧结束后自动恢复。
+     * 隐藏指定骨骼（包含其子骨骼）。必须在 {@link #render} 之前调用。
      *
      * @param boneName .geo.json 中定义的骨骼名称
      */
@@ -104,45 +105,75 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
     /**
      * 执行一帧渲染，流程：
      * <ol>
-     *   <li>将动画名注入 Controller，将进度注入 DummyAnimatable 的 tick</li>
-     *   <li>构建 AnimationState 并驱动模型动画计算</li>
-     *   <li>使用 GeoRenderer 默认流程绘制模型</li>
-     *   <li>清理 Molang 上下文，重置本帧状态</li>
+     *   <li>Reset 所有 bone 到初始姿态（清除上一帧残留）</li>
+     *   <li>采样动画写入 bone（纯函数，无跨帧状态）</li>
+     *   <li>应用骨骼可见性</li>
+     *   <li>绘制模型</li>
+     *   <li>Reset 所有 bone 到初始姿态（防止交叉污染）</li>
      * </ol>
      */
     @SuppressWarnings("all")
     public void render(PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight) {
-        DummyGeoAnimatable animatable = getAnimatable();
-        ResourceLocation texture = getTextureLocation(animatable);
-        RenderType renderType = getRenderType(animatable, texture, bufferSource, partialTick);
+        GeoModel<DummyGeoAnimatable> model = getGeoModel();
+        BakedGeoModel bakedModel = model.getBakedModel(model.getModelResource(DUMMY, this));
+        ResourceLocation texture = model.getTextureResource(DUMMY, this);
+        RenderType renderType = RenderType.entityTranslucent(texture);
         VertexConsumer buffer = bufferSource.getBuffer(renderType);
 
         poseStack.pushPose();
 
-        // 注入动画名与进度
-        double tickValue = progress;
+        // 1. Reset bone 到初始姿态（清除上一帧或其他渲染者残留的状态）
+        resetBones(bakedModel);
+
+        // 2. 采样动画写入 bone（纯函数，无跨帧状态）
         if (currentAnimationName != null) {
-            RawAnimation rawAnimation = RawAnimation.begin().then(currentAnimationName, Animation.LoopType.LOOP);
-            animatable.getController().setAnimation(rawAnimation);
-        }
-        animatable.setInjectedTick(tickValue);
-
-        // 驱动动画计算
-        AnimationState<DummyGeoAnimatable> animationState = new AnimationState<>(animatable, 0, 0, partialTick, false);
-        animationState.setData(DataTickets.TICK, tickValue);
-        GeoModel<DummyGeoAnimatable> model = getGeoModel();
-        model.handleAnimations(animatable, 0, animationState, partialTick);
-
-        // 应用骨骼可见性
-        for (String boneName1 : hiddenBones) {
-            getGeoModel().getBone(boneName1).ifPresent(bone -> bone.setHidden(true));
+            sampler.sample(currentAnimationName, progress, bakedModel);
         }
 
-        // 绘制模型
-        BakedGeoModel bakedModel = getGeoModel().getBakedModel(getGeoModel().getModelResource(getAnimatable(), this));
-        GeoRenderer.super.actuallyRender(poseStack, animatable, bakedModel, renderType, bufferSource, buffer, false, partialTick, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
+        // 3. 应用骨骼可见性
+        for (String boneName : hiddenBones) {
+            model.getBone(boneName).ifPresent(bone -> bone.setHidden(true));
+        }
+
+        // 4. 绘制模型
+        GeoRenderer.super.actuallyRender(poseStack, DUMMY, bakedModel, renderType, bufferSource, buffer, false, partialTick, packedLight, OverlayTexture.NO_OVERLAY, 0xFFFFFFFF);
+
+        // 5. Reset bone（防止共享的 GeoBone 脏状态影响下一个渲染者）
+        resetBones(bakedModel);
 
         poseStack.popPose();
+    }
+
+    // ===================== Bone 重置 =====================
+
+    /**
+     * 将 BakedGeoModel 中所有骨骼的 rot/pos/scale 恢复到 initialSnapshot 值，
+     * 并重置 hidden 状态，防止共享的 GeoBone 对象被不同渲染实例交叉污染。
+     */
+    private void resetBones(BakedGeoModel bakedModel) {
+        for (GeoBone bone : bakedModel.topLevelBones()) {
+            resetBoneRecursive(bone);
+        }
+    }
+
+    private void resetBoneRecursive(GeoBone bone) {
+        BoneSnapshot snapshot = bone.getInitialSnapshot();
+        if (snapshot != null) {
+            bone.setRotX(snapshot.getRotX());
+            bone.setRotY(snapshot.getRotY());
+            bone.setRotZ(snapshot.getRotZ());
+            bone.setPosX(snapshot.getOffsetX());
+            bone.setPosY(snapshot.getOffsetY());
+            bone.setPosZ(snapshot.getOffsetZ());
+            bone.setScaleX(snapshot.getScaleX());
+            bone.setScaleY(snapshot.getScaleY());
+            bone.setScaleZ(snapshot.getScaleZ());
+        }
+        bone.setHidden(bone.shouldNeverRender() == Boolean.TRUE);
+        bone.resetStateChanges();
+        for (GeoBone child : bone.getChildBones()) {
+            resetBoneRecursive(child);
+        }
     }
 
     // ===================== GeoRenderer 接口实现 =====================
@@ -161,7 +192,7 @@ public class GeoSideloader implements GeoRenderer<DummyGeoAnimatable> {
 
     @Override
     public DummyGeoAnimatable getAnimatable() {
-        return this.dummyAnimatable;
+        return DUMMY;
     }
 
     @Override

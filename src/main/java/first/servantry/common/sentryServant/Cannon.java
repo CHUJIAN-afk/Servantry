@@ -8,7 +8,9 @@ import first.servantry.api.servant.MomentumServant;
 import first.servantry.common.projectile.Corn;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.Ballistics;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -19,8 +21,16 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Cannon extends MomentumServant implements IBlockCollision<Cannon> {
 
-    /** 冷却计时器，初始700（召唤时视为刚发射过） */
-    private int cooldown = 700;
+    /**
+     * 冷却计时器，初始700（召唤时视为刚发射过）
+     */
+    private int cooldown = 200;
+    private int shootingTick = 0;
+    private boolean hasCorn = true;
+    private boolean shooting = false;
+    private int renderTick = 0;
+    private int lastRenderTick = 0;
+    private Vec3 targetPos = null;
 
     public Cannon() {
         setGravity(-0.05f);
@@ -39,9 +49,34 @@ public class Cannon extends MomentumServant implements IBlockCollision<Cannon> {
                 setRemove();
             }
             LivingEntity target = getTarget();
-            cooldown--;
-            if (isTarget(target)) {
-                fire(target);
+            boolean hasTarget = isTarget(target);
+            if (shootingTick == 0) {
+                if (--cooldown <= 0) {
+                    hasCorn = true;
+                    if (hasTarget) {
+                        shootingTick++;
+                        targetPos = target.getBoundingBox().getCenter();
+                    }
+                }
+            } else {
+                shootingTick++;
+                if (shootingTick == 30) {
+                    hasCorn = false;
+                    fire();
+                }
+                if (shootingTick == 50) {
+                    cooldown = 100;
+                    shootingTick = 0;
+                }
+            }
+            shooting = shootingTick != 0;
+        } else {
+            if (shooting) {
+                lastRenderTick = renderTick;
+                renderTick++;
+            } else {
+                lastRenderTick = 0;
+                renderTick = 0;
             }
         }
         super.tick();
@@ -60,18 +95,26 @@ public class Cannon extends MomentumServant implements IBlockCollision<Cannon> {
         setRemove();
     }
 
-    public void fire(LivingEntity target) {
-        Vec3 start = getPos();
-        Vec3 targetCenter = target.getBoundingBox().getCenter();
-        if (cooldown <= 0) {
-            Vec3 velocity = Ballistics.solveVelocity(start, targetCenter, 85f, 0.99f, -0.05f);
-            if (velocity != null) {
-                Corn projectile = new Corn(getDamageSource(), start, velocity);
-                cooldown = 700;
-                projectile.join(owner);
-                Playable.play(SoundEvents.GENERIC_EXPLODE, owner.level(), start, owner.getSoundSource());
-            }
+    public void fire() {
+        Vec3 start = getPos().add(0, 1, -1.5);
+        Vec3 velocity = Ballistics.solveVelocity(start, targetPos, 85f, 0.99f, -0.05f);
+        if (velocity != null) {
+            Corn projectile = new Corn(getDamageSource(), start, velocity);
+            projectile.join(owner);
+            Playable.play(SoundEvents.GENERIC_EXPLODE, owner.level(), start, owner.getSoundSource());
         }
+    }
+
+    @Override
+    public void writeAdditional(RegistryFriendlyByteBuf buf) {
+        buf.writeBoolean(shooting);
+        buf.writeBoolean(hasCorn);
+    }
+
+    @Override
+    public void readAdditional(RegistryFriendlyByteBuf buf) {
+        shooting = buf.readBoolean();
+        hasCorn = buf.readBoolean();
     }
 
     @Override
@@ -81,6 +124,14 @@ public class Cannon extends MomentumServant implements IBlockCollision<Cannon> {
 
     @Override
     public @NotNull AABB getBlockCollisionBox() {
-        return new AABB(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5);
+        return new AABB(-1, -1, -2, 1, 1.5, 2);
+    }
+
+    public float getShootingTick(float partialTick) {
+        return Mth.lerp(partialTick, lastRenderTick, renderTick);
+    }
+
+    public boolean isHasCorn() {
+        return hasCorn;
     }
 }

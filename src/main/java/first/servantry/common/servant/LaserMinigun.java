@@ -20,7 +20,6 @@ import net.minecraft.world.phys.Vec3;
 public class LaserMinigun extends Servant {
 
     private int cooldown = 0;
-    private int maxCooldown = 8;
 
     public LaserMinigun() {
         super();
@@ -44,14 +43,10 @@ public class LaserMinigun extends Servant {
                 setCurrentPathNode(currentNode.lerp(attackNode, 0.5f));
 
                 if (cooldown <= 0) {
-                    cooldown = maxCooldown;
-                    if (maxCooldown > 2) {
-                        maxCooldown -= 1;
-                    }
+                    cooldown = 2;
                     fire(target);
                 }
             } else {
-                maxCooldown = 8;
                 setCurrentPathNode(currentNode.lerp(idleNode, 0.5f));
             }
         }
@@ -71,7 +66,7 @@ public class LaserMinigun extends Servant {
             Vec3 laserTargetPos = targetPos.add(direction.scale(5)).offsetRandom(random, 3);
             Vec3 normalize = laserTargetPos.subtract(startPos).normalize();
 
-            ElectricLaser laser = new ElectricLaser(getDamageSource(), startPos.add(normalize.scale(-random.nextFloat()*0.25f)), normalize.scale(1.5));
+            ElectricLaser laser = new ElectricLaser(getDamageSource(), startPos.add(normalize.scale(random.nextFloat() * 0.5f)), normalize.scale(1.5));
             laser.join(owner);
         }
 

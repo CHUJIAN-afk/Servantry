@@ -1,16 +1,17 @@
 package first.servantry.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.Servantry;
+import first.servantry.api.client.geo.GeoSideloader;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
-import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.projectile.Corn;
-import first.servantry.register.ServantryModelRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.player.Player;
 
@@ -23,18 +24,20 @@ public class CornRenderer extends AbstractAttachmentEntityRenderer<Corn> {
     protected RenderContext<Corn> createContext(Corn entity) {
         return RenderContext.<Corn>builder()
                 .model(new ModelConfig<Corn>()
-                        .scale(0.3f)
-                        .translateOffset(-0.5f, -0.5f, -0.5f)
-                        .alphaDistanceFactor(1.0f)
+                               .scale(2)
+                               .translateOffset(0, -0.8f, 0.5f)
+                               .rotationOffset(180, 0, 0)
                 )
                 .build();
     }
 
     @Override
-    protected void render(Corn entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Corn> context, float partialTick) {
-        ModelRenderer.renderModel(ServantryModelRegister.TEST, poseStack, bufferSource);
-        if (!Minecraft.getInstance().isPaused()) {
-            Player owner = entity.getOwner();
+    protected void render(Corn corn, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Corn> context, float partialTick) {
+        GeoSideloader.create(Servantry.rl("corn"))
+                .render(poseStack, bufferSource, partialTick, LightTexture.FULL_BRIGHT);
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!minecraft.isPaused()) {
+            Player owner = corn.getOwner();
             ParticleHelper.create(owner.level())
                     .generic(GenericParticleBuilder.create()
                             .centerColor(0xFFDD00)

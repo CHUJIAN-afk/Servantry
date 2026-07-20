@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 /**
  * 死魂灵射弹渲染器 - 占位模型+紫色粒子拖尾。
  */
-public class NecroSpiritProjectileRenderer extends AbstractAttachmentEntityRenderer<MiniNecroSpirit> {
+public class MiniNecroSpiritRenderer extends AbstractAttachmentEntityRenderer<MiniNecroSpirit> {
 
     @Override
     protected RenderContext<MiniNecroSpirit> createContext(MiniNecroSpirit entity) {

@@ -184,7 +184,7 @@ public class MiniNecroSpirit extends Projectile implements ICollideAttack<MiniNe
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-1.5, -1.5, -1.5, 1.5, 1.5, 1.5);
+        return new AABB(-0.25, -0.25, -1, 0.25, 0.25, 1);
     }
 
     @Override

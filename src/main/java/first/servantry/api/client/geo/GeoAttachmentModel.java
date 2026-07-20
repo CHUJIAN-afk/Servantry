@@ -3,8 +3,6 @@ package first.servantry.api.client.geo;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.GeoModel;
 
-import java.util.Objects;
-
 /**
  * Geo 附件模型定义，根据 ResourceLocation 自动推导 geo/texture/animation 资源路径。
  * <p>
@@ -15,7 +13,7 @@ import java.util.Objects;
  *   <li>动画:   assets/{namespace}/animations/{path}.animation.json</li>
  * </ul>
  * <p>
- * 通常通过 {@link GeoSideloader#getGeoSideloader(ResourceLocation)} 间接获取，
+ * 通常通过 {@link GeoSideloader#create(ResourceLocation)} 间接获取，
  * 不需要单独持有此类的实例。
  */
 public class GeoAttachmentModel extends GeoModel<DummyGeoAnimatable> {
@@ -61,18 +59,5 @@ public class GeoAttachmentModel extends GeoModel<DummyGeoAnimatable> {
     @Override
     public ResourceLocation getAnimationResource(DummyGeoAnimatable animatable) {
         return this.animationResource;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof GeoAttachmentModel that)) {
-            return false;
-        }
-        return Objects.equals(modelResource, that.modelResource) && Objects.equals(textureResource, that.textureResource) && Objects.equals(animationResource, that.animationResource);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(modelResource, textureResource, animationResource);
     }
 }

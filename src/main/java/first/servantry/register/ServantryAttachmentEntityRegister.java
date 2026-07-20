@@ -158,7 +158,7 @@ public class ServantryAttachmentEntityRegister {
             register("corn", Corn::new, CornRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniNecroSpirit>> MINI_NECRO_SPIRIT =
-            register("mini_necro_spirit", MiniNecroSpirit::new, NecroSpiritProjectileRenderer::new);
+            register("mini_necro_spirit", MiniNecroSpirit::new, MiniNecroSpiritRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ElectricLaser>> ELECTRIC_LASER =
             register("electric_laser", ElectricLaser::new, ElectricLaserRenderer::new);

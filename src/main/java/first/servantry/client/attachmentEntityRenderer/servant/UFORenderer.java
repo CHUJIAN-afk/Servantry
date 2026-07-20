@@ -1,17 +1,19 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.servantry.Servantry;
+import first.servantry.api.client.geo.GeoSideloader;
 import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
-import first.servantry.api.client.render.ModelRenderer;
 import first.servantry.api.client.render.RenderContext;
 import first.servantry.api.client.render.renderConfig.ModelConfig;
 import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.api.entity.PathNode;
 import first.servantry.common.servant.UFO;
-import first.servantry.register.ServantryModelRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * UFO渲染器 - 占位模型+锥体拖尾。
@@ -23,17 +25,20 @@ public class UFORenderer extends AbstractAttachmentEntityRenderer<UFO> {
     protected RenderContext<UFO> createContext(UFO entity) {
         return RenderContext.<UFO>builder()
                 .model(new ModelConfig<UFO>()
-                               .scale(0.5f)
-                               .translateOffset(-0.5f, -0.5f, -0.5f)
+                               .translateOffset(0, -0.1f, 0)
                                .alphaDistanceFactor(1.5f))
                 .build();
     }
 
     @Override
     protected void render(UFO servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<UFO> context, float partialTick) {
-        if (servant.getTrailTimer() > 0 && !Minecraft.getInstance().isPaused()) {
-            int trailTimer = servant.getTrailTimer();
-            ParticleHelper.create(servant.getOwner().level())
+        GeoSideloader.create(Servantry.rl("ufo"))
+                .render(poseStack, bufferSource, partialTick, LightTexture.FULL_BRIGHT);
+        Minecraft minecraft = Minecraft.getInstance();
+        int trailTimer = servant.getTrailTimer();
+        if (trailTimer > 0 && !minecraft.isPaused()) {
+            Player owner = servant.getOwner();
+            ParticleHelper.create(owner.level())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0x46f7ff)
                                      .edgeColor(0x3dd6dd)
@@ -50,6 +55,5 @@ public class UFORenderer extends AbstractAttachmentEntityRenderer<UFO> {
                     .count(5)
                     .emit();
         }
-        ModelRenderer.renderModel(ServantryModelRegister.TEST, poseStack, bufferSource);
     }
 }
