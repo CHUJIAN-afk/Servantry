@@ -1,7 +1,6 @@
 package first.servantry.register;
 
 import first.servantry.Servantry;
-import first.servantry.api.common.dataComponent.ServantWeaponData;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -16,9 +15,6 @@ public class ServantryDataComponentRegister {
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ScabbardContainer>> SCABBARD =
             Register.registerComponentType("scabbard_container", builder -> builder.persistent(ScabbardContainer.CODEC).networkSynchronized(ScabbardContainer.STREAM_CODEC));
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ServantWeaponData>> SERVANT_WEAPON_DATA =
-            Register.registerComponentType("servant_weapon_data", builder -> builder.persistent(ServantWeaponData.CODEC).networkSynchronized(ServantWeaponData.STREAM_CODEC));
 
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
