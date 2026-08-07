@@ -1,7 +1,7 @@
 package first.servantry.common.servant.goal;
 
-import first.servantry.api.servant.MomentumServant;
-import first.servantry.api.servant.ai.ServantGoal;
+import first.lyra.common.servant.MomentumServant;
+import first.lyra.common.servant.ServantGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 

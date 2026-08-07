@@ -1,12 +1,12 @@
 package first.servantry.common.sentryServant;
 
-import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.PathNode;
-import first.servantry.api.servant.Servant;
+import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.servant.Servant;
+import first.lyra.utils.EasingCurve;
 import first.servantry.common.projectile.MiniRainbowCrystal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
-import first.servantry.utils.EasingCurve;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 

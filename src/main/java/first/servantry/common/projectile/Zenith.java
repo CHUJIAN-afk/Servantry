@@ -1,9 +1,9 @@
 package first.servantry.common.projectile;
 
-import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
-import first.servantry.api.entity.*;
-import first.servantry.api.projectile.Projectile;
+import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.entity.*;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.lyra.common.projectile.Projectile;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;

@@ -1,7 +1,7 @@
 package first.servantry.common.servant.goal.twins;
 
-import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
-import first.servantry.api.servant.ai.ServantGoal;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.lyra.common.servant.ServantGoal;
 import first.servantry.common.projectile.DemonFlame;
 import first.servantry.common.servant.Twins;
 import first.servantry.utils.ParticleHelper;

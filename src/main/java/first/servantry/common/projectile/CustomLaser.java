@@ -1,12 +1,12 @@
 package first.servantry.common.projectile;
 
-import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.entity.PathNode;
-import first.servantry.api.projectile.Projectile;
-import first.servantry.api.servant.Servant;
-import first.servantry.api.servant.ServantDamageSource;
+import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.projectile.Projectile;
+import first.lyra.common.servant.Servant;
+import first.lyra.common.servant.ServantDamageSource;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.damagesource.DamageSource;

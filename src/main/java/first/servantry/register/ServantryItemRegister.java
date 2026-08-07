@@ -1,89 +1,108 @@
 package first.servantry.register;
 
+import first.lyra.client.creativeTab.AnimBanner;
+import first.lyra.common.creativeTab.Section;
+import first.lyra.register.LyraItemRegisterBuilder;
 import first.servantry.Servantry;
-import first.servantry.client.creativeTab.AnimInfo;
 import first.servantry.common.item.ZenithItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.Tiers;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ServantryItemRegister {
 
-    public static final TabGroup MATERIAL = new TabGroup(3, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
-    public static final TabGroup BLOCK = new TabGroup(5, Servantry.rl("textures/item/banner/default_banner.png"), new AnimInfo(18, 1, 1));
+    /** 主 mod 物品注册表（宿主传入 LyraItemRegisterBuilder 使用）。 */
+    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Servantry.MODID);
+
+    public static final Section MATERIAL = new Section(3, Servantry.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), ServantryItemTagsRegister.SectionMaterial);
+    public static final Section BLOCK = new Section(5, Servantry.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), ServantryItemTagsRegister.SectionBlock);
 
     public static final DeferredItem<ZenithItem> Zenith =
-            ServantryItemRegisterBuilder.build(null, "zenith", () -> new ZenithItem(Tiers.NETHERITE, new Item.Properties()
+            LyraItemRegisterBuilder.build(ITEMS, "zenith", () -> new ZenithItem(Tiers.NETHERITE, new Item.Properties()
                             .rarity(Rarity.EPIC)
                             .stacksTo(1)))
                     .itemLanguage("Zenith", "天顶剑")
-                    .itemModel(ServantryItemRegisterBuilder::handheldItem)
+                    .itemModel(LyraItemRegisterBuilder::handheldItem)
                     .build();
 
     public static final DeferredItem<BlockItem> MithrilAnvil =
-            ServantryItemRegisterBuilder.build(BLOCK, "mithril_anvil", () -> new BlockItem(ServantryBlockRegister.MITHRIL_ANVIL.get(), new Item.Properties()))
+            LyraItemRegisterBuilder.build(ITEMS, "mithril_anvil", () -> new BlockItem(ServantryBlockRegister.MITHRIL_ANVIL.get(), new Item.Properties()))
+                    .itemTag(ServantryItemTagsRegister.SectionBlock)
                     .itemLanguage("Mithril Anvil", "秘银砧")
                     .blockLanguage("Mithril Anvil", "秘银砧")
                     .itemModel((location, provider) -> provider.simpleBlockItem(location))
                     .build();
     public static final DeferredItem<Item> Silk =
-            ServantryItemRegisterBuilder.build(MATERIAL, "silk")
+            LyraItemRegisterBuilder.build(ITEMS, "silk")
+                    .itemTag(ServantryItemTagsRegister.SectionMaterial)
                     .itemLanguage("Silk", "丝绸")
-                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> BlackLens =
-            ServantryItemRegisterBuilder.build(MATERIAL, "black_lens")
+            LyraItemRegisterBuilder.build(ITEMS, "black_lens")
+                    .itemTag(ServantryItemTagsRegister.SectionMaterial)
                     .itemLanguage("Black Lens", "黑色晶状体")
-                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> BeeWax =
-            ServantryItemRegisterBuilder.build(MATERIAL, "bee_wax")
+            LyraItemRegisterBuilder.build(ITEMS, "bee_wax")
+                    .itemTag(ServantryItemTagsRegister.SectionMaterial)
                     .itemLanguage("Bee Wax", "蜂蜡")
-                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> ForbiddenFragment =
-            ServantryItemRegisterBuilder.build(MATERIAL, "forbidden_fragment")
+            LyraItemRegisterBuilder.build(ITEMS, "forbidden_fragment")
+                    .itemTag(ServantryItemTagsRegister.SectionMaterial)
                     .itemLanguage("Forbidden Fragment", "禁戒碎片")
-                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> AdamantiteIngot =
-            ServantryItemRegisterBuilder.build(MATERIAL, "adamantite_ingot")
+            LyraItemRegisterBuilder.build(ITEMS, "adamantite_ingot")
+                    .itemTag(ServantryItemTagsRegister.SectionMaterial)
                     .itemLanguage("Adamantite Ingot", "精金锭")
                     .itemTag(Tags.Items.INGOTS)
-                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> SpiderFang =
-            ServantryItemRegisterBuilder.build(MATERIAL, "spider_fang")
+            LyraItemRegisterBuilder.build(ITEMS, "spider_fang")
+                    .itemTag(ServantryItemTagsRegister.SectionMaterial)
                     .itemLanguage("Spider Fang", "蜘蛛牙")
-                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> HallowedIngot =
-            ServantryItemRegisterBuilder.build(MATERIAL, "hallowed_ingot")
+            LyraItemRegisterBuilder.build(ITEMS, "hallowed_ingot")
+                    .itemTag(ServantryItemTagsRegister.SectionMaterial)
                     .itemLanguage("Hallowed Ingot", "神圣锭")
                     .itemTag(Tags.Items.INGOTS)
-                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> ChlorophyteIngot =
-            ServantryItemRegisterBuilder.build(MATERIAL, "chlorophyte_ingot")
+            LyraItemRegisterBuilder.build(ITEMS, "chlorophyte_ingot")
+                    .itemTag(ServantryItemTagsRegister.SectionMaterial)
                     .itemLanguage("Chlorophyte Ingot", "叶绿锭")
                     .itemTag(Tags.Items.INGOTS)
-                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> Stardust =
-            ServantryItemRegisterBuilder.build(MATERIAL, "stardust")
+            LyraItemRegisterBuilder.build(ITEMS, "stardust")
+                    .itemTag(ServantryItemTagsRegister.SectionMaterial)
                     .itemLanguage("Stardust", "星尘")
-                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> LuminiteIngot =
-            ServantryItemRegisterBuilder.build(MATERIAL, "luminite_ingot")
+            LyraItemRegisterBuilder.build(ITEMS, "luminite_ingot")
+                    .itemTag(ServantryItemTagsRegister.SectionMaterial)
                     .itemLanguage("Luminite Ingot", "夜明锭")
-                    .itemModel(ServantryItemRegisterBuilder::basicModel)
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
                     .itemTag(Tags.Items.INGOTS)
                     .build();
 
-    public static void register() {
+    public static void register(IEventBus eventBus) {
+        ITEMS.register(eventBus);
     }
 }

@@ -13,26 +13,9 @@ public class ServantryLanguageGenerateRegister {
     public static void init(){
         // ================= 模组基础 =================
         entry("modid.servantry", "Servantry", "仆从学");
-        entry("item.servantry.tooltip.set_bonus_title", "Set Rewards:", "套装奖励:");
-        entry("item.servantry.tooltip.damage", "Summon Damage", "仆从伤害");
-        entry("item.servantry.tooltip.knockback", "Knockback", "击退强度");
-        entry("item.servantry.tooltip.armor_pierce", "Armor Pierce", "护甲穿透");
-        entry("item.servantry.tooltip.summon", "Summons %s to fight for you", "召唤 %s 为你而战");
-        entry("item.servantry.tooltip.servant_slots", "Servant Slots: %s / %s", "仆从栏位: %s / %s");
-        entry("item.servantry.tooltip.sentry_servant_slots", "Sentry Servant Slots: %s / %s", "哨戒仆从栏位: %s / %s");
-        entry("item.servantry.tooltip.sentry_servant", "Sentry Servant", "哨戒仆从");
-        entry("item.servantry.tooltip.remove_all", "Sneak + Use to dismiss all servants of this type", "潜行右键以遣散该类型仆从");
         entry("death.attack.servantry.servant", "%1$s was torn apart by a servant", "%1$s 被仆从撕碎");
         entry("death.attack.servantry.servant.player", "%1$s was torn apart by a servant whilst fighting %2$s", "%1$s 在与 %2$s 战斗时被仆从撕碎");
         entry("container.servantry.mithril_anvil", "Forging", "超凡锻造");
-        // ================= 属性 =================
-        entry(ServantryAttributeRegister.ServantMaxCount.get().getDescriptionId(), "Max Servants", "仆从栏");
-        entry(ServantryAttributeRegister.SentryServantMaxCount.get().getDescriptionId(), "Max Sentry Servants", "哨戒仆从栏");
-        entry(ServantryAttributeRegister.ServantDamage.get().getDescriptionId(), "Servant Damage", "仆从伤害");
-        entry(ServantryAttributeRegister.ServantKnockback.get().getDescriptionId(), "Servant Knockback", "仆从击退");
-        entry(ServantryAttributeRegister.ServantArmorPierce.get().getDescriptionId(), "Servant Armor Pierce", "仆从护甲穿透");
-        entry(ServantryAttributeRegister.ServantSearchRange.get().getDescriptionId(), "Servant Search Range", "仆从索敌范围");
-        entry(ServantryAttributeRegister.HealthRegen.get().getDescriptionId(), "Health Regen", "生命再生");
         // ===================== 药水效果 =====================
         entry(ServantryMobEffectRegister.Obsession.get().getDescriptionId(), "Obsession", "着魔");
         entry(ServantryMobEffectRegister.CellParasitism.get().getDescriptionId(), "Cell Parasitism", "细胞寄生");
@@ -59,23 +42,10 @@ public class ServantryLanguageGenerateRegister {
         entry("jei.servantry.description.drops_from_zombie", "Occasionally drops from Zombie", "僵尸偶尔掉落");
         entry("jei.servantry.description.fishing", "Occasionally obtained from fishing in the ocean during rain", "在海洋中雨天钓鱼时偶尔获得");
         entry("jei.servantry.description.ancient_city", "Occasionally found in Ancient City chests", "偶尔在远古城市宝箱中发现");
-        // ===================== 客户端配置 =====================
-        entry("servantry.configuration.title", "Servantry Configuration", "仆从学配置");
-        entry("servantry.configuration.section.servantry.client.toml", "Client", "客户端");
-        entry("servantry.configuration.section.servantry.client.toml.title", "Client Configuration", "客户端配置");
-        configEntry("dynamic_light", "Dynamic Light", "动态光照", "Enable Servantry dynamic lighting, which increases additional rendering performance cost", "启用仆从学动态光照，会增加额外的渲染性能消耗");
-        configEntry("alpha_modify", "Alpha Modify", "透明度修正", "Enable Servantry proximity alpha modification, making servants transparent at close range to avoid blocking view", "启用仆从学近距离透明度修正，近距离透明化避免遮挡视线");
-        configEntry("damage_info", "Damage Info", "伤害信息", "Enable Servantry high-performance damage info, with negligible impact on client rendering performance", "启用仆从学高性能伤害信息，几乎不会影响客户端的渲染性能");
-        configEntry("debug_mode", "Debug Mode", "调试模式", "Enable virtual entity debug strokes", "启用虚拟实体调试描边");
     }
 
     public static void entry(String key, String enDesc, String zhDesc) {
         LanguageGenerate.put(key, new Pair<>(enDesc, zhDesc));
-    }
-
-    public static void configEntry(String configKey, String enName, String zhName, String enTooltip, String zhTooltip) {
-        entry("servantry.configuration." + configKey, enName, zhName);
-        entry("servantry.configuration." + configKey + ".tooltip", enTooltip, zhTooltip);
     }
 
     public static void potionEntry(String effectName, String enName, String zhName) {

@@ -1,11 +1,11 @@
 package first.servantry.common.servant.goal.terraprism;
 
-import first.servantry.api.entity.Ellipse;
-import first.servantry.api.entity.PathNode;
-import first.servantry.api.entity.PlannedPath;
-import first.servantry.api.servant.ai.ServantGoal;
+import first.lyra.common.entity.Ellipse;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.entity.PlannedPath;
+import first.lyra.common.servant.ServantGoal;
+import first.lyra.utils.EasingCurve;
 import first.servantry.common.servant.Terraprism;
-import first.servantry.utils.EasingCurve;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 

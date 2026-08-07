@@ -1,9 +1,10 @@
 package first.servantry.common;
 
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachment.AttachmentEntityData;
+import first.lyra.common.servant.ServantDamageSource;
+import first.lyra.register.LyraAttachmentRegister;
 import first.servantry.Servantry;
-import first.servantry.api.ServantryHelper;
-import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.servant.ServantDamageSource;
 import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.servant.ChlorophyteCrystal;
 import first.servantry.common.servant.StardustCell;
@@ -156,15 +157,15 @@ public class Event {
             if (ServantryArmorSetRegister.Hallowed.get().full(player)) {
                 target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
             }
-            List<VoidEater> voidEaters = ServantryHelper.get(player).getEntityData().get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
+            List<VoidEater> voidEaters = LyraHelper.get(player).getEntityData().get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
             if (!voidEaters.isEmpty()) {
                 target.addEffect(new MobEffectInstance(ServantryMobEffectRegister.GodSlayerInferno, 60));
             }
         }
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player && target.isAlive()) {
-            EntityData entityData = player.getData(ServantryAttachmentRegister.EntityData);
+            AttachmentEntityData entityData = player.getData(LyraAttachmentRegister.EntityData);
             if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof ChlorophyteCrystal)) {
-                List<ChlorophyteCrystal> crystals = entityData.get(EntityData.Type.ExtraServant, ServantryAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get());
+                List<ChlorophyteCrystal> crystals = entityData.get(AttachmentEntityData.Type.ExtraServant, ServantryAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get());
                 for (ChlorophyteCrystal crystal : crystals) {
                     if (crystal.getExtraShootCooldown() <= 0) {
                         crystal.setExtraShootCooldown(16);
@@ -173,7 +174,7 @@ public class Event {
                 }
             }
             if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof StardustCell)) {
-                List<StardustCell> stardustCells = entityData.get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_CELL.get());
+                List<StardustCell> stardustCells = entityData.get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_CELL.get());
                 for (StardustCell cell : stardustCells) {
                     if (cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
                         cell.setExtraShootCooldown(14);

@@ -4,13 +4,7 @@
   "package": "first.servantry.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "CombatRulesMixin",
-    "CreativeModeTabMixin",
-    "DamageSourceMixin",
-    "DamageSourcesMixin",
-    "LevelRendererAccessor",
-    "LivingEntityMixin",
-    "PlayerMixin"
+    "DamageSourcesMixin"
   ],
   "injectors": {
     "defaultRequire": 1
@@ -19,8 +13,5 @@
     "requireAnnotations": true
   },
   "client": [
-    "CreativeModeInventoryScreenMixin",
-    "EntityRendererMixin",
-    "LevelRendererMixin"
   ]
 }

@@ -1,14 +1,14 @@
 package first.servantry.common.servant;
 
-import first.servantry.api.ServantryHelper;
-import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.common.attachment.TargetCache;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.entity.PathNode;
-import first.servantry.api.servant.Servant;
-import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachment.AttachmentEntityData;
+import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.TargetCache;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.servant.Servant;
+import first.lyra.common.servant.ServantGoalSelector;
 import first.servantry.common.servant.goal.terraprism.TerraprismAttackGoal;
 import first.servantry.common.servant.goal.terraprism.TerraprismIdleGoal;
 import first.servantry.common.servant.goal.terraprism.TerraprismPrepGoal;
@@ -47,7 +47,7 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
     @Override
     public LivingEntity searchTarget() {
-        ServantryHelper helper = ServantryHelper.get(owner);
+        LyraHelper helper = LyraHelper.get(owner);
         TargetCache targetCache = helper.getTargetCache();
         if (!targetCache.isEmpty()) {
             float searchRange = targetCache.getServantSearchRange(this.getOwner(), this.getSearchDistance());
@@ -143,17 +143,17 @@ public class Terraprism extends Servant implements ICollideAttack<Terraprism> {
 
     @Override
     public int getOrder() {
-        return ServantryHelper.get(owner)
+        return LyraHelper.get(owner)
                 .getEntityData()
-                .get(EntityData.Type.Servant, Terraprism.class)
+                .get(AttachmentEntityData.Type.Servant, Terraprism.class)
                 .indexOf(this);
     }
 
     @Override
     public int getSameSize() {
-        return ServantryHelper.get(owner)
+        return LyraHelper.get(owner)
                 .getEntityData()
-                .get(EntityData.Type.Servant, Terraprism.class)
+                .get(AttachmentEntityData.Type.Servant, Terraprism.class)
                 .size();
     }
 

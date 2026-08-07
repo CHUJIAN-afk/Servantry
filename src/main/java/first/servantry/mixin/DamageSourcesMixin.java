@@ -1,6 +1,6 @@
 package first.servantry.mixin;
 
-import first.servantry.api.servant.ServantDamageSource;
+import first.lyra.common.servant.ServantDamageSource;
 import first.servantry.common.servant.InfiniteShadow;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;

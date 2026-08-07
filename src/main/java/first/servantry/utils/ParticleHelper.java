@@ -1,8 +1,8 @@
 package first.servantry.utils;
 
-import first.servantry.api.common.attachment.BatchedParticlesData;
-import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
-import first.servantry.register.ServantryAttachmentRegister;
+import first.lyra.common.attachment.ParticlesData;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.lyra.register.LyraAttachmentRegister;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -136,7 +136,7 @@ public class ParticleHelper {
     /**
      * 发射粒子，根据 count 自动选择模式。
      * <p>
-     * 服务端：累积到 Level 的 {@link BatchedParticlesData} 附件，由 tick 末统一打包下发，
+     * 服务端：累积到 Level 的 {@link ParticlesData} 附件，由 tick 末统一打包下发，
      * 避免每个粒子单独发送网络包。客户端：直接调用 {@link Level#addParticle} 生成粒子。
      * </p>
      */
@@ -146,7 +146,7 @@ public class ParticleHelper {
         }
 
         boolean server = !level.isClientSide();
-        BatchedParticlesData batch = server ? level.getData(ServantryAttachmentRegister.BatchedParticles) : null;
+        ParticlesData batch = server ? level.getData(LyraAttachmentRegister.BatchedParticles) : null;
 
         if (count <= 0) {
             ParticleOptions options = genericBuilder != null ? genericBuilder.build() : particleType;

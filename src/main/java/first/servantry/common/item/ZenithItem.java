@@ -1,10 +1,10 @@
 package first.servantry.common.item;
 
-import first.servantry.api.common.attachment.TargetCache;
-import first.servantry.api.entity.Ellipse;
-import first.servantry.api.entity.PathNode;
+import first.lyra.common.attachment.TargetCache;
+import first.lyra.common.entity.Ellipse;
+import first.lyra.common.entity.PathNode;
+import first.lyra.register.LyraAttachmentRegister;
 import first.servantry.common.projectile.Zenith;
-import first.servantry.register.ServantryAttachmentRegister;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -73,7 +73,7 @@ public class ZenithItem extends SwordItem {
      */
     private List<LivingEntity> collectTargets(Player player) {
         List<LivingEntity> result = new ArrayList<>();
-        TargetCache cache = player.getData(ServantryAttachmentRegister.TargetCache);
+        TargetCache cache = player.getData(LyraAttachmentRegister.TargetCache);
 
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookDir = player.getLookAngle().normalize();

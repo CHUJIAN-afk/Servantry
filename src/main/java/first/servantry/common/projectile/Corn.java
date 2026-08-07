@@ -1,16 +1,16 @@
 package first.servantry.common.projectile;
 
-import first.servantry.api.ServantryHelper;
-import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.common.attachment.TargetCache;
-import first.servantry.api.common.sound.Playable;
-import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.IBlockCollision;
-import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.projectile.Projectile;
-import first.servantry.api.servant.Servant;
-import first.servantry.api.servant.ServantDamageSource;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.TargetCache;
+import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.IBlockCollision;
+import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.projectile.Projectile;
+import first.lyra.common.servant.Servant;
+import first.lyra.common.servant.ServantDamageSource;
+import first.lyra.common.sound.Playable;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.core.particles.ParticleTypes;
@@ -67,7 +67,7 @@ public class Corn extends Projectile implements ICollideAttack<Corn>, IBlockColl
         if (source instanceof ServantDamageSource sds) {
             Servant servant = sds.getServant();
             // 通过TargetCache获取附近实体
-            ServantryHelper helper = ServantryHelper.get(owner);
+            LyraHelper helper = LyraHelper.get(owner);
             TargetCache targetCache = helper.getTargetCache();
             List<LivingEntity> nearbyEntities = targetCache.getEntities();
 

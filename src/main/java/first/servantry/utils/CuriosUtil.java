@@ -1,6 +1,6 @@
 package first.servantry.utils;
 
-import first.servantry.api.item.CurioItem;
+import first.servantry.common.item.CurioItem;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;

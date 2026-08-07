@@ -1,8 +1,8 @@
 package first.servantry.common.servant.goal.twins;
 
-import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
-import first.servantry.api.common.sound.Playable;
-import first.servantry.api.servant.ai.ServantGoal;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.lyra.common.servant.ServantGoal;
+import first.lyra.common.sound.Playable;
 import first.servantry.common.projectile.Laser;
 import first.servantry.common.servant.Twins;
 import first.servantry.register.ServantrySoundRegister;

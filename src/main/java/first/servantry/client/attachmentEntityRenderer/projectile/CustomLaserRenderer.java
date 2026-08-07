@@ -1,12 +1,12 @@
 package first.servantry.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.client.dynamicLight.DynamicLightDispatcher;
-import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
-import first.servantry.api.client.render.RenderContext;
-import first.servantry.api.client.render.renderConfig.ModelConfig;
-import first.servantry.api.client.render.renderer.LaserRendererHelper;
-import first.servantry.api.entity.PathNode;
+import first.lyra.client.dynamicLight.DynamicLightDispatcher;
+import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.rendererHelper.LaserRendererHelper;
+import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.common.entity.PathNode;
 import first.servantry.common.projectile.CustomLaser;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.AABB;

@@ -1,10 +1,11 @@
 package first.servantry.register;
 
+import first.lyra.api.LyraHelper;
+import first.lyra.common.armorSet.ArmorSet;
+import first.lyra.common.attachment.AttachmentEntityData;
+import first.lyra.register.LyraAttributeRegister;
+import first.lyra.register.LyraRegistries;
 import first.servantry.Servantry;
-import first.servantry.api.ServantryHelper;
-import first.servantry.api.armorSet.ArmorSet;
-import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.servant.ChlorophyteCrystal;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -14,7 +15,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ServantryArmorSetRegister {
 
-    private static final DeferredRegister<ArmorSet> Register = DeferredRegister.create(ServantryRegistries.ARMOR_SETS, Servantry.MODID);
+    private static final DeferredRegister<ArmorSet> Register = DeferredRegister.create(LyraRegistries.ARMOR_SETS, Servantry.MODID);
 
     public static final DeferredHolder<ArmorSet, ArmorSet> Bee =
             Register.register("bee", () -> ArmorSet.builder(Servantry.rl("bee"))
@@ -22,7 +23,7 @@ public class ServantryArmorSetRegister {
                     .piece(ServantryArmorRegister.BeeChestplate)
                     .piece(ServantryArmorRegister.BeeLeggings)
                     .piece(ServantryArmorRegister.BeeBoots)
-                    .modifier(ServantryAttributeRegister.ServantDamage, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.ServantDamage, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 
@@ -32,7 +33,7 @@ public class ServantryArmorSetRegister {
                     .piece(ServantryArmorRegister.SpiderChestplate)
                     .piece(ServantryArmorRegister.SpiderLeggings)
                     .piece(ServantryArmorRegister.SpiderBoots)
-                    .modifier(ServantryAttributeRegister.ServantDamage, 0.12, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.ServantDamage, 0.12, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 
@@ -53,8 +54,8 @@ public class ServantryArmorSetRegister {
                     .piece(ServantryArmorRegister.ObsidianLeggings)
                     .piece(ServantryArmorRegister.ObsidianBoots)
                     .modifier(Attributes.MOVEMENT_SPEED, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                    .modifier(ServantryAttributeRegister.ServantDamage, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                    .modifier(ServantryAttributeRegister.ServantSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.ServantDamage, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.ServantSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 
@@ -63,8 +64,8 @@ public class ServantryArmorSetRegister {
             .piece(ServantryArmorRegister.HallowedChestplate)
             .piece(ServantryArmorRegister.HallowedLeggings)
             .piece(ServantryArmorRegister.HallowedBoots)
-            .modifier(ServantryAttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
-            .modifier(ServantryAttributeRegister.ServantArmorPierce, 4, AttributeModifier.Operation.ADD_VALUE)
+            .modifier(LyraAttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+            .modifier(LyraAttributeRegister.ServantArmorPierce, 4, AttributeModifier.Operation.ADD_VALUE)
             .tooltip(1, "Servants grant I-frames on attack", "仆从攻击使敌人高亮")
             .build()
     );
@@ -75,8 +76,8 @@ public class ServantryArmorSetRegister {
                     .piece(ServantryArmorRegister.ValhallaKnightChestplate)
                     .piece(ServantryArmorRegister.ValhallaKnightLeggings)
                     .piece(ServantryArmorRegister.ValhallaKnightBoots)
-                    .modifier(ServantryAttributeRegister.SentryServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                    .modifier(ServantryAttributeRegister.ServantDamage, 0.40, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.SentryServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(LyraAttributeRegister.ServantDamage, 0.40, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .modifier(Attributes.KNOCKBACK_RESISTANCE, 1.0, AttributeModifier.Operation.ADD_VALUE)
                     .tooltip(1, "Summons a powerful leaf crystal to shoot at nearby enemies", "大幅提升弩车开火速度，弩箭速度，弩箭最大穿透数，弩箭伤害")
                     .tooltip(2, "Summons a powerful leaf crystal to shoot at nearby enemies", "受到伤害时，提供弩车恐慌增益，极大幅提升弩车开火速度")
@@ -89,14 +90,14 @@ public class ServantryArmorSetRegister {
                     .piece(ServantryArmorRegister.ChlorophyteChestplate)
                     .piece(ServantryArmorRegister.ChlorophyteLeggings)
                     .piece(ServantryArmorRegister.ChlorophyteBoots)
-                    .modifier(ServantryAttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(LyraAttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
                     .onStart(player -> {
                         ChlorophyteCrystal crystal = new ChlorophyteCrystal();
                         crystal.setDamage(10);
                         crystal.setKnockback(1);
-                        ServantryHelper.get(player).add(EntityData.Type.ExtraServant, crystal);
+                        LyraHelper.get(player).add(AttachmentEntityData.Type.ExtraServant, crystal);
                     })
-                    .onRemove(player -> ServantryHelper.get(player).getEntityData().remove(EntityData.Type.ExtraServant, ServantryAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))
+                    .onRemove(player -> LyraHelper.get(player).getEntityData().remove(AttachmentEntityData.Type.ExtraServant, ServantryAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))
                     .tooltip(1, "Summons a powerful leaf crystal to shoot at nearby enemies", "召唤强大的叶状水晶来射击附近的敌人")
                     .build()
             );
@@ -107,8 +108,8 @@ public class ServantryArmorSetRegister {
                     .piece(ServantryArmorRegister.SpookyChestplate)
                     .piece(ServantryArmorRegister.SpookyLeggings)
                     .piece(ServantryArmorRegister.SpookyBoots)
-                    .modifier(ServantryAttributeRegister.ServantDamage, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                    .modifier(ServantryAttributeRegister.ServantArmorPierce, 12, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(LyraAttributeRegister.ServantDamage, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.ServantArmorPierce, 12, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -118,8 +119,8 @@ public class ServantryArmorSetRegister {
                     .piece(ServantryArmorRegister.TikiChestplate)
                     .piece(ServantryArmorRegister.TikiLeggings)
                     .piece(ServantryArmorRegister.TikiBoots)
-                    .modifier(ServantryAttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                    .modifier(ServantryAttributeRegister.ServantSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(LyraAttributeRegister.ServantSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 

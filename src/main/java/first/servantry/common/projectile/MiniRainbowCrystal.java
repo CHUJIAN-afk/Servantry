@@ -1,14 +1,14 @@
 package first.servantry.common.projectile;
 
-import first.servantry.api.ServantryHelper;
-import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
-import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.PathNode;
-import first.servantry.api.projectile.Projectile;
-import first.servantry.api.servant.Servant;
-import first.servantry.api.servant.ServantDamageSource;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.lyra.common.projectile.Projectile;
+import first.lyra.common.servant.Servant;
+import first.lyra.common.servant.ServantDamageSource;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.ParticleHelper;
 import net.minecraft.util.FastColor;
@@ -58,7 +58,7 @@ public class MiniRainbowCrystal extends Projectile {
                         .spread(2)
                         .emit();
                 if (damageSource != null) {
-                    List<LivingEntity> entities = ServantryHelper.get(owner).getTargetCache().getEntities();
+                    List<LivingEntity> entities = LyraHelper.get(owner).getTargetCache().getEntities();
                     for (LivingEntity living : entities) {
                         if (living.getBoundingBox().getCenter().distanceToSqr(pos) < 9 + living.getBoundingBox().getSize() * 0.5) {
                             boolean isTarget = true;

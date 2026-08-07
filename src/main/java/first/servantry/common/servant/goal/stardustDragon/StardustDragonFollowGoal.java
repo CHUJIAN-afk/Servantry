@@ -1,8 +1,8 @@
 package first.servantry.common.servant.goal.stardustDragon;
 
-import first.servantry.api.entity.PathNode;
-import first.servantry.api.entity.PlannedPath;
-import first.servantry.api.servant.ai.ServantGoal;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.entity.PlannedPath;
+import first.lyra.common.servant.ServantGoal;
 import first.servantry.common.servant.StardustDragon;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;

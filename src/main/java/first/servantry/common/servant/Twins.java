@@ -1,11 +1,11 @@
 package first.servantry.common.servant;
 
-import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.IBlockCollision;
-import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.servant.MomentumServant;
-import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.IBlockCollision;
+import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.servant.MomentumServant;
+import first.lyra.common.servant.ServantGoalSelector;
 import first.servantry.common.servant.goal.MomentumServantIdleGoal;
 import first.servantry.common.servant.goal.twins.TwinsCursedFlameAttackGoal;
 import first.servantry.common.servant.goal.twins.TwinsLaserAttackGoal;

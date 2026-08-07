@@ -1,8 +1,8 @@
 package first.servantry.common.servant;
 
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.PathNode;
-import first.servantry.api.servant.Servant;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.servant.Servant;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;

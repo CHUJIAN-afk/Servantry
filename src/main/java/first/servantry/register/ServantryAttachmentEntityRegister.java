@@ -1,11 +1,11 @@
 package first.servantry.register;
 
+import first.lyra.client.render.AttachmentEntityRenderDispatcher;
+import first.lyra.client.render.IAttachmentEntityRenderer;
+import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.register.LyraRegistries;
 import first.servantry.Servantry;
-import first.servantry.api.client.render.AttachmentEntityRenderDispatcher;
-import first.servantry.api.client.render.IAttachmentEntityRenderer;
-import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.register.ServantryRegistries;
 import first.servantry.client.attachmentEntityRenderer.projectile.*;
 import first.servantry.client.attachmentEntityRenderer.servant.*;
 import first.servantry.common.projectile.*;
@@ -25,7 +25,7 @@ import java.util.function.Supplier;
  */
 public class ServantryAttachmentEntityRegister {
 
-    private static final DeferredRegister<AttachmentEntityType<?>> Register = DeferredRegister.create(ServantryRegistries.ATTACHMENT_ENTITY_TYPES, Servantry.MODID);
+    private static final DeferredRegister<AttachmentEntityType<?>> Register = DeferredRegister.create(LyraRegistries.ATTACHMENT_ENTITY_TYPES, Servantry.MODID);
 
     // ===================== 仆从类型 =====================
 

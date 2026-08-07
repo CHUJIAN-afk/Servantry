@@ -3,9 +3,9 @@ package first.servantry.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Either;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachment.AttachmentEntityData;
 import first.servantry.Servantry;
-import first.servantry.api.ServantryHelper;
-import first.servantry.api.common.attachment.EntityData;
 import first.servantry.client.renderType.OreScoutHighlightRenderType;
 import first.servantry.client.screen.MithrilAnvilGui;
 import first.servantry.client.tooltip.ScabbardTooltipComponent;
@@ -45,9 +45,9 @@ public class ClientEvent {
         ClientLevel clientLevel = minecraft.level;
         LocalPlayer player = minecraft.player;
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS && clientLevel != null && player != null) {
-            List<OreScout> scouts = ServantryHelper.get(player)
+            List<OreScout> scouts = LyraHelper.get(player)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.ORE_SCOUT.get());
+                    .get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.ORE_SCOUT.get());
             if (!scouts.isEmpty()) {
                 OreScout scout = scouts.getFirst();
                 MultiBufferSource bufferSource = minecraft.renderBuffers()

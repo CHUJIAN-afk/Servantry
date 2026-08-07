@@ -1,5 +1,6 @@
 package first.servantry.register;
 
+import first.lyra.register.LyraAttributeRegister;
 import first.servantry.Servantry;
 import it.unimi.dsi.fastutil.ints.Int2DoubleFunction;
 import net.minecraft.core.Holder;
@@ -38,7 +39,7 @@ public class ServantryMobEffectRegister {
      */
     public static final DeferredHolder<MobEffect, MobEffect> Obsession =
             Register.register("obsession", () -> builder(MobEffectCategory.BENEFICIAL, 0xb565ff)
-                    .addAttributeModifier(ServantryAttributeRegister.ServantMaxCount, Servantry.rl("obsession"), 1, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(LyraAttributeRegister.ServantMaxCount, Servantry.rl("obsession"), 1, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -47,7 +48,7 @@ public class ServantryMobEffectRegister {
      */
     public static final DeferredHolder<MobEffect, MobEffect> CellParasitism =
             Register.register("cell_parasitism", () -> builder(MobEffectCategory.HARMFUL, 0x8AE0FF)
-                    .addAttributeModifier(ServantryAttributeRegister.HealthRegen, Servantry.rl("cell_parasitism"), amplifier -> -(amplifier + 1) * 2, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(LyraAttributeRegister.HealthRegen, Servantry.rl("cell_parasitism"), amplifier -> -(amplifier + 1) * 2, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -56,7 +57,7 @@ public class ServantryMobEffectRegister {
      */
     public static final DeferredHolder<MobEffect, MobEffect> CursedFlame =
             Register.register("cursed_flame", () -> builder(MobEffectCategory.HARMFUL, 0x1AFF05)
-                    .addAttributeModifier(ServantryAttributeRegister.HealthRegen, Servantry.rl("cursed_flame"), amplifier -> -(amplifier + 1) * 2.4, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(LyraAttributeRegister.HealthRegen, Servantry.rl("cursed_flame"), amplifier -> -(amplifier + 1) * 2.4, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -65,7 +66,7 @@ public class ServantryMobEffectRegister {
      */
     public static final DeferredHolder<MobEffect, MobEffect> Shadowflame =
             Register.register("shadowflame", () -> builder(MobEffectCategory.HARMFUL, 0x9933FF)
-                    .addAttributeModifier(ServantryAttributeRegister.HealthRegen, Servantry.rl("shadowflame"), amplifier -> -(amplifier + 1) * 1.5, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(LyraAttributeRegister.HealthRegen, Servantry.rl("shadowflame"), amplifier -> -(amplifier + 1) * 1.5, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -83,7 +84,7 @@ public class ServantryMobEffectRegister {
      */
     public static final DeferredHolder<MobEffect, MobEffect> GodSlayerInferno =
             Register.register("god_slayer_inferno", () -> builder(MobEffectCategory.HARMFUL, 0x6f19d4)
-                    .addAttributeModifier(ServantryAttributeRegister.HealthRegen, Servantry.rl("god_slayer_inferno"), amplifier -> -(amplifier + 1) * 25, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(LyraAttributeRegister.HealthRegen, Servantry.rl("god_slayer_inferno"), amplifier -> -(amplifier + 1) * 25, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -103,7 +104,7 @@ public class ServantryMobEffectRegister {
 
     public static final DeferredHolder<MobEffect, MobEffect> SoulMight =
             Register.register("soul_might", () -> builder(MobEffectCategory.BENEFICIAL, 0x9B6BFF)
-                    .addAttributeModifier(ServantryAttributeRegister.ServantDamage, Servantry.rl("soul_might"), 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .addAttributeModifier(LyraAttributeRegister.ServantDamage, Servantry.rl("soul_might"), 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 
@@ -115,12 +116,12 @@ public class ServantryMobEffectRegister {
 
     public static final DeferredHolder<MobEffect, MobEffect> SoulRecovery =
             Register.register("soul_recovery", () -> builder(MobEffectCategory.BENEFICIAL, 0x83FFB1)
-                    .addAttributeModifier(ServantryAttributeRegister.HealthRegen, Servantry.rl("soul_recovery"), 0.05, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(LyraAttributeRegister.HealthRegen, Servantry.rl("soul_recovery"), 0.05, AttributeModifier.Operation.ADD_VALUE)
                     .build());
 
     public static final DeferredHolder<MobEffect, MobEffect> HallowedMight =
             Register.register("hallowed_might", () -> builder(MobEffectCategory.BENEFICIAL, 0xFFD875)
-                    .addAttributeModifier(ServantryAttributeRegister.ServantDamage, Servantry.rl("hallowed_might"), 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .addAttributeModifier(LyraAttributeRegister.ServantDamage, Servantry.rl("hallowed_might"), 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build());
 
     public static final DeferredHolder<MobEffect, MobEffect> HallowedGrace =
@@ -130,12 +131,12 @@ public class ServantryMobEffectRegister {
 
     public static final DeferredHolder<MobEffect, MobEffect> HallowedRadiance =
             Register.register("hallowed_radiance", () -> builder(MobEffectCategory.BENEFICIAL, 0xFFFFAA)
-                    .addAttributeModifier(ServantryAttributeRegister.HealthRegen, Servantry.rl("hallowed_radiance"), 0.1, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(LyraAttributeRegister.HealthRegen, Servantry.rl("hallowed_radiance"), 0.1, AttributeModifier.Operation.ADD_VALUE)
                     .build());
 
     public static final DeferredHolder<MobEffect, MobEffect> PhantasmalMight =
             Register.register("phantasmal_might", () -> builder(MobEffectCategory.BENEFICIAL, 0xD48CFF)
-                    .addAttributeModifier(ServantryAttributeRegister.ServantDamage, Servantry.rl("phantasmal_might"), 0.32, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .addAttributeModifier(LyraAttributeRegister.ServantDamage, Servantry.rl("phantasmal_might"), 0.32, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build());
 
     public static final DeferredHolder<MobEffect, MobEffect> PhantasmalBulwark =
@@ -145,7 +146,7 @@ public class ServantryMobEffectRegister {
 
     public static final DeferredHolder<MobEffect, MobEffect> PhantasmalRebirth =
             Register.register("phantasmal_rebirth", () -> builder(MobEffectCategory.BENEFICIAL, 0xFF8CDE)
-                    .addAttributeModifier(ServantryAttributeRegister.HealthRegen, Servantry.rl("phantasmal_rebirth"), 0.2, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(LyraAttributeRegister.HealthRegen, Servantry.rl("phantasmal_rebirth"), 0.2, AttributeModifier.Operation.ADD_VALUE)
                     .build());
 
 

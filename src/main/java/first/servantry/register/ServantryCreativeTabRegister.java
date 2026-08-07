@@ -1,85 +1,45 @@
 package first.servantry.register;
 
+import first.lyra.common.creativeTab.CreativeTabDispatcher;
 import first.servantry.Servantry;
-import first.servantry.client.creativeTab.AnimInfo;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.*;
-import java.util.function.Consumer;
 
-
+@EventBusSubscriber(modid = Servantry.MODID)
 public class ServantryCreativeTabRegister {
 
     public static final DeferredRegister<CreativeModeTab> Register = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Servantry.MODID);
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> Tab = Register.register("tab", () -> CreativeModeTab.builder().title(Component.translatable("modid.servantry")).icon(ServantryServantWeaponRegister.TerraPrism.get()::getDefaultInstance).build());
-    public static final Map<TabGroup, List<DeferredItem<?>>> TabBuilder = new HashMap<>();
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> Tab = Register.register("tab", () -> CreativeModeTab.builder()
+            .title(Component.translatable("modid.servantry"))
+            .icon(() -> ServantryServantWeaponRegister.TerraPrism.get().getDefaultInstance())
+            .build());
 
-    public static List<TabGroup> sortedTabGroup() {
-        List<TabGroup> sortedKeys = new ArrayList<>(TabBuilder.keySet());
-        sortedKeys.sort(Comparator.comparingInt(TabGroup::order));
-        return sortedKeys;
-    }
-
-    public static void renderBanners(final CreativeModeInventoryScreen screen, final GuiGraphics graphics, int mouseX, int mouseY, float scrollOffs) {
-        List<TabGroup> sections = sortedTabGroup();
-
-        int totalRows = 0;
-        for (TabGroup section : sections) {
-            totalRows += 1;
-            totalRows += (TabBuilder.get(section).size() + 8) / 9;
-        }
-
-        int scrollRow = Math.round(scrollOffs * Math.max(0, totalRows - 5));
-        int left = screen.getGuiLeft() + 8;
-        int top = screen.getGuiTop() + 17;
-
-        int currentRow = 0;
-        for (TabGroup section : sections) {
-            int bannerRow = currentRow;
-            int itemRows = (TabBuilder.get(section).size() + 8) / 9;
-            currentRow += 1 + itemRows;
-            ResourceLocation texture = section.texture();
-            AnimInfo animInfo = section.animInfo();
-            int visibleRow = bannerRow - scrollRow;
-            if (visibleRow < 0 || visibleRow >= 5) continue;
-            int bannerY = top + visibleRow * 18;
-            AnimInfo.blitAnimated(graphics, texture, animInfo, left, bannerY, 162, mouseX, mouseY, true);
-        }
-    }
-
-    public static void processItems(Consumer<ItemStack> displayItems, Consumer<ItemStack> searchItems) {
-        List<TabGroup> sortedKeys = sortedTabGroup();
-        for (TabGroup key : sortedKeys) {
-            List<DeferredItem<?>> items = TabBuilder.get(key);
-            List<ItemStack> stacks = new ArrayList<>(items.stream()
-                    .map(item -> item.get().getDefaultInstance())
-                    .toList());
-            for (int i = 0; i < 9; i++) {
-                stacks.addFirst(ItemStack.EMPTY);
-            }
-            while (stacks.size() % 9 != 0) {
-                stacks.add(ItemStack.EMPTY);
-            }
-            for (ItemStack stack : stacks) {
-                displayItems.accept(stack);
-                if (!stack.isEmpty()) {
-                    searchItems.accept(stack);
-                }
-            }
-        }
-    }
+    private static boolean tabRegistered = false;
 
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
+        // 接入 Lyra 创造分类:物品按 Section 特征标签自动归类,横幅渲染由 Lyra 的 mixin 处理
+        CreativeTabDispatcher.registerSection(ServantryServantWeaponRegister.SERVANT_WEAPON);
+        CreativeTabDispatcher.registerSection(ServantryArmorRegister.ARMOR);
+        CreativeTabDispatcher.registerSection(ServantryCurioRegister.ACCESSORY);
+        CreativeTabDispatcher.registerSection(ServantryItemRegister.MATERIAL);
+        CreativeTabDispatcher.registerSection(ServantryItemRegister.BLOCK);
+    }
+
+    /** Tab 注册完成后接入 Lyra 调度器(此处 Tab.value() 已可用)。 */
+    @SubscribeEvent
+    public static void onBuildContents(BuildCreativeModeTabContentsEvent event) {
+        if (!tabRegistered) {
+            CreativeTabDispatcher.registerTab(Tab);
+            tabRegistered = true;
+        }
     }
 }

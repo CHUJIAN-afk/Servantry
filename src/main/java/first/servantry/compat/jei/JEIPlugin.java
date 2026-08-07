@@ -1,8 +1,8 @@
 package first.servantry.compat.jei;
 
+import first.lyra.common.armorSet.ArmorSet;
+import first.lyra.register.LyraRegistries;
 import first.servantry.Servantry;
-import first.servantry.api.armorSet.ArmorSet;
-import first.servantry.api.register.ServantryRegistries;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
 import first.servantry.compat.jei.category.MithrilAnvilRecipeCategory;
 import first.servantry.register.ServantryCurioRegister;
@@ -53,7 +53,7 @@ public class JEIPlugin implements IModPlugin {
                     .toList();
             registration.addRecipes(MithrilAnvilRecipeCategory.SoulRecipeType, soulRecipeList);
         }
-        List<ArmorSet> armorSets = ServantryRegistries.ARMOR_SETS.stream().toList();
+        List<ArmorSet> armorSets = LyraRegistries.ARMOR_SETS.stream().toList();
         for (ArmorSet armorSet : armorSets) {
             List<ItemStack> itemStackList = armorSet.items().stream()
                     .map(ItemLike::asItem)

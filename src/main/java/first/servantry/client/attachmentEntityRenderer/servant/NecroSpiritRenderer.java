@@ -1,12 +1,12 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
-import first.servantry.api.client.render.ModelRenderer;
-import first.servantry.api.client.render.RenderContext;
-import first.servantry.api.client.render.renderConfig.ModelConfig;
-import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
-import first.servantry.api.entity.PathNode;
+import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.ModelRenderer;
+import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.common.servant.NecroSpirit;
 import first.servantry.register.ServantryModelRegister;
 import first.servantry.utils.ParticleHelper;

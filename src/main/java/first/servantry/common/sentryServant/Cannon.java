@@ -1,10 +1,10 @@
 package first.servantry.common.sentryServant;
 
-import first.servantry.api.common.sound.Playable;
-import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.IBlockCollision;
-import first.servantry.api.servant.MomentumServant;
+import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.IBlockCollision;
+import first.lyra.common.servant.MomentumServant;
+import first.lyra.common.sound.Playable;
 import first.servantry.common.projectile.Corn;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.utils.Ballistics;

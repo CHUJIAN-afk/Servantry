@@ -1,13 +1,13 @@
 package first.servantry.common.sentryServant;
 
-import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
-import first.servantry.api.entity.AttachmentEntity;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.entity.PathNode;
-import first.servantry.api.servant.Servant;
-import first.servantry.api.servant.ServantDamageSource;
+import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.lyra.common.servant.Servant;
+import first.lyra.common.servant.ServantDamageSource;
 import first.servantry.common.projectile.CustomLaser;
 import first.servantry.register.ServantryAttachmentEntityRegister;
 import first.servantry.register.ServantryMobEffectRegister;

@@ -1,10 +1,10 @@
 package first.servantry.common.servant;
 
-import first.servantry.api.ServantryHelper;
-import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.servant.MomentumServant;
-import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachment.AttachmentEntityData;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.servant.MomentumServant;
+import first.lyra.common.servant.ServantGoalSelector;
 import first.servantry.common.servant.goal.stardustDragon.StardustDragonFollowGoal;
 import first.servantry.common.servant.goal.stardustDragon.StardustDragonIdleGoal;
 import first.servantry.common.servant.goal.voidEater.VoidEaterAttackGoal;
@@ -34,9 +34,9 @@ public class VoidEater extends StardustDragon {
     @Override
     public void onRemove() {
         if (isHead()) {
-            List<VoidEater> voidEaters = ServantryHelper.get(owner)
+            List<VoidEater> voidEaters = LyraHelper.get(owner)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
+                    .get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
             for (VoidEater voidEater : voidEaters) {
                 voidEater.setRemove();
             }
@@ -52,9 +52,9 @@ public class VoidEater extends StardustDragon {
 
     @Override
     public @Nullable StardustDragon getHead() {
-        List<VoidEater> voidEaters = ServantryHelper.get(owner)
+        List<VoidEater> voidEaters = LyraHelper.get(owner)
                 .getEntityData()
-                .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
+                .get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
         if (!voidEaters.isEmpty()) {
             return voidEaters.getFirst();
         }
@@ -64,9 +64,9 @@ public class VoidEater extends StardustDragon {
     @Override
     public @Nullable VoidEater getPrecedingSegment() {
         if (!isHead()) {
-            List<VoidEater> voidEaters = ServantryHelper.get(owner)
+            List<VoidEater> voidEaters = LyraHelper.get(owner)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
+                    .get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
             int index = getSegmentIndex() - 1;
             if (index >= 0 && index < voidEaters.size()) {
                 return voidEaters.get(index);
@@ -78,9 +78,9 @@ public class VoidEater extends StardustDragon {
     @Override
     public @Nullable VoidEater getNextSegment() {
         if (getSegmentIndex() < getTotalSegments() - 1) {
-            List<VoidEater> voidEaters = ServantryHelper.get(owner)
+            List<VoidEater> voidEaters = LyraHelper.get(owner)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
+                    .get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.VOID_EATER.get());
             int index = getSegmentIndex() + 1;
             if (index >= 0 && index < voidEaters.size()) {
                 return voidEaters.get(index);

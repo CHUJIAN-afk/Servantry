@@ -1,14 +1,14 @@
 package first.servantry.common.servant;
 
-import first.servantry.api.ServantryHelper;
-import first.servantry.api.common.attachment.EntityData;
-import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.common.attachment.TargetCache;
-import first.servantry.api.common.particle.genericParticle.GenericParticleBuilder;
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.ICollideAttack;
-import first.servantry.api.servant.MomentumServant;
-import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachment.AttachmentEntityData;
+import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.TargetCache;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.lyra.common.servant.MomentumServant;
+import first.lyra.common.servant.ServantGoalSelector;
 import first.servantry.common.servant.goal.stardustDragon.StardustDragonAttackGoal;
 import first.servantry.common.servant.goal.stardustDragon.StardustDragonFollowGoal;
 import first.servantry.common.servant.goal.stardustDragon.StardustDragonIdleGoal;
@@ -57,7 +57,7 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     @Override
     public LivingEntity searchTarget() {
         if (isHead()) {
-            ServantryHelper helper = ServantryHelper.get(owner);
+            LyraHelper helper = LyraHelper.get(owner);
             TargetCache targetCache = helper.getTargetCache();
             if (!targetCache.isEmpty()) {
                 float searchRange = targetCache.getServantSearchRange(this.getOwner(), this.getSearchDistance());
@@ -114,9 +114,9 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     @Override
     public void onRemove() {
         if (isHead()) {
-            List<StardustDragon> dragons = ServantryHelper.get(owner)
+            List<StardustDragon> dragons = LyraHelper.get(owner)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
+                    .get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
             for (StardustDragon dragon : dragons) {
                 dragon.setRemove();
             }
@@ -125,9 +125,9 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
 
     @Nullable
     public StardustDragon getHead() {
-        List<StardustDragon> dragons = ServantryHelper.get(owner)
+        List<StardustDragon> dragons = LyraHelper.get(owner)
                 .getEntityData()
-                .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
+                .get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
         if (!dragons.isEmpty()) {
             return dragons.getFirst();
         }
@@ -141,9 +141,9 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     @Nullable
     public StardustDragon getPrecedingSegment() {
         if (!isHead()) {
-            List<StardustDragon> dragons = ServantryHelper.get(owner)
+            List<StardustDragon> dragons = LyraHelper.get(owner)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
+                    .get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
             int index = segmentIndex - 1;
             if (index >= 0 && index < dragons.size()) {
                 return dragons.get(index);
@@ -155,9 +155,9 @@ public class StardustDragon extends MomentumServant implements ICollideAttack<St
     @Nullable
     public StardustDragon getNextSegment() {
         if (segmentIndex < totalSegments - 1) {
-            List<StardustDragon> dragons = ServantryHelper.get(owner)
+            List<StardustDragon> dragons = LyraHelper.get(owner)
                     .getEntityData()
-                    .get(EntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
+                    .get(AttachmentEntityData.Type.Servant, ServantryAttachmentEntityRegister.STARDUST_DRAGON.get());
             int index = segmentIndex + 1;
             if (index >= 0 && index < dragons.size()) {
                 return dragons.get(index);

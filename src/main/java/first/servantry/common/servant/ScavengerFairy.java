@@ -1,9 +1,9 @@
 package first.servantry.common.servant;
 
-import first.servantry.api.entity.AttachmentEntityType;
-import first.servantry.api.entity.PathNode;
-import first.servantry.api.servant.Servant;
-import first.servantry.api.servant.ai.ServantGoalSelector;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.servant.Servant;
+import first.lyra.common.servant.ServantGoalSelector;
 import first.servantry.common.servant.goal.scavengerFairy.ScavengerFairyCollectItemGoal;
 import first.servantry.common.servant.goal.scavengerFairy.ScavengerFairyIdleGoal;
 import first.servantry.register.ServantryAttachmentEntityRegister;
