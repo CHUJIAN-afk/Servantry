@@ -34,8 +34,6 @@ public final class ModelRenderer {
     private ModelRenderer() {
     }
 
-    private static final Vector3f normalVec = new Vector3f();
-
     /**
      * 渲染模型。
      * <p>
@@ -67,12 +65,12 @@ public final class ModelRenderer {
             int vertexSize = vertexData.length / 4;
 
             // 计算法线（从 quad 的 direction 获取）
-            normalVec.set(quad.getDirection().step());
-            normalVec.mul(normalMatrix);
+            new Vector3f().set(quad.getDirection().step());
+            new Vector3f().mul(normalMatrix);
 
-            float n0 = normalVec.x();
-            float n1 = normalVec.y();
-            float n2 = normalVec.z();
+            float n0 = new Vector3f().x();
+            float n1 = new Vector3f().y();
+            float n2 = new Vector3f().z();
 
             for (int v = 0; v < 4; v++) {
                 int offset = v * vertexSize;

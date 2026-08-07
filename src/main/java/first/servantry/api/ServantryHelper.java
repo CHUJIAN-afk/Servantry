@@ -35,6 +35,7 @@ public final class ServantryHelper {
     }
 
     public void add(EntityData.Type type, AttachmentEntity entity) {
+        entity.setOwner(player);
         entityData.add(type, entity);
     }
 

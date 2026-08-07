@@ -45,8 +45,8 @@ public class Twins extends MomentumServant implements ICollideAttack<Twins>, IBl
     @Override
     public void registerGoals(ServantGoalSelector goalSelector) {
         goalSelector.addGoal(0, new TwinsLaserAttackGoal(this));
-        goalSelector.addGoal(0, new TwinsCursedFlameAttackGoal(this));
-        goalSelector.addGoal(1, new MomentumServantIdleGoal(this, 6, 0.01f, 64, false));
+        goalSelector.addGoal(1, new TwinsCursedFlameAttackGoal(this));
+        goalSelector.addGoal(2, new MomentumServantIdleGoal(this, 6, 0.01f, 64, true));
     }
 
     @Override

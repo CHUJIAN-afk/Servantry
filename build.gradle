@@ -62,6 +62,16 @@ neoForge {
 
         // applies to all the run configs above
         configureEach {
+            // 通过 JetBrains Runtime + HotswapAgent 启用增强型热重载 (DCEVM)。
+            // 要求 Gradle/IDE JVM 为 jbr-21 (JetBrains Runtime)，请参阅：https://github.com/HotswapProjects/HotswapAgent
+            jvmArgument('-XX:+AllowEnhancedClassRedefinition')
+            jvmArgument('-XX:HotswapAgent=fatjar')
+            // 禁用在 Minecraft 类加载下中断的框架插件
+            jvmArgument('-Dhotswapagent.disablePlugin=Log4j2,Proxy')
+            // JBR 21 热插拔性能适用于 Minecraft 等重型应用程序 (JetBrains Runtime#422)
+            jvmArgument('-XX:-SegmentedCodeCache')
+            jvmArgument('-XX:ReservedCodeCacheSize=96m')
+
             // Recommended logging data for a userdev environment
             // The markers can be added/remove as needed separated by commas.
             // "SCAN": For mods scan.
