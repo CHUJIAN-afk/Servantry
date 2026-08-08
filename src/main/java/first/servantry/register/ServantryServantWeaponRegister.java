@@ -12,6 +12,8 @@ import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
 import first.servantry.common.sentryServant.*;
 import first.servantry.common.servant.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
@@ -24,7 +26,7 @@ import static first.servantry.register.ServantryItemRegister.ITEMS;
 
 public class ServantryServantWeaponRegister {
 
-    public static final Section SERVANT_WEAPON = new Section(0, Servantry.rl("textures/item/banner/banner.png"), new AnimBanner(18, 3, 8), ServantryItemTagsRegister.SectionServantWeapon);
+    public static final Section SERVANT_WEAPON = new Section(0, Servantry.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), ServantryItemTagsRegister.SectionServantWeapon);
 
     /**
      * 黄蜂法杖
@@ -593,6 +595,14 @@ public class ServantryServantWeaponRegister {
                                     servant.init(servant.getInterpolatedIdleState(1));
                                     servantryHelper.add(AttachmentEntityData.Type.Servant, servant);
                                 }
+                            })
+                            .summonTooltip((weapon, itemStack, type, loc, player) -> {
+                                ScabbardContainer container = itemStack.getComponents()
+                                        .getOrDefault(ServantryDataComponentRegister.SCABBARD.get(), ScabbardContainer.EMPTY);
+                                if (!container.isEmpty()) {
+                                    return container.itemStack().getDisplayName().copy().withStyle(ChatFormatting.GRAY);
+                                }
+                                return Component.translatable("servant." + loc.getNamespace() + "." + loc.getPath()).withStyle(ChatFormatting.BLUE);
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC)
                                     .component(ServantryDataComponentRegister.SCABBARD, ScabbardContainer.EMPTY))

@@ -2,14 +2,13 @@ package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.common.servant.NecroSpirit;
-import first.servantry.register.ServantryModelRegister;
 import first.servantry.utils.ParticleHelper;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 
@@ -48,6 +47,6 @@ public class NecroSpiritRenderer extends AbstractAttachmentEntityRenderer<NecroS
                     .offset(0.12)
                     .emit();
         }
-        ModelRenderer.renderModel(ServantryModelRegister.TEST, poseStack, bufferSource);
+        RenderUtil.renderDebugLabel(poseStack, bufferSource, servant);
     }
 }

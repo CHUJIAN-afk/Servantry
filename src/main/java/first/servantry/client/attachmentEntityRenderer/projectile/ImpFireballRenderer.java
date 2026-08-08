@@ -3,14 +3,13 @@ package first.servantry.client.attachmentEntityRenderer.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.servantry.common.projectile.ImpFireball;
-import first.servantry.register.ServantryModelRegister;
 import first.servantry.utils.ParticleHelper;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.player.Player;
@@ -33,7 +32,7 @@ public class ImpFireballRenderer extends AbstractAttachmentEntityRenderer<ImpFir
 
     @Override
     protected void render(ImpFireball entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ImpFireball> context, float partialTick) {
-        ModelRenderer.renderModel(ServantryModelRegister.TEST, poseStack, bufferSource);
+        RenderUtil.renderDebugLabel(poseStack, bufferSource, entity);
         if (!Minecraft.getInstance().isPaused()) {
             Player owner = entity.getOwner();
             ParticleHelper.create(owner.level())

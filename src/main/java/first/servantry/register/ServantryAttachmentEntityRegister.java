@@ -66,25 +66,25 @@ public class ServantryAttachmentEntityRegister {
             register("chlorophyte_crystal", ChlorophyteCrystal::new, ChlorophyteCrystalRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MoonPortal>> MOON_PORTAL =
-            register("moon_portal", MoonPortal::new, null);
+            register("moon_portal", MoonPortal::new, TextOnlyRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<RainbowCrystal>> RAINBOW_CRYSTAL =
-            register("rainbow_crystal", RainbowCrystal::new, null);
+            register("rainbow_crystal", RainbowCrystal::new, TextOnlyRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Ballista>> BALLISTA =
             register("ballista", Ballista::new, BallistaRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SuperPeashooter>> SUPER_PEASHOOTER =
-            register("super_peashooter", SuperPeashooter::new, null);
+            register("super_peashooter", SuperPeashooter::new, TextOnlyRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<VoidEater>> VOID_EATER =
             register("void_eater", VoidEater::new, VoidEaterRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cloud>> CLOUD =
-            register("cloud", Cloud::new, null);
+            register("cloud", Cloud::new, TextOnlyRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<PulseTurret>> PULSE_TURRET =
-            register("pulse_turret", PulseTurret::new, null);
+            register("pulse_turret", PulseTurret::new, TextOnlyRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Hornet>> HORNET =
             register("hornet", Hornet::new, HornetRenderer::new);
@@ -134,7 +134,7 @@ public class ServantryAttachmentEntityRegister {
             register("mini_rainbow_crystal", MiniRainbowCrystal::new, RainbowCrystalRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CrossbowBolt>> CROSSBOW_BOLT =
-            register("crossbow_bolt", CrossbowBolt::new, null);
+            register("crossbow_bolt", CrossbowBolt::new, TextOnlyRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<GodFlame>> GOD_FLAME =
             register("god_flame", GodFlame::new, GodFlameRenderer::new);

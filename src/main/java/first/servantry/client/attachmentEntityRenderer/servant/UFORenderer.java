@@ -1,17 +1,15 @@
 package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.client.geo.GeoSideloader;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
-import first.servantry.Servantry;
 import first.servantry.common.servant.UFO;
 import first.servantry.utils.ParticleHelper;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.player.Player;
 
@@ -32,8 +30,7 @@ public class UFORenderer extends AbstractAttachmentEntityRenderer<UFO> {
 
     @Override
     protected void render(UFO servant, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<UFO> context, float partialTick) {
-        GeoSideloader.create(Servantry.rl("ufo"))
-                .render(poseStack, bufferSource, partialTick, LightTexture.FULL_BRIGHT);
+        RenderUtil.renderDebugLabel(poseStack, bufferSource, servant);
         Minecraft minecraft = Minecraft.getInstance();
         int trailTimer = servant.getTrailTimer();
         if (trailTimer > 0 && !minecraft.isPaused()) {

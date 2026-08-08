@@ -7,6 +7,7 @@ import first.lyra.client.render.trail.ConeTrailConfig;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.servantry.common.servant.DeadlySphere;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class DeadlySphereRenderer extends AbstractAttachmentEntityRenderer<DeadlySphere> {
@@ -34,6 +35,6 @@ public class DeadlySphereRenderer extends AbstractAttachmentEntityRenderer<Deadl
 
     @Override
     protected void render(DeadlySphere entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DeadlySphere> context, float partialTick) {
-
+        RenderUtil.renderDebugLabel(poseStack, bufferSource, entity);
     }
 }

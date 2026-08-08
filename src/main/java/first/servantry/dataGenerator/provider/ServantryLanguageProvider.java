@@ -1,58 +1,59 @@
 package first.servantry.dataGenerator.provider;
 
-import first.lyra.register.LyraLanguageRegister;
-import first.servantry.register.ServantryLanguageGenerateRegister;
+import first.lyra.dataGenerator.provider.LyraLanguageProvider;
+import first.servantry.register.ServantryMobEffectRegister;
+import first.servantry.register.ServantryPotionRegister;
 import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.common.data.LanguageProvider;
-import oshi.util.tuples.Pair;
 
-public class ServantryLanguageProvider extends LanguageProvider {
-
-    private final String locale;
+public class ServantryLanguageProvider extends LyraLanguageProvider {
 
     public ServantryLanguageProvider(PackOutput output, String modid, String locale) {
         super(output, modid, locale);
-        this.locale = locale;
     }
 
     @Override
-    protected void addTranslations() {
-        // 主 mod 静态语言键
-        ServantryLanguageGenerateRegister.init();
-        ServantryLanguageGenerateRegister.LanguageGenerate.entrySet()
-                .removeIf(entry -> {
-                    String key = entry.getKey();
-                    Pair<String, String> value = entry.getValue();
-                    String enDesc = value.getA();
-                    String zhDesc = value.getB();
-                    if (key != null) {
-                        if (enDesc != null && "en_us".equals(locale)) {
-                            add(key, enDesc);
-                        }
-                        if (zhDesc != null && "zh_cn".equals(locale)) {
-                            add(key, zhDesc);
-                            return true;
-                        }
-                    }
-                    return false;
-                });
-        // LyraItemRegisterBuilder 收集的物品语言键(仅输出 servantry 命名空间,库键由 Lyra 自己生成)
-        LyraLanguageRegister.LanguageGenerate.entrySet()
-                .removeIf(entry -> {
-                    String key = entry.getKey();
-                    String[] value = entry.getValue();
-                    if (key != null && key.contains("servantry")) {
-                        String enDesc = value[0];
-                        String zhDesc = value[1];
-                        if (enDesc != null && "en_us".equals(locale)) {
-                            add(key, enDesc);
-                        }
-                        if (zhDesc != null && "zh_cn".equals(locale)) {
-                            add(key, zhDesc);
-                            return true;
-                        }
-                    }
-                    return false;
-                });
+    public void init() {
+        // ================= 模组基础 =================
+        entry("modid.servantry", "Servantry", "仆从学");
+        entry("death.attack.servantry.servant", "%1$s was torn apart by a servant", "%1$s 被仆从撕碎");
+        entry("death.attack.servantry.servant.player", "%1$s was torn apart by a servant whilst fighting %2$s", "%1$s 在与 %2$s 战斗时被仆从撕碎");
+        entry("container.servantry.mithril_anvil", "Forging", "超凡锻造");
+        // ===================== 药水效果 =====================
+        entry(ServantryMobEffectRegister.Obsession.get().getDescriptionId(), "Obsession", "着魔");
+        entry(ServantryMobEffectRegister.CellParasitism.get().getDescriptionId(), "Cell Parasitism", "细胞寄生");
+        entry(ServantryMobEffectRegister.CursedFlame.get().getDescriptionId(), "Cursed Flame", "诅咒焰");
+        entry(ServantryMobEffectRegister.SoulMight.get().getDescriptionId(), "Soul Might", "灵魂力量");
+        entry(ServantryMobEffectRegister.SoulDefense.get().getDescriptionId(), "Soul Defense", "灵魂防御");
+        entry(ServantryMobEffectRegister.SoulRecovery.get().getDescriptionId(), "Soul Recovery", "灵魂恢复");
+        entry(ServantryMobEffectRegister.HallowedMight.get().getDescriptionId(), "Hallowed Might", "神圣之力");
+        entry(ServantryMobEffectRegister.HallowedGrace.get().getDescriptionId(), "Hallowed Grace", "神圣之佑");
+        entry(ServantryMobEffectRegister.HallowedRadiance.get().getDescriptionId(), "Hallowed Radiance", "神圣之辉");
+        entry(ServantryMobEffectRegister.PhantasmalMight.get().getDescriptionId(), "Phantasmal Might", "幻魂之力");
+        entry(ServantryMobEffectRegister.PhantasmalBulwark.get().getDescriptionId(), "Phantasmal Bulwark", "幻魂坚盾");
+        entry(ServantryMobEffectRegister.PhantasmalRebirth.get().getDescriptionId(), "Phantasmal Rebirth", "幻魂还生");
+        entry(ServantryMobEffectRegister.Shadowflame.get().getDescriptionId(), "Shadowflame", "暗影焰");
+        entry(ServantryMobEffectRegister.MoonBite.get().getDescriptionId(), "Moon Bite", "月噬");
+        entry(ServantryMobEffectRegister.GodSlayerInferno.get().getDescriptionId(), "God Slayer Inferno", "噬神怒焰");
+        entry(ServantryMobEffectRegister.ArmorCrunch.get().getDescriptionId(), "Armor Crunch", "碎甲");
+        // ===================== 药水类物品 =====================
+        potionEntry(ServantryPotionRegister.Obsession.getId().getPath(), "Obsession", "着魔");
+        // ===================== JEI 兼容 =====================
+        entry("jei.servantry.description.sold", "Occasionally sold by Clerics", "牧师偶尔出售");
+        entry("jei.servantry.description.terraprism", "Occasionally drops from Allays", "悦灵偶尔掉落");
+        entry("jei.servantry.description.drops_from_evokers", "Occasionally drops from Evokers", "唤魔者偶尔掉落");
+        entry("jei.servantry.description.drops_from_zombie", "Occasionally drops from Zombie", "僵尸偶尔掉落");
+        entry("jei.servantry.description.fishing", "Occasionally obtained from fishing in the ocean during rain", "在海洋中雨天钓鱼时偶尔获得");
+        entry("jei.servantry.description.ancient_city", "Occasionally found in Ancient City chests", "偶尔在远古城市宝箱中发现");
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static void potionEntry(String effectName, String enName, String zhName) {
+        for (String variant : new String[]{"", "long_", "strong_"}) {
+            String suffix = variant + effectName;
+            entry("item.minecraft.potion.effect." + suffix, "Potion of " + enName, zhName + "药水");
+            entry("item.minecraft.splash_potion.effect." + suffix, "Splash Potion of " + enName, "喷溅型" + zhName + "药水");
+            entry("item.minecraft.lingering_potion.effect." + suffix, "Lingering Potion of " + enName, "滞留型" + zhName + "药水");
+            entry("item.minecraft.tipped_arrow.effect." + suffix, "Arrow of " + enName, zhName + "之箭");
+        }
     }
 }

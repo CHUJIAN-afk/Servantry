@@ -2,12 +2,11 @@ package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.servantry.common.servant.Hornet;
-import first.servantry.register.ServantryModelRegister;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 /**
@@ -27,8 +26,7 @@ public class HornetRenderer extends AbstractAttachmentEntityRenderer<Hornet> {
     }
 
     @Override
-    protected void render(Hornet entity, PoseStack poseStack, MultiBufferSource bufferSource,
-                          PathNode visualNode, RenderContext<Hornet> context, float partialTick) {
-        ModelRenderer.renderModel(ServantryModelRegister.STARDUST_CELL, poseStack, bufferSource);
+    protected void render(Hornet entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Hornet> context, float partialTick) {
+        RenderUtil.renderDebugLabel(poseStack, bufferSource, entity);
     }
 }

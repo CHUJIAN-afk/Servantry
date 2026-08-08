@@ -3,14 +3,12 @@ package first.servantry.client.attachmentEntityRenderer.servant;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.servantry.common.servant.VoidEater;
-import first.servantry.register.ServantryModelRegister;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 
 public class VoidEaterRenderer extends AbstractAttachmentEntityRenderer<VoidEater> {
 
@@ -27,20 +25,8 @@ public class VoidEaterRenderer extends AbstractAttachmentEntityRenderer<VoidEate
     }
 
     @Override
-    protected void render(VoidEater dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<VoidEater> context, float partialTick) {
-        int total = dragon.getTotalSegments();
-        int index = dragon.getSegmentIndex();
-        ModelResourceLocation model;
-        if (index == 0) {
-            model = ServantryModelRegister.STARDUST_DRAGON_HEAD;
-        } else if (index == total - 1) {
-            model = ServantryModelRegister.STARDUST_DRAGON_BODY3;
-        } else if (index % 2 == 0) {
-            model = ServantryModelRegister.STARDUST_DRAGON_BODY1;
-        } else {
-            model = ServantryModelRegister.STARDUST_DRAGON_BODY2;
-        }
-        ModelRenderer.renderModel(model, poseStack, bufferSource);
+    protected void render(VoidEater voidEater, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<VoidEater> context, float partialTick) {
+        RenderUtil.renderDebugLabel(poseStack, bufferSource, voidEater);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

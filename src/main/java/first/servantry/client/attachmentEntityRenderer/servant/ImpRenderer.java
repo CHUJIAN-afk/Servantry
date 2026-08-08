@@ -2,12 +2,11 @@ package first.servantry.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.servantry.common.servant.Imp;
-import first.servantry.register.ServantryModelRegister;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 /**
@@ -27,6 +26,6 @@ public class ImpRenderer extends AbstractAttachmentEntityRenderer<Imp> {
 
     @Override
     protected void render(Imp entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Imp> context, float partialTick) {
-        ModelRenderer.renderModel(ServantryModelRegister.TEST, poseStack, bufferSource);
+        RenderUtil.renderDebugLabel(poseStack, bufferSource, entity);
     }
 }

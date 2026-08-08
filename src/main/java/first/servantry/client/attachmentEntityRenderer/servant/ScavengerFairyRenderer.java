@@ -7,6 +7,7 @@ import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.servantry.common.servant.ScavengerFairy;
+import first.servantry.utils.RenderUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class ScavengerFairyRenderer extends AbstractAttachmentEntityRenderer<ScavengerFairy> {
@@ -26,5 +27,6 @@ public class ScavengerFairyRenderer extends AbstractAttachmentEntityRenderer<Sca
     @Override
     protected void render(ScavengerFairy entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ScavengerFairy> context, float partialTick) {
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 12);
+        RenderUtil.renderDebugLabel(poseStack, bufferSource, entity);
     }
 }
