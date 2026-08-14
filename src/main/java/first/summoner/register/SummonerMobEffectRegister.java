@@ -39,7 +39,7 @@ public class SummonerMobEffectRegister {
      */
     public static final DeferredHolder<MobEffect, MobEffect> Obsession =
             Register.register("obsession", () -> builder(MobEffectCategory.BENEFICIAL, 0xb565ff)
-                    .addAttributeModifier(LyraAttributeRegister.ServantMaxCount, Summoner.rl("obsession"), 1, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(LyraAttributeRegister.MinionMaxCount, Summoner.rl("obsession"), 1, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -104,7 +104,7 @@ public class SummonerMobEffectRegister {
 
     public static final DeferredHolder<MobEffect, MobEffect> SoulMight =
             Register.register("soul_might", () -> builder(MobEffectCategory.BENEFICIAL, 0x9B6BFF)
-                    .addAttributeModifier(LyraAttributeRegister.ServantDamage, Summoner.rl("soul_might"), 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .addAttributeModifier(LyraAttributeRegister.SummonDamage, Summoner.rl("soul_might"), 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 
@@ -121,7 +121,7 @@ public class SummonerMobEffectRegister {
 
     public static final DeferredHolder<MobEffect, MobEffect> HallowedMight =
             Register.register("hallowed_might", () -> builder(MobEffectCategory.BENEFICIAL, 0xFFD875)
-                    .addAttributeModifier(LyraAttributeRegister.ServantDamage, Summoner.rl("hallowed_might"), 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .addAttributeModifier(LyraAttributeRegister.SummonDamage, Summoner.rl("hallowed_might"), 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build());
 
     public static final DeferredHolder<MobEffect, MobEffect> HallowedGrace =
@@ -136,7 +136,7 @@ public class SummonerMobEffectRegister {
 
     public static final DeferredHolder<MobEffect, MobEffect> PhantasmalMight =
             Register.register("phantasmal_might", () -> builder(MobEffectCategory.BENEFICIAL, 0xD48CFF)
-                    .addAttributeModifier(LyraAttributeRegister.ServantDamage, Summoner.rl("phantasmal_might"), 0.32, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .addAttributeModifier(LyraAttributeRegister.SummonDamage, Summoner.rl("phantasmal_might"), 0.32, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build());
 
     public static final DeferredHolder<MobEffect, MobEffect> PhantasmalBulwark =
@@ -154,7 +154,7 @@ public class SummonerMobEffectRegister {
         Register.register(eventBus);
     }
 
-    // ===================== ServantWeaponItemBuilder =====================
+    // ===================== MinionWeaponItemBuilder =====================
 
     private static Builder builder(MobEffectCategory category, int color) {
         return new Builder(category, color);

@@ -5,10 +5,10 @@ import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.ICollideAttack;
 import first.lyra.common.entity.PathNode;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
 import first.summoner.utils.ParticleHelper;
@@ -75,9 +75,9 @@ public class DestructionBullet extends Projectile implements ICollideAttack<Dest
 
     @Override
     public boolean isValidCollisionTarget(DestructionBullet entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
-            return servant.isTarget(target);
+        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
+            return minion.isTarget(target);
         }
         return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }

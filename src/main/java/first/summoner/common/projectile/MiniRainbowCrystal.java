@@ -5,10 +5,10 @@ import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.PathNode;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.util.FastColor;
@@ -62,9 +62,9 @@ public class MiniRainbowCrystal extends Projectile {
                     for (LivingEntity living : entities) {
                         if (living.getBoundingBox().getCenter().distanceToSqr(pos) < 9 + living.getBoundingBox().getSize() * 0.5) {
                             boolean isTarget = true;
-                            if (damageSource instanceof ServantDamageSource servantDamageSource) {
-                                Servant servant = servantDamageSource.getServant();
-                                isTarget = servant.isTarget(living);
+                            if (damageSource instanceof MinionDamageSource minionDamageSource) {
+                                Minion minion = minionDamageSource.getMinion();
+                                isTarget = minion.isTarget(living);
                             }
                             if (isTarget) {
                                 InvincibleData.attack(living)

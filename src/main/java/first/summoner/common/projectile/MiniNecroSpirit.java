@@ -6,10 +6,10 @@ import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
 import first.lyra.common.sound.Playable;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
@@ -78,14 +78,14 @@ public class MiniNecroSpirit extends Projectile implements ICollideAttack<MiniNe
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
+        if (source instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
             LyraHelper summonerHelper = LyraHelper.get(owner);
             TargetCache targetCache = summonerHelper.getTargetCache();
             List<LivingEntity> entities = targetCache.getEntities();
             List<LivingEntity> mainTargets = new ArrayList<>();
             for (LivingEntity living : entities) {
-                if (servant.isTarget(living)){
+                if (minion.isTarget(living)){
                     if (getPos().distanceToSqr(living.getBoundingBox().getCenter()) < 9) {
                         mainTargets.add(living);
                     }
@@ -112,7 +112,7 @@ public class MiniNecroSpirit extends Projectile implements ICollideAttack<MiniNe
                         .damageAmount(amount * 0.5f)
                         .apply();
                 for (LivingEntity entity : entities) {
-                    if (entity == living || (living.distanceToSqr(entity) < 4 && servant.isTarget(living))) {
+                    if (entity == living || (living.distanceToSqr(entity) < 4 && minion.isTarget(living))) {
                         InvincibleData.attack(living)
                                 .attacker(getUuid())
                                 .damageSource(source)

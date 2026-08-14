@@ -1,8 +1,8 @@
 package first.summoner.common.item;
 
 import com.google.common.collect.Multimap;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.summoner.Summoner;
 import first.summoner.common.builder.CurioItemBuilder;
 import first.summoner.utils.CuriosUtil;
@@ -41,15 +41,15 @@ public class CurioItem extends Item implements ICurioItem {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
-        if (event.getSource() instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
-            Player owner = servant.getOwner();
+        if (event.getSource() instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
+            Player owner = minion.getOwner();
             if (!owner.level().isClientSide()) {
                 List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
                 for (CurioItem curioItem : curiosItemList) {
                     PreDamageCallback callback = curioItem.preDamageCallback;
                     if (callback != null) {
-                        float result = callback.apply(servant, owner, event.getEntity(), event.getNewDamage(), servantDamageSource);
+                        float result = callback.apply(minion, owner, event.getEntity(), event.getNewDamage(), minionDamageSource);
                         if (result != event.getNewDamage()) {
                             event.setNewDamage(result);
                         }
@@ -61,15 +61,15 @@ public class CurioItem extends Item implements ICurioItem {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingDamageEventPost(LivingDamageEvent.Post event) {
-        if (event.getSource() instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
-            Player owner = servant.getOwner();
+        if (event.getSource() instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
+            Player owner = minion.getOwner();
             if (!owner.level().isClientSide()) {
                 List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
                 for (CurioItem curioItem : curiosItemList) {
                     PostDamageCallback callback = curioItem.postDamageCallback;
                     if (callback != null) {
-                        callback.accept(servant, owner, event.getEntity(), servantDamageSource);
+                        callback.accept(minion, owner, event.getEntity(), minionDamageSource);
                     }
                 }
             }
@@ -82,12 +82,12 @@ public class CurioItem extends Item implements ICurioItem {
 
     @FunctionalInterface
     public interface PreDamageCallback {
-        float apply(Servant servant, Player player, LivingEntity target, float damage, DamageSource damageSource);
+        float apply(Minion minion, Player player, LivingEntity target, float damage, DamageSource damageSource);
     }
 
     @FunctionalInterface
     public interface PostDamageCallback {
-        void accept(Servant servant, Player owner, LivingEntity target, DamageSource damageSource);
+        void accept(Minion minion, Player owner, LivingEntity target, DamageSource damageSource);
     }
 
     @Override

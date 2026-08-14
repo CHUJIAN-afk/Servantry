@@ -4,10 +4,10 @@ import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.ICollideAttack;
 import first.lyra.common.entity.PathNode;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.world.damagesource.DamageSource;
@@ -42,10 +42,10 @@ public class ShatteredStellarCore extends Projectile implements ICollideAttack<S
 
     @Override
     public boolean isValidCollisionTarget(ShatteredStellarCore entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
-            if (servant != null) {
-                return servant.isTarget(target);
+        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
+            if (minion != null) {
+                return minion.isTarget(target);
             }
         }
         return false;
@@ -58,8 +58,8 @@ public class ShatteredStellarCore extends Projectile implements ICollideAttack<S
         DamageSource source = getDamageSource();
         if (source != null) {
             UUID uuid = null;
-            if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
-                uuid = servant.getUuid();
+            if (source instanceof MinionDamageSource minionDamageSource && minionDamageSource.getMinion() instanceof Minion minion) {
+                uuid = minion.getUuid();
             }
             InvincibleData.attack(target)
                     .attacker(uuid)

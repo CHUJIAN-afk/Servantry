@@ -12,7 +12,7 @@
   },
   "entries": [
     {
-      "damage_type": "summoner:servant",
+      "damage_type": "summoner:minion",
       "texture": "summoner:textures/damage_font.png",
       "texture_width": 55,
       "texture_height": 7,

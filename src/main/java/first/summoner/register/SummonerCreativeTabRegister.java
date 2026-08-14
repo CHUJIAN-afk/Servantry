@@ -28,6 +28,6 @@ public class SummonerCreativeTabRegister {
 
     @SubscribeEvent
     public static void registerTab(FMLCommonSetupEvent event) {
-        CreativeTabDispatcher.register(Tab, SummonerWeaponRegister.SERVANT_WEAPON, SummonerArmorRegister.ARMOR, SummonerCurioRegister.ACCESSORY, SummonerItemRegister.MATERIAL, SummonerItemRegister.BLOCK);
+        CreativeTabDispatcher.register(Tab, SummonerWeaponRegister.MINION_WEAPON, SummonerArmorRegister.ARMOR, SummonerCurioRegister.ACCESSORY, SummonerItemRegister.MATERIAL, SummonerItemRegister.BLOCK);
     }
 }

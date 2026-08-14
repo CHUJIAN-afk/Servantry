@@ -6,11 +6,11 @@ import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.register.LyraRegistries;
 import first.summoner.Summoner;
+import first.summoner.client.attachmentEntityRenderer.minion.*;
 import first.summoner.client.attachmentEntityRenderer.projectile.*;
-import first.summoner.client.attachmentEntityRenderer.servant.*;
+import first.summoner.common.minion.*;
 import first.summoner.common.projectile.*;
-import first.summoner.common.sentryServant.*;
-import first.summoner.common.servant.*;
+import first.summoner.common.sentry.*;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLLoader;
@@ -57,7 +57,7 @@ public class SummonerAttachmentEntityRegister {
             register("ethereal_stellar_core", EtherealStellarCore::new, EtherealStellarCoreRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<OreScout>> ORE_SCOUT =
-            register("survey_drone", OreScout::new, OreScoutServantRenderer::new);
+            register("survey_drone", OreScout::new, OreScoutMinionRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ScavengerFairy>> SCAVENGER_FAIRY =
             register("scavenger_fairy", ScavengerFairy::new, ScavengerFairyRenderer::new);

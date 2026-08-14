@@ -1,0 +1,182 @@
+package first.summoner.common.minion;
+
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachment.AttachmentEntityData;
+import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.TargetCache;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionGoalSelector;
+import first.summoner.common.minion.goal.terraprism.TerraprismAttackGoal;
+import first.summoner.common.minion.goal.terraprism.TerraprismIdleGoal;
+import first.summoner.common.minion.goal.terraprism.TerraprismPrepGoal;
+import first.summoner.register.SummonerAttachmentEntityRegister;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class Terraprism extends Minion implements ICollideAttack<Terraprism> {
+
+    public boolean attacking = false;
+    private boolean blend = false;
+    public int trailTimer = 0;
+    public float idleBlend = 0f;
+    public float idleBlendO = 0f;
+    public final Set<LivingEntity> hitTargets = new HashSet<>();
+
+    public Terraprism() {
+        super();
+    }
+
+    @Override
+    public void registerGoals(MinionGoalSelector goalSelector) {
+        goalSelector.addGoal(0, new TerraprismAttackGoal(this));
+        goalSelector.addGoal(1, new TerraprismPrepGoal(this));
+        goalSelector.addGoal(2, new TerraprismIdleGoal(this));
+    }
+
+    @Override
+    public LivingEntity searchTarget() {
+        LyraHelper helper = LyraHelper.get(owner);
+        TargetCache targetCache = helper.getTargetCache();
+        if (!targetCache.isEmpty()) {
+            float searchRange = targetCache.getSummonSearchRange(this.getOwner(), this.getSearchDistance());
+            List<LivingEntity> targets = new ArrayList<>();
+            List<LivingEntity> entities = targetCache.getEntities();
+            for (LivingEntity living : entities) {
+                if ((attacking || targetCache.isVisibility(owner, living))) {
+                    if (targetCache.getDistance(owner, living) < searchRange) {
+                        if (isTarget(living)) {
+                            targets.add(living);
+                        }
+                    }
+                }
+            }
+            return targetCache.getNewTarget(this, targets, 8, false);
+        }
+        return null;
+    }
+
+    @Override
+    public int getSearchDistance() {
+        return 32;
+    }
+
+    @Override
+    public @NotNull AABB getHitbox() {
+        return new AABB(-0.15, -0.06, -0.35, 0.15, 0.06, 1);
+    }
+
+    @Override
+    public boolean canCollideAttack() {
+        return isTarget(getTarget());
+    }
+
+    @Override
+    public void onCollisionAttack(List<HitContext> hitContexts) {
+        for (HitContext hit : hitContexts) {
+            if (this.hitTargets.add(hit.entity())) {
+                InvincibleData.attack(hit.entity())
+                        .attacker(getUuid())
+                        .damageSource(getDamageSource())
+                        .damageAmount(getDamage())
+                        .apply();
+            }
+        }
+    }
+
+    @Override
+    public boolean isValidCollisionTarget(Terraprism entity, LivingEntity target) {
+        return isTarget(target);
+    }
+
+    @Override
+    public void tick() {
+        if (owner.level().isClientSide()) {
+            idleBlendO = idleBlend;
+            if (blend) {
+                trailTimer = Math.min(trailTimer + 1, 12);
+                idleBlend = Math.max(0.0f, idleBlend - 0.25f);
+            } else {
+                trailTimer = Math.max(trailTimer - 1, 0);
+                idleBlend = Math.min(1.0f, idleBlend + 0.1f);
+            }
+        }
+        super.tick();
+    }
+
+    @Override
+    public void writeAdditional(RegistryFriendlyByteBuf buf) {
+        buf.writeBoolean(attacking);
+        buf.writeBoolean(!(getGoalSelector().getCurrentGoal() instanceof TerraprismIdleGoal));
+    }
+
+    @Override
+    public void readAdditional(RegistryFriendlyByteBuf buf) {
+        this.attacking = buf.readBoolean();
+        this.blend = buf.readBoolean();
+    }
+
+    public int getColor(float partialTick) {
+        int order = getOrderCache();
+        int total = Math.max(1, getSameSizeCache());
+        float hueShift = ((float) order / total + (owner.tickCount + partialTick) * 0.015f) % 1.0f;
+        float breathFactor = 0.5f + 0.5f * Mth.sin(hueShift * Mth.TWO_PI);
+        return Mth.hsvToRgb(hueShift, 0.75f - 0.35f * breathFactor, 1.0f);
+    }
+
+    @Override
+    public PathNode getRenderNode(float partialTick) {
+        PathNode renderNode = super.getRenderNode(partialTick);
+        return renderNode.lerp(getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, idleBlendO, idleBlend));
+    }
+
+    @Override
+    public int getOrder() {
+        return LyraHelper.get(owner)
+                .getEntityData()
+                .get(AttachmentEntityData.Type.Minion, Terraprism.class)
+                .indexOf(this);
+    }
+
+    @Override
+    public int getSameSize() {
+        return LyraHelper.get(owner)
+                .getEntityData()
+                .get(AttachmentEntityData.Type.Minion, Terraprism.class)
+                .size();
+    }
+
+    public PathNode getInterpolatedIdleState(float partialTick) {
+        float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
+        float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);
+        float playerYaw = Mth.wrapDegrees(bodyYaw + Mth.wrapDegrees(headYaw - bodyYaw) * 0.5f);
+        float rad = (float) Math.toRadians(-playerYaw + 180);
+        float backX = (float) Math.sin(rad);
+        float backZ = (float) Math.cos(rad);
+        float rightX = (float) Math.cos(rad);
+        float rightZ = (float) -Math.sin(rad);
+        int order = getOrderCache();
+        double localZ = 0.75 + order * 0.12;
+        double floatSpeed = 0.08 + order * 0.01;
+        double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;
+        Vec3 playerPos = owner.getPosition(partialTick);
+        Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
+        return new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
+    }
+
+    @Override
+    public AttachmentEntityType<? extends Minion> getType() {
+        return SummonerAttachmentEntityRegister.TERRA_PRISM.get();
+    }
+}

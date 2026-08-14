@@ -2,9 +2,9 @@ package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.*;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -51,9 +51,9 @@ public class Rain extends Projectile implements IBlockCollision<Rain>, ICollideA
 
     @Override
     public boolean isValidCollisionTarget(Rain entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
-            return servant.isTarget(target);
+        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
+            return minion.isTarget(target);
         }
         return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }

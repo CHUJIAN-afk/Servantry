@@ -1,0 +1,52 @@
+package first.summoner.client.attachmentEntityRenderer.minion;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.summoner.common.minion.NecroSpirit;
+import first.summoner.utils.ParticleHelper;
+import first.summoner.utils.RenderUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+
+/**
+ * 死魂灵巫术单元渲染器 - 占位模型+紫色粒子拖尾。
+ */
+public class NecroSpiritRenderer extends AbstractAttachmentEntityRenderer<NecroSpirit> {
+
+    @Override
+    protected RenderContext<NecroSpirit> createContext(NecroSpirit entity) {
+        return RenderContext.<NecroSpirit>builder()
+                .model(new ModelConfig<NecroSpirit>()
+                        .scale(0.5f)
+                        .translateOffset(-0.5f, -0.5f, -0.5f)
+                        .alphaDistanceFactor(1.5f)
+                )
+                .build();
+    }
+
+    @Override
+    protected void render(NecroSpirit minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<NecroSpirit> context, float partialTick) {
+        if (!Minecraft.getInstance().isPaused()) {
+            ParticleHelper.create(minion.getOwner().level())
+                    .generic(GenericParticleBuilder.create()
+                                     .centerColor(0xff1200)
+                                     .edgeColor(0xd40f00)
+                                     .lifetime(5)
+                                     .lifetimeRandom(4)
+                                     .spin(0.3f)
+                                     .spinRandom(0.5F)
+                                     .friction(0.75F)
+                                     .scale(0.03f)
+                                     .scaleRandom(0.005f)
+                    )
+                    .pos(visualNode.pos())
+                    .offset(0.12)
+                    .emit();
+        }
+        RenderUtil.renderDebugLabel(poseStack, bufferSource, minion);
+    }
+}

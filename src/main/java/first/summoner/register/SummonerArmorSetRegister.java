@@ -6,7 +6,7 @@ import first.lyra.common.attachment.AttachmentEntityData;
 import first.lyra.register.LyraAttributeRegister;
 import first.lyra.register.LyraRegistries;
 import first.summoner.Summoner;
-import first.summoner.common.servant.ChlorophyteCrystal;
+import first.summoner.common.minion.ChlorophyteCrystal;
 import first.summoner.config.StartupConfig;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -24,7 +24,7 @@ public class SummonerArmorSetRegister {
                     .piece(SummonerArmorRegister.BeeChestplate)
                     .piece(SummonerArmorRegister.BeeLeggings)
                     .piece(SummonerArmorRegister.BeeBoots)
-                    .modifier(LyraAttributeRegister.ServantDamage, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.SummonDamage, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 
@@ -34,7 +34,7 @@ public class SummonerArmorSetRegister {
                     .piece(SummonerArmorRegister.SpiderChestplate)
                     .piece(SummonerArmorRegister.SpiderLeggings)
                     .piece(SummonerArmorRegister.SpiderBoots)
-                    .modifier(LyraAttributeRegister.ServantDamage, 0.12, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.SummonDamage, 0.12, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 
@@ -55,8 +55,8 @@ public class SummonerArmorSetRegister {
                     .piece(SummonerArmorRegister.ObsidianLeggings)
                     .piece(SummonerArmorRegister.ObsidianBoots)
                     .modifier(Attributes.MOVEMENT_SPEED, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                    .modifier(LyraAttributeRegister.ServantDamage, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                    .modifier(LyraAttributeRegister.ServantSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.SummonDamage, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.SummonSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 
@@ -65,9 +65,9 @@ public class SummonerArmorSetRegister {
             .piece(SummonerArmorRegister.HallowedChestplate)
             .piece(SummonerArmorRegister.HallowedLeggings)
             .piece(SummonerArmorRegister.HallowedBoots)
-            .modifier(LyraAttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
-            .modifier(LyraAttributeRegister.ServantArmorPierce, 4, AttributeModifier.Operation.ADD_VALUE)
-            .tooltip(1, "Servants grant I-frames on attack", "仆从攻击使敌人高亮")
+            .modifier(LyraAttributeRegister.MinionMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+            .modifier(LyraAttributeRegister.SummonArmorPierce, 4, AttributeModifier.Operation.ADD_VALUE)
+            .tooltip(1, "Minions grant I-frames on attack", "仆从攻击使敌人高亮")
             .build()
     );
 
@@ -77,8 +77,8 @@ public class SummonerArmorSetRegister {
                     .piece(SummonerArmorRegister.ValhallaKnightChestplate)
                     .piece(SummonerArmorRegister.ValhallaKnightLeggings)
                     .piece(SummonerArmorRegister.ValhallaKnightBoots)
-                    .modifier(LyraAttributeRegister.SentryServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                    .modifier(LyraAttributeRegister.ServantDamage, 0.40, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.SentryMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(LyraAttributeRegister.SummonDamage, 0.40, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .modifier(Attributes.KNOCKBACK_RESISTANCE, 1.0, AttributeModifier.Operation.ADD_VALUE)
                     .tooltip(1, "Summons a powerful leaf crystal to shoot at nearby enemies", "大幅提升弩车开火速度，弩箭速度，弩箭最大穿透数，弩箭伤害")
                     .tooltip(2, "Summons a powerful leaf crystal to shoot at nearby enemies", "受到伤害时，提供弩车恐慌增益，极大幅提升弩车开火速度")
@@ -91,15 +91,15 @@ public class SummonerArmorSetRegister {
                     .piece(SummonerArmorRegister.ChlorophyteChestplate)
                     .piece(SummonerArmorRegister.ChlorophyteLeggings)
                     .piece(SummonerArmorRegister.ChlorophyteBoots)
-                    .modifier(LyraAttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(LyraAttributeRegister.MinionMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
                     .onStart(player -> {
                         ChlorophyteCrystal crystal = new ChlorophyteCrystal();
                         crystal.setDamage(StartupConfig.ChlorophyteCrystalDamage.get());
                         crystal.setKnockback(StartupConfig.ChlorophyteCrystalDamage.get());
                         crystal.setArmorPierce(StartupConfig.ChlorophyteCrystalArmorPierce.get());
-                        LyraHelper.get(player).add(AttachmentEntityData.Type.ExtraServant, crystal);
+                        LyraHelper.get(player).add(AttachmentEntityData.Type.ExtraMinion, crystal);
                     })
-                    .onRemove(player -> LyraHelper.get(player).getEntityData().remove(AttachmentEntityData.Type.ExtraServant, SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))
+                    .onRemove(player -> LyraHelper.get(player).getEntityData().remove(AttachmentEntityData.Type.ExtraMinion, SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))
                     .tooltip(1, "Summons a powerful leaf crystal to shoot at nearby enemies", "召唤强大的叶状水晶来射击附近的敌人")
                     .build()
             );
@@ -110,8 +110,8 @@ public class SummonerArmorSetRegister {
                     .piece(SummonerArmorRegister.SpookyChestplate)
                     .piece(SummonerArmorRegister.SpookyLeggings)
                     .piece(SummonerArmorRegister.SpookyBoots)
-                    .modifier(LyraAttributeRegister.ServantDamage, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                    .modifier(LyraAttributeRegister.ServantArmorPierce, 12, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(LyraAttributeRegister.SummonDamage, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.SummonArmorPierce, 12, AttributeModifier.Operation.ADD_VALUE)
                     .build()
             );
 
@@ -121,8 +121,8 @@ public class SummonerArmorSetRegister {
                     .piece(SummonerArmorRegister.TikiChestplate)
                     .piece(SummonerArmorRegister.TikiLeggings)
                     .piece(SummonerArmorRegister.TikiBoots)
-                    .modifier(LyraAttributeRegister.ServantMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
-                    .modifier(LyraAttributeRegister.ServantSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
+                    .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
+                    .modifier(LyraAttributeRegister.SummonSearchRange, 0.3, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                     .build()
             );
 

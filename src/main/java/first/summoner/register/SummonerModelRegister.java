@@ -47,7 +47,7 @@ public class SummonerModelRegister {
     public static final ModelResourceLocation IMP_FIREBALL = standalone("imp_fireball");
 
     private static ModelResourceLocation standalone(String path) {
-        ModelResourceLocation location = ModelResourceLocation.standalone(Summoner.rl("servant/" + path));
+        ModelResourceLocation location = ModelResourceLocation.standalone(Summoner.rl("minion/" + path));
         MODELS.add(location);
         return location;
     }

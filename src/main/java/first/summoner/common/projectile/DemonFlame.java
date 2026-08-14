@@ -2,9 +2,9 @@ package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.*;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -49,9 +49,9 @@ public class DemonFlame extends Projectile implements ICollideAttack<DemonFlame>
 
     @Override
     public boolean isValidCollisionTarget(DemonFlame entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
-            return servant.isTarget(target);
+        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
+            return minion.isTarget(target);
         }
         return false;
     }

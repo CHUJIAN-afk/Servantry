@@ -2,8 +2,8 @@ package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.*;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.ServantDamageSource;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -70,8 +70,8 @@ public class ImpFireball extends Projectile implements ICollideAttack<ImpFirebal
 
     @Override
     public boolean isValidCollisionTarget(ImpFireball entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof ServantDamageSource sds) {
-            return sds.getServant().isTarget(target);
+        if (entity.getDamageSource() instanceof MinionDamageSource sds) {
+            return sds.getMinion().isTarget(target);
         }
         return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }

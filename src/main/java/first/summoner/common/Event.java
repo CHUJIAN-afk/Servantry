@@ -2,13 +2,13 @@ package first.summoner.common;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.AttachmentEntityData;
-import first.lyra.common.servant.ServantDamageSource;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.Summoner;
 import first.summoner.common.dataComponent.ScabbardContainer;
-import first.summoner.common.servant.ChlorophyteCrystal;
-import first.summoner.common.servant.StardustCell;
-import first.summoner.common.servant.VoidEater;
+import first.summoner.common.minion.ChlorophyteCrystal;
+import first.summoner.common.minion.StardustCell;
+import first.summoner.common.minion.VoidEater;
 import first.summoner.register.*;
 import first.summoner.utils.CuriosUtil;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -151,7 +151,7 @@ public class Event {
     }
 
     @SubscribeEvent
-    public static void onLivingDamageEventPostFromServant(LivingDamageEvent.Post event) {
+    public static void onLivingDamageEventPostFromMinion(LivingDamageEvent.Post event) {
         DamageSource damageSource = event.getSource();
         LivingEntity target = event.getEntity();
         if (!target.level().isClientSide() && target instanceof Player player) {
@@ -163,15 +163,15 @@ public class Event {
             if (SummonerArmorSetRegister.Hallowed.get().full(player)) {
                 target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
             }
-            List<VoidEater> voidEaters = LyraHelper.get(player).getEntityData().get(AttachmentEntityData.Type.Servant, SummonerAttachmentEntityRegister.VOID_EATER.get());
+            List<VoidEater> voidEaters = LyraHelper.get(player).getEntityData().get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.VOID_EATER.get());
             if (!voidEaters.isEmpty()) {
                 target.addEffect(new MobEffectInstance(SummonerMobEffectRegister.GodSlayerInferno, 60));
             }
         }
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player && target.isAlive()) {
             AttachmentEntityData entityData = player.getData(LyraAttachmentRegister.EntityData);
-            if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof ChlorophyteCrystal)) {
-                List<ChlorophyteCrystal> crystals = entityData.get(AttachmentEntityData.Type.ExtraServant, SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get());
+            if (!(damageSource instanceof MinionDamageSource minionDamageSource) || !(minionDamageSource.getMinion() instanceof ChlorophyteCrystal)) {
+                List<ChlorophyteCrystal> crystals = entityData.get(AttachmentEntityData.Type.ExtraMinion, SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get());
                 for (ChlorophyteCrystal crystal : crystals) {
                     if (crystal.getExtraShootCooldown() <= 0) {
                         crystal.setExtraShootCooldown(16);
@@ -179,8 +179,8 @@ public class Event {
                     }
                 }
             }
-            if (!(damageSource instanceof ServantDamageSource servantDamageSource) || !(servantDamageSource.getServant() instanceof StardustCell)) {
-                List<StardustCell> stardustCells = entityData.get(AttachmentEntityData.Type.Servant, SummonerAttachmentEntityRegister.STARDUST_CELL.get());
+            if (!(damageSource instanceof MinionDamageSource minionDamageSource) || !(minionDamageSource.getMinion() instanceof StardustCell)) {
+                List<StardustCell> stardustCells = entityData.get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.STARDUST_CELL.get());
                 for (StardustCell cell : stardustCells) {
                     if (cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
                         cell.setExtraShootCooldown(14);

@@ -33,7 +33,7 @@ public class RenderUtil {
         ResourceLocation location = LyraRegistries.ATTACHMENT_ENTITY_TYPES.getKey(entity.getType());
         assert location != null;
         String var10000 = location.getNamespace();
-        String key = "servant." + var10000 + "." + location.getPath();
+        String key = "summon." + var10000 + "." + location.getPath();
         Component component = Component.translatable(key).withStyle(ChatFormatting.DARK_AQUA);
 
         Minecraft minecraft = Minecraft.getInstance();

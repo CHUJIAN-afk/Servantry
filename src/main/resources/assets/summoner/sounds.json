@@ -4,9 +4,9 @@
       "summoner:use_terraprism"
     ]
   },
-  "use_servant_weapon": {
+  "use_minion_weapon": {
     "sounds": [
-      "summoner:use_servant_weapon"
+      "summoner:use_minion_weapon"
     ]
   },
   "use_moon_portal_staff": {

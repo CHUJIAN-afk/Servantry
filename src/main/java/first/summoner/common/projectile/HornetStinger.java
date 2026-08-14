@@ -5,8 +5,8 @@ import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.ServantDamageSource;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerCurioRegister;
 import first.summoner.utils.CuriosUtil;
@@ -58,8 +58,8 @@ public class HornetStinger extends Projectile implements ICollideAttack<HornetSt
 
     @Override
     public boolean isValidCollisionTarget(HornetStinger entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof ServantDamageSource sds) {
-            return sds.getServant().isTarget(target);
+        if (entity.getDamageSource() instanceof MinionDamageSource sds) {
+            return sds.getMinion().isTarget(target);
         }
         return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }

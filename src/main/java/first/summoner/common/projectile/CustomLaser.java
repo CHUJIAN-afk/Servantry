@@ -4,9 +4,9 @@ import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.ICollideAttack;
 import first.lyra.common.entity.PathNode;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.damagesource.DamageSource;
@@ -110,9 +110,9 @@ public class CustomLaser extends Projectile implements ICollideAttack<CustomLase
 
     @Override
     public boolean isValidCollisionTarget(CustomLaser entity, LivingEntity target) {
-        if (damageSource instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
-            return servant.isTarget(target);
+        if (damageSource instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
+            return minion.isTarget(target);
         }
         return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }

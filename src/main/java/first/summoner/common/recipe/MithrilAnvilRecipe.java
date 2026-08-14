@@ -125,7 +125,7 @@ public record MithrilAnvilRecipe(List<Ingredient> ingredients, List<Integer> cou
         return countInInventory(player, ingredients.get(index)) >= counts.get(index);
     }
 
-    // ==================== ServantWeaponItemBuilder ====================
+    // ==================== MinionWeaponItemBuilder ====================
 
     private boolean matchesItems(List<ItemStack> available) {
         for (int i = 0; i < ingredients.size(); i++) {

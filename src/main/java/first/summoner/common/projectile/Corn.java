@@ -7,9 +7,9 @@ import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
 import first.lyra.common.sound.Playable;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
@@ -64,15 +64,15 @@ public class Corn extends Projectile implements ICollideAttack<Corn>, IBlockColl
      */
     private void explodeAt(Vec3 explosionPos) {
         DamageSource source = getDamageSource();
-        if (source instanceof ServantDamageSource sds) {
-            Servant servant = sds.getServant();
+        if (source instanceof MinionDamageSource sds) {
+            Minion minion = sds.getMinion();
             // 通过TargetCache获取附近实体
             LyraHelper helper = LyraHelper.get(owner);
             TargetCache targetCache = helper.getTargetCache();
             List<LivingEntity> nearbyEntities = targetCache.getEntities();
 
             for (LivingEntity entity : nearbyEntities) {
-                if (servant.isTarget(entity)) {
+                if (minion.isTarget(entity)) {
                     double distance = entity.getBoundingBox().getCenter().distanceTo(explosionPos);
                     if (distance <= AOE_RADIUS) {
                         InvincibleData.attack(entity)
@@ -102,8 +102,8 @@ public class Corn extends Projectile implements ICollideAttack<Corn>, IBlockColl
 
     @Override
     public boolean isValidCollisionTarget(Corn entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof ServantDamageSource sds) {
-            return sds.getServant().isTarget(target);
+        if (entity.getDamageSource() instanceof MinionDamageSource sds) {
+            return sds.getMinion().isTarget(target);
         }
         return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }

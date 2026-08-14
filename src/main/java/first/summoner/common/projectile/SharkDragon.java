@@ -5,9 +5,9 @@ import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.ICollideAttack;
 import first.lyra.common.entity.PathNode;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -55,8 +55,8 @@ public class SharkDragon extends Projectile implements ICollideAttack<SharkDrago
         DamageSource source = getDamageSource();
         if (source != null) {
             UUID uuid = null;
-            if (source instanceof ServantDamageSource servantDamageSource && servantDamageSource.getServant() instanceof Servant servant) {
-                uuid = servant.getUuid();
+            if (source instanceof MinionDamageSource minionDamageSource && minionDamageSource.getMinion() instanceof Minion minion) {
+                uuid = minion.getUuid();
             }
             InvincibleData.attack(target)
                     .attacker(uuid)
@@ -70,9 +70,9 @@ public class SharkDragon extends Projectile implements ICollideAttack<SharkDrago
 
     @Override
     public boolean isValidCollisionTarget(SharkDragon entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
-            return servant.isTarget(target);
+        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
+            return minion.isTarget(target);
         }
         return false;
     }

@@ -3,10 +3,10 @@ package first.summoner.common.projectile;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.AttachingProjectile;
-import first.lyra.common.servant.Servant;
-import first.lyra.common.servant.ServantDamageSource;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
 import first.summoner.utils.ParticleHelper;
@@ -53,9 +53,9 @@ public class MiniStardustCell extends AttachingProjectile implements ICollideAtt
     @Override
     public boolean isValidCollisionTarget(MiniStardustCell entity, LivingEntity target) {
         DamageSource source = entity.getDamageSource();
-        if (source instanceof ServantDamageSource servantDamageSource) {
-            Servant servant = servantDamageSource.getServant();
-            return servant.isTarget(target);
+        if (source instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
+            return minion.isTarget(target);
         }
         return ICollideAttack.super.isValidCollisionTarget(entity, target);
     }

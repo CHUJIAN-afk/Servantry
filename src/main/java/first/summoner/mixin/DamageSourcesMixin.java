@@ -1,7 +1,7 @@
 package first.summoner.mixin;
 
-import first.lyra.common.servant.ServantDamageSource;
-import first.summoner.common.servant.InfiniteShadow;
+import first.lyra.common.minion.MinionDamageSource;
+import first.summoner.common.minion.InfiniteShadow;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.player.Player;
@@ -20,8 +20,8 @@ public class DamageSourcesMixin {
     )
     private void playerAttack(Player player, CallbackInfoReturnable<DamageSource> cir) {
         if (player instanceof InfiniteShadow.InfiniteShadowFakePlayer infiniteShadowFakePlayer) {
-            ServantDamageSource damageSource = infiniteShadowFakePlayer.getInfiniteShadow().getDamageSource();
-            cir.setReturnValue(new ServantDamageSource(damageSource.typeHolder(), infiniteShadowFakePlayer, damageSource.getEntity(), damageSource.getSourcePosition(), damageSource.getServant()));
+            MinionDamageSource damageSource = infiniteShadowFakePlayer.getInfiniteShadow().getDamageSource();
+            cir.setReturnValue(new MinionDamageSource(damageSource.typeHolder(), infiniteShadowFakePlayer, damageSource.getEntity(), damageSource.getSourcePosition(), damageSource.getMinion()));
         }
     }
 }

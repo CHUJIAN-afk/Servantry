@@ -10,7 +10,7 @@ import first.summoner.client.renderType.OreScoutHighlightRenderType;
 import first.summoner.client.screen.MithrilAnvilGui;
 import first.summoner.client.tooltip.ScabbardTooltipComponent;
 import first.summoner.common.dataComponent.ScabbardContainer;
-import first.summoner.common.servant.OreScout;
+import first.summoner.common.minion.OreScout;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerDataComponentRegister;
 import first.summoner.register.SummonerMenuRegister;
@@ -47,7 +47,7 @@ public class ClientEvent {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS && clientLevel != null && player != null) {
             List<OreScout> scouts = LyraHelper.get(player)
                     .getEntityData()
-                    .get(AttachmentEntityData.Type.Servant, SummonerAttachmentEntityRegister.ORE_SCOUT.get());
+                    .get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.ORE_SCOUT.get());
             if (!scouts.isEmpty()) {
                 OreScout scout = scouts.getFirst();
                 MultiBufferSource bufferSource = minecraft.renderBuffers()

@@ -10,9 +10,9 @@ import top.theillusivec4.curios.api.CuriosApi;
 public class SummonerItemTagsRegister {
 
     public static final TagKey<Item> Curio = register(ResourceLocation.fromNamespaceAndPath(CuriosApi.MODID, "curio"));
-    public static final TagKey<Item> ServantWeapon = register("servant_weapon");
+    public static final TagKey<Item> MinionWeapon = register("minion_weapon");
     // 创造模式分类分段特征标签（物品带标签自动归入对应分段）
-    public static final TagKey<Item> SectionServantWeapon = register("sections/servant_weapon");
+    public static final TagKey<Item> SectionMinionWeapon = register("sections/minion_weapon");
     public static final TagKey<Item> SectionArmor = register("sections/armor");
     public static final TagKey<Item> SectionAccessory = register("sections/accessory");
     public static final TagKey<Item> SectionMaterial = register("sections/material");

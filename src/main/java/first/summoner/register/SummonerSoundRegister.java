@@ -12,7 +12,7 @@ public class SummonerSoundRegister {
     private static final DeferredRegister<SoundEvent> Register = DeferredRegister.create(Registries.SOUND_EVENT, Summoner.MODID);
 
     public static final DeferredHolder<SoundEvent, SoundEvent> UseTerraprism = create("use_terraprism");
-    public static final DeferredHolder<SoundEvent, SoundEvent> UseServantWeapon = create("use_servant_weapon");
+    public static final DeferredHolder<SoundEvent, SoundEvent> UseMinionWeapon = create("use_minion_weapon");
     public static final DeferredHolder<SoundEvent, SoundEvent> UseMoonPortalStaff = create("use_moon_portal_staff");
     public static final DeferredHolder<SoundEvent, SoundEvent> UseBallistaStaff = create("use_ballista_staff");
     public static final DeferredHolder<SoundEvent, SoundEvent> UseCloudStaff = create("use_cloud_staff");
