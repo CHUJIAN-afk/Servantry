@@ -43,6 +43,7 @@ import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 
@@ -50,6 +51,11 @@ import java.util.List;
 
 @EventBusSubscriber(modid = Servantry.MODID)
 public class Event {
+
+    @SubscribeEvent
+    public static void login(PlayerEvent.PlayerLoggedInEvent event) {
+
+    }
 
     @SubscribeEvent
     public static void onItemStackedOnOther(ItemStackedOnOtherEvent event) {

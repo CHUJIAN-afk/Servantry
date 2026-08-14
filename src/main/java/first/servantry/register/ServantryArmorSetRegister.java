@@ -7,6 +7,7 @@ import first.lyra.register.LyraAttributeRegister;
 import first.lyra.register.LyraRegistries;
 import first.servantry.Servantry;
 import first.servantry.common.servant.ChlorophyteCrystal;
+import first.servantry.config.StartupConfig;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.IEventBus;
@@ -93,8 +94,9 @@ public class ServantryArmorSetRegister {
                     .modifier(LyraAttributeRegister.ServantMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
                     .onStart(player -> {
                         ChlorophyteCrystal crystal = new ChlorophyteCrystal();
-                        crystal.setDamage(10);
-                        crystal.setKnockback(1);
+                        crystal.setDamage(StartupConfig.ChlorophyteCrystalDamage.get());
+                        crystal.setKnockback(StartupConfig.ChlorophyteCrystalDamage.get());
+                        crystal.setArmorPierce(StartupConfig.ChlorophyteCrystalArmorPierce.get());
                         LyraHelper.get(player).add(AttachmentEntityData.Type.ExtraServant, crystal);
                     })
                     .onRemove(player -> LyraHelper.get(player).getEntityData().remove(AttachmentEntityData.Type.ExtraServant, ServantryAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))

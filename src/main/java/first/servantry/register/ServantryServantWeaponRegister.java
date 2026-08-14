@@ -12,6 +12,7 @@ import first.servantry.common.dataComponent.ScabbardContainer;
 import first.servantry.common.recipe.MithrilAnvilRecipe;
 import first.servantry.common.sentryServant.*;
 import first.servantry.common.servant.*;
+import first.servantry.config.StartupConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
@@ -33,8 +34,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Hornet>.ServantWeaponItem> HornetStaff =
             LyraItemRegisterBuilder.build(ITEMS, "hornet_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.HORNET)
-                            .damage(0.7f)
-                            .knockback(0.2f)
+                            .damage(StartupConfig.HornetStaffDamage.get())
+                            .knockback(StartupConfig.HornetStaffKnockback.get())
+                            .armorPierce(StartupConfig.HornetStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
@@ -49,8 +51,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Imp>.ServantWeaponItem> ImpStaff =
             LyraItemRegisterBuilder.build(ITEMS, "imp_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.IMP)
-                            .damage(1.7f)
-                            .knockback(0.2f)
+                            .damage(StartupConfig.ImpStaffDamage.get())
+                            .knockback(StartupConfig.ImpStaffKnockback.get())
+                            .armorPierce(StartupConfig.ImpStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseImpStaff)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
@@ -65,6 +68,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<OreScout>.ServantWeaponItem> SurveyDroneRemote =
             LyraItemRegisterBuilder.build(ITEMS, "survey_drone_remote", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.ORE_SCOUT)
+                            .damage(StartupConfig.SurveyDroneRemoteDamage.get())
+                            .knockback(StartupConfig.SurveyDroneRemoteKnockback.get())
+                            .armorPierce(StartupConfig.SurveyDroneRemoteArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 OreScout servant = weapon.createServant(player, itemStack);
@@ -98,6 +104,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<ScavengerFairy>.ServantWeaponItem> FairyBell =
             LyraItemRegisterBuilder.build(ITEMS, "fairy_bell", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.SCAVENGER_FAIRY)
+                            .damage(StartupConfig.FairyBellDamage.get())
+                            .knockback(StartupConfig.FairyBellKnockback.get())
+                            .armorPierce(StartupConfig.FairyBellArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 ScavengerFairy servant = weapon.createServant(player, itemStack);
@@ -130,8 +139,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<EnchantedThrowingKnives>.ServantWeaponItem> BladeStaff =
             LyraItemRegisterBuilder.build(ITEMS, "blade_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES)
-                            .damage(0.6f)
-                            .armorPierce(7.5f)
+                            .damage(StartupConfig.BladeStaffDamage.get())
+                            .knockback(StartupConfig.BladeStaffKnockback.get())
+                            .armorPierce(StartupConfig.BladeStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 EnchantedThrowingKnives servant = weapon.createServant(player, itemStack);
@@ -164,7 +174,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Cloud>.ServantWeaponItem> RainCloudStaff =
             LyraItemRegisterBuilder.build(ITEMS, "rain_cloud_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.CLOUD)
-                            .damage(3f)
+                            .damage(StartupConfig.RainCloudStaffDamage.get())
+                            .knockback(StartupConfig.RainCloudStaffKnockback.get())
+                            .armorPierce(StartupConfig.RainCloudStaffArmorPierce.get())
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseCloudStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -191,8 +203,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Twins>.ServantWeaponItem> OpticStaff =
             LyraItemRegisterBuilder.build(ITEMS, "optic_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.TWINS)
-                            .damage(2.4f)
-                            .knockback(0.2f)
+                            .damage(StartupConfig.OpticStaffDamage.get())
+                            .knockback(StartupConfig.OpticStaffKnockback.get())
+                            .armorPierce(StartupConfig.OpticStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseTerraprism)
                             .summon((weapon, player, itemStack) -> {
                                 LyraHelper servantryHelper = LyraHelper.get(player);
@@ -235,8 +248,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<DeadlySphere>.ServantWeaponItem> DeadlySphereStaff =
             LyraItemRegisterBuilder.build(ITEMS, "deadly_sphere_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.DEADLY_SPHERE)
-                            .damage(5.5f)
-                            .knockback(0.2f)
+                            .damage(StartupConfig.DeadlySphereStaffDamage.get())
+                            .knockback(StartupConfig.DeadlySphereStaffKnockback.get())
+                            .armorPierce(StartupConfig.DeadlySphereStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
@@ -251,8 +265,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<UFO>.ServantWeaponItem> XenoStaff =
             LyraItemRegisterBuilder.build(ITEMS, "xeno_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.UFO)
-                            .damage(3.6f)
-                            .knockback(0.2f)
+                            .damage(StartupConfig.XenoStaffDamage.get())
+                            .knockback(StartupConfig.XenoStaffKnockback.get())
+                            .armorPierce(StartupConfig.XenoStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
@@ -267,7 +282,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<PulseTurret>.ServantWeaponItem> PulseTurretRemote =
             LyraItemRegisterBuilder.build(ITEMS, "pulse_turret_remote", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.PULSE_TURRET)
-                            .damage(15f)
+                            .damage(StartupConfig.PulseTurretRemoteDamage.get())
+                            .knockback(StartupConfig.PulseTurretRemoteKnockback.get())
+                            .armorPierce(StartupConfig.PulseTurretRemoteArmorPierce.get())
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -297,8 +314,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Sharknado>.ServantWeaponItem> TempestStaff =
             LyraItemRegisterBuilder.build(ITEMS, "tempest_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.SHARKNADO)
-                            .damage(5f)
-                            .knockback(0.2f)
+                            .damage(StartupConfig.TempestStaffDamage.get())
+                            .knockback(StartupConfig.TempestStaffKnockback.get())
+                            .armorPierce(StartupConfig.TempestStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
@@ -313,8 +331,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Terraprism>.ServantWeaponItem> TerraPrism =
             LyraItemRegisterBuilder.build(ITEMS, "terraprism", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.TERRA_PRISM)
-                            .damage(9f)
-                            .knockback(0.4f)
+                            .damage(StartupConfig.TerraPrismDamage.get())
+                            .knockback(StartupConfig.TerraPrismKnockback.get())
+                            .armorPierce(StartupConfig.TerraPrismArmorPierce.get())
                             .sound(ServantrySoundRegister.UseTerraprism)
                             .summon((weapon, player, itemStack) -> {
                                 Terraprism servant = weapon.createServant(player, itemStack);
@@ -338,8 +357,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItem> BallistaRod =
             LyraItemRegisterBuilder.build(ITEMS, "ballista_rod", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.BALLISTA)
-                            .damage(3f)
-                            .knockback(0.47f)
+                            .damage(StartupConfig.BallistaRodDamage.get())
+                            .knockback(StartupConfig.BallistaRodKnockback.get())
+                            .armorPierce(StartupConfig.BallistaRodArmorPierce.get())
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -365,8 +385,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItem> BallistaCane =
             LyraItemRegisterBuilder.build(ITEMS, "ballista_cane", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.BALLISTA)
-                            .damage(7.4f)
-                            .knockback(0.47f)
+                            .damage(StartupConfig.BallistaCaneDamage.get())
+                            .knockback(StartupConfig.BallistaCaneKnockback.get())
+                            .armorPierce(StartupConfig.BallistaCaneArmorPierce.get())
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -392,8 +413,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Ballista>.ServantWeaponItem> BallistaStaff =
             LyraItemRegisterBuilder.build(ITEMS, "ballista_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.BALLISTA)
-                            .damage(15.6f)
-                            .knockback(0.47f)
+                            .damage(StartupConfig.BallistaStaffDamage.get())
+                            .knockback(StartupConfig.BallistaStaffKnockback.get())
+                            .armorPierce(StartupConfig.BallistaStaffArmorPierce.get())
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -420,8 +442,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<EtherealStellarCore>.ServantWeaponItem> EtherealStellarCoreStaff =
             LyraItemRegisterBuilder.build(ITEMS, "ethereal_stellar_core_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.ETHEREAL_STELLAR_CORE)
-                            .damage(5.0f)
-                            .knockback(0.2f)
+                            .damage(StartupConfig.EtherealStellarCoreStaffDamage.get())
+                            .knockback(StartupConfig.EtherealStellarCoreStaffKnockback.get())
+                            .armorPierce(StartupConfig.EtherealStellarCoreStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 EtherealStellarCore servant = weapon.createServant(player, itemStack);
@@ -453,8 +476,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<StardustCell>.ServantWeaponItem> StardustCellStaff =
             LyraItemRegisterBuilder.build(ITEMS, "stardust_cell_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.STARDUST_CELL)
-                            .damage(6f)
-                            .knockback(0.2f)
+                            .damage(StartupConfig.StardustCellStaffDamage.get())
+                            .knockback(StartupConfig.StardustCellStaffKnockback.get())
+                            .armorPierce(StartupConfig.StardustCellStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
@@ -474,8 +498,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<StardustDragon>.ServantWeaponItem> StardustDragonStaff =
             LyraItemRegisterBuilder.build(ITEMS, "stardust_dragon_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.STARDUST_DRAGON)
-                            .damage(4f)
-                            .knockback(0.2f)
+                            .damage(StartupConfig.StardustDragonStaffDamage.get())
+                            .knockback(StartupConfig.StardustDragonStaffKnockback.get())
+                            .armorPierce(StartupConfig.StardustDragonStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 LyraHelper helper = LyraHelper.get(player);
@@ -530,8 +555,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<MoonPortal>.ServantWeaponItem> MoonPortalStaff =
             LyraItemRegisterBuilder.build(ITEMS, "moon_portal_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.MOON_PORTAL)
-                            .damage(10)
-                            .knockback(0.75f)
+                            .damage(StartupConfig.MoonPortalStaffDamage.get())
+                            .knockback(StartupConfig.MoonPortalStaffKnockback.get())
+                            .armorPierce(StartupConfig.MoonPortalStaffArmorPierce.get())
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -556,8 +582,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<RainbowCrystal>.ServantWeaponItem> RainbowCrystalStaff =
             LyraItemRegisterBuilder.build(ITEMS, "rainbow_crystal_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.RAINBOW_CRYSTAL)
-                            .damage(13)
-                            .knockback(0.75f)
+                            .damage(StartupConfig.RainbowCrystalStaffDamage.get())
+                            .knockback(StartupConfig.RainbowCrystalStaffKnockback.get())
+                            .armorPierce(StartupConfig.RainbowCrystalStaffArmorPierce.get())
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -583,6 +610,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<InfiniteShadow>.ServantWeaponItem> InfiniteScabbard =
             LyraItemRegisterBuilder.build(ITEMS, "infinite_scabbard", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.INFINITE_SHADOW)
+                            .damage(StartupConfig.InfiniteScabbardDamage.get())
+                            .knockback(StartupConfig.InfiniteScabbardKnockback.get())
+                            .armorPierce(StartupConfig.InfiniteScabbardArmorPierce.get())
                             .sound(ServantrySoundRegister.UseTerraprism)
                             .summon((weapon, player, itemStack) -> {
                                 InfiniteShadow servant = weapon.createServant(player, itemStack);
@@ -620,8 +650,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<VoidEater>.ServantWeaponItem> VoidEaterMarionette =
             LyraItemRegisterBuilder.build(ITEMS, "void_eater_marionette", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.VOID_EATER)
-                            .damage(11f)
-                            .knockback(0.5f)
+                            .damage(StartupConfig.VoidEaterMarionetteDamage.get())
+                            .knockback(StartupConfig.VoidEaterMarionetteKnockback.get())
+                            .armorPierce(StartupConfig.VoidEaterMarionetteArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 LyraHelper helper = LyraHelper.get(player);
@@ -673,8 +704,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<SuperPeashooter>.ServantWeaponItem> ThundercloudBonsai =
             LyraItemRegisterBuilder.build(ITEMS, "thundercloud_bonsai", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.SUPER_PEASHOOTER)
-                            .damage(12f)
-                            .knockback(0)
+                            .damage(StartupConfig.ThundercloudBonsaiDamage.get())
+                            .knockback(StartupConfig.ThundercloudBonsaiKnockback.get())
+                            .armorPierce(StartupConfig.ThundercloudBonsaiArmorPierce.get())
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -701,8 +733,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<Cannon>.ServantWeaponItem> CornCannon =
             LyraItemRegisterBuilder.build(ITEMS, "corn_cannon", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.CANNON)
-                            .damage(6400f)
-                            .armorPierce(3600f)
+                            .damage(StartupConfig.CornCannonDamage.get())
+                            .knockback(StartupConfig.CornCannonKnockback.get())
+                            .armorPierce(StartupConfig.CornCannonArmorPierce.get())
                             .sentryServant()
                             .sound(ServantrySoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -729,7 +762,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<NecroSpirit>.ServantWeaponItem> NecroSpiritStaff =
             LyraItemRegisterBuilder.build(ITEMS, "necro_spirit_staff", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.NECRO_SPIRIT)
-                            .damage(700f)
+                            .damage(StartupConfig.NecroSpiritStaffDamage.get())
+                            .knockback(StartupConfig.NecroSpiritStaffKnockback.get())
+                            .armorPierce(StartupConfig.NecroSpiritStaffArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 NecroSpirit servant = weapon.createServant(player, itemStack);
@@ -753,8 +788,9 @@ public class ServantryServantWeaponRegister {
      */
     public static final DeferredItem<ServantWeaponItemBuilder<LaserMinigun>.ServantWeaponItem> LaserMinigunStaff =
             LyraItemRegisterBuilder.build(ITEMS, "laser_minigun", location -> new ServantWeaponItemBuilder<>(ServantryAttachmentEntityRegister.LASER_MINIGUN)
-                            .damage(6f)
-                            .knockback(0.2f)
+                            .damage(StartupConfig.LaserMinigunDamage.get())
+                            .knockback(StartupConfig.LaserMinigunKnockback.get())
+                            .armorPierce(StartupConfig.LaserMinigunArmorPierce.get())
                             .sound(ServantrySoundRegister.UseServantWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 LaserMinigun servant = weapon.createServant(player, itemStack);

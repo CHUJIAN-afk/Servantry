@@ -124,7 +124,7 @@ repositories {
 
 dependencies {
     // 独立库 mod Lyra (first.lyra.*)
-    implementation "first:Lyra:1.0.0"
+    implementation "first:Lyra:${lyra_version}"
 
     implementation "top.theillusivec4.curios:curios-neoforge:${curios_version}"
     implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
