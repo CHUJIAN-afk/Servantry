@@ -14,9 +14,7 @@ public class SummonerLanguageProvider extends LyraLanguageProvider {
     @Override
     public void init() {
         // ================= 模组基础 =================
-        entry("modid.summoner", "Summoner", "仆从学");
-        entry("death.attack.summoner.servant", "%1$s was torn apart by a servant", "%1$s 被仆从撕碎");
-        entry("death.attack.summoner.servant.player", "%1$s was torn apart by a servant whilst fighting %2$s", "%1$s 在与 %2$s 战斗时被仆从撕碎");
+        entry("modid.summoner", "Summoner", "召唤师");
         entry("container.summoner.mithril_anvil", "Forging", "超凡锻造");
         // ===================== 药水效果 =====================
         entry(SummonerMobEffectRegister.Obsession.get().getDescriptionId(), "Obsession", "着魔");
