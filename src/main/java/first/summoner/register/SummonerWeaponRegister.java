@@ -80,7 +80,7 @@ public class SummonerWeaponRegister {
                                     List<OreScout> oreScouts = entityData.get(AttachmentEntityData.Type.Minion, weapon.getType());
                                     if (oreScouts.isEmpty()) {
                                         summonerHelper.add(AttachmentEntityData.Type.Minion, minion);
-                                        minion.init(minion.getInterpolatedIdleState(1.0f));
+                                        minion.init(minion.getRenderNode(1.0f));
                                     }
                                 }
                             })

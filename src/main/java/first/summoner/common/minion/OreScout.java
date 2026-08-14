@@ -5,30 +5,32 @@ import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 public class OreScout extends Minion {
 
-    private final List<BlockPos> highlightedOres = new ArrayList<>();
-    private int scanCooldown = 0;
+    private BlockPos target = null;
+    private int searchRadius = 1;
 
     @Override
     public void tick() {
-        if (!getOwner().level().isClientSide()) {
-            setPath(Collections.singletonList(getInterpolatedIdleState(1.0f)));
-        } else {
-            if (--scanCooldown <= 0) {
-                scanCooldown = 5;
-                scanNearbyOres(16);
+        Level level = getOwner().level();
+        if (!level.isClientSide()) {
+            setPath(Collections.singletonList(getRenderNode(1.0f)));
+            if (target == null) {
+                target = getNearestOrePos(searchRadius);
+                searchRadius = searchRadius >= 16 ? 1 : searchRadius + 1;
+            }
+            if (target != null) {
+                level.destroyBlock(target, true, owner);
+                target = null;
             }
         }
         super.tick();
@@ -49,17 +51,8 @@ public class OreScout extends Minion {
         return false;
     }
 
-    public List<BlockPos> getHighlightedOres() {
-        return Collections.unmodifiableList(highlightedOres);
-    }
-
     @Override
     public PathNode getRenderNode(float partialTick) {
-        return getInterpolatedIdleState(partialTick);
-    }
-
-    public PathNode getInterpolatedIdleState(float partialTick) {
-        var owner = getOwner();
         double px = Mth.lerp(partialTick, owner.xo, owner.getX());
         double py = Mth.lerp(partialTick, owner.yo, owner.getY());
         double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
@@ -68,37 +61,34 @@ public class OreScout extends Minion {
         return new PathNode(targetPos, 0, 0, 0);
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private void scanNearbyOres(int radius) {
-        highlightedOres.clear();
+    private BlockPos getNearestOrePos(int radius) {
+        Level level = getOwner().level();
         BlockPos center = BlockPos.containing(getPos());
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+        int radiusSquared = radius * radius;
+        int innerSquared = (radius - 1) * (radius - 1);
+        // 仅搜索当前半径的球壳 (inner, radius]，由调用方逐层扩大半径
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
                 for (int z = -radius; z <= radius; z++) {
-                    if (x * x + y * y + z * z <= radius * radius) {
+                    int distanceSquared = x * x + y * y + z * z;
+                    if (distanceSquared <= radiusSquared && distanceSquared > innerSquared) {
                         cursor.set(center.getX() + x, center.getY() + y, center.getZ() + z);
-                        BlockState blockState = getOwner().level().getBlockState(cursor);
+                        BlockState blockState = level.getBlockState(cursor);
                         if (!blockState.isAir() && isOre(blockState)) {
-                            highlightedOres.add(cursor.immutable());
+                            return cursor.immutable();
                         }
                     }
                 }
             }
         }
+        return null;
     }
 
     private boolean isOre(BlockState state) {
-        return state.getTags().map(TagKey::location).anyMatch(this::isOreTag);
-    }
-
-    private boolean isOreTag(ResourceLocation location) {
-        String path = location.getPath();
-        return path.equals("ores")
-                || path.startsWith("ores/")
-                || path.endsWith("/ores")
-                || path.contains("/ores/")
-                || path.endsWith("_ores")
-                || path.endsWith("_ore");
+        return state.getTags().map(TagKey::location).anyMatch(location -> {
+            String path = location.getPath();
+            return path.equals("ores") || path.startsWith("ores/") || path.endsWith("/ores") || path.contains("/ores/") || path.endsWith("_ores") || path.endsWith("_ore");
+        });
     }
 }
