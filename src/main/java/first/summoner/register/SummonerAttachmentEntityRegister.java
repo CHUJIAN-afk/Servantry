@@ -51,55 +51,55 @@ public class SummonerAttachmentEntityRegister {
             register("sharknado", Sharknado::new, SharknadoRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DeadlySphere>> DEADLY_SPHERE =
-            register("deadly_sphere", DeadlySphere::new, DeadlySphereRenderer::new);
+            register("deadly_sphere", DeadlySphere::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EtherealStellarCore>> ETHEREAL_STELLAR_CORE =
             register("ethereal_stellar_core", EtherealStellarCore::new, EtherealStellarCoreRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<OreScout>> ORE_SCOUT =
-            register("survey_drone", OreScout::new, OreScoutMinionRenderer::new);
+            register("survey_drone", OreScout::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ScavengerFairy>> SCAVENGER_FAIRY =
-            register("scavenger_fairy", ScavengerFairy::new, ScavengerFairyRenderer::new);
+            register("scavenger_fairy", ScavengerFairy::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ChlorophyteCrystal>> CHLOROPHYTE_CRYSTAL =
             register("chlorophyte_crystal", ChlorophyteCrystal::new, ChlorophyteCrystalRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MoonPortal>> MOON_PORTAL =
-            register("moon_portal", MoonPortal::new, TextOnlyRenderer::new);
+            register("moon_portal", MoonPortal::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<RainbowCrystal>> RAINBOW_CRYSTAL =
-            register("rainbow_crystal", RainbowCrystal::new, TextOnlyRenderer::new);
+            register("rainbow_crystal", RainbowCrystal::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Ballista>> BALLISTA =
-            register("ballista", Ballista::new, BallistaRenderer::new);
+            register("ballista", Ballista::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SuperPeashooter>> SUPER_PEASHOOTER =
-            register("super_peashooter", SuperPeashooter::new, TextOnlyRenderer::new);
+            register("super_peashooter", SuperPeashooter::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<VoidEater>> VOID_EATER =
-            register("void_eater", VoidEater::new, VoidEaterRenderer::new);
+            register("void_eater", VoidEater::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cloud>> CLOUD =
-            register("cloud", Cloud::new, TextOnlyRenderer::new);
+            register("cloud", Cloud::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<PulseTurret>> PULSE_TURRET =
-            register("pulse_turret", PulseTurret::new, TextOnlyRenderer::new);
+            register("pulse_turret", PulseTurret::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Hornet>> HORNET =
-            register("hornet", Hornet::new, HornetRenderer::new);
+            register("hornet", Hornet::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Imp>> IMP =
-            register("imp", Imp::new, ImpRenderer::new);
+            register("imp", Imp::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<UFO>> UFO =
-            register("ufo", UFO::new, UFORenderer::new);
+            register("ufo", UFO::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cannon>> CANNON =
-            register("cannon", Cannon::new, CannonRenderer::new);
+            register("cannon", Cannon::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<NecroSpirit>> NECRO_SPIRIT =
-            register("necro_spirit", NecroSpirit::new, NecroSpiritRenderer::new);
+            register("necro_spirit", NecroSpirit::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<LaserMinigun>> LASER_MINIGUN =
             register("laser_minigun", LaserMinigun::new, LaserMinigunRenderer::new);
@@ -134,7 +134,7 @@ public class SummonerAttachmentEntityRegister {
             register("mini_rainbow_crystal", MiniRainbowCrystal::new, RainbowCrystalRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CrossbowBolt>> CROSSBOW_BOLT =
-            register("crossbow_bolt", CrossbowBolt::new, TextOnlyRenderer::new);
+            register("crossbow_bolt", CrossbowBolt::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<GodFlame>> GOD_FLAME =
             register("god_flame", GodFlame::new, GodFlameRenderer::new);
@@ -149,16 +149,16 @@ public class SummonerAttachmentEntityRegister {
             register("destruction_bullet", DestructionBullet::new, DestructionBulletRenderer::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<HornetStinger>> HORNET_STINGER =
-            register("hornet_stinger", HornetStinger::new, HornetStingerRenderer::new);
+            register("hornet_stinger", HornetStinger::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ImpFireball>> IMP_FIREBALL =
-            register("imp_fireball", ImpFireball::new, ImpFireballRenderer::new);
+            register("imp_fireball", ImpFireball::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Corn>> CORN =
-            register("corn", Corn::new, CornRenderer::new);
+            register("corn", Corn::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniNecroSpirit>> MINI_NECRO_SPIRIT =
-            register("mini_necro_spirit", MiniNecroSpirit::new, MiniNecroSpiritRenderer::new);
+            register("mini_necro_spirit", MiniNecroSpirit::new, null);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ElectricLaser>> ELECTRIC_LASER =
             register("electric_laser", ElectricLaser::new, ElectricLaserRenderer::new);
@@ -167,7 +167,10 @@ public class SummonerAttachmentEntityRegister {
         AttachmentEntityType<T> type = new AttachmentEntityType<>(supplier);
         DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register = Register.register(name, () -> type);
         Dist dist = FMLLoader.getDist();
-        if (renderer != null && dist.isClient()) {
+        if (dist.isClient()) {
+            if (renderer == null) {
+                renderer = TextOnlyRenderer::new;
+            }
             AttachmentEntityRenderDispatcher.register(type, renderer.get());
         }
         return register;
