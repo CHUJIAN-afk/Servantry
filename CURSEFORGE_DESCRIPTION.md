@@ -1,6 +1,6 @@
-# Servantry
+# Summoner
 
-Servantry is a summoner-focused combat mod inspired by Terraria's summoner class. Summon servants that fight for you, and deploy sentries to hold the line.
+Summoner is a summoner-focused combat mod inspired by Terraria's summoner class. Summon servants that fight for you, and deploy sentries to hold the line.
 
 ## Gameplay
 

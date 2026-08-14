@@ -1,0 +1,14 @@
+{
+  "type": "summoner:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "summoner:spider_fang"
+      }
+    }
+  ],
+  "result": {
+    "id": "summoner:spider_mask"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "type": "summoner:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "summoner:hallowed_ingot"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "minecraft:diamond"
+      }
+    },
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "minecraft:netherite_ingot"
+      }
+    }
+  ],
+  "result": {
+    "id": "summoner:survey_drone_remote"
+  }
+}

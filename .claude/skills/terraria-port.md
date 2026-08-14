@@ -237,180 +237,240 @@ public int getStingerCooldown() {
 ### MomentumServant 模板
 
 ```java
-package first.servantry.common.servant;
+package first.summoner.common.servant;
 
-import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.entity.*;
-import first.servantry.api.entity.ICollideAttack.HitContext;
-import first.servantry.api.entity.IBlockCollision.CollisionContext;
-import first.servantry.api.servant.MomentumServant;
-import first.servantry.api.servant.ai.ServantGoalSelector;
-import first.servantry.common.servant.goal.{name}.{Name}AttackGoal;
-import first.servantry.common.servant.goal.{name}.{Name}IdleGoal;
-import first.servantry.register.ServantryAttachmentEntityRegister;
+import first.summoner.api.common.attachment.InvincibleData;
+import first.summoner.api.entity.*;
+import first.summoner.api.entity.ICollideAttack.HitContext;
+import first.summoner.api.entity.IBlockCollision.CollisionContext;
+import first.summoner.api.servant.MomentumServant;
+import first.summoner.api.servant.ai.ServantGoalSelector;
+import first.summoner.common.servant.goal.{name}.{Name}AttackGoal;
+import first.summoner.common.servant.goal.{name}.{Name}IdleGoal;
+import first.summoner.register.ServantryAttachmentEntityRegister;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class {Name} extends MomentumServant
-        implements ICollideAttack<{Name}>, IBlockCollision<{Name}> {
+public class {Name}extends MomentumServant
+        implements ICollideAttack
 
-    public {Name}() {
+< {
+    Name
+}>,IBlockCollision
+
+< {
+    Name
+}>{
+
+public {
+    Name
+}(){
         super();
-        setDrag({drag});
-        setGravity({gravity});
-        setRotationSpeed({rotSpeed});
-    }
 
-    @Override
-    public void registerGoals(ServantGoalSelector goalSelector) {
-        goalSelector.addGoal(0, new {Name}AttackGoal(this));
-        goalSelector.addGoal(2, new {Name}IdleGoal(this));
-    }
+setDrag( {
+    drag
+});
 
-    @Override
-    public @NotNull AABB getHitbox() {
-        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
-    }
+setGravity( {
+    gravity
+});
 
-    @Override
-    public @NotNull AABB getBlockCollisionBox() {
-        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
-    }
-
-    @Override
-    public boolean canCollideWithBlocks() {
-        return !isExecutingPath();
-    }
-
-    @Override
-    public boolean canCollideAttack() {
-        return isTarget(getTarget());
-    }
-
-    @Override
-    public boolean isValidCollisionTarget({Name} entity, LivingEntity target) {
-        return isTarget(target);
-    }
-
-    @Override
-    public void onCollisionAttack(List<HitContext> hitContexts) {
-        for (HitContext hit : hitContexts) {
-            InvincibleData.attack(hit.entity())
-                    .attacker(getUuid())
-                    .damageSource(getDamageSource())
-                    .damageAmount(getDamage())
-                    .invincibleTime({invincibleTime})  // ceil(Terraria帧/4)
-                    .apply();
+setRotationSpeed( {
+    rotSpeed
+});
         }
+
+@Override
+public void registerGoals(ServantGoalSelector goalSelector) {
+    goalSelector.addGoal(0, new {
+        Name
+    } AttackGoal(this));
+    goalSelector.addGoal(2, new {
+        Name
+    } IdleGoal(this));
+}
+
+@Override
+public @NotNull AABB getHitbox() {
+    return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
+}
+
+@Override
+public @NotNull AABB getBlockCollisionBox() {
+    return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
+}
+
+@Override
+public boolean canCollideWithBlocks() {
+    return !isExecutingPath();
+}
+
+@Override
+public boolean canCollideAttack() {
+    return isTarget(getTarget());
+}
+
+@Override
+public boolean isValidCollisionTarget( {
+    Name
+}
+
+entity,
+LivingEntity target){
+        return
+
+isTarget(target);
     }
 
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        setVelocity(IBlockCollision.bounceVelocity(getVelocity(), context, 0.98, 0.01));
+@Override
+public void onCollisionAttack(List<HitContext> hitContexts) {
+    for (HitContext hit : hitContexts) {
+        InvincibleData.attack(hit.entity())
+                .attacker(getUuid())
+                .damageSource(getDamageSource())
+                .damageAmount(getDamage())
+                .invincibleTime({invincibleTime})  // ceil(Terraria帧/4)
+                .apply();
     }
+}
 
-    @Override
-    public int getSearchDistance() {
-        return 32;
-    }
+@Override
+public void onBlockCollision(CollisionContext context) {
+    setVelocity(IBlockCollision.bounceVelocity(getVelocity(), context, 0.98, 0.01));
+}
 
-    @Override
-    public AttachmentEntityType<? extends MomentumServant> getType() {
-        return ServantryAttachmentEntityRegister.{Name}.get();
-    }
+@Override
+public int getSearchDistance() {
+    return 32;
+}
+
+@Override
+public AttachmentEntityType<? extends MomentumServant> getType() {
+    return ServantryAttachmentEntityRegister. {
+        Name
+    }.get();
+}
 }
 ```
 
 ### AttackGoal 模板
 
 ```java
-package first.servantry.common.servant.goal.{name};
+package first.summoner.common.servant.goal.
 
-import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.servant.{Name};
+{name};
+
+import first.summoner.api.servant.ai.ServantGoal;
+import first.summoner.common.servant.{Name};
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
-public class {Name}AttackGoal extends ServantGoal<{Name}> {
+public class {Name}AttackGoal extends ServantGoal
 
-    private int cooldown = 0;
+< {
+    Name
+}>{
 
-    public {Name}AttackGoal({Name} servant) {
+private int cooldown = 0;
+
+public {
+    Name
+}
+
+AttackGoal( {
+    Name
+}
+
+servant){
         super(servant);
-    }
-
-    @Override
-    public boolean canUse() {
-        return servant.isTarget(servant.getTarget());
-    }
-
-    @Override
-    public void tick() {
-        LivingEntity target = servant.getTarget();
-        Vec3 targetPos = target.getBoundingBox().getCenter();
-        servant.lookAtPos(targetPos);
-
-        if (--cooldown <= 0) {
-            cooldown = {attackCooldown};
-            Vec3 direction = targetPos.subtract(servant.getPos()).normalize();
-            servant.applyForce(direction.scale({chargeForce}));
         }
+
+@Override
+public boolean canUse() {
+    return servant.isTarget(servant.getTarget());
+}
+
+@Override
+public void tick() {
+    LivingEntity target = servant.getTarget();
+    Vec3 targetPos = target.getBoundingBox().getCenter();
+    servant.lookAtPos(targetPos);
+
+    if (--cooldown <= 0) {
+        cooldown = {attackCooldown};
+        Vec3 direction = targetPos.subtract(servant.getPos()).normalize();
+        servant.applyForce(direction.scale({chargeForce}));
     }
+}
 }
 ```
 
 ### IdleGoal 模板
 
 ```java
-package first.servantry.common.servant.goal.{name};
+package first.summoner.common.servant.goal.
 
-import first.servantry.api.servant.ai.ServantGoal;
-import first.servantry.common.servant.{Name};
+{name};
+
+import first.summoner.api.servant.ai.ServantGoal;
+import first.summoner.common.servant.{Name};
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-public class {Name}IdleGoal extends ServantGoal<{Name}> {
+public class {Name}IdleGoal extends ServantGoal
 
-    private Vec3 wanderPos = Vec3.ZERO;
+< {
+    Name
+}>{
 
-    public {Name}IdleGoal({Name} servant) {
+private Vec3 wanderPos = Vec3.ZERO;
+
+public {
+    Name
+}
+
+IdleGoal( {
+    Name
+}
+
+servant){
         super(servant);
-    }
-
-    @Override
-    public boolean canUse() {
-        return !servant.isTarget(servant.getTarget());
-    }
-
-    @Override
-    public void tick() {
-        Player owner = servant.getOwner();
-        Vec3 ownerPos = owner.getBoundingBox().getCenter();
-        wanderPos = servant.getWanderPos(wanderPos, ownerPos, {wanderRadius}, {wanderHeight});
-        double distance = servant.getPos().distanceTo(wanderPos);
-        servant.applyForce(wanderPos.subtract(servant.getPos()).normalize()
-                .scale(Math.min(distance * {approachFactor}, {maxApproachForce})));
-        if (servant.getPos().distanceToSqr(ownerPos) > {returnDist} * {returnDist}) {
-            servant.teleportTo(ownerPos);
         }
+
+@Override
+public boolean canUse() {
+    return !servant.isTarget(servant.getTarget());
+}
+
+@Override
+public void tick() {
+    Player owner = servant.getOwner();
+    Vec3 ownerPos = owner.getBoundingBox().getCenter();
+    wanderPos = servant.getWanderPos(wanderPos, ownerPos, {wanderRadius}, {wanderHeight});
+    double distance = servant.getPos().distanceTo(wanderPos);
+    servant.applyForce(wanderPos.subtract(servant.getPos()).normalize()
+                               .scale(Math.min(distance * {approachFactor}, {maxApproachForce})));
+    if (servant.getPos().distanceToSqr(ownerPos) > {returnDist} * {returnDist}) {
+        servant.teleportTo(ownerPos);
     }
+}
 }
 ```
 
 ### Projectile 模板
 
 ```java
-package first.servantry.common.projectile;
+package first.summoner.common.projectile;
 
-import first.servantry.api.common.attachment.InvincibleData;
-import first.servantry.api.entity.*;
-import first.servantry.api.projectile.Projectile;
-import first.servantry.api.servant.Servant;
-import first.servantry.api.servant.ServantDamageSource;
-import first.servantry.register.ServantryAttachmentEntityRegister;
+import first.summoner.api.common.attachment.InvincibleData;
+import first.summoner.api.entity.*;
+import first.summoner.api.projectile.Projectile;
+import first.summoner.api.servant.Servant;
+import first.summoner.api.servant.ServantDamageSource;
+import first.summoner.register.ServantryAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -420,66 +480,102 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class {Name}Projectile extends Projectile
-        implements ICollideAttack<{Name}Projectile>, IBlockCollision<{Name}Projectile> {
+        implements ICollideAttack
 
-    public {Name}Projectile() {
-        super();
-    }
+< {
+    Name
+}
 
-    public {Name}Projectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
-        setDrag({drag});
-        setMaxSpeed({maxSpeed});
-        setMaxLife({maxLife});
-        setGravity({gravity});
-    }
+Projectile>,IBlockCollision
 
-    @Override
-    public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
-        if (source != null) {
-            for (HitContext hit : hitContexts) {
-                InvincibleData.attack(hit.entity())
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .invincibleTime({invincibleTime})  // ceil(Terraria帧/4)
-                        .apply();
-            }
+< {
+    Name
+}
+
+Projectile>{
+
+public {
+    Name
+}
+
+Projectile() {
+    super();
+}
+
+public {
+    Name
+}
+
+Projectile(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
+    super(startPos, direction);
+    setDamageSource(damageSource);
+    setDrag({drag});
+    setMaxSpeed({maxSpeed});
+    setMaxLife({maxLife});
+    setGravity({gravity});
+}
+
+@Override
+public void onCollisionAttack(List<HitContext> hitContexts) {
+    DamageSource source = getDamageSource();
+    if (source != null) {
+        for (HitContext hit : hitContexts) {
+            InvincibleData.attack(hit.entity())
+                    .attacker(getUuid())
+                    .damageSource(source)
+                    .damageAmount(getDamage())
+                    .invincibleTime({invincibleTime})  // ceil(Terraria帧/4)
+                    .apply();
         }
-        setRemove();
     }
+    setRemove();
+}
 
-    @Override
-    public boolean isValidCollisionTarget({Name}Projectile entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof ServantDamageSource sds) {
-            return sds.getServant().isTarget(target);
+@Override
+public boolean isValidCollisionTarget( {
+    Name
+}
+
+        Projectile entity, LivingEntity
+target){
+        if(entity.
+
+getDamageSource() instanceof
+ServantDamageSource sds){
+        return sds.
+
+getServant().
+
+isTarget(target);
         }
-        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+                return ICollideAttack .super.
+
+isValidCollisionTarget(entity, target);
     }
 
-    @Override
-    public @NotNull AABB getHitbox() {
-        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
-    }
+@Override
+public @NotNull AABB getHitbox() {
+    return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
+}
 
-    @Override
-    public @NotNull AABB getBlockCollisionBox() {
-        return getHitbox();
-    }
+@Override
+public @NotNull AABB getBlockCollisionBox() {
+    return getHitbox();
+}
 
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        currentPathNode = new PathNode(context.position(),
-                currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
-        setRemove();
-    }
+@Override
+public void onBlockCollision(CollisionContext context) {
+    currentPathNode = new PathNode(context.position(),
+                                   currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+    setRemove();
+}
 
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return ServantryAttachmentEntityRegister.{Name}Projectile.get();
-    }
+@Override
+public AttachmentEntityType<? extends AttachmentEntity> getType() {
+    return ServantryAttachmentEntityRegister. {
+        Name
+    } Projectile.get();
+}
 }
 ```
 
@@ -517,40 +613,103 @@ public static final DeferredItem<ServantWeaponItemBuilder<{Name}>.ServantWeaponI
 ### 渲染器模板（AbstractAttachmentEntityRenderer）
 
 ```java
-package first.servantry.client.attachmentEntityRenderer.servant;
+package first.summoner.client.attachmentEntityRenderer.servant;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.servantry.api.client.render.AbstractAttachmentEntityRenderer;
-import first.servantry.api.client.render.ModelRenderer;
-import first.servantry.api.client.render.RenderContext;
-import first.servantry.api.client.render.renderConfig.ModelConfig;
-import first.servantry.api.entity.PathNode;
-import first.servantry.common.servant.{Name};
-import first.servantry.register.ServantryModelRegister;
+import first.summoner.api.client.render.AbstractAttachmentEntityRenderer;
+import first.summoner.api.client.render.ModelRenderer;
+import first.summoner.api.client.render.RenderContext;
+import first.summoner.api.client.render.renderConfig.ModelConfig;
+import first.summoner.api.entity.PathNode;
+import first.summoner.common.servant.{Name};
+import first.summoner.register.ServantryModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-public class {Name}Renderer extends AbstractAttachmentEntityRenderer<{Name}> {
+public class {Name}Renderer extends AbstractAttachmentEntityRenderer
 
-    @Override
-    protected RenderContext<{Name}> createContext({Name} entity) {
-        return RenderContext.<{Name}>builder()
-                // .trail(...) — 可选拖尾
-                .model(new ModelConfig<{Name}>()
-                        .scale({scale}f)
-                        .translateOffset({tx}f, {ty}f, {tz}f)
-                        .rotationOffset({yawOff}, {pitchOff}, {rollOff})
-                        .alphaDistanceFactor({alphaDist}f)
-                )
-                .build();
-    }
+< {
+    Name
+}>{
 
-    @Override
-    protected void render({Name} entity, PoseStack poseStack,
-                          MultiBufferSource bufferSource, PathNode visualNode,
-                          RenderContext<{Name}> context, float partialTick) {
-        ModelRenderer.renderModel(ServantryModelRegister.{MODEL}, poseStack, bufferSource);
-    }
+        @Override
+    protected RenderContext
+
+< {
+    Name
+}>
+
+createContext( {
+    Name
 }
+
+entity){
+        return RenderContext .
+
+< {
+    Name
+}>
+
+builder()
+// .trail(...) — 可选拖尾
+                .
+
+model(new ModelConfig< {
+    Name
+}>()
+        .
+
+scale( {
+    scale
+}
+
+f)
+        .
+
+translateOffset( {
+    tx
+}
+
+f,{ty}f,{tz}f)
+        .
+
+rotationOffset( {
+    yawOff
+},{pitchOff},{rollOff})
+        .
+
+alphaDistanceFactor( {
+    alphaDist
+}
+
+f)
+        )
+        .
+
+build();
+    }
+
+@Override
+protected void render( {
+    Name
+}
+
+entity,
+PoseStack poseStack,
+        MultiBufferSource bufferSource, PathNode
+visualNode,
+        RenderContext
+
+< {
+    Name
+}>context,
+float partialTick){
+        ModelRenderer.
+
+renderModel(ServantryModelRegister . {
+    MODEL
+},poseStack,bufferSource);
+        }
+        }
 ```
 
 ## 注意事项
@@ -579,7 +738,7 @@ public class {Name}Renderer extends AbstractAttachmentEntityRenderer<{Name}> {
 
 ### 第一步：创建仆从实体类
 
-**路径：** `src/main/java/first/servantry/common/servant/YourServant.java`
+**路径：** `src/main/java/first/summoner/common/servant/YourServant.java`
 
 #### 基类选择
 
@@ -597,7 +756,7 @@ public class {Name}Renderer extends AbstractAttachmentEntityRenderer<{Name}> {
 
 ### 第二步：创建 AI 目标类
 
-**路径：** `src/main/java/first/servantry/common/servant/goal/yourservant/`
+**路径：** `src/main/java/first/summoner/common/servant/goal/yourservant/`
 
 #### ServantGoal 生命周期
 

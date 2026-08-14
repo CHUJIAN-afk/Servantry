@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>Summoner 封面生成器</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background: #0a0d1f;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    color: #c8d0e8;
+  }
+  .preview-wrap {
+    padding: 14px;
+    background: #121736;
+    border: 1px solid #2a3260;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+  canvas {
+    display: block;
+    width: 560px;
+    height: 560px;
+    image-rendering: pixelated;
+    border-radius: 8px;
+  }
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  button {
+    padding: 10px 26px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #0a0d1f;
+    background: linear-gradient(135deg, #6ef0ff, #4d6bff);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(77, 107, 255, 0.4);
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  button:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(77, 107, 255, 0.55); }
+  button:active { transform: translateY(0); }
+  .hint { font-size: 13px; color: #7c86ad; }
+</style>
+</head>
+<body>
+  <div class="preview-wrap">
+    <canvas id="cover" width="400" height="400"></canvas>
+  </div>
+  <div class="toolbar">
+    <button onclick="screenshot()">一键截图 (400x400 PNG)</button>
+    <span class="hint">预览为放大显示,导出保持 400×400</span>
+  </div>
+
+<script>
+(function () {
+  const canvas = document.getElementById('cover');
+  const ctx = canvas.getContext('2d');
+  const W = 400, H = 400;
+
+  // 固定随机种子,保证每次绘制一致
+  let seed = 1337;
+  function rand() {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+  }
+
+  function drawBackground() {
+    // 夜空渐变:深蓝 → 靛紫 → 暗紫
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0c1130');
+    g.addColorStop(0.55, '#1b1747');
+    g.addColorStop(1, '#341b56');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    // 星尘粒子
+    for (let i = 0; i < 190; i++) {
+      const x = rand() * W;
+      const y = rand() * H * 0.85;
+      const r = 0.4 + rand() * 1.1;
+      const a = 0.25 + rand() * 0.6;
+      ctx.fillStyle = 'rgba(255,255,255,' + a.toFixed(3) + ')';
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // 几颗亮星(十字光芒)
+    for (let i = 0; i < 6; i++) {
+      const x = rand() * W;
+      const y = rand() * H * 0.6;
+      drawStarGlint(x, y, 2.2 + rand() * 2);
+    }
+
+    // 月牙(右上)
+    drawMoon(334, 66, 26);
+
+    // 底部山峦剪影(两层)
+    drawMountains('#241a4d', 1.0, 0);
+    drawMountains('#1a1440', 0.62, 90);
+  }
+
+  function drawStarGlint(x, y, r) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(x - r * 3, y); ctx.lineTo(x + r * 3, y);
+    ctx.moveTo(x, y - r * 3); ctx.lineTo(x, y + r * 3);
+    ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(x, y, r * 0.6, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawMoon(x, y, r) {
+    ctx.save();
+    ctx.fillStyle = '#f4f1d8';
+    ctx.shadowColor = 'rgba(244,241,216,0.8)';
+    ctx.shadowBlur = 18;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    // 用背景近似色切出月牙
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#151a3d';
+    ctx.beginPath(); ctx.arc(x - r * 0.55, y - r * 0.3, r * 0.85, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawMountains(color, scale, baseY) {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += 8) {
+      const y = H - baseY - (Math.sin(x * 0.012 + scale * 6) * 26 + Math.sin(x * 0.03) * 14 + 30) * scale;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawSummonCircle(cx, cy, r) {
+    ctx.save();
+    // 外圈刻度
+    ctx.strokeStyle = 'rgba(80, 235, 255, 0.75)';
+    ctx.lineWidth = 1.6;
+    ctx.shadowColor = 'rgba(80, 235, 255, 0.9)';
+    ctx.shadowBlur = 14;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+
+    // 刻度线
+    ctx.lineWidth = 1.2;
+    for (let i = 0; i < 24; i++) {
+      const ang = (i / 24) * Math.PI * 2;
+      const longTick = i % 6 === 0;
+      const r0 = r - (longTick ? 7 : 4);
+      const r1 = r - 1;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(ang) * r0, cy + Math.sin(ang) * r0);
+      ctx.lineTo(cx + Math.cos(ang) * r1, cy + Math.sin(ang) * r1);
+      ctx.stroke();
+    }
+
+    // 内圈
+    ctx.strokeStyle = 'rgba(80, 235, 255, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.shadowBlur = 0;
+    ctx.beginPath(); ctx.arc(cx, cy, r * 0.62, 0, Math.PI * 2); ctx.stroke();
+
+    // 符文点
+    ctx.fillStyle = 'rgba(140, 220, 255, 0.9)';
+    for (let i = 0; i < 8; i++) {
+      const ang = (i / 8) * Math.PI * 2 + Math.PI / 8;
+      const rr = r * 0.62;
+      ctx.beginPath();
+      ctx.arc(cx + Math.cos(ang) * rr, cy + Math.sin(ang) * rr, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawCrystal(cx, cy) {
+    ctx.save();
+    // 中央水晶(菱形,青色发光)
+    const top = cy - 46, bottom = cy + 52, halfW = 26;
+    const grad = ctx.createLinearGradient(cx, top, cx, bottom);
+    grad.addColorStop(0, '#dffcff');
+    grad.addColorStop(0.45, '#7deaff');
+    grad.addColorStop(1, '#2f7bff');
+    ctx.fillStyle = grad;
+    ctx.shadowColor = 'rgba(90, 230, 255, 1)';
+    ctx.shadowBlur = 30;
+    ctx.beginPath();
+    ctx.moveTo(cx, top);
+    ctx.lineTo(cx + halfW, cy - 4);
+    ctx.lineTo(cx, bottom);
+    ctx.lineTo(cx - halfW, cy - 4);
+    ctx.closePath();
+    ctx.fill();
+    // 内部折线
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(255,255,255,0.75)';
+    ctx.lineWidth = 1.1;
+    ctx.beginPath();
+    ctx.moveTo(cx, top + 10);
+    ctx.lineTo(cx + halfW * 0.55, cy - 4);
+    ctx.lineTo(cx, bottom - 12);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - halfW, cy - 4);
+    ctx.lineTo(cx, cy + 6);
+    ctx.lineTo(cx + halfW, cy - 4);
+    ctx.stroke();
+    // 顶部亮点
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath(); ctx.arc(cx, top + 8, 2.4, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawOrb(x, y, r, color) {
+    ctx.save();
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r * 2.4);
+    g.addColorStop(0, color);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r * 2.4, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(x, y, r * 0.55, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawTitle() {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // 主标题 SERVANTRY
+    const tg = ctx.createLinearGradient(0, 58, 0, 108);
+    tg.addColorStop(0, '#ffffff');
+    tg.addColorStop(1, '#8ee9ff');
+    ctx.fillStyle = tg;
+    ctx.font = '700 46px Georgia, "Times New Roman", serif';
+    ctx.shadowColor = 'rgba(90, 220, 255, 0.9)';
+    ctx.shadowBlur = 22;
+    ctx.fillText('SERVANTRY', W / 2, 86);
+    ctx.shadowBlur = 0;
+
+    // 副标题
+    ctx.fillStyle = '#7fd8f0';
+    ctx.font = '400 13px Georgia, serif';
+    ctx.fillText("S U M M O N E R ' S   A R S E N A L", W / 2, 118);
+
+    // 底部中文
+    ctx.fillStyle = '#ffd76a';
+    ctx.font = '600 17px "Microsoft YaHei", "PingFang SC", sans-serif';
+    ctx.shadowColor = 'rgba(255, 200, 90, 0.8)';
+    ctx.shadowBlur = 12;
+    ctx.fillText('仆从学', W / 2, 362);
+    ctx.restore();
+  }
+
+  function drawOrnaments() {
+    // 法阵周围四个仆从符号(小剑、小水晶、小飞刀、小球)
+    const cx = 200, cy = 242, R = 128;
+    drawMiniSword(cx, cy - R, '#9fd8ff');
+    drawMiniCrystal(cx + R, cy, '#7deaff');
+    drawMiniDagger(cx, cy + R, '#c9a5ff');
+    drawMiniOrb(cx - R, cy, '#ffd76a');
+  }
+
+  function drawMiniSword(x, y, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(-Math.PI / 4);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.4;
+    ctx.shadowColor = color; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(0, 12); ctx.stroke();
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(-6, 6); ctx.lineTo(6, 10); ctx.lineTo(-5, 14); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawMiniCrystal(x, y, color) {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.shadowColor = color; ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 13); ctx.lineTo(x + 8, y); ctx.lineTo(x, y + 13); ctx.lineTo(x - 8, y);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawMiniDagger(x, y, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.PI / 4);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.4;
+    ctx.shadowColor = color; ctx.shadowBlur = 8;
+    ctx.beginPath(); ctx.moveTo(0, -14); ctx.lineTo(0, 12); ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawMiniOrb(x, y, color) {
+    drawOrb(x, y, 5, color);
+  }
+
+  function render() {
+    drawBackground();
+    drawTitle();
+    drawSummonCircle(200, 242, 118);
+    drawCrystal(200, 242);
+    // 环绕水晶的仆从光点
+    drawOrb(168, 214, 4.5, 'rgba(125, 234, 255, 0.9)');
+    drawOrb(232, 214, 4, 'rgba(160, 160, 255, 0.9)');
+    drawOrb(200, 268, 4.5, 'rgba(255, 215, 106, 0.9)');
+    drawOrb(228, 260, 3.5, 'rgba(255, 160, 220, 0.9)');
+    drawOrnaments();
+  }
+
+  render();
+
+  window.screenshot = function () {
+    const link = document.createElement('a');
+    link.download = 'summoner-cover.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
+})();
+</script>
+</body>
+</html>

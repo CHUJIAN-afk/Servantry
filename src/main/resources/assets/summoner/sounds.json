@@ -1,0 +1,47 @@
+{
+  "use_terraprism": {
+    "sounds": [
+      "summoner:use_terraprism"
+    ]
+  },
+  "use_servant_weapon": {
+    "sounds": [
+      "summoner:use_servant_weapon"
+    ]
+  },
+  "use_moon_portal_staff": {
+    "sounds": [
+      "summoner:use_moon_portal_staff"
+    ]
+  },
+  "use_ballista_staff": {
+    "sounds": [
+      "summoner:use_ballista_staff"
+    ]
+  },
+  "ballista_shot": {
+    "sounds": [
+      "summoner:ballista_shot"
+    ]
+  },
+  "laser": {
+    "sounds": [
+      "summoner:laser"
+    ]
+  },
+  "use_cloud_staff": {
+    "sounds": [
+      "summoner:use_cloud_staff"
+    ]
+  },
+  "use_imp_staff": {
+    "sounds": [
+      "summoner:use_imp_staff"
+    ]
+  },
+  "imp_fire": {
+    "sounds": [
+      "summoner:imp_fire"
+    ]
+  }
+}

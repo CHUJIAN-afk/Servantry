@@ -1,0 +1,20 @@
+{
+  "type": "summoner:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 10,
+      "ingredient": {
+        "item": "summoner:stardust"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "summoner:luminite_ingot"
+      }
+    }
+  ],
+  "result": {
+    "id": "summoner:stardust_helmet"
+  }
+}

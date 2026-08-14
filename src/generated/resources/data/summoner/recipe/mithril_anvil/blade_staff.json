@@ -1,0 +1,20 @@
+{
+  "type": "summoner:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 12,
+      "ingredient": {
+        "item": "minecraft:amethyst_shard"
+      }
+    },
+    {
+      "count": 12,
+      "ingredient": {
+        "item": "minecraft:iron_ingot"
+      }
+    }
+  ],
+  "result": {
+    "id": "summoner:blade_staff"
+  }
+}

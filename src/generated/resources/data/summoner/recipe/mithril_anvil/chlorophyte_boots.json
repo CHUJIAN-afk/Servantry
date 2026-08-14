@@ -1,0 +1,14 @@
+{
+  "type": "summoner:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 12,
+      "ingredient": {
+        "item": "summoner:chlorophyte_ingot"
+      }
+    }
+  ],
+  "result": {
+    "id": "summoner:chlorophyte_boots"
+  }
+}

@@ -1,8 +1,8 @@
 {
   "values": [
-    "servantry:adamantite_ingot",
-    "servantry:hallowed_ingot",
-    "servantry:chlorophyte_ingot",
-    "servantry:luminite_ingot"
+    "summoner:adamantite_ingot",
+    "summoner:hallowed_ingot",
+    "summoner:chlorophyte_ingot",
+    "summoner:luminite_ingot"
   ]
 }

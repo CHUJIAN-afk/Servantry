@@ -1,14 +1,14 @@
 {
   "values": [
-    "servantry:bee_headgear",
-    "servantry:obsidian_helmet",
-    "servantry:spider_mask",
-    "servantry:forbidden_mask",
-    "servantry:hallowed_helmet",
-    "servantry:chlorophyte_helmet",
-    "servantry:valhalla_knight_helmet",
-    "servantry:tiki_helmet",
-    "servantry:spooky_helmet",
-    "servantry:stardust_helmet"
+    "summoner:bee_headgear",
+    "summoner:obsidian_helmet",
+    "summoner:spider_mask",
+    "summoner:forbidden_mask",
+    "summoner:hallowed_helmet",
+    "summoner:chlorophyte_helmet",
+    "summoner:valhalla_knight_helmet",
+    "summoner:tiki_helmet",
+    "summoner:spooky_helmet",
+    "summoner:stardust_helmet"
   ]
 }

@@ -115,7 +115,7 @@
 
 ### 涉及文件
 
-- `src/main/java/first/servantry/register/ArmorMaterialRegister.java`
-- `src/main/java/first/servantry/register/ItemRegister.java`
-- `src/main/java/first/servantry/register/ArmorSetRegister.java`
-- `src/main/java/first/servantry/dadageneeator/provider/ServantryLanguageProvider.java`
+- `src/main/java/first/summoner/register/ArmorMaterialRegister.java`
+- `src/main/java/first/summoner/register/ItemRegister.java`
+- `src/main/java/first/summoner/register/ArmorSetRegister.java`
+- `src/main/java/first/summoner/dadageneeator/provider/ServantryLanguageProvider.java`

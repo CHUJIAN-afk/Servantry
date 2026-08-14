@@ -1,0 +1,20 @@
+{
+  "type": "summoner:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 10,
+      "ingredient": {
+        "item": "summoner:adamantite_ingot"
+      }
+    },
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "summoner:forbidden_fragment"
+      }
+    }
+  ],
+  "result": {
+    "id": "summoner:forbidden_mask"
+  }
+}

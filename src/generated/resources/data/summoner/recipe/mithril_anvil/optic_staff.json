@@ -1,0 +1,20 @@
+{
+  "type": "summoner:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "summoner:black_lens"
+      }
+    },
+    {
+      "count": 12,
+      "ingredient": {
+        "item": "summoner:hallowed_ingot"
+      }
+    }
+  ],
+  "result": {
+    "id": "summoner:optic_staff"
+  }
+}

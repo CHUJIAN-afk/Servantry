@@ -1,0 +1,14 @@
+{
+  "type": "summoner:mithril_anvil",
+  "ingredients": [
+    {
+      "count": 18,
+      "ingredient": {
+        "item": "summoner:stardust"
+      }
+    }
+  ],
+  "result": {
+    "id": "summoner:stardust_cell_staff"
+  }
+}

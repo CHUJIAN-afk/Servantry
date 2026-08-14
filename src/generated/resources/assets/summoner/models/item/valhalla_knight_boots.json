@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "summoner:item/valhalla_knight_boots"
+  }
+}
