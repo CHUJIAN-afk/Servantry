@@ -25,7 +25,7 @@ import java.util.List;
 
 import static first.summoner.register.SummonerItemRegister.ITEMS;
 
-public class SummonerServantWeaponRegister {
+public class SummonerWeaponRegister {
 
     public static final Section SERVANT_WEAPON = new Section(0, Summoner.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), SummonerItemTagsRegister.SectionServantWeapon);
 
@@ -91,7 +91,7 @@ public class SummonerServantWeaponRegister {
                             .ingredient(SummonerItemRegister.HallowedIngot, 8)
                             .ingredient(Items.DIAMOND, 8)
                             .ingredient(Items.NETHERITE_INGOT, 1)
-                            .result(SummonerServantWeaponRegister.SurveyDroneRemote)
+                            .result(SummonerWeaponRegister.SurveyDroneRemote)
                             .save(output))
                     .itemLanguage("Survey Drone Remote", "矿勘无人机遥控器")
                     .servantLanguage(SummonerAttachmentEntityRegister.ORE_SCOUT, "Survey Drone", "矿勘无人机")
@@ -126,7 +126,7 @@ public class SummonerServantWeaponRegister {
                     .recipe(output -> MithrilAnvilRecipe.builder()
                             .ingredient(SummonerItemRegister.HallowedIngot, 8)
                             .ingredient(Items.AMETHYST_SHARD, 8)
-                            .result(SummonerServantWeaponRegister.FairyBell)
+                            .result(SummonerWeaponRegister.FairyBell)
                             .save(output))
                     .itemLanguage("Fairy Bell", "妖精铃铛")
                     .servantLanguage(SummonerAttachmentEntityRegister.SCAVENGER_FAIRY, "Scavenger Fairy", "拾荒妖精")
@@ -161,7 +161,7 @@ public class SummonerServantWeaponRegister {
                     .recipe(output -> MithrilAnvilRecipe.builder()
                             .ingredient(Items.AMETHYST_SHARD, 12)
                             .ingredient(Items.IRON_INGOT, 12)
-                            .result(SummonerServantWeaponRegister.BladeStaff)
+                            .result(SummonerWeaponRegister.BladeStaff)
                             .save(output))
                     .itemLanguage("Blade Staff", "刃杖")
                     .servantLanguage(SummonerAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES, "Enchanted Throwing Knives", "附魔飞刀")
@@ -236,7 +236,7 @@ public class SummonerServantWeaponRegister {
                     .recipe(output -> MithrilAnvilRecipe.builder()
                             .ingredient(SummonerItemRegister.BlackLens)
                             .ingredient(SummonerItemRegister.HallowedIngot, 12)
-                            .result(SummonerServantWeaponRegister.OpticStaff)
+                            .result(SummonerWeaponRegister.OpticStaff)
                             .save(output))
                     .itemLanguage("Optic Staff", "魔眼法杖")
                     .servantLanguage(SummonerAttachmentEntityRegister.TWINS, "Twins", "双子魔眼")
@@ -463,7 +463,7 @@ public class SummonerServantWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionServantWeapon)
                     .recipe(output -> MithrilAnvilRecipe.builder()
                             .ingredient(SummonerItemRegister.Stardust, 12)
-                            .result(SummonerServantWeaponRegister.EtherealStellarCoreStaff)
+                            .result(SummonerWeaponRegister.EtherealStellarCoreStaff)
                             .save(output))
                     .itemLanguage("Ethereal Stellar Core Staff", "缥缈星核法杖")
                     .servantLanguage(SummonerAttachmentEntityRegister.ETHEREAL_STELLAR_CORE, "Ethereal Stellar Core", "缥缈星核")
@@ -485,7 +485,7 @@ public class SummonerServantWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionServantWeapon)
                     .recipe(output -> MithrilAnvilRecipe.builder()
                             .ingredient(SummonerItemRegister.Stardust, 18)
-                            .result(SummonerServantWeaponRegister.StardustCellStaff)
+                            .result(SummonerWeaponRegister.StardustCellStaff)
                             .save(output))
                     .itemLanguage("Stardust Cell Staff", "星尘细胞法杖")
                     .servantLanguage(SummonerAttachmentEntityRegister.STARDUST_CELL, "Stardust Cell", "星尘细胞")
@@ -542,7 +542,7 @@ public class SummonerServantWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionServantWeapon)
                     .recipe(output -> MithrilAnvilRecipe.builder()
                             .ingredient(SummonerItemRegister.Stardust, 18)
-                            .result(SummonerServantWeaponRegister.StardustDragonStaff)
+                            .result(SummonerWeaponRegister.StardustDragonStaff)
                             .save(output))
                     .itemLanguage("Stardust Dragon Staff", "星尘之龙法杖")
                     .servantLanguage(SummonerAttachmentEntityRegister.STARDUST_DRAGON, "Stardust Dragon", "星尘之龙")

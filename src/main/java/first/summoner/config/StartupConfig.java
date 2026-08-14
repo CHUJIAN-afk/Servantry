@@ -90,7 +90,7 @@ public class StartupConfig {
     public static final ModConfigSpec.ConfigValue<Float> ChlorophyteCrystalArmorPierce;
 
     static {
-        Builder.push("summoner_servant_weapon");
+        Builder.push("weapon");
         Builder.push("hornet_staff");
         HornetStaffDamage = Builder.define("hornet_staff_damage", 0.7f);
         HornetStaffKnockback = Builder.define("hornet_staff_knockback", 0.2f);
@@ -221,8 +221,6 @@ public class StartupConfig {
         LaserMinigunKnockback = Builder.define("laser_minigun_knockback", 0.2f);
         LaserMinigunArmorPierce = Builder.define("laser_minigun_armor_pierce", 0f);
         Builder.pop();
-        Builder.pop();
-        Builder.push("extra_servant");
         Builder.push("chlorophyte_crystal");
         ChlorophyteCrystalDamage = Builder.define("chlorophyte_crystal_damage", 10f);
         ChlorophyteCrystalKnockback = Builder.define("chlorophyte_crystal_knockback", 1f);

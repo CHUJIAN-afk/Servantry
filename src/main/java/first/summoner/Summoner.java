@@ -21,7 +21,7 @@ public class Summoner {
         SummonerItemRegister.register(eventBus);
         SummonerArmorRegister.register();
         SummonerCurioRegister.register();
-        SummonerServantWeaponRegister.register();
+        SummonerWeaponRegister.register();
         SummonerMobEffectRegister.register(eventBus);
         SummonerPotionRegister.register(eventBus);
         SummonerSoundRegister.register(eventBus);

@@ -8,7 +8,7 @@ import first.summoner.compat.jei.category.MithrilAnvilRecipeCategory;
 import first.summoner.register.SummonerCurioRegister;
 import first.summoner.register.SummonerItemRegister;
 import first.summoner.register.SummonerMithrilAnvilRecipeRegister;
-import first.summoner.register.SummonerServantWeaponRegister;
+import first.summoner.register.SummonerWeaponRegister;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -69,9 +69,9 @@ public class JEIPlugin implements IModPlugin {
         registration.addIngredientInfo(SummonerCurioRegister.MonksBelt.get(), Component.translatable("jei.summoner.description.sold"));
         registration.addIngredientInfo(SummonerCurioRegister.SquiresShield.get(), Component.translatable("jei.summoner.description.sold"));
         // 掉落
-        registration.addIngredientInfo(SummonerServantWeaponRegister.TerraPrism.get(), Component.translatable("jei.summoner.description.terraprism"));
+        registration.addIngredientInfo(SummonerWeaponRegister.TerraPrism.get(), Component.translatable("jei.summoner.description.terraprism"));
         registration.addIngredientInfo(SummonerCurioRegister.SummonerEmblem.get(), Component.translatable("jei.summoner.description.drops_from_evokers"));
         registration.addIngredientInfo(SummonerItemRegister.BlackLens.get(), Component.translatable("jei.summoner.description.drops_from_zombie"));
-        registration.addIngredientInfo(SummonerServantWeaponRegister.TempestStaff.get(), Component.translatable("jei.summoner.description.fishing"));
+        registration.addIngredientInfo(SummonerWeaponRegister.TempestStaff.get(), Component.translatable("jei.summoner.description.fishing"));
     }
 }

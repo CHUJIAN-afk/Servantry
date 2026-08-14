@@ -62,7 +62,7 @@ public class Event {
         if (event.getClickAction() == ClickAction.SECONDARY) {
             ItemStack carried = event.getCarriedItem();
             ItemStack stackedOn = event.getStackedOnItem();
-            if (carried.is(SummonerServantWeaponRegister.InfiniteScabbard.get())) {
+            if (carried.is(SummonerWeaponRegister.InfiniteScabbard.get())) {
                 Slot slot = event.getSlot();
                 Player player = event.getPlayer();
                 ScabbardContainer scabbard = carried.getOrDefault(SummonerDataComponentRegister.SCABBARD.get(), ScabbardContainer.EMPTY);
@@ -113,7 +113,7 @@ public class Event {
         Level level = player.level();
         if (!level.isClientSide() && level.isRaining() && level.getBiome(player.blockPosition()).is(BiomeTags.IS_OCEAN)) {
             if (player.getRandom().nextFloat() < 0.01f) {
-                event.getDrops().add(SummonerServantWeaponRegister.TempestStaff.get().getDefaultInstance());
+                event.getDrops().add(SummonerWeaponRegister.TempestStaff.get().getDefaultInstance());
             }
         }
     }
@@ -124,13 +124,13 @@ public class Event {
         if (event.getName().equals(ResourceLocation.withDefaultNamespace("chests/ancient_city"))) {
             table.addPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(0.05f))
-                    .add(LootItem.lootTableItem(SummonerServantWeaponRegister.InfiniteScabbard.get()))
+                    .add(LootItem.lootTableItem(SummonerWeaponRegister.InfiniteScabbard.get()))
                     .build());
         }
         if (event.getName().equals(ResourceLocation.withDefaultNamespace("entities/allay"))) {
             table.addPool(LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1f))
-                    .add(LootItem.lootTableItem(SummonerServantWeaponRegister.TerraPrism.get())
+                    .add(LootItem.lootTableItem(SummonerWeaponRegister.TerraPrism.get())
                             .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                     .build());
         }

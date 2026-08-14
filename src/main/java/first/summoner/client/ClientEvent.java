@@ -14,7 +14,7 @@ import first.summoner.common.servant.OreScout;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerDataComponentRegister;
 import first.summoner.register.SummonerMenuRegister;
-import first.summoner.register.SummonerServantWeaponRegister;
+import first.summoner.register.SummonerWeaponRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -79,7 +79,7 @@ public class ClientEvent {
     @SubscribeEvent
     public static void renderSoulItemTooltipHandler(RenderTooltipEvent.GatherComponents event) {
         ItemStack itemStack = event.getItemStack();
-        if (itemStack.is(SummonerServantWeaponRegister.InfiniteScabbard.get())) {
+        if (itemStack.is(SummonerWeaponRegister.InfiniteScabbard.get())) {
             ScabbardContainer scabbard = itemStack.getOrDefault(SummonerDataComponentRegister.SCABBARD.get(), ScabbardContainer.EMPTY);
             if (!scabbard.isEmpty()) {
                 List<Either<FormattedText, TooltipComponent>> tooltipElements = event.getTooltipElements();
