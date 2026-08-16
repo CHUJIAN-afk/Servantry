@@ -34,9 +34,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<Hornet>.MinionWeaponItem> HornetStaff =
             LyraItemRegisterBuilder.build(ITEMS, "hornet_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.HORNET)
-                            .damage(StartupConfig.HornetStaffDamage.get())
-                            .knockback(StartupConfig.HornetStaffKnockback.get())
-                            .armorPierce(StartupConfig.HornetStaffArmorPierce.get())
+                            .damage(StartupConfig.HornetStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.HornetStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.HornetStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
@@ -51,9 +51,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<Imp>.MinionWeaponItem> ImpStaff =
             LyraItemRegisterBuilder.build(ITEMS, "imp_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.IMP)
-                            .damage(StartupConfig.ImpStaffDamage.get())
-                            .knockback(StartupConfig.ImpStaffKnockback.get())
-                            .armorPierce(StartupConfig.ImpStaffArmorPierce.get())
+                            .damage(StartupConfig.ImpStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.ImpStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.ImpStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseImpStaff)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
@@ -68,9 +68,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<OreScout>.MinionWeaponItem> SurveyDroneRemote =
             LyraItemRegisterBuilder.build(ITEMS, "survey_drone_remote", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.ORE_SCOUT)
-                            .damage(StartupConfig.SurveyDroneRemoteDamage.get())
-                            .knockback(StartupConfig.SurveyDroneRemoteKnockback.get())
-                            .armorPierce(StartupConfig.SurveyDroneRemoteArmorPierce.get())
+                            .damage(StartupConfig.SurveyDroneRemoteDamage.get().floatValue())
+                            .knockback(StartupConfig.SurveyDroneRemoteKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.SurveyDroneRemoteArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 OreScout minion = weapon.createMinion(player, itemStack);
@@ -104,9 +104,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<ScavengerFairy>.MinionWeaponItem> FairyBell =
             LyraItemRegisterBuilder.build(ITEMS, "fairy_bell", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.SCAVENGER_FAIRY)
-                            .damage(StartupConfig.FairyBellDamage.get())
-                            .knockback(StartupConfig.FairyBellKnockback.get())
-                            .armorPierce(StartupConfig.FairyBellArmorPierce.get())
+                            .damage(StartupConfig.FairyBellDamage.get().floatValue())
+                            .knockback(StartupConfig.FairyBellKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.FairyBellArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 ScavengerFairy minion = weapon.createMinion(player, itemStack);
@@ -139,9 +139,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<EnchantedThrowingKnives>.MinionWeaponItem> BladeStaff =
             LyraItemRegisterBuilder.build(ITEMS, "blade_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES)
-                            .damage(StartupConfig.BladeStaffDamage.get())
-                            .knockback(StartupConfig.BladeStaffKnockback.get())
-                            .armorPierce(StartupConfig.BladeStaffArmorPierce.get())
+                            .damage(StartupConfig.BladeStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.BladeStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.BladeStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 EnchantedThrowingKnives minion = weapon.createMinion(player, itemStack);
@@ -174,9 +174,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<Cloud>.MinionWeaponItem> RainCloudStaff =
             LyraItemRegisterBuilder.build(ITEMS, "rain_cloud_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.CLOUD)
-                            .damage(StartupConfig.RainCloudStaffDamage.get())
-                            .knockback(StartupConfig.RainCloudStaffKnockback.get())
-                            .armorPierce(StartupConfig.RainCloudStaffArmorPierce.get())
+                            .damage(StartupConfig.RainCloudStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.RainCloudStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.RainCloudStaffArmorPierce.get().floatValue())
                             .sentry()
                             .sound(SummonerSoundRegister.UseCloudStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -203,9 +203,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<Twins>.MinionWeaponItem> OpticStaff =
             LyraItemRegisterBuilder.build(ITEMS, "optic_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.TWINS)
-                            .damage(StartupConfig.OpticStaffDamage.get())
-                            .knockback(StartupConfig.OpticStaffKnockback.get())
-                            .armorPierce(StartupConfig.OpticStaffArmorPierce.get())
+                            .damage(StartupConfig.OpticStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.OpticStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.OpticStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseTerraprism)
                             .summon((weapon, player, itemStack) -> {
                                 LyraHelper summonerHelper = LyraHelper.get(player);
@@ -248,9 +248,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<DeadlySphere>.MinionWeaponItem> DeadlySphereStaff =
             LyraItemRegisterBuilder.build(ITEMS, "deadly_sphere_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.DEADLY_SPHERE)
-                            .damage(StartupConfig.DeadlySphereStaffDamage.get())
-                            .knockback(StartupConfig.DeadlySphereStaffKnockback.get())
-                            .armorPierce(StartupConfig.DeadlySphereStaffArmorPierce.get())
+                            .damage(StartupConfig.DeadlySphereStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.DeadlySphereStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.DeadlySphereStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
@@ -265,9 +265,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<UFO>.MinionWeaponItem> XenoStaff =
             LyraItemRegisterBuilder.build(ITEMS, "xeno_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.UFO)
-                            .damage(StartupConfig.XenoStaffDamage.get())
-                            .knockback(StartupConfig.XenoStaffKnockback.get())
-                            .armorPierce(StartupConfig.XenoStaffArmorPierce.get())
+                            .damage(StartupConfig.XenoStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.XenoStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.XenoStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
@@ -282,9 +282,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<PulseTurret>.MinionWeaponItem> PulseTurretRemote =
             LyraItemRegisterBuilder.build(ITEMS, "pulse_turret_remote", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.PULSE_TURRET)
-                            .damage(StartupConfig.PulseTurretRemoteDamage.get())
-                            .knockback(StartupConfig.PulseTurretRemoteKnockback.get())
-                            .armorPierce(StartupConfig.PulseTurretRemoteArmorPierce.get())
+                            .damage(StartupConfig.PulseTurretRemoteDamage.get().floatValue())
+                            .knockback(StartupConfig.PulseTurretRemoteKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.PulseTurretRemoteArmorPierce.get().floatValue())
                             .sentry()
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -314,9 +314,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<Sharknado>.MinionWeaponItem> TempestStaff =
             LyraItemRegisterBuilder.build(ITEMS, "tempest_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.SHARKNADO)
-                            .damage(StartupConfig.TempestStaffDamage.get())
-                            .knockback(StartupConfig.TempestStaffKnockback.get())
-                            .armorPierce(StartupConfig.TempestStaffArmorPierce.get())
+                            .damage(StartupConfig.TempestStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.TempestStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.TempestStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
@@ -331,9 +331,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<Terraprism>.MinionWeaponItem> TerraPrism =
             LyraItemRegisterBuilder.build(ITEMS, "terraprism", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.TERRA_PRISM)
-                            .damage(StartupConfig.TerraPrismDamage.get())
-                            .knockback(StartupConfig.TerraPrismKnockback.get())
-                            .armorPierce(StartupConfig.TerraPrismArmorPierce.get())
+                            .damage(StartupConfig.TerraPrismDamage.get().floatValue())
+                            .knockback(StartupConfig.TerraPrismKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.TerraPrismArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseTerraprism)
                             .summon((weapon, player, itemStack) -> {
                                 Terraprism minion = weapon.createMinion(player, itemStack);
@@ -357,9 +357,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<Ballista>.MinionWeaponItem> BallistaRod =
             LyraItemRegisterBuilder.build(ITEMS, "ballista_rod", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.BALLISTA)
-                            .damage(StartupConfig.BallistaRodDamage.get())
-                            .knockback(StartupConfig.BallistaRodKnockback.get())
-                            .armorPierce(StartupConfig.BallistaRodArmorPierce.get())
+                            .damage(StartupConfig.BallistaRodDamage.get().floatValue())
+                            .knockback(StartupConfig.BallistaRodKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.BallistaRodArmorPierce.get().floatValue())
                             .sentry()
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -385,9 +385,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<Ballista>.MinionWeaponItem> BallistaCane =
             LyraItemRegisterBuilder.build(ITEMS, "ballista_cane", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.BALLISTA)
-                            .damage(StartupConfig.BallistaCaneDamage.get())
-                            .knockback(StartupConfig.BallistaCaneKnockback.get())
-                            .armorPierce(StartupConfig.BallistaCaneArmorPierce.get())
+                            .damage(StartupConfig.BallistaCaneDamage.get().floatValue())
+                            .knockback(StartupConfig.BallistaCaneKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.BallistaCaneArmorPierce.get().floatValue())
                             .sentry()
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -413,9 +413,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<Ballista>.MinionWeaponItem> BallistaStaff =
             LyraItemRegisterBuilder.build(ITEMS, "ballista_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.BALLISTA)
-                            .damage(StartupConfig.BallistaStaffDamage.get())
-                            .knockback(StartupConfig.BallistaStaffKnockback.get())
-                            .armorPierce(StartupConfig.BallistaStaffArmorPierce.get())
+                            .damage(StartupConfig.BallistaStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.BallistaStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.BallistaStaffArmorPierce.get().floatValue())
                             .sentry()
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -442,9 +442,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<EtherealStellarCore>.MinionWeaponItem> EtherealStellarCoreStaff =
             LyraItemRegisterBuilder.build(ITEMS, "ethereal_stellar_core_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.ETHEREAL_STELLAR_CORE)
-                            .damage(StartupConfig.EtherealStellarCoreStaffDamage.get())
-                            .knockback(StartupConfig.EtherealStellarCoreStaffKnockback.get())
-                            .armorPierce(StartupConfig.EtherealStellarCoreStaffArmorPierce.get())
+                            .damage(StartupConfig.EtherealStellarCoreStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.EtherealStellarCoreStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.EtherealStellarCoreStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 EtherealStellarCore minion = weapon.createMinion(player, itemStack);
@@ -476,9 +476,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<StardustCell>.MinionWeaponItem> StardustCellStaff =
             LyraItemRegisterBuilder.build(ITEMS, "stardust_cell_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.STARDUST_CELL)
-                            .damage(StartupConfig.StardustCellStaffDamage.get())
-                            .knockback(StartupConfig.StardustCellStaffKnockback.get())
-                            .armorPierce(StartupConfig.StardustCellStaffArmorPierce.get())
+                            .damage(StartupConfig.StardustCellStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.StardustCellStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.StardustCellStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
@@ -498,9 +498,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<StardustDragon>.MinionWeaponItem> StardustDragonStaff =
             LyraItemRegisterBuilder.build(ITEMS, "stardust_dragon_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.STARDUST_DRAGON)
-                            .damage(StartupConfig.StardustDragonStaffDamage.get())
-                            .knockback(StartupConfig.StardustDragonStaffKnockback.get())
-                            .armorPierce(StartupConfig.StardustDragonStaffArmorPierce.get())
+                            .damage(StartupConfig.StardustDragonStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.StardustDragonStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.StardustDragonStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 LyraHelper helper = LyraHelper.get(player);
@@ -555,9 +555,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<MoonPortal>.MinionWeaponItem> MoonPortalStaff =
             LyraItemRegisterBuilder.build(ITEMS, "moon_portal_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.MOON_PORTAL)
-                            .damage(StartupConfig.MoonPortalStaffDamage.get())
-                            .knockback(StartupConfig.MoonPortalStaffKnockback.get())
-                            .armorPierce(StartupConfig.MoonPortalStaffArmorPierce.get())
+                            .damage(StartupConfig.MoonPortalStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.MoonPortalStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.MoonPortalStaffArmorPierce.get().floatValue())
                             .sentry()
                             .sound(SummonerSoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -582,9 +582,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<RainbowCrystal>.MinionWeaponItem> RainbowCrystalStaff =
             LyraItemRegisterBuilder.build(ITEMS, "rainbow_crystal_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.RAINBOW_CRYSTAL)
-                            .damage(StartupConfig.RainbowCrystalStaffDamage.get())
-                            .knockback(StartupConfig.RainbowCrystalStaffKnockback.get())
-                            .armorPierce(StartupConfig.RainbowCrystalStaffArmorPierce.get())
+                            .damage(StartupConfig.RainbowCrystalStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.RainbowCrystalStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.RainbowCrystalStaffArmorPierce.get().floatValue())
                             .sentry()
                             .sound(SummonerSoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -610,9 +610,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<InfiniteShadow>.MinionWeaponItem> InfiniteScabbard =
             LyraItemRegisterBuilder.build(ITEMS, "infinite_scabbard", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.INFINITE_SHADOW)
-                            .damage(StartupConfig.InfiniteScabbardDamage.get())
-                            .knockback(StartupConfig.InfiniteScabbardKnockback.get())
-                            .armorPierce(StartupConfig.InfiniteScabbardArmorPierce.get())
+                            .damage(StartupConfig.InfiniteScabbardDamage.get().floatValue())
+                            .knockback(StartupConfig.InfiniteScabbardKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.InfiniteScabbardArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseTerraprism)
                             .summon((weapon, player, itemStack) -> {
                                 InfiniteShadow minion = weapon.createMinion(player, itemStack);
@@ -650,9 +650,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<VoidEater>.MinionWeaponItem> VoidEaterMarionette =
             LyraItemRegisterBuilder.build(ITEMS, "void_eater_marionette", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.VOID_EATER)
-                            .damage(StartupConfig.VoidEaterMarionetteDamage.get())
-                            .knockback(StartupConfig.VoidEaterMarionetteKnockback.get())
-                            .armorPierce(StartupConfig.VoidEaterMarionetteArmorPierce.get())
+                            .damage(StartupConfig.VoidEaterMarionetteDamage.get().floatValue())
+                            .knockback(StartupConfig.VoidEaterMarionetteKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.VoidEaterMarionetteArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 LyraHelper helper = LyraHelper.get(player);
@@ -704,9 +704,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<SuperPeashooter>.MinionWeaponItem> ThundercloudBonsai =
             LyraItemRegisterBuilder.build(ITEMS, "thundercloud_bonsai", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.SUPER_PEASHOOTER)
-                            .damage(StartupConfig.ThundercloudBonsaiDamage.get())
-                            .knockback(StartupConfig.ThundercloudBonsaiKnockback.get())
-                            .armorPierce(StartupConfig.ThundercloudBonsaiArmorPierce.get())
+                            .damage(StartupConfig.ThundercloudBonsaiDamage.get().floatValue())
+                            .knockback(StartupConfig.ThundercloudBonsaiKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.ThundercloudBonsaiArmorPierce.get().floatValue())
                             .sentry()
                             .sound(SummonerSoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -733,9 +733,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<Cannon>.MinionWeaponItem> CornCannon =
             LyraItemRegisterBuilder.build(ITEMS, "corn_cannon", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.CANNON)
-                            .damage(StartupConfig.CornCannonDamage.get())
-                            .knockback(StartupConfig.CornCannonKnockback.get())
-                            .armorPierce(StartupConfig.CornCannonArmorPierce.get())
+                            .damage(StartupConfig.CornCannonDamage.get().floatValue())
+                            .knockback(StartupConfig.CornCannonKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.CornCannonArmorPierce.get().floatValue())
                             .sentry()
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
@@ -762,9 +762,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<NecroSpirit>.MinionWeaponItem> NecroSpiritStaff =
             LyraItemRegisterBuilder.build(ITEMS, "necro_spirit_staff", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.NECRO_SPIRIT)
-                            .damage(StartupConfig.NecroSpiritStaffDamage.get())
-                            .knockback(StartupConfig.NecroSpiritStaffKnockback.get())
-                            .armorPierce(StartupConfig.NecroSpiritStaffArmorPierce.get())
+                            .damage(StartupConfig.NecroSpiritStaffDamage.get().floatValue())
+                            .knockback(StartupConfig.NecroSpiritStaffKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.NecroSpiritStaffArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 NecroSpirit minion = weapon.createMinion(player, itemStack);
@@ -788,9 +788,9 @@ public class SummonerWeaponRegister {
      */
     public static final DeferredItem<MinionWeaponItemBuilder<LaserMinigun>.MinionWeaponItem> LaserMinigunStaff =
             LyraItemRegisterBuilder.build(ITEMS, "laser_minigun", location -> new MinionWeaponItemBuilder<>(SummonerAttachmentEntityRegister.LASER_MINIGUN)
-                            .damage(StartupConfig.LaserMinigunDamage.get())
-                            .knockback(StartupConfig.LaserMinigunKnockback.get())
-                            .armorPierce(StartupConfig.LaserMinigunArmorPierce.get())
+                            .damage(StartupConfig.LaserMinigunDamage.get().floatValue())
+                            .knockback(StartupConfig.LaserMinigunKnockback.get().floatValue())
+                            .armorPierce(StartupConfig.LaserMinigunArmorPierce.get().floatValue())
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 LaserMinigun minion = weapon.createMinion(player, itemStack);

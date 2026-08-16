@@ -94,9 +94,9 @@ public class SummonerArmorSetRegister {
                     .modifier(LyraAttributeRegister.MinionMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
                     .onStart(player -> {
                         ChlorophyteCrystal crystal = new ChlorophyteCrystal();
-                        crystal.setDamage(StartupConfig.ChlorophyteCrystalDamage.get());
-                        crystal.setKnockback(StartupConfig.ChlorophyteCrystalDamage.get());
-                        crystal.setArmorPierce(StartupConfig.ChlorophyteCrystalArmorPierce.get());
+                        crystal.setDamage(StartupConfig.ChlorophyteCrystalDamage.get().floatValue());
+                        crystal.setKnockback(StartupConfig.ChlorophyteCrystalKnockback.get().floatValue());
+                        crystal.setArmorPierce(StartupConfig.ChlorophyteCrystalArmorPierce.get().floatValue());
                         LyraHelper.get(player).add(AttachmentEntityData.Type.ExtraMinion, crystal);
                     })
                     .onRemove(player -> LyraHelper.get(player).getEntityData().remove(AttachmentEntityData.Type.ExtraMinion, SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))
