@@ -1,0 +1,22 @@
+package first.summoner.register;
+
+import first.summoner.Summoner;
+import first.summoner.common.attachment.CurioData;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+
+import java.util.HashSet;
+
+public class SummonerAttachmentRegister {
+
+    private static final DeferredRegister<AttachmentType<?>> Register = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Summoner.MODID);
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<CurioData>> CurioData = Register.register("curio_data", () -> AttachmentType.builder(() -> new CurioData(new HashSet<>())).build());
+
+    public static void register(IEventBus eventBus) {
+        Register.register(eventBus);
+    }
+}

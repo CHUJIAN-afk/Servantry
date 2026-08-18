@@ -23,7 +23,7 @@ import org.apache.commons.lang3.function.TriFunction;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-import java.util.List;
+import java.util.Set;
 
 @EventBusSubscriber(modid = Summoner.MODID)
 public class CurioItem extends Item implements ICurioItem {
@@ -45,7 +45,7 @@ public class CurioItem extends Item implements ICurioItem {
             Minion minion = minionDamageSource.getMinion();
             Player owner = minion.getOwner();
             if (!owner.level().isClientSide()) {
-                List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
+                Set<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
                 for (CurioItem curioItem : curiosItemList) {
                     PreDamageCallback callback = curioItem.preDamageCallback;
                     if (callback != null) {
@@ -65,7 +65,7 @@ public class CurioItem extends Item implements ICurioItem {
             Minion minion = minionDamageSource.getMinion();
             Player owner = minion.getOwner();
             if (!owner.level().isClientSide()) {
-                List<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
+                Set<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
                 for (CurioItem curioItem : curiosItemList) {
                     PostDamageCallback callback = curioItem.postDamageCallback;
                     if (callback != null) {
@@ -97,7 +97,7 @@ public class CurioItem extends Item implements ICurioItem {
 
     @Override
     public boolean canEquip(SlotContext slotContext, ItemStack stack) {
-        return !CuriosUtil.isEquipped(slotContext.entity(), stack.getItem());
+        return !CuriosUtil.isEquipped(slotContext.entity(), (CurioItem) stack.getItem());
     }
 
     @Override

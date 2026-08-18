@@ -26,6 +26,7 @@ public class Summoner {
         SummonerPotionRegister.register(eventBus);
         SummonerSoundRegister.register(eventBus);
         SummonerArmorSetRegister.register(eventBus);
+        SummonerAttachmentRegister.register(eventBus);
         container.registerConfig(ModConfig.Type.STARTUP, StartupConfig.Spec);
     }
 
