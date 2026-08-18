@@ -42,7 +42,7 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
         int red = FastColor.ARGB32.red(color);
         int green = FastColor.ARGB32.green(color);
         int blue = FastColor.ARGB32.blue(color);
-        RenderUtil.renderStandalone(SummonerModelRegister.TERRAPRISM, poseStack, bufferSource, FastColor.ARGB32.color(255, red, green, blue), RenderUtil.FULL_LIGHT);
+        RenderUtil.renderStandalone(SummonerModelRegister.TERRAPRISM, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), red, green, blue), RenderUtil.FULL_LIGHT);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }
