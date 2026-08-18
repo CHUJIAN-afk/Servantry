@@ -15,7 +15,6 @@ public class SummonerLanguageProvider extends LyraLanguageProvider {
     public void init() {
         // ================= 模组基础 =================
         entry("modid.summoner", "Summoner", "召唤师");
-        entry("container.summoner.mithril_anvil", "Forging", "超凡锻造");
         // ===================== 药水效果 =====================
         entry(SummonerMobEffectRegister.Obsession.get().getDescriptionId(), "Obsession", "着魔");
         entry(SummonerMobEffectRegister.CellParasitism.get().getDescriptionId(), "Cell Parasitism", "细胞寄生");

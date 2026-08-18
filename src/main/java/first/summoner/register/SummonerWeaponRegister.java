@@ -10,13 +10,11 @@ import first.lyra.register.LyraItemRegisterBuilder;
 import first.summoner.Summoner;
 import first.summoner.common.dataComponent.ScabbardContainer;
 import first.summoner.common.minion.*;
-import first.summoner.common.recipe.MithrilAnvilRecipe;
 import first.summoner.common.sentry.*;
 import first.summoner.config.StartupConfig;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -87,12 +85,6 @@ public class SummonerWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(SummonerItemRegister.HallowedIngot, 8)
-                            .ingredient(Items.DIAMOND, 8)
-                            .ingredient(Items.NETHERITE_INGOT, 1)
-                            .result(SummonerWeaponRegister.SurveyDroneRemote)
-                            .save(output))
                     .itemLanguage("Survey Drone Remote", "矿勘无人机遥控器")
                     .summonLanguage(SummonerAttachmentEntityRegister.ORE_SCOUT, "Survey Drone", "矿勘无人机")
                     .itemLanguageTooltip(1, "Summons up to 1 Survey Drone", "最多召唤1架矿勘无人机")
@@ -123,11 +115,6 @@ public class SummonerWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(SummonerItemRegister.HallowedIngot, 8)
-                            .ingredient(Items.AMETHYST_SHARD, 8)
-                            .result(SummonerWeaponRegister.FairyBell)
-                            .save(output))
                     .itemLanguage("Fairy Bell", "妖精铃铛")
                     .summonLanguage(SummonerAttachmentEntityRegister.SCAVENGER_FAIRY, "Scavenger Fairy", "拾荒妖精")
                     .itemLanguageTooltip(1, "Summons up to 1 Scavenger Fairy", "最多召唤1只拾荒妖精")
@@ -158,11 +145,6 @@ public class SummonerWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(Items.AMETHYST_SHARD, 12)
-                            .ingredient(Items.IRON_INGOT, 12)
-                            .result(SummonerWeaponRegister.BladeStaff)
-                            .save(output))
                     .itemLanguage("Blade Staff", "刃杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES, "Enchanted Throwing Knives", "附魔飞刀")
                     .itemLanguageTooltip(1, "Don't let their small size fool you", "别被它们小小的个头给骗了")
@@ -233,11 +215,6 @@ public class SummonerWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.RARE))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(SummonerItemRegister.BlackLens)
-                            .ingredient(SummonerItemRegister.HallowedIngot, 12)
-                            .result(SummonerWeaponRegister.OpticStaff)
-                            .save(output))
                     .itemLanguage("Optic Staff", "魔眼法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.TWINS, "Twins", "双子魔眼")
                     .itemModel(LyraItemRegisterBuilder::handheldItem)
@@ -461,10 +438,6 @@ public class SummonerWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(SummonerItemRegister.Stardust, 12)
-                            .result(SummonerWeaponRegister.EtherealStellarCoreStaff)
-                            .save(output))
                     .itemLanguage("Ethereal Stellar Core Staff", "缥缈星核法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.ETHEREAL_STELLAR_CORE, "Ethereal Stellar Core", "缥缈星核")
                     .itemLanguageTooltip(1, "Summons up to 9 Ethereal Stellar Cores", "最多召唤9个缥缈星核")
@@ -483,10 +456,6 @@ public class SummonerWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(SummonerItemRegister.Stardust, 18)
-                            .result(SummonerWeaponRegister.StardustCellStaff)
-                            .save(output))
                     .itemLanguage("Stardust Cell Staff", "星尘细胞法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.STARDUST_CELL, "Stardust Cell", "星尘细胞")
                     .itemLanguageTooltip(1, "Cultivate the most beautiful cellular infection", "培养最美丽的细胞感染")
@@ -540,10 +509,6 @@ public class SummonerWeaponRegister {
                             .properties(properties -> properties.rarity(Rarity.EPIC))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
-                    .recipe(output -> MithrilAnvilRecipe.builder()
-                            .ingredient(SummonerItemRegister.Stardust, 18)
-                            .result(SummonerWeaponRegister.StardustDragonStaff)
-                            .save(output))
                     .itemLanguage("Stardust Dragon Staff", "星尘之龙法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.STARDUST_DRAGON, "Stardust Dragon", "星尘之龙")
                     .itemLanguageTooltip(1, "When you have a dragon, who needs a swarm?", "有了一条巨龙后，谁还需要一群仆从呢？")

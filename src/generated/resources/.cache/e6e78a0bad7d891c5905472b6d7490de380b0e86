@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-14T21:35:08.4037247	Item Models: summoner
+// 1.21.1	2026-08-18T17:57:29.0857126	Item Models: summoner
 2f0f12de9674b8aaaf1afa4e2aa42f3e326156f1 assets/summoner/models/item/adamantite_ingot.json
 dfd235cedf5a4c6ed82a229e3aea00f38c65a735 assets/summoner/models/item/apprentices_scarf.json
 eaa95ce6bcf921e88836c38085395aa77d00a18a assets/summoner/models/item/ballista_cane.json
@@ -43,7 +43,6 @@ e57ebd2c34e69c28f2e364c36d0b79817bd8ef1f assets/summoner/models/item/huntresses_
 083f5803953641a479105133b2938f85c1d6b2b5 assets/summoner/models/item/kaleidoscope.json
 25af28c98645609fb7fdbc59451d2761b0abea34 assets/summoner/models/item/laser_minigun.json
 7ed1c2fef6760cf473adb756995f4ecc7475b39a assets/summoner/models/item/luminite_ingot.json
-1a6a9e36a42c3b17e3eaa5c12de6ce17034cd89d assets/summoner/models/item/mithril_anvil.json
 fc6735ec4723f84fecc37376cc8982c4647ac201 assets/summoner/models/item/monks_belt.json
 fc895d503bab24abdb6b4368d43a7488d2d71420 assets/summoner/models/item/moon_portal_staff.json
 89f386b0d90e7b2bf45f6bafdfc3dcded8a44644 assets/summoner/models/item/necromantic_scroll.json

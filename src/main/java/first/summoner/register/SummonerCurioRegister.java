@@ -9,7 +9,6 @@ import first.lyra.register.LyraItemRegisterBuilder;
 import first.summoner.Summoner;
 import first.summoner.common.item.CurioItem;
 import first.summoner.common.projectile.MiniStardustCell;
-import first.summoner.common.recipe.MithrilAnvilRecipe;
 import first.summoner.utils.CuriosUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.util.RandomSource;
@@ -225,11 +224,6 @@ public class SummonerCurioRegister {
                     .properties(properties -> properties.rarity(Rarity.EPIC))
                     .build())
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
-            .recipe(output -> MithrilAnvilRecipe.builder()
-                    .ingredient(NecromanticScroll)
-                    .ingredient(HerculesBeetle)
-                    .result(SummonerCurioRegister.PapyrusScarab)
-                    .save(output))
             .itemLanguage("Papyrus Scarab", "甲虫莎草纸")
             .itemModel(LyraItemRegisterBuilder::basicModel)
             .itemTag(SummonerItemTagsRegister.Curio)

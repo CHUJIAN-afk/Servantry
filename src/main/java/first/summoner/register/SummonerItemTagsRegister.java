@@ -16,7 +16,6 @@ public class SummonerItemTagsRegister {
     public static final TagKey<Item> SectionArmor = register("sections/armor");
     public static final TagKey<Item> SectionAccessory = register("sections/accessory");
     public static final TagKey<Item> SectionMaterial = register("sections/material");
-    public static final TagKey<Item> SectionBlock = register("sections/block");
 
     private static TagKey<Item> register(ResourceLocation location) {
         return TagKey.create(Registries.ITEM, location);

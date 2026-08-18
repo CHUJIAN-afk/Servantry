@@ -1,6 +1,4 @@
 {
-  "block.summoner.mithril_anvil": "秘银砧",
-  "container.summoner.mithril_anvil": "超凡锻造",
   "effect.summoner.armor_crunch": "碎甲",
   "effect.summoner.cell_parasitism": "细胞寄生",
   "effect.summoner.cursed_flame": "诅咒焰",
@@ -90,7 +88,6 @@
   "item.summoner.kaleidoscope.tooltip.1": "仆从攻击时有 10% 概率造成暴击",
   "item.summoner.laser_minigun": "激光机枪",
   "item.summoner.luminite_ingot": "夜明锭",
-  "item.summoner.mithril_anvil": "秘银砧",
   "item.summoner.monks_belt": "武僧腰带",
   "item.summoner.moon_portal_staff": "月亮传送门法杖",
   "item.summoner.necro_spirit_staff": "死魂灵巫术单元",

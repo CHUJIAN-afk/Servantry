@@ -1,6 +1,4 @@
 {
-  "block.summoner.mithril_anvil": "Mithril Anvil",
-  "container.summoner.mithril_anvil": "Forging",
   "effect.summoner.armor_crunch": "Armor Crunch",
   "effect.summoner.cell_parasitism": "Cell Parasitism",
   "effect.summoner.cursed_flame": "Cursed Flame",
@@ -90,7 +88,6 @@
   "item.summoner.kaleidoscope.tooltip.1": "Minion attacks have a 10% chance to critically strike",
   "item.summoner.laser_minigun": "Laser Minigun",
   "item.summoner.luminite_ingot": "Luminite Ingot",
-  "item.summoner.mithril_anvil": "Mithril Anvil",
   "item.summoner.monks_belt": "Monk's Belt",
   "item.summoner.moon_portal_staff": "Moon Portal Staff",
   "item.summoner.necro_spirit_staff": "Necro Spirit Staff",

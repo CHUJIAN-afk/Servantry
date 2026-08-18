@@ -3,25 +3,17 @@ package first.summoner.compat.jei;
 import first.lyra.common.armorSet.ArmorSet;
 import first.lyra.register.LyraRegistries;
 import first.summoner.Summoner;
-import first.summoner.common.recipe.MithrilAnvilRecipe;
-import first.summoner.compat.jei.category.MithrilAnvilRecipeCategory;
 import first.summoner.register.SummonerCurioRegister;
 import first.summoner.register.SummonerItemRegister;
-import first.summoner.register.SummonerMithrilAnvilRecipeRegister;
 import first.summoner.register.SummonerWeaponRegister;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.registration.IRecipeCatalystRegistration;
-import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -35,24 +27,7 @@ public class JEIPlugin implements IModPlugin {
     }
 
     @Override
-    public void registerCategories(@NotNull IRecipeCategoryRegistration registration) {
-        registration.addRecipeCategories(new MithrilAnvilRecipeCategory(registration.getJeiHelpers().getGuiHelper()));
-    }
-
-    @Override
-    public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(new ItemStack(SummonerItemRegister.MithrilAnvil.asItem()), MithrilAnvilRecipeCategory.SoulRecipeType);
-    }
-
-    @Override
     public void registerRecipes(@NotNull IRecipeRegistration registration) {
-        if (Minecraft.getInstance().level instanceof Level level) {
-            List<MithrilAnvilRecipe> soulRecipeList = level.getRecipeManager().getAllRecipesFor(SummonerMithrilAnvilRecipeRegister.MITHRIL_ANVIL_TYPE.get())
-                    .stream()
-                    .map(RecipeHolder::value)
-                    .toList();
-            registration.addRecipes(MithrilAnvilRecipeCategory.SoulRecipeType, soulRecipeList);
-        }
         List<ArmorSet> armorSets = LyraRegistries.ARMOR_SETS.stream().toList();
         for (ArmorSet armorSet : armorSets) {
             List<ItemStack> itemStackList = armorSet.items().stream()

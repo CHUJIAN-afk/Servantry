@@ -26,10 +26,6 @@ public class Summoner {
         SummonerPotionRegister.register(eventBus);
         SummonerSoundRegister.register(eventBus);
         SummonerArmorSetRegister.register(eventBus);
-        SummonerBlockRegister.register(eventBus);
-        SummonerMenuRegister.register(eventBus);
-        SummonerMithrilAnvilRecipeRegister.register(eventBus);
-        SummonerNetworkPacketRegister.register(eventBus);
         container.registerConfig(ModConfig.Type.STARTUP, StartupConfig.Spec);
     }
 

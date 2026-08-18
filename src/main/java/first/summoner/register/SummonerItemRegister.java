@@ -5,7 +5,6 @@ import first.lyra.common.creativeTab.Section;
 import first.lyra.register.LyraItemRegisterBuilder;
 import first.summoner.Summoner;
 import first.summoner.common.item.ZenithItem;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.Tiers;
@@ -20,7 +19,6 @@ public class SummonerItemRegister {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Summoner.MODID);
 
     public static final Section MATERIAL = new Section(3, Summoner.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), SummonerItemTagsRegister.SectionMaterial);
-    public static final Section BLOCK = new Section(5, Summoner.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), SummonerItemTagsRegister.SectionBlock);
 
     public static final DeferredItem<ZenithItem> Zenith =
             LyraItemRegisterBuilder.build(ITEMS, "zenith", () -> new ZenithItem(Tiers.NETHERITE, new Item.Properties()
@@ -30,13 +28,6 @@ public class SummonerItemRegister {
                     .itemModel(LyraItemRegisterBuilder::handheldItem)
                     .build();
 
-    public static final DeferredItem<BlockItem> MithrilAnvil =
-            LyraItemRegisterBuilder.build(ITEMS, "mithril_anvil", () -> new BlockItem(SummonerBlockRegister.MITHRIL_ANVIL.get(), new Item.Properties()))
-                    .itemTag(SummonerItemTagsRegister.SectionBlock)
-                    .itemLanguage("Mithril Anvil", "秘银砧")
-                    .blockLanguage("Mithril Anvil", "秘银砧")
-                    .itemModel((location, provider) -> provider.simpleBlockItem(location))
-                    .build();
     public static final DeferredItem<Item> Silk =
             LyraItemRegisterBuilder.build(ITEMS, "silk")
                     .itemTag(SummonerItemTagsRegister.SectionMaterial)
