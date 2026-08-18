@@ -13,13 +13,13 @@ import net.minecraft.world.phys.AABB;
 public class DestructionBulletRenderer extends AbstractAttachmentEntityRenderer<DestructionBullet> {
 
     @Override
-    protected RenderContext<DestructionBullet> createContext(DestructionBullet laser) {
+    protected RenderContext<DestructionBullet> createContext(DestructionBullet laser, float partialTick) {
         return RenderContext.<DestructionBullet>builder()
                 .build();
     }
 
     @Override
-    protected void render(DestructionBullet entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DestructionBullet> context, float partialTick) {
+    protected void render(DestructionBullet entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DestructionBullet> context, float partialTick, float alpha) {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;

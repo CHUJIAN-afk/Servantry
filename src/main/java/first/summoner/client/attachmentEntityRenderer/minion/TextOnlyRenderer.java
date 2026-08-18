@@ -25,13 +25,13 @@ import org.joml.Matrix4f;
 public class TextOnlyRenderer<T extends AttachmentEntity> extends AbstractAttachmentEntityRenderer<T> {
 
     @Override
-    protected RenderContext<T> createContext(T entity) {
+    protected RenderContext<T> createContext(T entity, float partialTick) {
         return RenderContext.<T>builder()
                 .build();
     }
 
     @Override
-    protected void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context, float partialTick) {
+    protected void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context, float partialTick, float alpha) {
         ResourceLocation location = LyraRegistries.ATTACHMENT_ENTITY_TYPES.getKey(entity.getType());
         assert location != null;
         String key = "summon." + location.getNamespace() + "." + location.getPath();

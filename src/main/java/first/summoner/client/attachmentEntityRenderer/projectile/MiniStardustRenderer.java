@@ -3,14 +3,15 @@ package first.summoner.client.attachmentEntityRenderer.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ConeTrailConfig;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.summoner.common.projectile.MiniStardustCell;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.util.FastColor;
 
 /**
  * 星细胞射弹渲染器。
@@ -21,7 +22,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 public class MiniStardustRenderer extends AbstractAttachmentEntityRenderer<MiniStardustCell> {
 
     @Override
-    protected RenderContext<MiniStardustCell> createContext(MiniStardustCell projectile) {
+    protected RenderContext<MiniStardustCell> createContext(MiniStardustCell projectile, float partialTick) {
         return RenderContext.<MiniStardustCell>builder()
                 .trail(new ConeTrailConfig<MiniStardustCell>()
                         .timer(projectile.getTrailTimer())
@@ -39,8 +40,8 @@ public class MiniStardustRenderer extends AbstractAttachmentEntityRenderer<MiniS
     }
 
     @Override
-    protected void render(MiniStardustCell projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniStardustCell> context, float partialTick) {
-        ModelRenderer.renderModel(SummonerModelRegister.STARDUST_CELL, poseStack, bufferSource);
+    protected void render(MiniStardustCell projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniStardustCell> context, float partialTick, float alpha) {
+        RenderUtil.renderStandalone(SummonerModelRegister.STARDUST_CELL, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 

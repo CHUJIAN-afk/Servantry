@@ -22,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<InfiniteShadow> {
 
     @Override
-    protected RenderContext<InfiniteShadow> createContext(InfiniteShadow infiniteShadow) {
+    protected RenderContext<InfiniteShadow> createContext(InfiniteShadow infiniteShadow, float partialTick) {
         int timer = infiniteShadow.attacking ? infiniteShadow.trailTimer : 0;
         ItemStack itemStack = infiniteShadow.getItemStack();
         if (!itemStack.isEmpty()) {
@@ -46,7 +46,7 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
     }
 
     @Override
-    protected void render(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> context, float partialTick) {
+    protected void render(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> context, float partialTick, float alpha) {
         ItemStack itemStack = infiniteShadow.getItemStack();
         if (!itemStack.isEmpty()) {
             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();

@@ -13,13 +13,13 @@ import net.minecraft.world.phys.AABB;
 public class GodFlameRenderer extends AbstractAttachmentEntityRenderer<GodFlame> {
 
     @Override
-    protected RenderContext<GodFlame> createContext(GodFlame projectile) {
+    protected RenderContext<GodFlame> createContext(GodFlame projectile, float partialTick) {
         return RenderContext.<GodFlame>builder()
                 .build();
     }
 
     @Override
-    protected void render(GodFlame entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<GodFlame> context, float partialTick) {
+    protected void render(GodFlame entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<GodFlame> context, float partialTick, float alpha) {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;

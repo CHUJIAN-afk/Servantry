@@ -3,19 +3,20 @@ package first.summoner.client.attachmentEntityRenderer.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ConeTrailConfig;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.summoner.common.projectile.ShatteredStellarCore;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.util.FastColor;
 
 public class ShatteredStellarCoreRenderer extends AbstractAttachmentEntityRenderer<ShatteredStellarCore> {
 
     @Override
-    protected RenderContext<ShatteredStellarCore> createContext(ShatteredStellarCore projectile) {
+    protected RenderContext<ShatteredStellarCore> createContext(ShatteredStellarCore projectile, float partialTick) {
         return RenderContext.<ShatteredStellarCore>builder()
                 .trail(new ConeTrailConfig<ShatteredStellarCore>()
                                .timer(15)
@@ -33,8 +34,8 @@ public class ShatteredStellarCoreRenderer extends AbstractAttachmentEntityRender
     }
 
     @Override
-    protected void render(ShatteredStellarCore projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ShatteredStellarCore> context, float partialTick) {
-        ModelRenderer.renderModel(SummonerModelRegister.STARDUST_CELL, poseStack, bufferSource);
+    protected void render(ShatteredStellarCore projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ShatteredStellarCore> context, float partialTick, float alpha) {
+        RenderUtil.renderStandalone(SummonerModelRegister.STARDUST_CELL, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

@@ -3,19 +3,20 @@ package first.summoner.client.attachmentEntityRenderer.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ConeTrailConfig;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.summoner.common.projectile.MiniChlorophyteCrystal;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.util.FastColor;
 
 public class MiniChlorophyteCrystalRenderer extends AbstractAttachmentEntityRenderer<MiniChlorophyteCrystal> {
 
     @Override
-    protected RenderContext<MiniChlorophyteCrystal> createContext(MiniChlorophyteCrystal crystal) {
+    protected RenderContext<MiniChlorophyteCrystal> createContext(MiniChlorophyteCrystal crystal, float partialTick) {
         return RenderContext.<MiniChlorophyteCrystal>builder()
                 .model(new ModelConfig<MiniChlorophyteCrystal>()
                         .rotationOffset(0, 90, 0)
@@ -34,8 +35,8 @@ public class MiniChlorophyteCrystalRenderer extends AbstractAttachmentEntityRend
     }
 
     @Override
-    protected void render(MiniChlorophyteCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniChlorophyteCrystal> context, float partialTick) {
-        ModelRenderer.renderModel(SummonerModelRegister.CHLOROPHYTE_CRYSTAL, poseStack, bufferSource);
+    protected void render(MiniChlorophyteCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniChlorophyteCrystal> context, float partialTick, float alpha) {
+        RenderUtil.renderStandalone(SummonerModelRegister.CHLOROPHYTE_CRYSTAL, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

@@ -3,14 +3,15 @@ package first.summoner.client.attachmentEntityRenderer.minion;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.summoner.common.minion.StardustDragon;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.util.FastColor;
 
 /**
  * 星尘龙渲染器。
@@ -27,7 +28,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<StardustDragon> {
 
     @Override
-    protected RenderContext<StardustDragon> createContext(StardustDragon dragon) {
+    protected RenderContext<StardustDragon> createContext(StardustDragon dragon, float partialTick) {
         int total = dragon.getTotalSegments();
         int index = dragon.getSegmentIndex();
         boolean isTail = index == total - 1;
@@ -39,7 +40,7 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
     }
 
     @Override
-    protected void render(StardustDragon dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustDragon> context, float partialTick) {
+    protected void render(StardustDragon dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustDragon> context, float partialTick, float alpha) {
         int total = dragon.getTotalSegments();
         int index = dragon.getSegmentIndex();
         ModelResourceLocation model;
@@ -52,7 +53,7 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
         } else {
             model = SummonerModelRegister.STARDUST_DRAGON_BODY2;
         }
-        ModelRenderer.renderModel(model, poseStack, bufferSource);
+        RenderUtil.renderStandalone(model, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 

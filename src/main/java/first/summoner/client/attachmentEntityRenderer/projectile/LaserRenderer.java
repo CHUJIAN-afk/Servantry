@@ -13,13 +13,13 @@ import net.minecraft.world.phys.AABB;
 public class LaserRenderer extends AbstractAttachmentEntityRenderer<Laser> {
 
     @Override
-    protected RenderContext<Laser> createContext(Laser laser) {
+    protected RenderContext<Laser> createContext(Laser laser, float partialTick) {
         return RenderContext.<Laser>builder()
                 .build();
     }
 
     @Override
-    protected void render(Laser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Laser> context, float partialTick) {
+    protected void render(Laser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Laser> context, float partialTick, float alpha) {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;

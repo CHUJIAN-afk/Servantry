@@ -7,14 +7,12 @@ import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.trail.ConeTrailConfig;
 import first.lyra.common.entity.PathNode;
 import first.summoner.common.projectile.MiniRainbowCrystal;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class RainbowCrystalRenderer extends AbstractAttachmentEntityRenderer<MiniRainbowCrystal> {
 
     @Override
-    protected RenderContext<MiniRainbowCrystal> createContext(MiniRainbowCrystal crystal) {
-        float partialTick = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+    protected RenderContext<MiniRainbowCrystal> createContext(MiniRainbowCrystal crystal, float partialTick) {
         return RenderContext.<MiniRainbowCrystal>builder()
                 .trail(new ConeTrailConfig<MiniRainbowCrystal>()
                                .timer(15)
@@ -27,7 +25,7 @@ public class RainbowCrystalRenderer extends AbstractAttachmentEntityRenderer<Min
     }
 
     @Override
-    protected void render(MiniRainbowCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniRainbowCrystal> context, float partialTick) {
+    protected void render(MiniRainbowCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniRainbowCrystal> context, float partialTick, float alpha) {
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

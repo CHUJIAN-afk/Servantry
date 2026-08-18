@@ -18,7 +18,7 @@ import net.minecraft.util.Mth;
 public class LaserMinigunRenderer extends AbstractAttachmentEntityRenderer<LaserMinigun> {
 
     @Override
-    protected RenderContext<LaserMinigun> createContext(LaserMinigun entity) {
+    protected RenderContext<LaserMinigun> createContext(LaserMinigun entity, float partialTick) {
         return RenderContext.<LaserMinigun>builder()
                 .model(new ModelConfig<LaserMinigun>()
                                .translateOffset(0.0375f, -0.35f, 0)
@@ -28,7 +28,7 @@ public class LaserMinigunRenderer extends AbstractAttachmentEntityRenderer<Laser
     }
 
     @Override
-    protected void render(LaserMinigun minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<LaserMinigun> context, float partialTick) {
+    protected void render(LaserMinigun minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<LaserMinigun> context, float partialTick, float alpha) {
         int tickCount = minion.getTickCount();
         GeoSideloader.create(Summoner.rl("laser_minigun"))
                 .setAnimation("shooting", Mth.lerp(partialTick, tickCount, tickCount + 1))

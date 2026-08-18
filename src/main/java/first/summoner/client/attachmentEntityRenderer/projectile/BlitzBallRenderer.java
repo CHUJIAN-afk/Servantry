@@ -21,14 +21,14 @@ import java.util.Set;
 public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBall> {
 
     @Override
-    protected RenderContext<BlitzBall> createContext(BlitzBall entity) {
+    protected RenderContext<BlitzBall> createContext(BlitzBall entity, float partialTick) {
         return RenderContext.<BlitzBall>builder()
                 .build();
     }
 
     @Override
-    protected void modelModify(BlitzBall blitzBall, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context, float partialTick) {
-        super.modelModify(blitzBall, poseStack, bufferSource, visualNode, context, partialTick);
+    protected void modelModify(BlitzBall blitzBall, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context, float partialTick, float alpha) {
+        super.modelModify(blitzBall, poseStack, bufferSource, visualNode, context, partialTick, alpha);
         Set<Integer> list = blitzBall.getIdList();
         Player owner = blitzBall.getOwner();
         Level level = owner.level();
@@ -56,7 +56,7 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
     }
 
     @Override
-    protected void render(BlitzBall entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context, float partialTick) {
+    protected void render(BlitzBall entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context, float partialTick, float alpha) {
         SphereRendererHelper.builder()
                 .radius(0.25f)
                 .layers(3)

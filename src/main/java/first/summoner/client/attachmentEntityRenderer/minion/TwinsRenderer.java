@@ -2,19 +2,20 @@ package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ConeTrailConfig;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.summoner.common.minion.Twins;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.util.FastColor;
 
 public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
 
     @Override
-    protected RenderContext<Twins> createContext(Twins twins) {
+    protected RenderContext<Twins> createContext(Twins twins, float partialTick) {
         int trailTimer = twins.getTrailTimer();
         return RenderContext.<Twins>builder()
                 .trail(new ConeTrailConfig<Twins>()
@@ -35,11 +36,11 @@ public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
     }
 
     @Override
-    protected void render(Twins minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Twins> context, float partialTick) {
+    protected void render(Twins minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Twins> context, float partialTick, float alpha) {
         if (minion.isLaserEye()) {
-            ModelRenderer.renderModel(SummonerModelRegister.TWINS_LASER, poseStack, bufferSource);
+            RenderUtil.renderStandalone(SummonerModelRegister.TWINS_LASER, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
         } else {
-            ModelRenderer.renderModel(SummonerModelRegister.TWINS_CURSED_FLAME, poseStack, bufferSource);
+            RenderUtil.renderStandalone(SummonerModelRegister.TWINS_CURSED_FLAME, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
         }
     }
 }

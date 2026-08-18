@@ -3,8 +3,8 @@ package first.summoner.client.attachmentEntityRenderer.minion;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.ModelRenderer;
 import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ConeTrailConfig;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
@@ -14,6 +14,7 @@ import first.summoner.register.SummonerModelRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.util.FastColor;
 
 /**
  * 星尘细胞渲染器。
@@ -24,7 +25,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<StardustCell> {
 
     @Override
-    protected RenderContext<StardustCell> createContext(StardustCell minion) {
+    protected RenderContext<StardustCell> createContext(StardustCell minion, float partialTick) {
         return RenderContext.<StardustCell>builder()
                 .trail(new ConeTrailConfig<StardustCell>()
                         .timer(minion.getTrailTimer())
@@ -42,7 +43,7 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
     }
 
     @Override
-    protected void render(StardustCell minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> context, float partialTick) {
+    protected void render(StardustCell minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> context, float partialTick, float alpha) {
         if (context.hasTrail() && !Minecraft.getInstance().isPaused()) {
             int trailTimer = minion.getTrailTimer();
             ParticleHelper.create(minion.getOwner().level())
@@ -61,7 +62,7 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
                     .offset(0.25)
                     .emit();
         }
-        ModelRenderer.renderModel(SummonerModelRegister.STARDUST_CELL, poseStack, bufferSource);
+        RenderUtil.renderStandalone(SummonerModelRegister.STARDUST_CELL, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 
