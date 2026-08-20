@@ -49,8 +49,8 @@ public class SummonerWeaponRegister {
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Summon Contract", "召唤契约")
-                    .itemLanguageTooltip(1, "Cannot summon. Sneak right-click to dismiss all minions and sentries", "无法召唤召唤物。潜行右键遣散所有仆从与哨兵")
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemLanguageTooltip(1, "Sneak right-click to dismiss all minions and sentries", "潜行右键遣散所有仆从与哨兵")
+                    // TODO: 恢复 itemModel 前需添加 textures/item/summon_contract.png（datagen 校验纹理必须存在）
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
