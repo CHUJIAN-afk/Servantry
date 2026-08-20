@@ -38,6 +38,7 @@ public class SummonerItemRegister {
             LyraItemRegisterBuilder.build(ITEMS, "black_lens")
                     .itemTag(SummonerItemTagsRegister.SectionMaterial)
                     .itemLanguage("Black Lens", "黑色晶状体")
+                    .jeiInfo(1, "Occasionally drops from Zombie", "僵尸偶尔掉落")
                     .itemModel(LyraItemRegisterBuilder::basicModel)
                     .build();
     public static final DeferredItem<Item> BeeWax =

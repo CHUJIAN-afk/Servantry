@@ -299,6 +299,7 @@ public class SummonerWeaponRegister {
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Tempest Staff", "暴风雨法杖")
+                    .jeiInfo(1, "Occasionally obtained from fishing in the ocean during rain", "在海洋中雨天钓鱼时偶尔获得")
                     .summonLanguage(SummonerAttachmentEntityRegister.SHARKNADO, "Sharknado", "鲨鱼龙卷")
                     .itemModel(LyraItemRegisterBuilder::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -324,8 +325,9 @@ public class SummonerWeaponRegister {
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Terraprism", "泰拉棱镜")
-                    .summonLanguage(SummonerAttachmentEntityRegister.TERRA_PRISM, "Terraprism", "泰拉棱镜")
                     .itemLanguageTooltip(1, "A flawless blade once hailed as the Prism of the Earth", "曾被冠以大地棱彩美名的无暇之剑")
+                    .jeiInfo(1, "Occasionally drops from Allays", "悦灵偶尔掉落")
+                    .summonLanguage(SummonerAttachmentEntityRegister.TERRA_PRISM, "Terraprism", "泰拉棱镜")
                     .itemModel(LyraItemRegisterBuilder::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
@@ -607,6 +609,7 @@ public class SummonerWeaponRegister {
                     .summonLanguage(SummonerAttachmentEntityRegister.INFINITE_SHADOW, "Infinite Shadow", "无限之影")
                     .itemLanguageTooltip(1, "A scabbard that stores a blade of infinite potential", "蕴含无限可能之'剑'的剑鞘")
                     .itemLanguageTooltip(2, "Right-click an item to store, right-click an empty slot to retrieve", "右键物品存入，右键空格子取出")
+                    .jeiInfo(1, "Occasionally found in Ancient City chests", "偶尔在远古城市宝箱中发现")
                     .itemModel(LyraItemRegisterBuilder::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();

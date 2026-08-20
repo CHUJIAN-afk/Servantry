@@ -55,6 +55,7 @@ public class SummonerCurioRegister {
                     .build())
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Pygmy Necklace", "矮人项链")
+            .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
             .itemModel(LyraItemRegisterBuilder::basicModel)
             .itemTag(SummonerItemTagsRegister.Curio)
             .build();
@@ -73,6 +74,7 @@ public class SummonerCurioRegister {
                     .build())
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Hercules Beetle", "大力士甲虫")
+            .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
             .itemModel(LyraItemRegisterBuilder::basicModel)
             .itemTag(SummonerItemTagsRegister.Curio)
             .build();
@@ -90,6 +92,7 @@ public class SummonerCurioRegister {
                     .build())
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Apprentice's Scarf", "学徒围巾")
+            .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
             .itemModel(LyraItemRegisterBuilder::basicModel)
             .itemTag(SummonerItemTagsRegister.Curio)
             .build();
@@ -107,6 +110,7 @@ public class SummonerCurioRegister {
                     .build())
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Huntress's Buckler", "女猎人圆盾")
+            .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
             .itemModel(LyraItemRegisterBuilder::basicModel)
             .itemTag(SummonerItemTagsRegister.Curio)
             .build();
@@ -123,6 +127,7 @@ public class SummonerCurioRegister {
                     .build())
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Monk's Belt", "武僧腰带")
+            .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
             .itemModel(LyraItemRegisterBuilder::basicModel)
             .itemTag(SummonerItemTagsRegister.Curio)
             .build();
@@ -140,6 +145,7 @@ public class SummonerCurioRegister {
                     .build())
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Squire's Shield", "侍卫护盾")
+            .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
             .itemModel(LyraItemRegisterBuilder::basicModel)
             .itemTag(SummonerItemTagsRegister.Curio)
             .build();
@@ -156,6 +162,7 @@ public class SummonerCurioRegister {
                     .build())
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Summoner Emblem", "召唤师徽章")
+            .jeiInfo(1, "Occasionally drops from Evokers", "唤魔者偶尔掉落")
             .itemModel(LyraItemRegisterBuilder::basicModel)
             .itemTag(SummonerItemTagsRegister.Curio)
             .build();

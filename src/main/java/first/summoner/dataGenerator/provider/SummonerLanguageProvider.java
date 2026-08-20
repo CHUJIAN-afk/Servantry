@@ -34,13 +34,6 @@ public class SummonerLanguageProvider extends LyraLanguageProvider {
         entry(SummonerMobEffectRegister.ArmorCrunch.get().getDescriptionId(), "Armor Crunch", "碎甲");
         // ===================== 药水类物品 =====================
         potionEntry(SummonerPotionRegister.Obsession.getId().getPath(), "Obsession", "着魔");
-        // ===================== JEI 兼容 =====================
-        entry("jei.summoner.description.sold", "Occasionally sold by Clerics", "牧师偶尔出售");
-        entry("jei.summoner.description.terraprism", "Occasionally drops from Allays", "悦灵偶尔掉落");
-        entry("jei.summoner.description.drops_from_evokers", "Occasionally drops from Evokers", "唤魔者偶尔掉落");
-        entry("jei.summoner.description.drops_from_zombie", "Occasionally drops from Zombie", "僵尸偶尔掉落");
-        entry("jei.summoner.description.fishing", "Occasionally obtained from fishing in the ocean during rain", "在海洋中雨天钓鱼时偶尔获得");
-        entry("jei.summoner.description.ancient_city", "Occasionally found in Ancient City chests", "偶尔在远古城市宝箱中发现");
     }
 
     @SuppressWarnings("SameParameterValue")
