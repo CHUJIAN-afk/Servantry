@@ -22,7 +22,7 @@ public class ClientEvent {
 
     @SubscribeEvent
     public static void registerTooltipFactories(RegisterClientTooltipComponentFactoriesEvent event) {
-        event.register(ScabbardTooltipComponent.class, tooltipComponent -> tooltipComponent);
+        event.register(ScabbardTooltipComponent.class, ScabbardTooltipComponent.class::cast);
     }
 
     @SubscribeEvent
