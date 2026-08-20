@@ -3,6 +3,7 @@ package first.summoner.register;
 import first.lyra.api.LyraHelper;
 import first.lyra.client.creativeTab.AnimBanner;
 import first.lyra.common.attachment.AttachmentEntityData;
+
 import first.lyra.common.builder.MinionWeaponItemBuilder;
 import first.lyra.common.creativeTab.Section;
 import first.lyra.common.entity.PathNode;
@@ -27,6 +28,31 @@ public class SummonerWeaponRegister {
 
     public static final Section MINION_WEAPON = new Section(0, Summoner.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), SummonerItemTagsRegister.SectionMinionWeapon);
 
+    /**
+     * 召唤契约 - 无法召唤，潜行右键遣散所有仆从与哨兵
+     */
+    public static final DeferredItem<MinionWeaponItemBuilder<Hornet>.MinionWeaponItem> SummonContract =
+            LyraItemRegisterBuilder.build(ITEMS, "summon_contract", location -> new MinionWeaponItemBuilder<Hornet>(() -> null)
+                            .summon((weapon, player, itemStack) -> {
+                                // 无法召唤召唤物
+                            })
+                            .onRemove(player -> {
+                                AttachmentEntityData entityData = LyraHelper.get(player).getEntityData();
+                                entityData.getGroups().forEach((type, map) -> {
+                                    if (type == AttachmentEntityData.Type.Minion || type == AttachmentEntityData.Type.Sentry) {
+                                        map.keySet().forEach(entityType -> entityData.remove(type, entityType));
+                                    }
+                                });
+                            })
+                            .sound(SummonerSoundRegister.UseMinionWeapon)
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .build())
+                    .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
+                    .itemLanguage("Summon Contract", "召唤契约")
+                    .itemLanguageTooltip(1, "Cannot summon. Sneak right-click to dismiss all minions and sentries", "无法召唤召唤物。潜行右键遣散所有仆从与哨兵")
+                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemTag(SummonerItemTagsRegister.MinionWeapon)
+                    .build();
     /**
      * 黄蜂法杖
      */
