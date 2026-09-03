@@ -3,7 +3,6 @@ package first.summoner.common.minion.goal.scavengerFairy;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.MinionGoal;
 import first.summoner.common.minion.ScavengerFairy;
-import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -25,8 +24,9 @@ public class ScavengerFairyCollectItemGoal extends MinionGoal<ScavengerFairy> {
         Entity targetEntity = minion.getTargetEntity();
         if (targetEntity != null) {
             if (targetEntity instanceof ItemEntity itemEntity) {
-                NonNullList<ItemStack> items = minion.getOwner().getInventory().items;
-                for (ItemStack item : items) {
+                var inventory = minion.getOwner().getInventory();
+                for (int i = 0; i < inventory.getContainerSize(); i++) {
+                    ItemStack item = inventory.getItem(i);
                     if (item.isEmpty()) {
                         return true;
                     }

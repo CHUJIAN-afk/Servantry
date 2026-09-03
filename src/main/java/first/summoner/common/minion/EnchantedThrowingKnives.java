@@ -4,7 +4,7 @@ import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionGoalSelector;
@@ -19,7 +19,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +32,7 @@ import java.util.List;
  * </ul>
  * </p>
  */
-public class EnchantedThrowingKnives extends Minion implements ICollideAttack<EnchantedThrowingKnives> {
+public class EnchantedThrowingKnives extends Minion implements IEntityCollision<EnchantedThrowingKnives> {
 
     // ===================== 渲染状态 =====================
 
@@ -93,18 +92,12 @@ public class EnchantedThrowingKnives extends Minion implements ICollideAttack<En
     @Override
     public void tick() {
         if (getOwner().level().isClientSide()) {
-            // 拖尾计时器更新
-            if (attacking) {
-                trailTimer = 15;
-            } else if (trailTimer > 0) {
-                trailTimer--;
-            }
             // 空闲混合系数更新
             idleBlendO = idleBlend;
             if (!attacking) {
-                idleBlend = Math.min(1.0f, idleBlend + 0.1f);
+                idleBlend = Math.min(1.0f, idleBlend + 0.05f);
             } else {
-                idleBlend = Math.max(0.0f, idleBlend - 0.25f);
+                idleBlend = Math.max(0.0f, idleBlend - 0.1f);
             }
         }
         super.tick();
@@ -112,22 +105,16 @@ public class EnchantedThrowingKnives extends Minion implements ICollideAttack<En
 
     @Override
     public LivingEntity searchTarget() {
-        LyraHelper helper = LyraHelper.get(owner);
-        TargetCache targetCache = helper.getTargetCache();
-        if (!targetCache.isEmpty()) {
-            float searchRange = targetCache.getSummonSearchRange(this.getOwner(), this.getSearchDistance());
-            List<LivingEntity> targets = new ArrayList<>();
-            List<LivingEntity> entities = targetCache.getEntities();
-            for (LivingEntity living : entities) {
-                if ((attacking || targetCache.isVisibility(owner, living))) {
-                    if (targetCache.getDistance(owner, living) < searchRange) {
-                        if (isTarget(living)) {
-                            targets.add(living);
-                        }
-                    }
+        int distance = this.getSearchDistance();
+        if (distance > 0) {
+            LyraHelper helper = LyraHelper.get(this.owner);
+            TargetCache targetCache = helper.getTargetCache();
+            if (!targetCache.isEmpty()) {
+                List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), targetCache.getSummonSearchRange(this.getOwner(), (float) distance), (living) -> (attacking || targetCache.isVisibility(this.owner, living)) && this.isTarget(living));
+                if (!targets.isEmpty()) {
+                    return targetCache.getNewTarget(this, targets, 8, false);
                 }
             }
-            return targetCache.getNewTarget(this, targets, 8, false);
         }
         return null;
     }
@@ -147,6 +134,12 @@ public class EnchantedThrowingKnives extends Minion implements ICollideAttack<En
     @Override
     public void readAdditional(RegistryFriendlyByteBuf buf) {
         this.attacking = buf.readBoolean();
+    }
+
+    @Override
+    public PathNode getRenderNode(float partialTick) {
+        PathNode renderNode = super.getRenderNode(partialTick);
+        return renderNode.lerp(getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, idleBlendO, idleBlend));
     }
 
     // ===================== 空闲状态计算 =====================

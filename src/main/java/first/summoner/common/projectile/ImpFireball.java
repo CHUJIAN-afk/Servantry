@@ -1,13 +1,18 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.*;
+import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.IBlockCollision;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.MinionDamageSource;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import net.minecraft.util.RandomSource;
+import first.summoner.utils.ParticleHelper;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +23,7 @@ import java.util.List;
  * 小鬼火球射弹 - 穿透4个敌怪，100%施加着火了！效果。
  * 使用 GLOBAL 无敌帧模式（穿透攻击互相干扰）。
  */
-public class ImpFireball extends Projectile implements ICollideAttack<ImpFireball>, IBlockCollision<ImpFireball> {
+public class ImpFireball extends Projectile implements IEntityCollision<ImpFireball>, IBlockCollision<ImpFireball> {
 
     private int hitCount = 0;
 
@@ -38,6 +43,24 @@ public class ImpFireball extends Projectile implements ICollideAttack<ImpFirebal
     @Override
     public void tick() {
         super.tick();
+        Level level = getOwner().level();
+        if (!level.isClientSide()) {
+            ParticleHelper.create(level)
+                    .generic(GenericParticleBuilder.create()
+                                     .centerColor(0xe1c316)
+                                     .edgeColor(0xff7506)
+                                     .lifetime(4)
+                                     .lifetimeRandom(8)
+                                     .spin(0.25f)
+                                     .spinRandom(0.25F)
+                                     .scale(0.015f)
+                                     .scaleRandom(0.015f)
+                    )
+                    .pos(getPos())
+                    .count(8)
+                    .offset(0.2)
+                    .emit();
+        }
     }
 
     @Override
@@ -46,8 +69,7 @@ public class ImpFireball extends Projectile implements ICollideAttack<ImpFirebal
         if (source != null) {
             for (HitContext hit : hitContexts) {
                 if (hitCount >= 4) {
-                    // 超过穿透上限：移动到最后一个命中实体位置，跳过其他实体，移除自身
-                    currentPathNode = new PathNode(hit.hitPoint(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+                    setCurrentPathNode(getCollisionAfterPathNode(hit.hitPoint(), getCurrentPathNode()));
                     setRemove();
                     return;
                 }
@@ -59,9 +81,8 @@ public class ImpFireball extends Projectile implements ICollideAttack<ImpFirebal
                         .invincibleTime(2)
                         .global()
                         .apply();
-                if (applied && living.getRemainingFireTicks() < 60) {
-                    RandomSource random = getOwner().getRandom();
-                    living.setRemainingFireTicks(60 + random.nextIntBetweenInclusive(0, 60));
+                if (applied) {
+                    living.igniteForTicks(60);
                     hitCount++;
                 }
             }
@@ -73,7 +94,7 @@ public class ImpFireball extends Projectile implements ICollideAttack<ImpFirebal
         if (entity.getDamageSource() instanceof MinionDamageSource sds) {
             return sds.getMinion().isTarget(target);
         }
-        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override

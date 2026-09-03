@@ -6,7 +6,7 @@ import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * 玉米炮射弹 - 抛物线飞行，命中实体或方块时对3格内所有敌对目标造成伤害。
  */
-public class Corn extends Projectile implements ICollideAttack<Corn>, IBlockCollision<Corn> {
+public class Corn extends Projectile implements IEntityCollision<Corn>, IBlockCollision<Corn> {
 
     /** AOE伤害半径 */
     private static final double AOE_RADIUS = 3.0;
@@ -69,20 +69,15 @@ public class Corn extends Projectile implements ICollideAttack<Corn>, IBlockColl
             // 通过TargetCache获取附近实体
             LyraHelper helper = LyraHelper.get(owner);
             TargetCache targetCache = helper.getTargetCache();
-            List<LivingEntity> nearbyEntities = targetCache.getEntities();
+            List<LivingEntity> nearbyEntities = targetCache.getEntitiesInRadius(explosionPos, AOE_RADIUS, minion::isTarget);
 
             for (LivingEntity entity : nearbyEntities) {
-                if (minion.isTarget(entity)) {
-                    double distance = entity.getBoundingBox().getCenter().distanceTo(explosionPos);
-                    if (distance <= AOE_RADIUS) {
-                        InvincibleData.attack(entity)
-                                .attacker(getUuid())
-                                .damageSource(source)
-                                .damageAmount(getDamage())
-                                .invincibleTime(10)
-                                .apply();
-                    }
-                }
+                InvincibleData.attack(entity)
+                        .attacker(getUuid())
+                        .damageSource(source)
+                        .damageAmount(getDamage())
+                        .invincibleTime(10)
+                        .apply();
             }
         }
         Vec3 pos = getPos();
@@ -105,7 +100,7 @@ public class Corn extends Projectile implements ICollideAttack<Corn>, IBlockColl
         if (entity.getDamageSource() instanceof MinionDamageSource sds) {
             return sds.getMinion().isTarget(target);
         }
-        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override

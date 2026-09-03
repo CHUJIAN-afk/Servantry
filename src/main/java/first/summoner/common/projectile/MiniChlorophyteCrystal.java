@@ -1,9 +1,11 @@
 package first.summoner.common.projectile;
 
+import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
@@ -18,9 +20,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.UUID;
 
-public class MiniChlorophyteCrystal extends Projectile implements ICollideAttack<MiniChlorophyteCrystal> {
+public class MiniChlorophyteCrystal extends Projectile implements IEntityCollision<MiniChlorophyteCrystal> {
 
     public MiniChlorophyteCrystal() {
         super();
@@ -46,24 +47,23 @@ public class MiniChlorophyteCrystal extends Projectile implements ICollideAttack
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
         if (source != null) {
-            UUID uuid = null;
-            if (source instanceof MinionDamageSource minionDamageSource && minionDamageSource.getMinion() instanceof Minion minion) {
-                uuid = minion.getUuid();
-            }
+            TargetCache targetCache = LyraHelper.get(owner).getTargetCache();
             HitContext context = hitContexts.getFirst();
             LivingEntity target = context.entity();
-            InvincibleData.attack(target)
-                    .attacker(uuid)
-                    .damageSource(source)
-                    .damageAmount(getDamage())
-                    .apply();
-            Vec3 pos = getPos();
-            Vec3 direction = getVelocity();
-            GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
-                    .centerColor(0x1bff10)
-                    .edgeColor(0x17b70e);
+            Vec3 pos = target.getBoundingBox().getCenter();
+            List<LivingEntity> list = targetCache.getEntitiesInRadius(pos, 2.5, living -> isValidCollisionTarget(this, living));
+            for (LivingEntity living : list) {
+                InvincibleData.attack(living)
+                        .damageSource(source)
+                        .damageAmount(getDamage())
+                        .apply();
+            }
+            setCurrentPathNode(getCollisionAfterPathNode(context.hitPoint(), getCurrentPathNode()));
+            setRemove();
             ParticleHelper.create(owner.level())
-                    .generic(genericParticleBuilder
+                    .generic(GenericParticleBuilder.create()
+                            .centerColor(0x1bff10)
+                            .edgeColor(0x17b70e)
                             .lifetime(6)
                             .lifetimeRandom(6)
                             .spin(0.1f)
@@ -74,13 +74,11 @@ public class MiniChlorophyteCrystal extends Projectile implements ICollideAttack
                     )
                     .pos(pos)
                     .offset(0.05)
-                    .velocity(direction)
+                    .velocity(getVelocity())
                     .count(30)
                     .speed(0.85)
-                    .spread(2)
+                    .spread(Math.TAU)
                     .emit();
-            currentPathNode = new PathNode(context.hitPoint(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
-            setRemove();
         }
     }
 

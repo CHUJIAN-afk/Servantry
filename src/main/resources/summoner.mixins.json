@@ -4,14 +4,19 @@
   "package": "first.summoner.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "DamageSourcesMixin"
+    "CommonHooksMixin",
+    "DamageSourcesMixin",
+    "MixinHandlerMixin",
+    "TargetCacheMixin"
+  ],
+  "client": [
+    "ItemEnchantmentsMixin",
+    "LocalPlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "overwrites": {
     "requireAnnotations": true
-  },
-  "client": [
-  ]
+  }
 }

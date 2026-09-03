@@ -2,7 +2,7 @@ package first.summoner.common.projectile;
 
 import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class CustomLaser extends Projectile implements ICollideAttack<CustomLaser> {
+public class CustomLaser extends Projectile implements IEntityCollision<CustomLaser> {
 
     private int color = 0;
     private float alpha = 1;
@@ -114,7 +114,7 @@ public class CustomLaser extends Projectile implements ICollideAttack<CustomLase
             Minion minion = minionDamageSource.getMinion();
             return minion.isTarget(target);
         }
-        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override

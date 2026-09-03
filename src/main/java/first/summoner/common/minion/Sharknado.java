@@ -2,7 +2,7 @@ package first.summoner.common.minion;
 
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * 鲨鱼龙卷仆从 - 碰撞攻击并发射鲨鱼射弹。
  */
-public class Sharknado extends MomentumMinion implements ICollideAttack<Sharknado> {
+public class Sharknado extends MomentumMinion implements IEntityCollision<Sharknado> {
 
     /**
      * 射击冷却
@@ -91,7 +91,7 @@ public class Sharknado extends MomentumMinion implements ICollideAttack<Sharknad
         return SummonerAttachmentEntityRegister.SHARKNADO.get();
     }
 
-    // ===================== ICollideAttack 实现 =====================
+    // ===================== IEntityCollision 实现 =====================
 
     @Override
     public @NotNull AABB getHitbox() {

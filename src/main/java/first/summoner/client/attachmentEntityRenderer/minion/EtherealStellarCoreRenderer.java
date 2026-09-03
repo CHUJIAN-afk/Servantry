@@ -26,7 +26,7 @@ public class EtherealStellarCoreRenderer extends AbstractAttachmentEntityRendere
     }
 
     @Override
-    protected void render(EtherealStellarCore minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EtherealStellarCore> context, float partialTick, float alpha) {
+    protected void render(EtherealStellarCore minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EtherealStellarCore> context, float partialTick, int packedLight, float alpha) {
         RenderUtil.renderStandalone(SummonerModelRegister.STARDUST_CELL, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }

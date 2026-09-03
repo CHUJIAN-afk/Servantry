@@ -6,7 +6,6 @@ import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ModelConfig;
-import first.lyra.client.render.trail.RibbonTrailConfig;
 import first.lyra.common.entity.PathNode;
 import first.summoner.common.minion.EnchantedThrowingKnives;
 import first.summoner.register.SummonerModelRegister;
@@ -24,11 +23,6 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
     @Override
     protected RenderContext<EnchantedThrowingKnives> createContext(EnchantedThrowingKnives minion, float partialTick) {
         return RenderContext.<EnchantedThrowingKnives>builder()
-                .trail(new RibbonTrailConfig<EnchantedThrowingKnives>()
-                               .timer(minion.trailTimer)
-                               .colorRGB(0x7759ff)
-                               .historyLength(4)
-                               .upOffset(0.225f))
                 .model(new ModelConfig<EnchantedThrowingKnives>()
                                .scale(0.5f)
                                .translateOffset(-0.5f, -0.5f, -0.5f)
@@ -37,8 +31,8 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
     }
 
     @Override
-    protected void render(EnchantedThrowingKnives minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EnchantedThrowingKnives> context, float partialTick, float alpha) {
-        RenderUtil.renderStandalone(SummonerModelRegister.ENCHANTED_THROWING_KNIVES, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
-        DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
+    protected void render(EnchantedThrowingKnives minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<EnchantedThrowingKnives> context, float partialTick, int packedLight, float alpha) {
+        RenderUtil.renderStandalone(SummonerModelRegister.ENCHANTED_THROWING_KNIVES, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), packedLight);
+        DynamicLightDispatcher.addLightSources(visualNode.pos(), 4);
     }
 }

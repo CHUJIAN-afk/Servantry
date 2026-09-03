@@ -3,7 +3,7 @@ package first.summoner.common.projectile;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class DestructionBullet extends Projectile implements ICollideAttack<DestructionBullet>, IBlockCollision<DestructionBullet> {
+public class DestructionBullet extends Projectile implements IEntityCollision<DestructionBullet>, IBlockCollision<DestructionBullet> {
 
     public DestructionBullet() {
         super();
@@ -79,7 +79,7 @@ public class DestructionBullet extends Projectile implements ICollideAttack<Dest
             Minion minion = minionDamageSource.getMinion();
             return minion.isTarget(target);
         }
-        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override

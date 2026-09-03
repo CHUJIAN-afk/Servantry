@@ -5,7 +5,7 @@
   "textures": {
     "0": "summoner:item/entity/chlorophyte_crystal/1",
     "1": "summoner:item/entity/chlorophyte_crystal/2",
-    "particle": "summoner:item/chlorophyte_crystal/1"
+    "particle": "summoner:item/entity/chlorophyte_crystal/1"
   },
   "elements": [
     {

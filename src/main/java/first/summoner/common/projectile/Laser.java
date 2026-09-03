@@ -3,7 +3,7 @@ package first.summoner.common.projectile;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
@@ -21,7 +21,7 @@ import java.util.UUID;
 /**
  * 激光射弹 - 高速直线飞行的红色激光束。
  */
-public class Laser extends Projectile implements ICollideAttack<Laser>, IBlockCollision<Laser> {
+public class Laser extends Projectile implements IEntityCollision<Laser>, IBlockCollision<Laser> {
 
     public Laser() {
         super();
@@ -62,7 +62,7 @@ public class Laser extends Projectile implements ICollideAttack<Laser>, IBlockCo
             Minion minion = minionDamageSource.getMinion();
             return minion.isTarget(target);
         }
-        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override

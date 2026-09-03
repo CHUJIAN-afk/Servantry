@@ -2,7 +2,7 @@ package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class ShatteredStellarCore extends Projectile implements ICollideAttack<ShatteredStellarCore> {
+public class ShatteredStellarCore extends Projectile implements IEntityCollision<ShatteredStellarCore> {
 
     private LivingEntity chaseTarget = null;
 
@@ -44,11 +44,9 @@ public class ShatteredStellarCore extends Projectile implements ICollideAttack<S
     public boolean isValidCollisionTarget(ShatteredStellarCore entity, LivingEntity target) {
         if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
             Minion minion = minionDamageSource.getMinion();
-            if (minion != null) {
-                return minion.isTarget(target);
-            }
+            return minion.isTarget(target);
         }
-        return false;
+        return target == chaseTarget;
     }
 
     @Override

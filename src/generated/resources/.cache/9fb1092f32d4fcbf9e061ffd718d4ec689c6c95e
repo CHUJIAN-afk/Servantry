@@ -1,1 +1,5 @@
-// 1.21.1	2026-08-18T17:57:29.0847143	Recipes
+// 1.21.1	2026-09-02T14:47:40.1708508	Recipes
+921e47c21bd22d01db291af7bf4ad06dca867ba5 data/summoner/advancement/recipes/combat/crafting/blade_staff.json
+77fbafae57bf7c2bce626f660412c5c707bb0c71 data/summoner/advancement/recipes/tools/crafting/gilded_wand.json
+3767aca700e4aa8e3ad8bd291ade7a12cc3b8c62 data/summoner/recipe/crafting/blade_staff.json
+99ac3dad7c5498628326fc05205a2bc832c7b127 data/summoner/recipe/crafting/gilded_wand.json

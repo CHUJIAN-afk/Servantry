@@ -14,6 +14,7 @@ import java.util.List;
  * 仆从模型注册。
  * <p>
  * 注册不与物品/方块关联的独立模型文件，供渲染器直接使用。
+ * 1.21.1: ModelEvent.RegisterAdditional + ModelResourceLocation.standalone。
  * </p>
  */
 @EventBusSubscriber(modid = Summoner.MODID, value = Dist.CLIENT)
@@ -21,7 +22,6 @@ public class SummonerModelRegister {
 
     private static final List<ModelResourceLocation> MODELS = new ArrayList<>();
 
-    public static final ModelResourceLocation TEST = standalone("stardust_cell");
     public static final ModelResourceLocation ENCHANTED_THROWING_KNIVES = standalone("enchanted_throwing_knives");
     public static final ModelResourceLocation STARDUST_CELL = standalone("stardust_cell");
     public static final ModelResourceLocation TERRAPRISM = standalone("terraprism");
@@ -41,10 +41,6 @@ public class SummonerModelRegister {
     public static final ModelResourceLocation RAINBOW_CRYSTAL = standalone("rainbow_crystal");
     public static final ModelResourceLocation SCAVENGER_FAIRY = standalone("scavenger_fairy");
     public static final ModelResourceLocation SURVEY_DRONE = standalone("survey_drone");
-    public static final ModelResourceLocation HORNET = standalone("hornet");
-    public static final ModelResourceLocation HORNET_STINGER = standalone("hornet_stinger");
-    public static final ModelResourceLocation IMP = standalone("imp");
-    public static final ModelResourceLocation IMP_FIREBALL = standalone("imp_fireball");
 
     private static ModelResourceLocation standalone(String path) {
         ModelResourceLocation location = ModelResourceLocation.standalone(Summoner.rl("minion/" + path));

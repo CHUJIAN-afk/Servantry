@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class Rain extends Projectile implements IBlockCollision<Rain>, ICollideAttack<Rain> {
+public class Rain extends Projectile implements IBlockCollision<Rain>, IEntityCollision<Rain> {
 
     public Rain(){
         super();
@@ -55,7 +55,7 @@ public class Rain extends Projectile implements IBlockCollision<Rain>, ICollideA
             Minion minion = minionDamageSource.getMinion();
             return minion.isTarget(target);
         }
-        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override

@@ -25,7 +25,6 @@ import net.neoforged.neoforge.common.UsernameCache;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class InfiniteShadow extends Terraprism {
@@ -125,7 +124,7 @@ public class InfiniteShadow extends Terraprism {
         private final InfiniteShadow infiniteShadow;
 
         public InfiniteShadowFakePlayer(ServerLevel level, InfiniteShadow infiniteShadow) {
-            super(level, new InfiniteShadowGameProfile(infiniteShadow.getUuid(), "infinite_shadow_fake_player", infiniteShadow.getOwner()));
+            super(level, buildProfile(infiniteShadow));
             this.infiniteShadow = infiniteShadow;
         }
 
@@ -138,45 +137,19 @@ public class InfiniteShadow extends Terraprism {
             return infiniteShadow;
         }
 
-        public static class InfiniteShadowGameProfile extends GameProfile {
-
-            private final Player owner;
-
-            public InfiniteShadowGameProfile(UUID id, String name, Player owner) {
-                super(id, name);
-                this.owner = owner;
-            }
-
-            public UUID getId() {
-                return this.owner == null ? super.getId() : this.owner.getUUID();
-            }
-
-            public String getName() {
-                if (this.owner == null) {
-                    return super.getName();
-                } else {
-                    String lastKnownUsername = UsernameCache.getLastKnownUsername(this.owner.getUUID());
-                    return lastKnownUsername == null ? super.getName() : lastKnownUsername;
+        // 26.2: GameProfile 为 final,无法继承伪装名字,直接按 owner 信息构造
+        private static GameProfile buildProfile(InfiniteShadow infiniteShadow) {
+            UUID id = infiniteShadow.getUuid();
+            String name = "infinite_shadow_fake_player";
+            Player owner = infiniteShadow.getOwner();
+            if (owner != null) {
+                id = owner.getUUID();
+                String lastKnownUsername = UsernameCache.getLastKnownUsername(owner.getUUID());
+                if (lastKnownUsername != null) {
+                    name = lastKnownUsername;
                 }
             }
-
-            public boolean equals(Object o) {
-                if (this == o) {
-                    return true;
-                } else if (!(o instanceof GameProfile otherProfile)) {
-                    return false;
-                } else {
-                    return Objects.equals(this.getId(), otherProfile.getId()) && Objects.equals(this.getName(), otherProfile.getName());
-                }
-            }
-
-            public int hashCode() {
-                UUID id = this.getId();
-                String name = this.getName();
-                int result = id == null ? 0 : id.hashCode();
-                result = 31 * result + (name == null ? 0 : name.hashCode());
-                return result;
-            }
+            return new GameProfile(id, name);
         }
     }
 }

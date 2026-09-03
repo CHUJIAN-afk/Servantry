@@ -25,7 +25,7 @@ public class RainbowCrystalRenderer extends AbstractAttachmentEntityRenderer<Min
     }
 
     @Override
-    protected void render(MiniRainbowCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniRainbowCrystal> context, float partialTick, float alpha) {
+    protected void render(MiniRainbowCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniRainbowCrystal> context, float partialTick, int packedLight, float alpha) {
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

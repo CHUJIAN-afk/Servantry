@@ -2,7 +2,7 @@ package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 星细胞射弹 - 追踪目标并黏着施加寄生效果。
  */
-public class MiniStardustCell extends AttachingProjectile implements ICollideAttack<MiniStardustCell> {
+public class MiniStardustCell extends AttachingProjectile implements IEntityCollision<MiniStardustCell> {
 
     private LivingEntity chaseTarget;
 
@@ -57,7 +57,7 @@ public class MiniStardustCell extends AttachingProjectile implements ICollideAtt
             Minion minion = minionDamageSource.getMinion();
             return minion.isTarget(target);
         }
-        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override

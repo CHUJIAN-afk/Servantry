@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class Zenith extends Projectile implements ICollideAttack<Zenith> {
+public class Zenith extends Projectile implements IEntityCollision<Zenith> {
 
     public LivingEntity chaseTarget = null;
     public Vec3 direction = Vec3.ZERO;

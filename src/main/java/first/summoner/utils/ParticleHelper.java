@@ -153,7 +153,7 @@ public class ParticleHelper {
             if (server) {
                 batch.add(options, x, y, z, vx, vy, vz);
             } else {
-                level.addParticle(options, false, x, y, z, vx, vy, vz);
+                level.addParticle(options, x, y, z, vx, vy, vz);
             }
         } else {
             Vec3 baseDir = new Vec3(vx, vy, vz).normalize();
@@ -174,7 +174,7 @@ public class ParticleHelper {
                 if (server) {
                     batch.add(options, px, py, pz, velocity.x, velocity.y, velocity.z);
                 } else {
-                    level.addParticle(options, false, px, py, pz, velocity.x, velocity.y, velocity.z);
+                    level.addParticle(options, px, py, pz, velocity.x, velocity.y, velocity.z);
                 }
             }
         }

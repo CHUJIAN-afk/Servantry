@@ -35,7 +35,7 @@ public class MiniChlorophyteCrystalRenderer extends AbstractAttachmentEntityRend
     }
 
     @Override
-    protected void render(MiniChlorophyteCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniChlorophyteCrystal> context, float partialTick, float alpha) {
+    protected void render(MiniChlorophyteCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniChlorophyteCrystal> context, float partialTick, int packedLight, float alpha) {
         RenderUtil.renderStandalone(SummonerModelRegister.CHLOROPHYTE_CRYSTAL, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }

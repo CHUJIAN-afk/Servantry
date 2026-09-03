@@ -4,7 +4,7 @@ import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 黄蜂毒刺射弹 - 不可穿透，命中后施加中毒效果。
  */
-public class HornetStinger extends Projectile implements ICollideAttack<HornetStinger>, IBlockCollision<HornetStinger> {
+public class HornetStinger extends Projectile implements IEntityCollision<HornetStinger>, IBlockCollision<HornetStinger> {
 
     public HornetStinger() {
         super();
@@ -61,7 +61,7 @@ public class HornetStinger extends Projectile implements ICollideAttack<HornetSt
         if (entity.getDamageSource() instanceof MinionDamageSource sds) {
             return sds.getMinion().isTarget(target);
         }
-        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override

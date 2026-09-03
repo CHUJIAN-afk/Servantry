@@ -1,0 +1,21 @@
+{
+  "anvil_cost": 1,
+  "description": {
+    "translate": "enchantment.summoner.food_chain"
+  },
+  "max_cost": {
+    "base": 4,
+    "per_level_above_first": 0
+  },
+  "max_level": 1,
+  "min_cost": {
+    "base": 2,
+    "per_level_above_first": 0
+  },
+  "primary_items": "summoner:gilded_wand",
+  "slots": [
+    "hand"
+  ],
+  "supported_items": "summoner:gilded_wand",
+  "weight": 32
+}

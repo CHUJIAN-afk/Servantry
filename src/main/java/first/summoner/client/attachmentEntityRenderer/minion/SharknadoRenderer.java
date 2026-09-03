@@ -24,7 +24,7 @@ public class SharknadoRenderer extends AbstractAttachmentEntityRenderer<Sharknad
     }
 
     @Override
-    protected void render(Sharknado entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Sharknado> context, float partialTick, float alpha) {
-        RenderUtil.renderStandalone(SummonerModelRegister.SHARKNADO, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
+    protected void render(Sharknado entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Sharknado> context, float partialTick, int packedLight, float alpha) {
+        RenderUtil.renderStandalone(SummonerModelRegister.SHARKNADO, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), packedLight);
     }
 }

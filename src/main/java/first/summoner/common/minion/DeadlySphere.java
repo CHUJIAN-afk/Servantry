@@ -3,7 +3,7 @@ package first.summoner.common.minion;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 致命球 - 冲刺攻击型仆从，AI与魔焰眼一致。
  */
-public class DeadlySphere extends MomentumMinion implements ICollideAttack<DeadlySphere>, IBlockCollision<DeadlySphere> {
+public class DeadlySphere extends MomentumMinion implements IEntityCollision<DeadlySphere>, IBlockCollision<DeadlySphere> {
 
     private int trailTimer = 0;
     private Appearance appearance = Appearance.FIRE;

@@ -1,7 +1,7 @@
 package first.summoner.common.minion.goal.voidEater;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.minion.MinionGoal;
@@ -163,7 +163,7 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
                 laser.setHitConsumer((laserProjectile, hitContexts) -> {
                     DamageSource source = laserProjectile.getDamageSource();
                     if (source != null) {
-                        for (ICollideAttack.HitContext hitContext : hitContexts) {
+                        for (IEntityCollision.HitContext hitContext : hitContexts) {
                             LivingEntity living = hitContext.entity();
                             InvincibleData.attack(living)
                                     .attacker(laserProjectile.getUuid())

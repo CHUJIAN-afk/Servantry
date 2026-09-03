@@ -57,23 +57,15 @@ public class MiniRainbowCrystal extends Projectile {
                         .speed(0.5)
                         .spread(2)
                         .emit();
-                if (damageSource != null) {
-                    List<LivingEntity> entities = LyraHelper.get(owner).getTargetCache().getEntities();
+                if (damageSource instanceof MinionDamageSource minionDamageSource) {
+                    Minion minion = minionDamageSource.getMinion();
+                    List<LivingEntity> entities = LyraHelper.get(owner).getTargetCache().getEntitiesInRadius(pos, 3.5, minion::isTarget);
                     for (LivingEntity living : entities) {
-                        if (living.getBoundingBox().getCenter().distanceToSqr(pos) < 9 + living.getBoundingBox().getSize() * 0.5) {
-                            boolean isTarget = true;
-                            if (damageSource instanceof MinionDamageSource minionDamageSource) {
-                                Minion minion = minionDamageSource.getMinion();
-                                isTarget = minion.isTarget(living);
-                            }
-                            if (isTarget) {
-                                InvincibleData.attack(living)
-                                        .attacker(uuid)
-                                        .damageSource(damageSource)
-                                        .damageAmount(getDamage())
-                                        .apply();
-                            }
-                        }
+                        InvincibleData.attack(living)
+                                .attacker(uuid)
+                                .damageSource(damageSource)
+                                .damageAmount(getDamage())
+                                .apply();
                     }
                 }
             }
@@ -86,7 +78,7 @@ public class MiniRainbowCrystal extends Projectile {
         float r = 0.5f + 0.5f * (float) Math.sin(t * Math.PI * 2);
         float g = 0.5f + 0.5f * (float) Math.sin(t * Math.PI * 2 - Math.PI * 2 / 3);
         float b = 0.5f + 0.5f * (float) Math.sin(t * Math.PI * 2 - Math.PI * 4 / 3);
-        return FastColor.ARGB32.colorFromFloat(1, r, g, b);
+        return FastColor.ARGB32.color(255, (int) (r * 255), (int) (g * 255), (int) (b * 255));
     }
 
     @Override

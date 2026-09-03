@@ -10,6 +10,7 @@ import first.lyra.common.entity.PathNode;
 import first.summoner.common.minion.Twins;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.util.FastColor;
 
 public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
@@ -36,11 +37,8 @@ public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
     }
 
     @Override
-    protected void render(Twins minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Twins> context, float partialTick, float alpha) {
-        if (minion.isLaserEye()) {
-            RenderUtil.renderStandalone(SummonerModelRegister.TWINS_LASER, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
-        } else {
-            RenderUtil.renderStandalone(SummonerModelRegister.TWINS_CURSED_FLAME, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
-        }
+    protected void render(Twins minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Twins> context, float partialTick, int packedLight, float alpha) {
+        ModelResourceLocation modelKey = minion.isLaserEye() ? SummonerModelRegister.TWINS_LASER : SummonerModelRegister.TWINS_CURSED_FLAME;
+        RenderUtil.renderStandalone(modelKey, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), packedLight);
     }
 }

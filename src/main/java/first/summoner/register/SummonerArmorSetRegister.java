@@ -7,7 +7,6 @@ import first.lyra.register.LyraAttributeRegister;
 import first.lyra.register.LyraRegistries;
 import first.summoner.Summoner;
 import first.summoner.common.minion.ChlorophyteCrystal;
-import first.summoner.config.StartupConfig;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.IEventBus;
@@ -94,9 +93,8 @@ public class SummonerArmorSetRegister {
                     .modifier(LyraAttributeRegister.MinionMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
                     .onStart(player -> {
                         ChlorophyteCrystal crystal = new ChlorophyteCrystal();
-                        crystal.setDamage(StartupConfig.ChlorophyteCrystalDamage.get().floatValue());
-                        crystal.setKnockback(StartupConfig.ChlorophyteCrystalKnockback.get().floatValue());
-                        crystal.setArmorPierce(StartupConfig.ChlorophyteCrystalArmorPierce.get().floatValue());
+                        crystal.setDamage(10f);
+                        crystal.setKnockback(1f);
                         LyraHelper.get(player).add(AttachmentEntityData.Type.ExtraMinion, crystal);
                     })
                     .onRemove(player -> LyraHelper.get(player).getEntityData().remove(AttachmentEntityData.Type.ExtraMinion, SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))

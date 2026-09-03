@@ -2,7 +2,7 @@ package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * 噬神火球 - 紫色高速火球射弹，造成20tick无敌帧。
  */
-public class GodFlame extends Projectile implements ICollideAttack<GodFlame> {
+public class GodFlame extends Projectile implements IEntityCollision<GodFlame> {
 
     public GodFlame() {
         super();

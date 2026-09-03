@@ -3,7 +3,7 @@ package first.summoner.common.minion;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
 import first.summoner.common.minion.goal.MomentumMinionIdleGoal;
@@ -27,7 +27,7 @@ import java.util.List;
  * </ul>
  * </p>
  */
-public class Twins extends MomentumMinion implements ICollideAttack<Twins>, IBlockCollision<Twins> {
+public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IBlockCollision<Twins> {
 
     /**
      * 是否为激光眼（true=激光眼，false=咒焰眼）

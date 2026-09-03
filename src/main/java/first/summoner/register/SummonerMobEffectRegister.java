@@ -353,11 +353,6 @@ public class SummonerMobEffectRegister {
         public MobEffect build() {
             MobEffect effect = new MobEffect(category, color) {
                 @Override
-                public int getBlendDurationTicks() {
-                    return blendDurationTicks;
-                }
-
-                @Override
                 public boolean applyEffectTick(@NotNull LivingEntity entity, int amplifier) {
                     if (applyEffectTick != null) {
                         applyEffectTick.accept(entity, amplifier);
@@ -428,11 +423,6 @@ public class SummonerMobEffectRegister {
                         return particleFactory.apply(effect);
                     }
                     return super.createParticleOptions(effect);
-                }
-
-                @Override
-                public @NotNull FeatureFlagSet requiredFeatures() {
-                    return requiredFeatures;
                 }
 
             };

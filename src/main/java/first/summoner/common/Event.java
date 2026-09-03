@@ -2,59 +2,69 @@ package first.summoner.common;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.AttachmentEntityData;
+import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.Summoner;
+import first.summoner.common.attachment.SummonMarkData;
 import first.summoner.common.dataComponent.ScabbardContainer;
 import first.summoner.common.minion.ChlorophyteCrystal;
 import first.summoner.common.minion.StardustCell;
 import first.summoner.common.minion.VoidEater;
+import first.summoner.common.summonMark.SummonMarkType;
 import first.summoner.register.*;
 import first.summoner.utils.CuriosUtil;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.BasicItemListing;
 import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
-import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.village.VillagerTradesEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 
 import java.util.List;
+import java.util.Set;
 
 @EventBusSubscriber(modid = Summoner.MODID)
 public class Event {
 
     @SubscribeEvent
-    public static void login(PlayerEvent.PlayerLoggedInEvent event) {
+    public static void tickHandler(PlayerTickEvent.Post event) {
+        Player player = event.getEntity();
+        player.getData(SummonerAttachmentRegister.SummonMarkData).tick(player);
+    }
 
+    @SubscribeEvent
+    public static void damageHandler(LivingDamageEvent.Post event) {
+        DamageSource source = event.getSource();
+        LivingEntity target = event.getEntity();
+        if (!target.level().isClientSide() && source instanceof MinionDamageSource minionDamageSource) {
+            Minion minion = minionDamageSource.getMinion();
+            Player owner = minion.getOwner();
+            SummonMarkData summonMarkData = owner.getData(SummonerAttachmentRegister.SummonMarkData);
+            if (summonMarkData.isSummonMarkTarget(target)) {
+                Set<SummonMarkType> summonMarks = summonMarkData.getMarkTypes();
+                for (SummonMarkType summonMark : summonMarks) {
+                    summonMark.damage(summonMarkData, target, minionDamageSource, event.getNewDamage());
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -90,19 +100,6 @@ public class Event {
     }
 
     @SubscribeEvent
-    public static void onVillagerTrades(VillagerTradesEvent event) {
-        if (event.getType() == VillagerProfession.CLERIC) {
-            Int2ObjectMap<List<VillagerTrades.ItemListing>> trades = event.getTrades();
-            Item[] items = {SummonerCurioRegister.ApprenticesScarf.get(), SummonerCurioRegister.HuntressesBuckler.get(), SummonerCurioRegister.MonksBelt.get(), SummonerCurioRegister.SquiresShield.get()};
-            for (Item item : items) {
-                trades.get(1).add(new BasicItemListing(20, item.getDefaultInstance(), 8, 10));
-            }
-            trades.get(3).add(new BasicItemListing(new ItemStack(Items.EMERALD, 25), new ItemStack(Items.SKELETON_SKULL), SummonerCurioRegister.PygmyNecklace.get().getDefaultInstance(), 1, 30, 1.0f));
-            trades.get(4).add(new BasicItemListing(30, SummonerCurioRegister.HerculesBeetle.get().getDefaultInstance(), 1, 40));
-        }
-    }
-
-    @SubscribeEvent
     public static void onCurioChange(CurioChangeEvent event) {
         CuriosUtil.handler(event);
     }
@@ -119,41 +116,12 @@ public class Event {
     }
 
     @SubscribeEvent
-    public static void onLootTableLoad(LootTableLoadEvent event) {
-        LootTable table = event.getTable();
-        if (event.getName().equals(ResourceLocation.withDefaultNamespace("chests/ancient_city"))) {
-            table.addPool(LootPool.lootPool()
-                    .setRolls(ConstantValue.exactly(0.05f))
-                    .add(LootItem.lootTableItem(SummonerWeaponRegister.InfiniteScabbard.get()))
-                    .build());
-        }
-        if (event.getName().equals(ResourceLocation.withDefaultNamespace("entities/allay"))) {
-            table.addPool(LootPool.lootPool()
-                    .setRolls(ConstantValue.exactly(1f))
-                    .add(LootItem.lootTableItem(SummonerWeaponRegister.TerraPrism.get())
-                            .when(LootItemRandomChanceCondition.randomChance(0.01f)))
-                    .build());
-        }
-        if (event.getName().equals(ResourceLocation.withDefaultNamespace("entities/evoker"))) {
-            table.addPool(LootPool.lootPool()
-                    .setRolls(ConstantValue.exactly(1f))
-                    .add(LootItem.lootTableItem(SummonerCurioRegister.SummonerEmblem.get())
-                            .when(LootItemRandomChanceCondition.randomChance(0.1f)))
-                    .build());
-        }
-        if (event.getName().equals(ResourceLocation.withDefaultNamespace("entities/zombie"))) {
-            table.addPool(LootPool.lootPool()
-                    .setRolls(ConstantValue.exactly(1f))
-                    .add(LootItem.lootTableItem(SummonerItemRegister.BlackLens.get())
-                            .when(LootItemRandomChanceCondition.randomChance(0.01f)))
-                    .build());
-        }
-    }
-
-    @SubscribeEvent
     public static void onLivingDamageEventPostFromMinion(LivingDamageEvent.Post event) {
         DamageSource damageSource = event.getSource();
         LivingEntity target = event.getEntity();
+        if (!target.level().isClientSide() && target.getType() == EntityType.WARDEN) {
+            target.heal(target.getMaxHealth());
+        }
         if (!target.level().isClientSide() && target instanceof Player player) {
             if (SummonerArmorSetRegister.ValhallaKnight.get().full(player)) {
                 player.addEffect(new MobEffectInstance(SummonerMobEffectRegister.BallistaPanicked, 100));

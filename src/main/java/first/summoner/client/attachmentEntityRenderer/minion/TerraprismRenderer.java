@@ -13,11 +13,6 @@ import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.FastColor;
 
-/**
- * 泰拉棱镜渲染器。
- * <p>
- * 使用丝带拖尾，渲染带色调渐变的棱镜模型。
- */
 public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terraprism> {
 
     @Override
@@ -27,7 +22,7 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
                                .timer(minion.attacking ? minion.trailTimer : 0)
                                .colorRGB(minion.getColor(partialTick))
                                .segmentsPerNode(4)
-                               .historyLength(5)
+                               .historyLength(6)
                                .upOffset(1.015f))
                 .model(new ModelConfig<Terraprism>()
                                .scale(1.5f)
@@ -37,12 +32,9 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
     }
 
     @Override
-    protected void render(Terraprism terraprism, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Terraprism> context, float partialTick, float alpha) {
+    protected void render(Terraprism terraprism, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Terraprism> context, float partialTick, int packedLight, float alpha) {
         int color = terraprism.getColor(partialTick);
-        int red = FastColor.ARGB32.red(color);
-        int green = FastColor.ARGB32.green(color);
-        int blue = FastColor.ARGB32.blue(color);
-        RenderUtil.renderStandalone(SummonerModelRegister.TERRAPRISM, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), red, green, blue), RenderUtil.FULL_LIGHT);
+        RenderUtil.renderStandalone(SummonerModelRegister.TERRAPRISM, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), FastColor.ARGB32.red(color), FastColor.ARGB32.green(color), FastColor.ARGB32.blue(color)), RenderUtil.FULL_LIGHT);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

@@ -3,7 +3,6 @@ package first.summoner.register;
 import com.google.common.collect.ImmutableMultimap;
 import first.lyra.client.creativeTab.AnimBanner;
 import first.lyra.common.creativeTab.Section;
-import first.lyra.common.damageInfo.IDamageSourceCritical;
 import first.lyra.register.LyraAttributeRegister;
 import first.lyra.register.LyraItemRegisterBuilder;
 import first.summoner.Summoner;
@@ -11,6 +10,7 @@ import first.summoner.common.item.CurioItem;
 import first.summoner.common.projectile.MiniStardustCell;
 import first.summoner.utils.CuriosUtil;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -18,6 +18,10 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.registries.DeferredItem;
 
@@ -33,9 +37,9 @@ public class SummonerCurioRegister {
     /**
      * 蜂巢背包
      */
-    public static final DeferredItem<CurioItem> HivePack = LyraItemRegisterBuilder.build(ITEMS, "hive_pack", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> HivePack = LyraItemRegisterBuilder.build(ITEMS, "hive_pack", (location) -> CurioItem.builder()
                     .properties(properties -> properties.rarity(Rarity.EPIC))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Hive Pack", "蜂巢背包")
             .itemLanguageTooltip(1, "Increased power of hornet", "增加黄蜂的力量")
@@ -45,14 +49,14 @@ public class SummonerCurioRegister {
     /**
      * 矮人项链 - 仆从栏+1
      */
-    public static final DeferredItem<CurioItem> PygmyNecklace = LyraItemRegisterBuilder.build(ITEMS, "pygmy_necklace", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> PygmyNecklace = LyraItemRegisterBuilder.build(ITEMS, "pygmy_necklace", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(LyraAttributeRegister.MinionMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Pygmy Necklace", "矮人项链")
             .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
@@ -62,7 +66,7 @@ public class SummonerCurioRegister {
     /**
      * 大力士甲虫 - 仆从栏+1，召唤击退+50%
      */
-    public static final DeferredItem<CurioItem> HerculesBeetle = LyraItemRegisterBuilder.build(ITEMS, "hercules_beetle", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> HerculesBeetle = LyraItemRegisterBuilder.build(ITEMS, "hercules_beetle", (location) -> CurioItem.builder()
                     
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
@@ -71,7 +75,7 @@ public class SummonerCurioRegister {
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.RARE))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Hercules Beetle", "大力士甲虫")
             .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
@@ -81,7 +85,7 @@ public class SummonerCurioRegister {
     /**
      * 学徒围巾 - 仆从数量+1，召唤伤害+10%
      */
-    public static final DeferredItem<CurioItem> ApprenticesScarf = LyraItemRegisterBuilder.build(ITEMS, "apprentices_scarf", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> ApprenticesScarf = LyraItemRegisterBuilder.build(ITEMS, "apprentices_scarf", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(LyraAttributeRegister.SentryMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
@@ -89,7 +93,7 @@ public class SummonerCurioRegister {
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Apprentice's Scarf", "学徒围巾")
             .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
@@ -99,7 +103,7 @@ public class SummonerCurioRegister {
     /**
      * 女猎人圆盾 - 护甲+2，仆从数量+1
      */
-    public static final DeferredItem<CurioItem> HuntressesBuckler = LyraItemRegisterBuilder.build(ITEMS, "huntresses_buckler", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> HuntressesBuckler = LyraItemRegisterBuilder.build(ITEMS, "huntresses_buckler", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(Attributes.ARMOR, new AttributeModifier(id, 2, AttributeModifier.Operation.ADD_VALUE));
@@ -107,7 +111,7 @@ public class SummonerCurioRegister {
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Huntress's Buckler", "女猎人圆盾")
             .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
@@ -117,14 +121,14 @@ public class SummonerCurioRegister {
     /**
      * 武僧腰带 - 召唤伤害+10%，召唤击退+50%
      */
-    public static final DeferredItem<CurioItem> MonksBelt = LyraItemRegisterBuilder.build(ITEMS, "monks_belt", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> MonksBelt = LyraItemRegisterBuilder.build(ITEMS, "monks_belt", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(LyraAttributeRegister.SummonDamage, new AttributeModifier(id, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
                         builder.put(LyraAttributeRegister.SummonKnockback, new AttributeModifier(id, 0.5, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
                         return builder.build();
                     })
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Monk's Belt", "武僧腰带")
             .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
@@ -134,7 +138,7 @@ public class SummonerCurioRegister {
     /**
      * 侍卫护盾 - 护甲+2，召唤伤害+10%
      */
-    public static final DeferredItem<CurioItem> SquiresShield = LyraItemRegisterBuilder.build(ITEMS, "squires_shield", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> SquiresShield = LyraItemRegisterBuilder.build(ITEMS, "squires_shield", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(Attributes.ARMOR, new AttributeModifier(id, 2, AttributeModifier.Operation.ADD_VALUE));
@@ -142,7 +146,7 @@ public class SummonerCurioRegister {
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Squire's Shield", "侍卫护盾")
             .jeiInfo(1, "Occasionally sold by Clerics", "牧师偶尔出售")
@@ -152,24 +156,29 @@ public class SummonerCurioRegister {
     /**
      * 召唤师徽章 - 召唤伤害+15%
      */
-    public static final DeferredItem<CurioItem> SummonerEmblem = LyraItemRegisterBuilder.build(ITEMS, "summoner_emblem", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> SummonerEmblem = LyraItemRegisterBuilder.build(ITEMS, "summoner_emblem", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(LyraAttributeRegister.SummonDamage, new AttributeModifier(id, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Summoner Emblem", "召唤师徽章")
             .jeiInfo(1, "Occasionally drops from Evokers", "唤魔者偶尔掉落")
+            .lootTable(ResourceLocation.withDefaultNamespace("entities/evoker"), () -> LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1f))
+                    .add(LootItem.lootTableItem(SummonerCurioRegister.SummonerEmblem.get())
+                            .when(LootItemRandomChanceCondition.randomChance(0.1f)))
+                    .build())
             .itemModel(LyraItemRegisterBuilder::basicModel)
             .itemTag(SummonerItemTagsRegister.Curio)
             .build();
     /**
      * 始源暗影焰
      */
-    public static final DeferredItem<CurioItem> PrimordialShadowflame = LyraItemRegisterBuilder.build(ITEMS, "primordial_shadowflame", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> PrimordialShadowflame = LyraItemRegisterBuilder.build(ITEMS, "primordial_shadowflame", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(LyraAttributeRegister.MinionMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
@@ -177,7 +186,7 @@ public class SummonerCurioRegister {
                     })
                     .onPostDamage((minion, owner, target, damageSource) -> target.addEffect(new MobEffectInstance(SummonerMobEffectRegister.Shadowflame, 60, 0)))
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Primordial Shadowflame", "始源暗影焰")
             .itemLanguageTooltip(1, "Minions inflict shadowflame on attack", "仆从攻击施加暗影焰")
@@ -187,7 +196,7 @@ public class SummonerCurioRegister {
     /**
      * 死灵卷轴 - 仆从栏+1，召唤伤害+10%
      */
-    public static final DeferredItem<CurioItem> NecromanticScroll = LyraItemRegisterBuilder.build(ITEMS, "necromantic_scroll", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> NecromanticScroll = LyraItemRegisterBuilder.build(ITEMS, "necromantic_scroll", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(LyraAttributeRegister.MinionMaxCount, new AttributeModifier(id, 1, AttributeModifier.Operation.ADD_VALUE));
@@ -195,7 +204,7 @@ public class SummonerCurioRegister {
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Necromantic Scroll", "死灵卷轴")
             .itemModel(LyraItemRegisterBuilder::basicModel)
@@ -204,14 +213,14 @@ public class SummonerCurioRegister {
     /**
      * 威胁分析仪 - 加大仆从的索敌半径
      */
-    public static final DeferredItem<CurioItem> ThreatAnalyzer = LyraItemRegisterBuilder.build(ITEMS, "threat_analyzer", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> ThreatAnalyzer = LyraItemRegisterBuilder.build(ITEMS, "threat_analyzer", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(LyraAttributeRegister.SummonSearchRange, new AttributeModifier(id, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Threat Analyzer", "威胁分析仪")
             .itemModel(LyraItemRegisterBuilder::basicModel)
@@ -220,7 +229,7 @@ public class SummonerCurioRegister {
     /**
      * 甲虫莎草纸 - 仆从栏+2，召唤伤害+15%，召唤击退+50%
      */
-    public static final DeferredItem<CurioItem> PapyrusScarab = LyraItemRegisterBuilder.build(ITEMS, "papyrus_scarab", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> PapyrusScarab = LyraItemRegisterBuilder.build(ITEMS, "papyrus_scarab", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(LyraAttributeRegister.MinionMaxCount, new AttributeModifier(id, 2, AttributeModifier.Operation.ADD_VALUE));
@@ -229,36 +238,16 @@ public class SummonerCurioRegister {
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Papyrus Scarab", "甲虫莎草纸")
             .itemModel(LyraItemRegisterBuilder::basicModel)
             .itemTag(SummonerItemTagsRegister.Curio)
             .build();
     /**
-     * 万花筒
-     */
-    public static final DeferredItem<CurioItem> Kaleidoscope = LyraItemRegisterBuilder.build(ITEMS, "kaleidoscope", () -> CurioItem.builder()
-                    .onPreDamage((minion, owner, target, damage, damageSource) -> {
-                        RandomSource random = owner.getRandom();
-                        if (random.nextFloat() < 0.1f) {
-                            ((IDamageSourceCritical) damageSource).lyra$setCritical(true);
-                            return damage * 2f;
-                        }
-                        return damage;
-                    })
-                    .properties(properties -> properties.rarity(Rarity.EPIC))
-                    .build())
-            .itemTag(SummonerItemTagsRegister.SectionAccessory)
-            .itemLanguage("Kaleidoscope", "万花筒")
-            .itemLanguageTooltip(1, "Minion attacks have a 10% chance to critically strike", "仆从攻击时有 10% 概率造成暴击")
-            .itemModel(LyraItemRegisterBuilder::basicModel)
-            .itemTag(SummonerItemTagsRegister.Curio)
-            .build();
-    /**
      * 灵魂浮雕 - 仆从攻击后随机获得灵魂增益（下位互斥）
      */
-    public static final DeferredItem<CurioItem> SoulRelief = LyraItemRegisterBuilder.build(ITEMS, "soul_relief", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> SoulRelief = LyraItemRegisterBuilder.build(ITEMS, "soul_relief", (location) -> CurioItem.builder()
                     .onPostDamage((minion, owner, target, damageSource) -> {
                         if (!CuriosUtil.isEquipped(owner, SummonerCurioRegister.HallowedRune.get()) && !CuriosUtil.isEquipped(owner, SummonerCurioRegister.PhantasmalRelic.get())) {
                             List<Holder<MobEffect>> effects = new ArrayList<>();
@@ -270,7 +259,7 @@ public class SummonerCurioRegister {
                         }
                     })
                     .properties(properties -> properties.rarity(Rarity.UNCOMMON))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Soul Relief", "灵魂浮雕")
             .itemLanguageTooltip(1, "Minion attacks grant a random soul boon", "仆从攻击会使你获得一个随机灵魂增益")
@@ -283,7 +272,7 @@ public class SummonerCurioRegister {
     /**
      * 神圣符文 - 仆从攻击后随机获得神圣增益（中位互斥）
      */
-    public static final DeferredItem<CurioItem> HallowedRune = LyraItemRegisterBuilder.build(ITEMS, "hallowed_rune", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> HallowedRune = LyraItemRegisterBuilder.build(ITEMS, "hallowed_rune", (location) -> CurioItem.builder()
                     .onPostDamage((minion, owner, target, damageSource) -> {
                         if (!CuriosUtil.isEquipped(owner, SummonerCurioRegister.PhantasmalRelic.get())) {
                             List<Holder<MobEffect>> effects = new ArrayList<>();
@@ -295,7 +284,7 @@ public class SummonerCurioRegister {
                         }
                     })
                     .properties(properties -> properties.rarity(Rarity.RARE))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Hallowed Rune", "神圣符文")
             .itemLanguageTooltip(1, "Minion attacks grant a random hallowed boon", "仆从攻击会使你获得一个随机神圣增益")
@@ -309,7 +298,7 @@ public class SummonerCurioRegister {
     /**
      * 幻魂神物 - 仆从攻击后随机获得幻魂增益（上位）
      */
-    public static final DeferredItem<CurioItem> PhantasmalRelic = LyraItemRegisterBuilder.build(ITEMS, "phantasmal_relic", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> PhantasmalRelic = LyraItemRegisterBuilder.build(ITEMS, "phantasmal_relic", (location) -> CurioItem.builder()
                     .onPostDamage((minion, owner, target, damageSource) -> {
                         List<Holder<MobEffect>> effects = new ArrayList<>();
                         effects.add(SummonerMobEffectRegister.PhantasmalMight);
@@ -319,7 +308,7 @@ public class SummonerCurioRegister {
                         owner.addEffect(new MobEffectInstance(effects.get(random.nextInt(effects.size())), 60));
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Phantasmal Relic", "幻魂神物")
             .itemLanguageTooltip(1, "Minion attacks grant a random phantasmal boon", "仆从攻击会使你获得一个随机幻魂增益")
@@ -333,14 +322,14 @@ public class SummonerCurioRegister {
     /**
      * 猎魂徽记
      */
-    public static final DeferredItem<CurioItem> HuntSoulEmblem = LyraItemRegisterBuilder.build(ITEMS, "hunt_soul_emblem", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> HuntSoulEmblem = LyraItemRegisterBuilder.build(ITEMS, "hunt_soul_emblem", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(LyraAttributeRegister.SummonDamage, new AttributeModifier(id, 0.25, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Hunt Soul Emblem", "猎魂徽记")
             .itemModel(LyraItemRegisterBuilder::basicModel)
@@ -349,7 +338,7 @@ public class SummonerCurioRegister {
     /**
      * 蚀日尊戒
      */
-    public static final DeferredItem<CurioItem> EclipseRing = LyraItemRegisterBuilder.build(ITEMS, "eclipse_ring", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> EclipseRing = LyraItemRegisterBuilder.build(ITEMS, "eclipse_ring", (location) -> CurioItem.builder()
                     .attributeModifiers((slotContext, id, stack) -> {
                         ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
                         builder.put(LyraAttributeRegister.SummonDamage, new AttributeModifier(id, 0.12, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
@@ -362,7 +351,7 @@ public class SummonerCurioRegister {
                         return builder.build();
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Eclipse Ring", "蚀日尊戒")
             .itemLanguageTooltip(1, "Contains the power of the solar eclipse", "蕴含着日蚀之阴的力量")
@@ -372,7 +361,7 @@ public class SummonerCurioRegister {
     /**
      * 星尘碎片 - 仆从攻击时5%概率产生星尘细胞射弹
      */
-    public static final DeferredItem<CurioItem> StardustFragment = LyraItemRegisterBuilder.build(ITEMS, "stardust_fragment", () -> CurioItem.builder()
+    public static final DeferredItem<CurioItem> StardustFragment = LyraItemRegisterBuilder.build(ITEMS, "stardust_fragment", (location) -> CurioItem.builder()
                     .onPostDamage((minion, owner, target, damageSource) -> {
                         if (owner.getRandom().nextFloat() < 0.05f) {
                             Vec3 startPos = minion.getPos();
@@ -386,7 +375,7 @@ public class SummonerCurioRegister {
                         }
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))
-                    .build())
+                    .build(location))
             .itemTag(SummonerItemTagsRegister.SectionAccessory)
             .itemLanguage("Stardust Fragment", "星尘碎片")
             .itemLanguageTooltip(1, "Minion hits have a 5% chance to release a Stardust Cell", "仆从攻击时有 5% 概率释放星尘细胞")

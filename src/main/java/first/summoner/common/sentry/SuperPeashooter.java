@@ -8,7 +8,6 @@ import first.lyra.common.sound.Playable;
 import first.summoner.common.projectile.BlitzBall;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerSoundRegister;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -24,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SuperPeashooter extends MomentumMinion implements IBlockCollision<SuperPeashooter> {
 
-    private int level = 1;
     private int aiming = 0;
     private int cooldown = 0;
     /** 当前射击任务，运行中非 null，结束后自动置 null。射击期间不推进冷却 */
@@ -86,24 +84,6 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
             Vec3 v = getVelocity();
             setVelocity(new Vec3(v.x(), 0, v.z()));
         }
-    }
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(level);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        level = buf.readInt();
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
     }
 
     @Override

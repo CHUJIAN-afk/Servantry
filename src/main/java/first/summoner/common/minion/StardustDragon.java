@@ -3,9 +3,8 @@ package first.summoner.common.minion;
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.AttachmentEntityData;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -22,7 +21,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,7 +30,7 @@ import java.util.List;
  * 首次召唤创建多个体节，重复召唤可增加体节数量。
  * </p>
  */
-public class StardustDragon extends MomentumMinion implements ICollideAttack<StardustDragon> {
+public class StardustDragon extends MomentumMinion implements IEntityCollision<StardustDragon> {
 
     /** 当前体节索引 */
     private int segmentIndex = 0;
@@ -57,21 +55,7 @@ public class StardustDragon extends MomentumMinion implements ICollideAttack<Sta
     @Override
     public LivingEntity searchTarget() {
         if (isHead()) {
-            LyraHelper helper = LyraHelper.get(owner);
-            TargetCache targetCache = helper.getTargetCache();
-            if (!targetCache.isEmpty()) {
-                float searchRange = targetCache.getSummonSearchRange(this.getOwner(), this.getSearchDistance());
-                List<LivingEntity> targets = new ArrayList<>();
-                List<LivingEntity> entities = targetCache.getEntities();
-                for (LivingEntity living : entities) {
-                    if (targetCache.getDistance(owner, living) < searchRange) {
-                        if (isTarget(living)) {
-                            targets.add(living);
-                        }
-                    }
-                }
-                return targetCache.getNewTarget(this, targets, 0, true);
-            }
+            return super.searchTarget();
         }
         return null;
     }

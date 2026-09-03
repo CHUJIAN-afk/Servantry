@@ -16,12 +16,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CrossbowBolt extends Projectile implements IBlockCollision<CrossbowBolt>, ICollideAttack<CrossbowBolt> {
+public class CrossbowBolt extends Projectile implements IBlockCollision<CrossbowBolt>, IEntityCollision<CrossbowBolt> {
 
     private int maxPierceCount = 3;
     public final Set<LivingEntity> hitTargets = new HashSet<>();
 
     public CrossbowBolt() {
+
     }
 
     public CrossbowBolt(DamageSource damageSource, Vec3 startPos, Vec3 direction) {

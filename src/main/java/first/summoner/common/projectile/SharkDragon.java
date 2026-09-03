@@ -3,7 +3,7 @@ package first.summoner.common.projectile;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
-public class SharkDragon extends Projectile implements ICollideAttack<SharkDragon>, IBlockCollision<SharkDragon> {
+public class SharkDragon extends Projectile implements IEntityCollision<SharkDragon>, IBlockCollision<SharkDragon> {
 
     public SharkDragon() {
         super();

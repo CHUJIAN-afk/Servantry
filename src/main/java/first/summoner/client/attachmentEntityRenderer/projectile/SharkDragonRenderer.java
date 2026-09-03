@@ -9,6 +9,7 @@ import first.lyra.common.entity.PathNode;
 import first.summoner.common.projectile.SharkDragon;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.util.FastColor;
 
 public class SharkDragonRenderer extends AbstractAttachmentEntityRenderer<SharkDragon> {
@@ -24,11 +25,8 @@ public class SharkDragonRenderer extends AbstractAttachmentEntityRenderer<SharkD
     }
 
     @Override
-    protected void render(SharkDragon entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<SharkDragon> context, float partialTick, float alpha) {
-        if (entity.getTickCount() % 20 < 10) {
-            RenderUtil.renderStandalone(SummonerModelRegister.SHARK_OPEN, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
-        } else {
-            RenderUtil.renderStandalone(SummonerModelRegister.SHARK_CLOSE, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
-        }
+    protected void render(SharkDragon entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<SharkDragon> context, float partialTick, int packedLight, float alpha) {
+        ModelResourceLocation modelKey = entity.getTickCount() % 20 < 10 ? SummonerModelRegister.SHARK_OPEN : SummonerModelRegister.SHARK_CLOSE;
+        RenderUtil.renderStandalone(modelKey, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), packedLight);
     }
 }

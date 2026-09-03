@@ -5,10 +5,12 @@ import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -85,10 +87,23 @@ public class OreScout extends Minion {
         return null;
     }
 
+    private static final TagKey<Block>[] ORE_TAGS = new TagKey[]{
+            BlockTags.COAL_ORES,
+            BlockTags.COPPER_ORES,
+            BlockTags.DIAMOND_ORES,
+            BlockTags.EMERALD_ORES,
+            BlockTags.GOLD_ORES,
+            BlockTags.IRON_ORES,
+            BlockTags.LAPIS_ORES,
+            BlockTags.REDSTONE_ORES
+    };
+
     private boolean isOre(BlockState state) {
-        return state.getTags().map(TagKey::location).anyMatch(location -> {
-            String path = location.getPath();
-            return path.equals("ores") || path.startsWith("ores/") || path.endsWith("/ores") || path.contains("/ores/") || path.endsWith("_ores") || path.endsWith("_ore");
-        });
+        for (TagKey<Block> tag : ORE_TAGS) {
+            if (state.is(tag)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

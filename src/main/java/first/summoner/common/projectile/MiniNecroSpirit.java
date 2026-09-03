@@ -5,7 +5,7 @@ import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -20,14 +20,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 死魂灵射弹 - 跟踪目标飞行，可穿透方块，只命中追踪目标。
  * 命中时造成三次伤害：100%/50%/50%，对追踪目标伤害×1.25。
  */
-public class MiniNecroSpirit extends Projectile implements ICollideAttack<MiniNecroSpirit> {
+public class MiniNecroSpirit extends Projectile implements IEntityCollision<MiniNecroSpirit> {
 
     /** 追踪目标的UUID */
     private LivingEntity trackingTarget;
@@ -82,15 +81,7 @@ public class MiniNecroSpirit extends Projectile implements ICollideAttack<MiniNe
             Minion minion = minionDamageSource.getMinion();
             LyraHelper summonerHelper = LyraHelper.get(owner);
             TargetCache targetCache = summonerHelper.getTargetCache();
-            List<LivingEntity> entities = targetCache.getEntities();
-            List<LivingEntity> mainTargets = new ArrayList<>();
-            for (LivingEntity living : entities) {
-                if (minion.isTarget(living)){
-                    if (getPos().distanceToSqr(living.getBoundingBox().getCenter()) < 9) {
-                        mainTargets.add(living);
-                    }
-                }
-            }
+            List<LivingEntity> mainTargets = targetCache.getEntitiesInRadius(getPos(), 3, minion::isTarget);
             for (LivingEntity living : mainTargets) {
                 float amount = getDamage();
                 if (living == trackingTarget) {
@@ -111,14 +102,14 @@ public class MiniNecroSpirit extends Projectile implements ICollideAttack<MiniNe
                         .damageSource(source)
                         .damageAmount(amount * 0.5f)
                         .apply();
-                for (LivingEntity entity : entities) {
-                    if (entity == living || (living.distanceToSqr(entity) < 4 && minion.isTarget(living))) {
-                        InvincibleData.attack(living)
-                                .attacker(getUuid())
-                                .damageSource(source)
-                                .damageAmount(amount * 1.75f)
-                                .apply();
-                    }
+                List<LivingEntity> splashTargets = targetCache.getEntitiesInRadius(living.position(), 2,
+                        entity -> entity == living || minion.isTarget(entity));
+                for (LivingEntity entity : splashTargets) {
+                    InvincibleData.attack(living)
+                            .attacker(getUuid())
+                            .damageSource(source)
+                            .damageAmount(amount * 1.75f)
+                            .apply();
                 }
             }
             // 命中粒子效果

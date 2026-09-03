@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class DemonFlame extends Projectile implements ICollideAttack<DemonFlame>, IBlockCollision<DemonFlame> {
+public class DemonFlame extends Projectile implements IEntityCollision<DemonFlame>, IBlockCollision<DemonFlame> {
 
     public DemonFlame() {
         super();

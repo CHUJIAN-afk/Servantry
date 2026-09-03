@@ -101,6 +101,27 @@ public class SummonerAttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<LaserMinigun>> LASER_MINIGUN =
             register("laser_minigun", LaserMinigun::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<LightningAura>> LIGHTNING_AURA =
+            register("lightning_aura", LightningAura::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Barnacle>> BARNACLE =
+            register("barnacle", Barnacle::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EyeLaserTurret>> EYE_LASER_TURRET =
+            register("eye_laser_turret", EyeLaserTurret::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Hydra>> HYDRA =
+            register("hydra", Hydra::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Inferno>> INFERNO =
+            register("inferno", Inferno::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<BloodBat>> BLOOD_BAT =
+            register("blood_bat", BloodBat::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<RuinRelic>> RUIN_RELIC =
+            register("ruin_relic", RuinRelic::new);
+
     // ===================== 射弹类型 =====================
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniStardustCell>> MINI_STARDUST_CELL =
@@ -160,9 +181,26 @@ public class SummonerAttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ElectricLaser>> ELECTRIC_LASER =
             register("electric_laser", ElectricLaser::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Meteor>> METEOR =
+            register("meteor", Meteor::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Petal>> PETAL =
+            register("petal", Petal::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<PoisonSaliva>> POISON_SALIVA =
+            register("poison_saliva", PoisonSaliva::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<FrostBolt>> FROST_BOLT =
+            register("frost_bolt", FrostBolt::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ExplosionFlameBall>> EXPLOSION_FLAME_BALL =
+            register("explosion_flame_ball", ExplosionFlameBall::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ForbiddenOrb>> FORBIDDEN_ORB =
+            register("forbidden_orb", ForbiddenOrb::new);
+
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
-        AttachmentEntityType<T> type = new AttachmentEntityType<>(supplier);
-        return Register.register(name, () -> type);
+        return Register.register(name, ResourceLocation -> new AttachmentEntityType<>(ResourceLocation, supplier));
     }
 
     public static void register(IEventBus eventBus) {

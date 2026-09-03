@@ -1,6 +1,5 @@
 {
   "values": [
-    "summoner:summon_contract",
     "summoner:hornet_staff",
     "summoner:imp_staff",
     "summoner:survey_drone_remote",
@@ -16,6 +15,9 @@
     "summoner:ballista_rod",
     "summoner:ballista_cane",
     "summoner:ballista_staff",
+    "summoner:lightning_aura_rod",
+    "summoner:lightning_aura_cane",
+    "summoner:lightning_aura_staff",
     "summoner:ethereal_stellar_core_staff",
     "summoner:stardust_cell_staff",
     "summoner:stardust_dragon_staff",
@@ -26,6 +28,14 @@
     "summoner:thundercloud_bonsai",
     "summoner:corn_cannon",
     "summoner:necro_spirit_staff",
-    "summoner:laser_minigun"
+    "summoner:laser_minigun",
+    "summoner:barnacle_staff",
+    "summoner:eye_laser_turret_staff",
+    "summoner:hydra_staff",
+    "summoner:inferno_rod",
+    "summoner:inferno_cane",
+    "summoner:inferno_staff",
+    "summoner:sanguine_staff",
+    "summoner:ruin_staff"
   ]
 }

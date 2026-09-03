@@ -23,9 +23,14 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 天顶剑。
+ * <p>
+ * 1.21.1: SwordItem + Tier（26.2 的 ToolMaterial/Weapon 组件在 1.21.1 无对应物）。
+ * </p>
+ */
 public class ZenithItem extends SwordItem {
 
     public ZenithItem(Tier tier, Properties properties) {
@@ -69,33 +74,25 @@ public class ZenithItem extends SwordItem {
     }
 
     /**
-     * 收集玩家视线前方8格内距离视线向量不足8格的敌人，以及玩家周围4格的敌人。
+     * 收集玩家周围/视线内的敌人（走 TargetCache 空间分组）。
      */
     private List<LivingEntity> collectTargets(Player player) {
-        List<LivingEntity> result = new ArrayList<>();
         TargetCache cache = player.getData(LyraAttachmentRegister.TargetCache);
 
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookDir = player.getLookAngle().normalize();
         Vec3 lookEnd = eyePos.add(lookDir.scale(8));
 
-        for (LivingEntity entity : cache.getEntities()) {
-            Vec3 entityPos = entity.getBoundingBox().getCenter();
-            double distToPlayer = entityPos.distanceTo(eyePos);
-
-            // 玩家周围4格
-            if (distToPlayer <= 8) {
-                result.add(entity);
-                continue;
+        // 以视线终点为中心，半径 16 的球覆盖“玩家周围8格”和“视线8格内偏离≤8”的所有候选，再用断言精确过滤
+        return cache.getEntitiesInRadius(lookEnd, 16, entity -> {
+            if (cache.getDistance(player, entity) <= 4) {
+                return true;
             }
-
+            Vec3 entityPos = entity.getBoundingBox().getCenter();
             // 视线前方：到视线向量的距离不足8格，且在视线前方
             double distToLine = distanceToLineSegment(eyePos, lookEnd, entityPos);
-            if (distToLine <= 8 && entityPos.subtract(eyePos).dot(lookDir) > 0) {
-                result.add(entity);
-            }
-        }
-        return result;
+            return distToLine <= 8 && entityPos.subtract(eyePos).dot(lookDir) > 0;
+        });
     }
 
     /**
@@ -106,7 +103,7 @@ public class ZenithItem extends SwordItem {
         double lineLenSq = line.lengthSqr();
         if (lineLenSq < 1e-5) return point.distanceTo(lineStart);
 
-        double t = Math.max(0, Math.min(1, point.subtract(lineStart).dot(line) / lineLenSq));
+        double t = Math.clamp(point.subtract(lineStart).dot(line) / lineLenSq, 0, 1);
         Vec3 projection = lineStart.add(line.scale(t));
         return point.distanceTo(projection);
     }

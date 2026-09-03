@@ -32,7 +32,7 @@ public class EtherealStellarCore extends Minion {
             if (getShootCooldown() <= 0 && isTarget(target)) {
                 shootTarget(target);
             }
-            currentPathNode = getInterpolatedIdleState(1f);
+            setCurrentPathNode(getInterpolatedIdleState(1f));
         }
         super.tick();
     }

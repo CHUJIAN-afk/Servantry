@@ -3,7 +3,7 @@ package first.summoner.common.projectile;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
@@ -22,7 +22,7 @@ import java.util.UUID;
  * 电能激光射弹 - 高速直线飞行的蓝色激光束。
  * 继承Laser的物理特性，颜色改为蓝色，无着火效果。
  */
-public class ElectricLaser extends Projectile implements ICollideAttack<ElectricLaser>, IBlockCollision<ElectricLaser> {
+public class ElectricLaser extends Projectile implements IEntityCollision<ElectricLaser>, IBlockCollision<ElectricLaser> {
 
     public ElectricLaser() {
         super();
@@ -62,7 +62,7 @@ public class ElectricLaser extends Projectile implements ICollideAttack<Electric
             Minion minion = minionDamageSource.getMinion();
             return minion.isTarget(target);
         }
-        return ICollideAttack.super.isValidCollisionTarget(entity, target);
+        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override

@@ -3,7 +3,7 @@ package first.summoner.common.sentry;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.ICollideAttack;
+import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionDamageSource;
@@ -99,16 +99,15 @@ public class MoonPortal extends Minion {
             float pYaw = laserProjectile.getCurrentPathNode().yaw();
             float pPitch = laserProjectile.getCurrentPathNode().pitch();
             Vec3 dir = Vec3.directionFromRotation(pPitch, pYaw);
-            Vec3 end = pos.add(dir.scale(32));
+            Vec3 end = pos.add(dir.scale(Math.max(pos.distanceTo(target.getBoundingBox().getCenter()),  32)));
             HitResult hit = owner.level().clip(new ClipContext(pos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner));
             Vec3 hitPos = hit.getType() != HitResult.Type.MISS ? hit.getLocation() : end;
             laserProjectile.setHitbox(pos, hitPos, 0.15f);
             Vec3 direction = hitPos.offsetRandom(owner.getRandom(), 2).subtract(hitPos).normalize();
-            GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
-                             .centerColor(0x00fdd6)
-                             .edgeColor(0x00d4b0);
             ParticleHelper.create(owner.level())
-                    .generic(genericParticleBuilder
+                    .generic(GenericParticleBuilder.create()
+                                     .centerColor(0x00fdd6)
+                                     .edgeColor(0x00d4b0)
                                      .lifetime(5)
                                      .lifetimeRandom(5)
                                      .spin(0.1f)
@@ -129,7 +128,7 @@ public class MoonPortal extends Minion {
         projectile.setHitConsumer((laser, hitContexts) -> {
             DamageSource source = getDamageSource();
             if (source != null) {
-                for (ICollideAttack.HitContext hitContext : hitContexts) {
+                for (IEntityCollision.HitContext hitContext : hitContexts) {
                     LivingEntity living = hitContext.entity();
                     InvincibleData.attack(living)
                             .attacker(laser.getUuid())

@@ -43,7 +43,7 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
     }
 
     @Override
-    protected void render(StardustCell minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> context, float partialTick, float alpha) {
+    protected void render(StardustCell minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustCell> context, float partialTick, int packedLight, float alpha) {
         if (context.hasTrail() && !Minecraft.getInstance().isPaused()) {
             int trailTimer = minion.getTrailTimer();
             ParticleHelper.create(minion.getOwner().level())

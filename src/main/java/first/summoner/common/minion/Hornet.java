@@ -80,10 +80,11 @@ public class Hornet extends MomentumMinion implements IBlockCollision<Hornet> {
      */
     public int getStingerCooldown() {
         RandomSource random = owner.getRandom();
+        int cooldown = 13 + random.nextIntBetweenInclusive(0, 4);
         if (CuriosUtil.isEquipped(owner, SummonerCurioRegister.HivePack.get())) {
-            return 11 + random.nextIntBetweenInclusive(0, 2);
+            cooldown = (int) (cooldown * 0.67);
         }
-        return 13 + random.nextIntBetweenInclusive(0, 4);
+        return cooldown;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.minion.Minion;
@@ -39,26 +40,19 @@ public class BlitzBall extends Projectile {
     @Override
     public void tick() {
         Level level = owner.level();
-        if (!level.isClientSide() && damageSource != null) {
+        if (!level.isClientSide() && damageSource instanceof MinionDamageSource minionDamageSource) {
             idList.clear();
-            List<LivingEntity> entities = owner.getData(LyraAttachmentRegister.TargetCache).getEntities();
+            TargetCache targetCache = owner.getData(LyraAttachmentRegister.TargetCache);
+            Minion minion = minionDamageSource.getMinion();
+            List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 3, minion::isTarget);
             for (LivingEntity living : entities) {
-                if (living.getBoundingBox().getCenter().distanceToSqr(getPos()) < 9 + living.getBoundingBox().getSize() * 0.5) {
-                    boolean isTarget = true;
-                    if (damageSource instanceof MinionDamageSource minionDamageSource) {
-                        Minion minion = minionDamageSource.getMinion();
-                        isTarget = minion.isTarget(living);
-                    }
-                    if (isTarget) {
-                        idList.add(living.getId());
-                        InvincibleData.attack(living)
-                                .attacker(getUuid())
-                                .damageSource(damageSource)
-                                .damageAmount(getDamage())
-                                .invincibleTime(3)
-                                .apply();
-                    }
-                }
+                idList.add(living.getId());
+                InvincibleData.attack(living)
+                        .attacker(getUuid())
+                        .damageSource(damageSource)
+                        .damageAmount(getDamage())
+                        .invincibleTime(3)
+                        .apply();
             }
         }
         if (level.isClientSide()){

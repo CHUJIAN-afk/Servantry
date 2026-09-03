@@ -9,7 +9,6 @@ import first.lyra.client.render.trail.RibbonTrailConfig;
 import first.lyra.client.render.trail.TrailConfig;
 import first.lyra.common.entity.PathNode;
 import first.summoner.common.minion.InfiniteShadow;
-import first.summoner.utils.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -19,6 +18,8 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
+import static first.summoner.utils.RenderUtil.getDominantColor;
+
 public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<InfiniteShadow> {
 
     @Override
@@ -26,7 +27,7 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
         int timer = infiniteShadow.attacking ? infiniteShadow.trailTimer : 0;
         ItemStack itemStack = infiniteShadow.getItemStack();
         if (!itemStack.isEmpty()) {
-            int dominantColor = RenderUtil.getDominantColor(itemStack);
+            int dominantColor = getDominantColor(itemStack);
             TrailConfig<InfiniteShadow, ?> trailConfig = null;
             if (!(itemStack.getItem() instanceof BlockItem)) {
                 trailConfig = new RibbonTrailConfig<InfiniteShadow>()
@@ -46,7 +47,7 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
     }
 
     @Override
-    protected void render(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> context, float partialTick, float alpha) {
+    protected void render(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> context, float partialTick, int packedLight, float alpha) {
         ItemStack itemStack = infiniteShadow.getItemStack();
         if (!itemStack.isEmpty()) {
             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();

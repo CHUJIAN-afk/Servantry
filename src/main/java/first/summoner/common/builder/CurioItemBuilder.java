@@ -47,4 +47,9 @@ public class CurioItemBuilder {
     public CurioItem build() {
         return new CurioItem(this);
     }
+
+    /** 兼容 26.2 注册签名；1.21.1 物品 id 由 DeferredRegister 注册时决定，无需注入。 */
+    public CurioItem build(ResourceLocation id) {
+        return new CurioItem(this);
+    }
 }
