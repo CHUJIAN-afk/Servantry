@@ -6,6 +6,7 @@ import first.summoner.common.minion.ScavengerFairy;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -24,7 +25,7 @@ public class ScavengerFairyCollectItemGoal extends MinionGoal<ScavengerFairy> {
         Entity targetEntity = minion.getTargetEntity();
         if (targetEntity != null) {
             if (targetEntity instanceof ItemEntity itemEntity) {
-                var inventory = minion.getOwner().getInventory();
+                Inventory inventory = minion.getOwner().getInventory();
                 for (int i = 0; i < inventory.getContainerSize(); i++) {
                     ItemStack item = inventory.getItem(i);
                     if (item.isEmpty()) {

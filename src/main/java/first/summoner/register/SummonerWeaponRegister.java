@@ -8,7 +8,7 @@ import first.lyra.common.creativeTab.Section;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.item.SummonerWeaponItem;
 import first.lyra.register.LyraAttributeRegister;
-import first.lyra.register.LyraItemRegisterBuilder;
+import first.lyra.register.LyraItemRegistries;
 import first.summoner.Summoner;
 import first.summoner.common.dataComponent.ScabbardContainer;
 import first.summoner.common.item.GildedWandItem;
@@ -43,6 +43,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCon
 import net.minecraft.world.level.storage.loot.predicates.WeatherCheck;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 
@@ -50,10 +51,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static first.summoner.register.SummonerItemRegister.ITEMS;
-
 @SuppressWarnings("unused")
 public class SummonerWeaponRegister {
+
+    public static final LyraItemRegistries REGISTRIES = Summoner.REGISTRIES;
 
     public static final Section MINION_WEAPON_TOOL = new Section(-1, Summoner.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), SummonerItemTagsRegister.SectionMinionWeaponTool, provider -> {
         List<ItemStack> list = new ArrayList<>();
@@ -70,7 +71,7 @@ public class SummonerWeaponRegister {
     public static final Section MINION_WEAPON = new Section(0, Summoner.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), SummonerItemTagsRegister.SectionMinionWeapon);
 
     public static final DeferredItem<GildedWandItem> GildedWand =
-            LyraItemRegisterBuilder.build(ITEMS, "gilded_wand", ResourceLocation -> new GildedWandItem(() -> new Item.Properties()
+            REGISTRIES.build("gilded_wand", ResourceLocation -> new GildedWandItem(() -> new Item.Properties()
                             .stacksTo(1)
                             .rarity(Rarity.EPIC)
                             .durability(15 * 60 * 20)
@@ -86,7 +87,7 @@ public class SummonerWeaponRegister {
                     .itemLanguageTooltip(3, "", "潜行右键遣散所有仆从与哨兵")
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeaponTool)
                     .itemTag(ItemTags.DURABILITY_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .recipeWithLookup((lookup, recipeOutput) -> ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, SummonerWeaponRegister.GildedWand)
                             .pattern("  G")
                             .pattern(" S ")
@@ -100,7 +101,7 @@ public class SummonerWeaponRegister {
      * 黄蜂法杖
      */
     public static final DeferredItem<SummonerWeaponItem<Hornet>> HornetStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "hornet_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.HORNET)
+            REGISTRIES.build("hornet_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.HORNET)
                             .damage(0.7f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -109,19 +110,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Hornet Staff", "黄蜂法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.HORNET, "Hornet", "黄蜂")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/bee"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/bee"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.HornetStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 小鬼法杖
      */
     public static final DeferredItem<SummonerWeaponItem<Imp>> ImpStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "imp_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.IMP)
+            REGISTRIES.build("imp_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.IMP)
                             .damage(1.7f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseImpStaff)
@@ -130,7 +131,7 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Imp Staff", "小鬼法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.IMP, "Imp", "小鬼")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/magma_cube"), () -> {
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/magma_cube"), LootTable -> {
                         CompoundTag tag = new CompoundTag();
                         tag.putInt("Size", 3);
                         return LootPool.lootPool()
@@ -140,19 +141,19 @@ public class SummonerWeaponRegister {
                                         .when(LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, EntityPredicate.Builder.entity().nbt(new NbtPredicate(tag)))))
                                 .build();
                     })
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/shipwreck_treasure"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/shipwreck_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.ImpStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 无人机
      */
     public static final DeferredItem<SummonerWeaponItem<OreScout>> SurveyDroneRemote =
-            LyraItemRegisterBuilder.build(ITEMS, "survey_drone_remote", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.ORE_SCOUT)
+            REGISTRIES.build("survey_drone_remote", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.ORE_SCOUT)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 OreScout minion = weapon.createMinion(player, itemStack);
@@ -170,14 +171,14 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Survey Drone Remote", "矿勘无人机遥控器")
                     .summonLanguage(SummonerAttachmentEntityRegister.ORE_SCOUT, "Survey Drone", "矿勘无人机")
                     .itemLanguageTooltip(1, "Summons up to 1 Survey Drone", "最多召唤1架矿勘无人机")
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 妖精铃铛
      */
     public static final DeferredItem<SummonerWeaponItem<ScavengerFairy>> FairyBell =
-            LyraItemRegisterBuilder.build(ITEMS, "fairy_bell", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SCAVENGER_FAIRY)
+            REGISTRIES.build("fairy_bell", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SCAVENGER_FAIRY)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 ScavengerFairy minion = weapon.createMinion(player, itemStack);
@@ -195,19 +196,19 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Fairy Bell", "妖精铃铛")
                     .summonLanguage(SummonerAttachmentEntityRegister.SCAVENGER_FAIRY, "Scavenger Fairy", "拾荒妖精")
                     .itemLanguageTooltip(1, "Summons up to 1 Scavenger Fairy", "最多召唤1只拾荒妖精")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/shipwreck_treasure"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/shipwreck_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.FairyBell.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 刃杖 - 召唤附魔飞刀群
      */
     public static final DeferredItem<SummonerWeaponItem<EnchantedThrowingKnives>> BladeStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "blade_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES)
+            REGISTRIES.build("blade_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES)
                             .damage(0.6f)
                             .armorPierce(7.5f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -237,14 +238,14 @@ public class SummonerWeaponRegister {
                             .define('S', Items.STICK)
                             .unlockedBy("has_amethyst_shard", InventoryChangeTrigger.TriggerInstance.hasItems(Items.AMETHYST_SHARD))
                             .save(recipeOutput, Summoner.rl("crafting/blade_staff")))
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 雨云法杖
      */
     public static final DeferredItem<SummonerWeaponItem<Cloud>> RainCloudStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "rain_cloud_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.CLOUD)
+            REGISTRIES.build("rain_cloud_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.CLOUD)
                             .damage(3f)
                             .slotType(AttachmentEntityData.Type.Sentry)
                             .sound(SummonerSoundRegister.UseCloudStaff)
@@ -264,20 +265,20 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Rain Cloud Staff", "雨云法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.CLOUD, "Rain Cloud", "雨云")
                     .itemLanguageTooltip(1, "Summons a cloud to rain down on your foes", "召唤云朵来向敌人降下大雨")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/phantom"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/phantom"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.RainCloudStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f))
                                     .when(WeatherCheck.weather().setRaining(true)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 魔眼法杖 - 召唤双子魔眼
      */
     public static final DeferredItem<SummonerWeaponItem<Twins>> OpticStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "optic_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.TWINS)
+            REGISTRIES.build("optic_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.TWINS)
                             .damage(2.4f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseTerraprism)
@@ -306,19 +307,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Optic Staff", "魔眼法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.TWINS, "Twins", "双子魔眼")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/ghast"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/ghast"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.OpticStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 致命球法杖 - 召唤致命球仆从
      */
     public static final DeferredItem<SummonerWeaponItem<DeadlySphere>> DeadlySphereStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "deadly_sphere_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.DEADLY_SPHERE)
+            REGISTRIES.build("deadly_sphere_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.DEADLY_SPHERE)
                             .damage(5.5f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -327,19 +328,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Deadly Sphere Staff", "致命球法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.DEADLY_SPHERE, "Deadly Sphere", "致命球")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/jungle_temple"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/jungle_temple"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.DeadlySphereStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 外星法杖
      */
     public static final DeferredItem<SummonerWeaponItem<UFO>> XenoStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "xeno_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.UFO)
+            REGISTRIES.build("xeno_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.UFO)
                             .damage(3.6f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -348,19 +349,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Xeno Staff", "外星法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.UFO, "UFO", "UFO")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.XenoStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 脉冲炮塔遥控装置
      */
     public static final DeferredItem<SummonerWeaponItem<PulseTurret>> PulseTurretRemote =
-            LyraItemRegisterBuilder.build(ITEMS, "pulse_turret_remote", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.PULSE_TURRET)
+            REGISTRIES.build("pulse_turret_remote", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.PULSE_TURRET)
                             .damage(2.5f)
                             .slotType(AttachmentEntityData.Type.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
@@ -381,19 +382,19 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Pulse Turret Remote", "脉冲炮塔遥控装置")
                     .summonLanguage(SummonerAttachmentEntityRegister.PULSE_TURRET, "Pulse Turret", "脉冲炮塔")
                     .itemLanguageTooltip(1, "At most one pulse turret can exist at a time", "最多召唤一个脉冲炮塔")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/abandoned_mineshaft"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/abandoned_mineshaft"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.PulseTurretRemote.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 暴风雨法杖 - 召唤鲨鱼龙卷
      */
     public static final DeferredItem<SummonerWeaponItem<Sharknado>> TempestStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "tempest_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SHARKNADO)
+            REGISTRIES.build("tempest_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SHARKNADO)
                             .damage(5f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -403,14 +404,14 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Tempest Staff", "暴风雨法杖")
                     .jeiInfo(1, "Occasionally obtained from fishing in the ocean during rain", "在海洋中雨天钓鱼时偶尔获得")
                     .summonLanguage(SummonerAttachmentEntityRegister.SHARKNADO, "Sharknado", "鲨鱼龙卷")
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 泰拉棱镜 - 召唤泰拉棱镜仆从
      */
     public static final DeferredItem<SummonerWeaponItem<Terraprism>> TerraPrism =
-            LyraItemRegisterBuilder.build(ITEMS, "terraprism", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.TERRA_PRISM)
+            REGISTRIES.build("terraprism", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.TERRA_PRISM)
                             .damage(9f)
                             .knockback(0.4f)
                             .sound(SummonerSoundRegister.UseTerraprism)
@@ -430,19 +431,19 @@ public class SummonerWeaponRegister {
                     .summonLanguage(SummonerAttachmentEntityRegister.TERRA_PRISM, "Terraprism", "泰拉棱镜")
                     .itemLanguageTooltip(1, "A flawless blade once hailed as the Prism of the Earth", "曾被冠以大地棱彩美名的无暇之剑")
                     .jeiInfo(1, "Occasionally drops from Allays", "悦灵偶尔掉落")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/allay"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/allay"), LootTable -> LootPool.lootPool()
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.TerraPrism)
                                     .when(LootItemRandomChanceCondition.randomChance(0.01f))
                             )
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 弩车魔杖
      */
     public static final DeferredItem<SummonerWeaponItem<Ballista>> BallistaRod =
-            LyraItemRegisterBuilder.build(ITEMS, "ballista_rod", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BALLISTA)
+            REGISTRIES.build("ballista_rod", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BALLISTA)
                             .damage(3f)
                             .knockback(0.47f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -462,19 +463,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Ballista Rod", "弩车魔杖")
                     .itemLanguageTooltip(1, "A slow but high damage tower that shoots piercing bolts", "速度缓慢但伤害力极高的防御塔，可以射出穿透性箭矢")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.BallistaRod.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 弩车手杖
      */
     public static final DeferredItem<SummonerWeaponItem<Ballista>> BallistaCane =
-            LyraItemRegisterBuilder.build(ITEMS, "ballista_cane", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BALLISTA)
+            REGISTRIES.build("ballista_cane", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BALLISTA)
                             .damage(7.4f)
                             .knockback(0.47f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -494,19 +495,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Ballista Cane", "弩车手杖")
                     .itemLanguageTooltip(1, "A slow but high damage tower that shoots piercing bolts", "速度缓慢但伤害力极高的防御塔，可以射出穿透性箭矢")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.BallistaCane.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 弩车法杖
      */
     public static final DeferredItem<SummonerWeaponItem<Ballista>> BallistaStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "ballista_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BALLISTA)
+            REGISTRIES.build("ballista_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BALLISTA)
                             .damage(15.6f)
                             .knockback(0.47f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -527,19 +528,19 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Ballista Staff", "弩车法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.BALLISTA, "Ballista", "弩车")
                     .itemLanguageTooltip(1, "A slow but high damage tower that shoots piercing bolts", "速度缓慢但伤害力极高的防御塔，可以射出穿透性箭矢")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.BallistaStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 闪电光环魔杖
      */
     public static final DeferredItem<SummonerWeaponItem<LightningAura>> LightningAuraRod =
-            LyraItemRegisterBuilder.build(ITEMS, "lightning_aura_rod", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.LIGHTNING_AURA)
+            REGISTRIES.build("lightning_aura_rod", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.LIGHTNING_AURA)
                             .damage(0.4f)
                             .knockback(0.25f)
                             .armorPierce(1000f)
@@ -559,19 +560,19 @@ public class SummonerWeaponRegister {
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Lightning Aura Rod", "闪电光环魔杖")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/village/village_weaponsmith"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/village/village_weaponsmith"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.LightningAuraRod.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 闪电光环手杖
      */
     public static final DeferredItem<SummonerWeaponItem<LightningAura>> LightningAuraCane =
-            LyraItemRegisterBuilder.build(ITEMS, "lightning_aura_cane", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.LIGHTNING_AURA)
+            REGISTRIES.build("lightning_aura_cane", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.LIGHTNING_AURA)
                             .damage(1.1f)
                             .knockback(0.25f)
                             .armorPierce(1000f)
@@ -591,19 +592,19 @@ public class SummonerWeaponRegister {
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Lightning Aura Cane", "闪电光环手杖")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/village/village_weaponsmith"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/village/village_weaponsmith"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.LightningAuraCane.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 闪电光环法杖
      */
     public static final DeferredItem<SummonerWeaponItem<LightningAura>> LightningAuraStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "lightning_aura_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.LIGHTNING_AURA)
+            REGISTRIES.build("lightning_aura_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.LIGHTNING_AURA)
                             .damage(3.4f)
                             .knockback(0.25f)
                             .armorPierce(1000f)
@@ -624,19 +625,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Lightning Aura Staff", "闪电光环法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.LIGHTNING_AURA, "Lightning Aura", "闪电光环")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/village/village_weaponsmith"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/village/village_weaponsmith"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.LightningAuraStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 缥缈星核法杖 - 召唤缥缈星核仆从
      */
     public static final DeferredItem<SummonerWeaponItem<EtherealStellarCore>> EtherealStellarCoreStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "ethereal_stellar_core_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.ETHEREAL_STELLAR_CORE)
+            REGISTRIES.build("ethereal_stellar_core_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.ETHEREAL_STELLAR_CORE)
                             .damage(5f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -657,19 +658,19 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Ethereal Stellar Core Staff", "缥缈星核法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.ETHEREAL_STELLAR_CORE, "Ethereal Stellar Core", "缥缈星核")
                     .itemLanguageTooltip(1, "Summons up to 9 Ethereal Stellar Cores", "最多召唤9个缥缈星核")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.EtherealStellarCoreStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 星尘细胞杖 - 召唤星尘细胞仆从
      */
     public static final DeferredItem<SummonerWeaponItem<StardustCell>> StardustCellStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "stardust_cell_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.STARDUST_CELL)
+            REGISTRIES.build("stardust_cell_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.STARDUST_CELL)
                             .damage(6f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -679,19 +680,19 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Stardust Cell Staff", "星尘细胞法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.STARDUST_CELL, "Stardust Cell", "星尘细胞")
                     .itemLanguageTooltip(1, "Cultivate the most beautiful cellular infection", "培养最美丽的细胞感染")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.StardustCellStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 星尘龙杖 - 召唤星尘龙（多体节仆从）
      */
     public static final DeferredItem<SummonerWeaponItem<StardustDragon>> StardustDragonStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "stardust_dragon_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.STARDUST_DRAGON)
+            REGISTRIES.build("stardust_dragon_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.STARDUST_DRAGON)
                             .damage(4f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -732,19 +733,19 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Stardust Dragon Staff", "星尘之龙法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.STARDUST_DRAGON, "Stardust Dragon", "星尘之龙")
                     .itemLanguageTooltip(1, "When you have a dragon, who needs a swarm?", "有了一条巨龙后，谁还需要一群仆从呢？")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.StardustDragonStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 月亮传送门法杖
      */
     public static final DeferredItem<SummonerWeaponItem<MoonPortal>> MoonPortalStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "moon_portal_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.MOON_PORTAL)
+            REGISTRIES.build("moon_portal_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.MOON_PORTAL)
                             .damage(10f)
                             .knockback(0.75f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -763,19 +764,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Moon Portal Staff", "月亮传送门法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.MOON_PORTAL, "Moon Portal", "月亮传送门")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/ender_dragon"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/ender_dragon"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.MoonPortalStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.1f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 七彩水晶法杖
      */
     public static final DeferredItem<SummonerWeaponItem<RainbowCrystal>> RainbowCrystalStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "rainbow_crystal_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.RAINBOW_CRYSTAL)
+            REGISTRIES.build("rainbow_crystal_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.RAINBOW_CRYSTAL)
                             .damage(13f)
                             .knockback(0.75f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -795,19 +796,19 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Rainbow Crystal Staff", "七彩水晶法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.RAINBOW_CRYSTAL, "Rainbow Crystal", "七彩水晶")
                     .itemLanguageTooltip(1, "'The colors, Duke, the colors!'", "“公爵，多么缤纷的颜色！”")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/ender_dragon"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/ender_dragon"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.RainbowCrystalStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.1f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 无限剑鞘
      */
     public static final DeferredItem<SummonerWeaponItem<InfiniteShadow>> InfiniteScabbard =
-            LyraItemRegisterBuilder.build(ITEMS, "infinite_scabbard", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFINITE_SHADOW)
+            REGISTRIES.build("infinite_scabbard", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFINITE_SHADOW)
                             .sound(SummonerSoundRegister.UseTerraprism)
                             .summon((weapon, player, itemStack) -> {
                                 InfiniteShadow minion = weapon.createMinion(player, itemStack);
@@ -828,19 +829,19 @@ public class SummonerWeaponRegister {
                     .summonLanguage(SummonerAttachmentEntityRegister.INFINITE_SHADOW, "Infinite Shadow", "无限之影")
                     .itemLanguageTooltip(1, "A scabbard that stores a blade of infinite potential", "蕴含无限可能之'剑'的剑鞘")
                     .itemLanguageTooltip(2, "Right-click an item to store, right-click an empty slot to retrieve", "右键物品存入，右键空格子取出")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/ancient_city"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/ancient_city"), LootTable -> LootPool.lootPool()
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.InfiniteScabbard)
                                          .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .jeiInfo(1, "Occasionally found in Ancient City chests", "偶尔在远古城市宝箱中发现")
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 虚空吞噬者傀具
      */
     public static final DeferredItem<SummonerWeaponItem<VoidEater>> VoidEaterMarionette =
-            LyraItemRegisterBuilder.build(ITEMS, "void_eater_marionette", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.VOID_EATER)
+            REGISTRIES.build("void_eater_marionette", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.VOID_EATER)
                             .damage(11f)
                             .knockback(0.5f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -883,19 +884,19 @@ public class SummonerWeaponRegister {
                     .itemLanguageTooltip(1, "Contains the power to command miniature devourers", "蕴含掌控小型吞噬者的力量")
                     .itemLanguageTooltip(2, "The devourer uses the God Eater, Holy Incineration and Cosmic Maelstrom to attack", "吞噬者会使用噬神者，焚灭虔信之火和超宇宙狂涡攻击")
                     .itemLanguageTooltip(3, "While the devourer is present, all your attacks unleash God-Slaying Fury", "吞噬者在场时，你的所有攻击都会释放弑神怒焰")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.VoidEaterMarionette.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.005f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 雷云盆栽
      */
     public static final DeferredItem<SummonerWeaponItem<SuperPeashooter>> ThundercloudBonsai =
-            LyraItemRegisterBuilder.build(ITEMS, "thundercloud_bonsai", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SUPER_PEASHOOTER)
+            REGISTRIES.build("thundercloud_bonsai", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SUPER_PEASHOOTER)
                             .damage(12f)
                             .slotType(AttachmentEntityData.Type.Sentry)
                             .sound(SummonerSoundRegister.UseMoonPortalStaff)
@@ -914,7 +915,7 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Thundercloud Bonsai", "雷云盆栽")
                     .summonLanguage(SummonerAttachmentEntityRegister.SUPER_PEASHOOTER, "Super Peashooter", "超级电能豌豆射手")
                     .itemLanguageTooltip(1, "Fires seven lightning balls at once, with a chance to fire a large number of scattered lightning balls at once", "一次发射七颗雷电球，有概率一次发射大量散射雷电球")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/creeper"), () -> {
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/creeper"), LootTable -> {
                         CompoundTag tag = new CompoundTag();
                         tag.putBoolean("powered", true);
                         return LootPool.lootPool()
@@ -924,14 +925,14 @@ public class SummonerWeaponRegister {
                                         .when(LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, EntityPredicate.Builder.entity().nbt(new NbtPredicate(tag)))))
                                 .build();
                     })
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 玉米加农炮
      */
     public static final DeferredItem<SummonerWeaponItem<Cannon>> CornCannon =
-            LyraItemRegisterBuilder.build(ITEMS, "corn_cannon", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.CANNON)
+            REGISTRIES.build("corn_cannon", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.CANNON)
                             .damage(6400f)
                             .armorPierce(3600f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -952,14 +953,14 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Corn Cannon", "玉米加农炮")
                     .summonLanguage(SummonerAttachmentEntityRegister.CANNON, "Cannon", "玉米加农炮")
                     .itemLanguageTooltip(1, "Uses 2 Sentry slots", "占用 2 哨兵栏")
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 死魂灵巫术单元
      */
     public static final DeferredItem<SummonerWeaponItem<NecroSpirit>> NecroSpiritStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "necro_spirit_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.NECRO_SPIRIT)
+            REGISTRIES.build("necro_spirit_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.NECRO_SPIRIT)
                             .damage(700f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
@@ -978,14 +979,14 @@ public class SummonerWeaponRegister {
                     .itemLanguage("Necro Spirit Staff", "死魂灵巫术单元")
                     .summonLanguage(SummonerAttachmentEntityRegister.NECRO_SPIRIT, "Necro Spirit", "死魂灵")
                     .itemLanguageTooltip(1, "Summons up to 1 Necro Spirit", "最多召唤1个死魂灵")
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 激光机枪 - 召唤激光机枪仆从（最多1个）
      */
     public static final DeferredItem<SummonerWeaponItem<LaserMinigun>> LaserMinigunStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "laser_minigun", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.LASER_MINIGUN)
+            REGISTRIES.build("laser_minigun", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.LASER_MINIGUN)
                             .damage(6f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -1004,19 +1005,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Laser Minigun", "激光机枪")
                     .summonLanguage(SummonerAttachmentEntityRegister.LASER_MINIGUN, "Laser Minigun", "激光机枪")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/warden"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/warden"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.LaserMinigunStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 藤壶法杖
      */
     public static final DeferredItem<SummonerWeaponItem<Barnacle>> BarnacleStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "barnacle_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BARNACLE)
+            REGISTRIES.build("barnacle_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BARNACLE)
                             .damage(3.3f)
                             .knockback(0.75f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -1035,19 +1036,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Barnacle Staff", "藤壶法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.BARNACLE, "Barnacle", "藤壶")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/drowned"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/drowned"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.BarnacleStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 眼球激光塔
      */
     public static final DeferredItem<SummonerWeaponItem<EyeLaserTurret>> EyeLaserTurretStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "eye_laser_turret_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.EYE_LASER_TURRET)
+            REGISTRIES.build("eye_laser_turret_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.EYE_LASER_TURRET)
                             .damage(1.2f)
                             .knockback(0.25f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -1066,19 +1067,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Eye Laser Turret Staff", "眼球激光塔魔杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.EYE_LASER_TURRET, "Eye Laser Turret", "眼球激光塔")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/elder_guardian"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/elder_guardian"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.EyeLaserTurretStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 寒霜九头蛇法杖
      */
     public static final DeferredItem<SummonerWeaponItem<Hydra>> HydraStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "hydra_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.HYDRA)
+            REGISTRIES.build("hydra_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.HYDRA)
                             .damage(10f)
                             .knockback(0.75f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -1097,19 +1098,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Hydra Staff", "寒霜九头蛇法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.HYDRA, "Hydra", "寒霜九头蛇")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/stray"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/stray"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.HydraStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 爆炸烈焰魔杖
      */
     public static final DeferredItem<SummonerWeaponItem<Inferno>> InfernoRod =
-            LyraItemRegisterBuilder.build(ITEMS, "inferno_rod", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFERNO)
+            REGISTRIES.build("inferno_rod", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFERNO)
                             .damage(1.7f)
                             .knockback(0.3f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -1128,19 +1129,19 @@ public class SummonerWeaponRegister {
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Inferno Rod", "爆炸烈焰魔杖")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/bastion_treasure"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/bastion_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.InfernoRod.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 爆炸烈焰手杖
      */
     public static final DeferredItem<SummonerWeaponItem<Inferno>> InfernoCane =
-            LyraItemRegisterBuilder.build(ITEMS, "inferno_cane", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFERNO)
+            REGISTRIES.build("inferno_cane", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFERNO)
                             .damage(4.2f)
                             .knockback(0.3f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -1159,19 +1160,19 @@ public class SummonerWeaponRegister {
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Inferno Cane", "爆炸烈焰手杖")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/bastion_treasure"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/bastion_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.InfernoCane.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 爆炸烈焰法杖
      */
     public static final DeferredItem<SummonerWeaponItem<Inferno>> InfernoStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "inferno_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFERNO)
+            REGISTRIES.build("inferno_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFERNO)
                             .damage(8.8f)
                             .knockback(0.3f)
                             .slotType(AttachmentEntityData.Type.Sentry)
@@ -1191,19 +1192,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Inferno Staff", "爆炸烈焰法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.INFERNO, "Inferno", "爆炸烈焰")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/bastion_treasure"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/bastion_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.InfernoStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 血红法杖 - 召唤血蝙蝠仆从
      */
     public static final DeferredItem<SummonerWeaponItem<BloodBat>> SanguineStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "sanguine_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BLOOD_BAT)
+            REGISTRIES.build("sanguine_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BLOOD_BAT)
                             .damage(3.5f)
                             .knockback(0.3f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -1221,19 +1222,19 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Sanguine Staff", "血红法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.BLOOD_BAT, "Blood Bat", "血蝙蝠")
-                    .lootTable(ResourceLocation.withDefaultNamespace("entities/bat"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("entities/bat"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.SanguineStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
     /**
      * 毁灭法杖 - 召唤禁戒遗迹仆从
      */
     public static final DeferredItem<SummonerWeaponItem<RuinRelic>> RuinStaff =
-            LyraItemRegisterBuilder.build(ITEMS, "ruin_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.RUIN_RELIC)
+            REGISTRIES.build("ruin_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.RUIN_RELIC)
                             .damage(4f)
                             .knockback(0.4f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
@@ -1251,12 +1252,12 @@ public class SummonerWeaponRegister {
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Ruin Staff", "毁灭法杖")
                     .summonLanguage(SummonerAttachmentEntityRegister.RUIN_RELIC, "Ruin Relic", "禁戒遗迹")
-                    .lootTable(ResourceLocation.withDefaultNamespace("chests/desert_pyramid"), () -> LootPool.lootPool()
+                    .lootTable(ResourceLocation.withDefaultNamespace("chests/desert_pyramid"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.RuinStaff.get())
                                     .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
-                    .itemModel(LyraItemRegisterBuilder::handheldItem)
+                    .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();
 

@@ -1,5 +1,6 @@
 package first.summoner;
 
+import first.lyra.register.LyraItemRegistries;
 import first.summoner.register.*;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -10,16 +11,18 @@ import net.neoforged.fml.common.Mod;
 public class Summoner {
 
     public static final String MODID = "summoner";
+    public static final LyraItemRegistries REGISTRIES = LyraItemRegistries.create(MODID).languageInit(new SummonerLanguageRegister());
 
     public Summoner(IEventBus eventBus, ModContainer container) {
-        SummonerCreativeTabRegister.register(eventBus);
-        SummonerDataComponentRegister.register(eventBus);
-        SummonerAttachmentEntityRegister.register(eventBus);
-        SummonerItemRegister.register(eventBus);
-        SummonerArmorMaterialRegister.register(eventBus);
+        SummonerItemRegister.register();
         SummonerArmorRegister.register();
         SummonerCurioRegister.register();
         SummonerWeaponRegister.register();
+        REGISTRIES.register(eventBus);
+        SummonerCreativeTabRegister.register(eventBus);
+        SummonerDataComponentRegister.register(eventBus);
+        SummonerAttachmentEntityRegister.register(eventBus);
+        SummonerArmorMaterialRegister.register(eventBus);
         SummonerEnchantmentRegister.register(eventBus);
         SummonerMobEffectRegister.register(eventBus);
         SummonerPotionRegister.register(eventBus);

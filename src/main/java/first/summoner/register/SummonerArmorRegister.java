@@ -4,43 +4,44 @@ import first.lyra.client.creativeTab.AnimBanner;
 import first.lyra.common.builder.AttributeArmorItemBuilder;
 import first.lyra.common.creativeTab.Section;
 import first.lyra.register.LyraAttributeRegister;
-import first.lyra.register.LyraItemRegisterBuilder;
+import first.lyra.register.LyraItemRegistries;
 import first.summoner.Summoner;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Rarity;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.registries.DeferredItem;
 
-import static first.summoner.register.SummonerItemRegister.ITEMS;
-
 public class SummonerArmorRegister {
+
+    public static final LyraItemRegistries REGISTRIES = Summoner.REGISTRIES;
 
     public static final Section ARMOR = new Section(1, Summoner.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), SummonerItemTagsRegister.SectionArmor);
     /**
      * 小雪怪外套
      */
     public static final DeferredItem<ArmorItem> FlinxFurCoat =
-            LyraItemRegisterBuilder.build(ITEMS, "flinx_fur_coat", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.Flinx, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("flinx_fur_coat", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.Flinx, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionArmor)
                     .itemLanguage("Flinx Fur Coat", "小雪怪皮毛外套")
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 蜜蜂头饰 - +4% 召唤伤害，+1 仆从栏
      */
     public static final DeferredItem<ArmorItem> BeeHeadgear =
-            LyraItemRegisterBuilder.build(ITEMS, "bee_headgear", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.HELMET)
+            REGISTRIES.build("bee_headgear", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.04, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
@@ -51,13 +52,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 蜜蜂胸甲 - +4% 召唤伤害，+1 仆从栏
      */
     public static final DeferredItem<ArmorItem> BeeChestplate =
-            LyraItemRegisterBuilder.build(ITEMS, "bee_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("bee_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.04, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
@@ -68,13 +69,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 蜜蜂护胫 - +5% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> BeeLeggings =
-            LyraItemRegisterBuilder.build(ITEMS, "bee_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.LEGGINGS)
+            REGISTRIES.build("bee_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -84,13 +85,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 蜜蜂靴 - 套装奖励部分
      */
     public static final DeferredItem<ArmorItem> BeeBoots =
-            LyraItemRegisterBuilder.build(ITEMS, "bee_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.BOOTS)
+            REGISTRIES.build("bee_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 1, AttributeModifier.Operation.ADD_VALUE)
                             .properties(p -> p.rarity(Rarity.UNCOMMON))
                             .build())
@@ -99,13 +100,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 黑曜石头盔 - +8% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> ObsidianHelmet =
-            LyraItemRegisterBuilder.build(ITEMS, "obsidian_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.HELMET)
+            REGISTRIES.build("obsidian_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .build())
@@ -114,13 +115,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 黑曜石胸甲 - +1 仆从栏
      */
     public static final DeferredItem<ArmorItem> ObsidianChestplate =
-            LyraItemRegisterBuilder.build(ITEMS, "obsidian_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("obsidian_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .build())
@@ -129,13 +130,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 黑曜石护腿 - +8% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> ObsidianLeggings =
-            LyraItemRegisterBuilder.build(ITEMS, "obsidian_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.LEGGINGS)
+            REGISTRIES.build("obsidian_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .build())
@@ -144,13 +145,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 黑曜石靴子 - +8% 移动速度
      */
     public static final DeferredItem<ArmorItem> ObsidianBoots =
-            LyraItemRegisterBuilder.build(ITEMS, "obsidian_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.BOOTS)
+            REGISTRIES.build("obsidian_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ObsidianArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .build())
@@ -159,13 +160,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 蜘蛛面具 - +5% 召唤伤害，+1 仆从栏
      */
     public static final DeferredItem<ArmorItem> SpiderMask =
-            LyraItemRegisterBuilder.build(ITEMS, "spider_mask", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.HELMET)
+            REGISTRIES.build("spider_mask", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
@@ -176,13 +177,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 蜘蛛胸甲 - +5% 召唤伤害，+1 仆从栏
      */
     public static final DeferredItem<ArmorItem> SpiderChestplate =
-            LyraItemRegisterBuilder.build(ITEMS, "spider_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("spider_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 3, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
@@ -193,13 +194,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 蜘蛛护胫 - +6% 召唤伤害，+1 仆从栏
      */
     public static final DeferredItem<ArmorItem> SpiderLeggings =
-            LyraItemRegisterBuilder.build(ITEMS, "spider_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.LEGGINGS)
+            REGISTRIES.build("spider_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 3, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
@@ -210,13 +211,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 蜘蛛靴
      */
     public static final DeferredItem<ArmorItem> SpiderBoots =
-            LyraItemRegisterBuilder.build(ITEMS, "spider_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.BOOTS)
+            REGISTRIES.build("spider_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpiderArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -226,13 +227,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 禁戒面具 - +15% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> ForbiddenMask =
-            LyraItemRegisterBuilder.build(ITEMS, "forbidden_mask", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.HELMET)
+            REGISTRIES.build("forbidden_mask", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.15, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.RARE))
@@ -242,13 +243,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 禁戒长袍 - +10%召唤伤害，+1 仆从栏
      */
     public static final DeferredItem<ArmorItem> ForbiddenRobe =
-            LyraItemRegisterBuilder.build(ITEMS, "forbidden_robe", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("forbidden_robe", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
@@ -259,13 +260,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 禁戒裤 - +1 仆从栏
      */
     public static final DeferredItem<ArmorItem> ForbiddenLeggings =
-            LyraItemRegisterBuilder.build(ITEMS, "forbidden_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.LEGGINGS)
+            REGISTRIES.build("forbidden_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 3, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .properties(p -> p.rarity(Rarity.RARE))
@@ -275,13 +276,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 禁戒靴
      */
     public static final DeferredItem<ArmorItem> ForbiddenBoots =
-            LyraItemRegisterBuilder.build(ITEMS, "forbidden_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.BOOTS)
+            REGISTRIES.build("forbidden_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ForbiddenArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.RARE))
@@ -291,13 +292,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 神圣头盔
      */
     public static final DeferredItem<ArmorItem> HallowedHelmet =
-            LyraItemRegisterBuilder.build(ITEMS, "hallowed_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET)
+            REGISTRIES.build("hallowed_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -308,13 +309,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 神圣胸甲 - +14% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> HallowedChestplate =
-            LyraItemRegisterBuilder.build(ITEMS, "hallowed_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("hallowed_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 5, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.14, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -324,13 +325,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 神圣护腿 - +7% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> HallowedLeggings =
-            LyraItemRegisterBuilder.build(ITEMS, "hallowed_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.LEGGINGS)
+            REGISTRIES.build("hallowed_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.07, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -340,13 +341,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 神圣靴子 - +8% 移动速度
      */
     public static final DeferredItem<ArmorItem> HallowedBoots =
-            LyraItemRegisterBuilder.build(ITEMS, "hallowed_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.BOOTS)
+            REGISTRIES.build("hallowed_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.HallowedArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 3, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(Attributes.MOVEMENT_SPEED, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -356,13 +357,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 叶绿面具 - +1 召唤栏，+10% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> ChlorophyteHelmet =
-            LyraItemRegisterBuilder.build(ITEMS, "chlorophyte_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.HELMET)
+            REGISTRIES.build("chlorophyte_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -373,13 +374,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 叶绿板甲 - +6% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> ChlorophyteChestplate =
-            LyraItemRegisterBuilder.build(ITEMS, "chlorophyte_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("chlorophyte_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 6, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.19, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -389,13 +390,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 叶绿护胫 - +4% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> ChlorophyteLeggings =
-            LyraItemRegisterBuilder.build(ITEMS, "chlorophyte_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.LEGGINGS)
+            REGISTRIES.build("chlorophyte_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 5, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.16, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -405,13 +406,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 叶绿战靴 - +2% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> ChlorophyteBoots =
-            LyraItemRegisterBuilder.build(ITEMS, "chlorophyte_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.BOOTS)
+            REGISTRIES.build("chlorophyte_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ChlorophyteArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 3, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(Attributes.MOVEMENT_SPEED, 0.05, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.UNCOMMON))
@@ -421,13 +422,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 英灵殿骑士头盔 - +2 哨兵栏，+10% 召唤伤害，+10% 原版伤害
      */
     public static final DeferredItem<ArmorItem> ValhallaKnightHelmet =
-            LyraItemRegisterBuilder.build(ITEMS, "valhalla_knight_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.HELMET)
+            REGISTRIES.build("valhalla_knight_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 7, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SentryMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -439,13 +440,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 英灵殿骑士胸甲 - +30% 召唤伤害，+0.4 生命再生
      */
     public static final DeferredItem<ArmorItem> ValhallaKnightChestplate =
-            LyraItemRegisterBuilder.build(ITEMS, "valhalla_knight_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("valhalla_knight_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 8, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.30, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .modifier(LyraAttributeRegister.HealthRegen, 0.4, AttributeModifier.Operation.ADD_VALUE)
@@ -456,13 +457,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 英灵殿骑士护腿 - +20% 召唤伤害，+20% 原版伤害
      */
     public static final DeferredItem<ArmorItem> ValhallaKnightLeggings =
-            LyraItemRegisterBuilder.build(ITEMS, "valhalla_knight_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.LEGGINGS)
+            REGISTRIES.build("valhalla_knight_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 6, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .modifier(Attributes.ATTACK_DAMAGE, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -473,13 +474,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 英灵殿骑士战靴 - +20% 移动速度
      */
     public static final DeferredItem<ArmorItem> ValhallaKnightBoots =
-            LyraItemRegisterBuilder.build(ITEMS, "valhalla_knight_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.BOOTS)
+            REGISTRIES.build("valhalla_knight_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.ValhallaKnightArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(Attributes.MOVEMENT_SPEED, 0.20, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.RARE))
@@ -489,13 +490,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 提基面具 - +1 召唤栏，+10% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> TikiHelmet =
-            LyraItemRegisterBuilder.build(ITEMS, "tiki_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.HELMET)
+            REGISTRIES.build("tiki_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -506,13 +507,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 提基胸甲 - +10% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> TikiChestplate =
-            LyraItemRegisterBuilder.build(ITEMS, "tiki_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("tiki_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 6, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -523,13 +524,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 提基护腿 - +7% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> TikiLeggings =
-            LyraItemRegisterBuilder.build(ITEMS, "tiki_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.LEGGINGS)
+            REGISTRIES.build("tiki_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .properties(p -> p.rarity(Rarity.RARE))
@@ -539,13 +540,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 提基战靴 - +3% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> TikiBoots =
-            LyraItemRegisterBuilder.build(ITEMS, "tiki_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.BOOTS)
+            REGISTRIES.build("tiki_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.TikiArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 3, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.1, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.RARE))
@@ -555,13 +556,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 阴森头盔 - +11% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> SpookyHelmet =
-            LyraItemRegisterBuilder.build(ITEMS, "spooky_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.HELMET)
+            REGISTRIES.build("spooky_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 3, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -572,13 +573,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 阴森胸甲 - +11% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> SpookyChestplate =
-            LyraItemRegisterBuilder.build(ITEMS, "spooky_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("spooky_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -589,13 +590,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 阴森护腿 - +8% 召唤伤害，+1 召唤栏
      */
     public static final DeferredItem<ArmorItem> SpookyLeggings =
-            LyraItemRegisterBuilder.build(ITEMS, "spooky_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.LEGGINGS)
+            REGISTRIES.build("spooky_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.11, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -606,13 +607,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 阴森战靴 - +4% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> SpookyBoots =
-            LyraItemRegisterBuilder.build(ITEMS, "spooky_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.BOOTS)
+            REGISTRIES.build("spooky_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.SpookyArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(Attributes.MOVEMENT_SPEED, 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                             .properties(p -> p.rarity(Rarity.RARE))
@@ -622,13 +623,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 星尘头盔 - +1 召唤栏，+16% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> StardustHelmet =
-            LyraItemRegisterBuilder.build(ITEMS, "stardust_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.HELMET)
+            REGISTRIES.build("stardust_helmet", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.HELMET)
                             .modifier(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SentryMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
@@ -641,13 +642,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 星尘板甲 - +22% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> StardustChestplate =
-            LyraItemRegisterBuilder.build(ITEMS, "stardust_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.CHESTPLATE)
+            REGISTRIES.build("stardust_chestplate", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.CHESTPLATE)
                             .modifier(Attributes.ARMOR, 6, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 2, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.22, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -659,13 +660,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 星尘护腿 - +15% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> StardustLeggings =
-            LyraItemRegisterBuilder.build(ITEMS, "stardust_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.LEGGINGS)
+            REGISTRIES.build("stardust_leggings", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.LEGGINGS)
                             .modifier(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonDamage, 0.22, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -677,13 +678,13 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
      * 星尘战靴 - +7% 召唤伤害
      */
     public static final DeferredItem<ArmorItem> StardustBoots =
-            LyraItemRegisterBuilder.build(ITEMS, "stardust_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.BOOTS)
+            REGISTRIES.build("stardust_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.StardustArmorMaterial, ArmorItem.Type.BOOTS)
                             .modifier(Attributes.ARMOR, 3, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.MinionMaxCount, 1, AttributeModifier.Operation.ADD_VALUE)
                             .modifier(LyraAttributeRegister.SummonSearchRange, 0.08, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
@@ -694,7 +695,7 @@ public class SummonerArmorRegister {
                     .itemTag(Tags.Items.ENCHANTABLES)
                     .itemTag(Tags.Items.ARMORS)
                     .itemTag(ItemTags.ARMOR_ENCHANTABLE)
-                    .itemModel(LyraItemRegisterBuilder::basicModel)
+                    .itemModel(ItemModelProvider::basicItem)
                     .build();
 
     public static void register() {

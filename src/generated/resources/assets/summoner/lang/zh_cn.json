@@ -228,12 +228,6 @@
   "item.summoner.void_eater_marionette.tooltip.3": "吞噬者在场时，你的所有攻击都会释放弑神怒焰",
   "item.summoner.xeno_staff": "外星法杖",
   "item.summoner.zenith": "天顶剑",
-  "lyra.summoner.chlorophyte.set.1": "召唤强大的叶状水晶来射击附近的敌人",
-  "lyra.summoner.forbidden.set.1": "允许你召唤远古风暴吸引附近的敌人",
-  "lyra.summoner.hallowed.set.1": "仆从攻击使敌人高亮",
-  "lyra.summoner.stardust.set.1": "星尘守卫将保护你不受附近敌人的伤害",
-  "lyra.summoner.valhalla_knight.set.1": "大幅提升弩车开火速度，弩箭速度，弩箭最大穿透数，弩箭伤害",
-  "lyra.summoner.valhalla_knight.set.2": "受到伤害时，提供弩车恐慌增益，极大幅提升弩车开火速度",
   "mark.additional_armor_pierce": "护甲穿透",
   "mark.additional_damage": "标记伤害",
   "mark.critical_hit_rate": "暴击率",
@@ -268,5 +262,11 @@
   "summon.summoner.terraprism": "泰拉棱镜",
   "summon.summoner.twins": "双子魔眼",
   "summon.summoner.ufo": "UFO",
-  "summon.summoner.void_eater": "虚空吞噬者"
+  "summon.summoner.void_eater": "虚空吞噬者",
+  "summoner.chlorophyte.set.1": "召唤强大的叶状水晶来射击附近的敌人",
+  "summoner.forbidden.set.1": "允许你召唤远古风暴吸引附近的敌人",
+  "summoner.hallowed.set.1": "仆从攻击使敌人高亮",
+  "summoner.stardust.set.1": "星尘守卫将保护你不受附近敌人的伤害",
+  "summoner.valhalla_knight.set.1": "大幅提升弩车开火速度，弩箭速度，弩箭最大穿透数，弩箭伤害",
+  "summoner.valhalla_knight.set.2": "受到伤害时，提供弩车恐慌增益，极大幅提升弩车开火速度"
 }

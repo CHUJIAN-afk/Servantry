@@ -43,6 +43,6 @@ side = "BOTH"
 [[dependencies."${mod_id}"]]
 modId = "lyra"
 type = "required"
-versionRange = "[1.21.1.1,)"
+versionRange = "[1.21.1.8,)"
 ordering = "AFTER"
 side = "BOTH"

@@ -228,12 +228,6 @@
   "item.summoner.void_eater_marionette.tooltip.3": "While the devourer is present, all your attacks unleash God-Slaying Fury",
   "item.summoner.xeno_staff": "Xeno Staff",
   "item.summoner.zenith": "Zenith",
-  "lyra.summoner.chlorophyte.set.1": "Summons a powerful leaf crystal to shoot at nearby enemies",
-  "lyra.summoner.forbidden.set.1": "Allows you to summon an ancient storm to attract nearby enemies",
-  "lyra.summoner.hallowed.set.1": "Minions grant I-frames on attack",
-  "lyra.summoner.stardust.set.1": "A stardust guardian will protect you from nearby enemies",
-  "lyra.summoner.valhalla_knight.set.1": "Summons a powerful leaf crystal to shoot at nearby enemies",
-  "lyra.summoner.valhalla_knight.set.2": "Summons a powerful leaf crystal to shoot at nearby enemies",
   "mark.additional_armor_pierce": "Armor Pierce",
   "mark.additional_damage": "Mark Damage",
   "mark.critical_hit_rate": "Crit Rate",
@@ -268,5 +262,11 @@
   "summon.summoner.terraprism": "Terraprism",
   "summon.summoner.twins": "Twins",
   "summon.summoner.ufo": "UFO",
-  "summon.summoner.void_eater": "Void Eater"
+  "summon.summoner.void_eater": "Void Eater",
+  "summoner.chlorophyte.set.1": "Summons a powerful leaf crystal to shoot at nearby enemies",
+  "summoner.forbidden.set.1": "Allows you to summon an ancient storm to attract nearby enemies",
+  "summoner.hallowed.set.1": "Minions grant I-frames on attack",
+  "summoner.stardust.set.1": "A stardust guardian will protect you from nearby enemies",
+  "summoner.valhalla_knight.set.1": "Summons a powerful leaf crystal to shoot at nearby enemies",
+  "summoner.valhalla_knight.set.2": "Summons a powerful leaf crystal to shoot at nearby enemies"
 }
