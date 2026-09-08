@@ -5,9 +5,11 @@ import first.lyra.client.creativeTab.AnimBanner;
 import first.lyra.common.attachment.AttachmentEntityData;
 import first.lyra.common.builder.MinionWeaponItemBuilder;
 import first.lyra.common.creativeTab.Section;
+import first.lyra.common.dataComponent.LyraRarity;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.item.SummonerWeaponItem;
 import first.lyra.register.LyraAttributeRegister;
+import first.lyra.register.LyraDataComponentRegister;
 import first.lyra.register.LyraItemRegistries;
 import first.summoner.Summoner;
 import first.summoner.common.dataComponent.ScabbardContainer;
@@ -74,6 +76,7 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("gilded_wand", ResourceLocation -> new GildedWandItem(() -> new Item.Properties()
                             .stacksTo(1)
                             .rarity(Rarity.EPIC)
+                            .component(LyraDataComponentRegister.RARITY, new LyraRarity(0xA66800))
                             .durability(15 * 60 * 20)
                             .component(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)
                             .component(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.builder()
@@ -105,7 +108,7 @@ public class SummonerWeaponRegister {
                             .damage(0.7f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFFDA41)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Hornet Staff", "黄蜂法杖")
@@ -113,7 +116,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/bee"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.HornetStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -126,7 +129,7 @@ public class SummonerWeaponRegister {
                             .damage(1.7f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseImpStaff)
-                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFE7902)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Imp Staff", "小鬼法杖")
@@ -137,14 +140,14 @@ public class SummonerWeaponRegister {
                         return LootPool.lootPool()
                                 .setRolls(ConstantValue.exactly(1f))
                                 .add(LootItem.lootTableItem(SummonerWeaponRegister.ImpStaff.get())
-                                        .when(LootItemRandomChanceCondition.randomChance(0.01f))
-                                        .when(LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, EntityPredicate.Builder.entity().nbt(new NbtPredicate(tag)))))
+                                             .when(LootItemRandomChanceCondition.randomChance(0.01f))
+                                             .when(LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, EntityPredicate.Builder.entity().nbt(new NbtPredicate(tag)))))
                                 .build();
                     })
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/shipwreck_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.ImpStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -165,7 +168,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xAB5D66)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Survey Drone Remote", "矿勘无人机遥控器")
@@ -190,7 +193,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x936F20)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Fairy Bell", "妖精铃铛")
@@ -199,7 +202,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/shipwreck_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.FairyBell.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::basicItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -223,7 +226,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x636BAF)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Blade Staff", "刃杖")
@@ -259,7 +262,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, cloud);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xA6670C)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Rain Cloud Staff", "雨云法杖")
@@ -268,8 +271,8 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/phantom"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.RainCloudStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f))
-                                    .when(WeatherCheck.weather().setRaining(true)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f))
+                                         .when(WeatherCheck.weather().setRaining(true)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -302,7 +305,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, flameEye);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFF4040)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Optic Staff", "魔眼法杖")
@@ -310,7 +313,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/ghast"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.OpticStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.02f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -323,7 +326,7 @@ public class SummonerWeaponRegister {
                             .damage(5.5f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
-                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x04F6FF)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Deadly Sphere Staff", "致命球法杖")
@@ -331,7 +334,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/jungle_temple"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.DeadlySphereStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -344,7 +347,7 @@ public class SummonerWeaponRegister {
                             .damage(3.6f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x1079FF)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Xeno Staff", "外星法杖")
@@ -352,7 +355,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.XenoStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -376,7 +379,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xB16500)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Pulse Turret Remote", "脉冲炮塔遥控装置")
@@ -385,7 +388,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/abandoned_mineshaft"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.PulseTurretRemote.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -398,7 +401,7 @@ public class SummonerWeaponRegister {
                             .damage(5f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
-                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xDC30FF)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Tempest Staff", "暴风雨法杖")
@@ -424,7 +427,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x75A7D1)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Terraprism", "泰拉棱镜")
@@ -433,7 +436,7 @@ public class SummonerWeaponRegister {
                     .jeiInfo(1, "Occasionally drops from Allays", "悦灵偶尔掉落")
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/allay"), LootTable -> LootPool.lootPool()
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.TerraPrism)
-                                    .when(LootItemRandomChanceCondition.randomChance(0.01f))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.01f))
                             )
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
@@ -458,7 +461,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xD25259)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Ballista Rod", "弩车魔杖")
@@ -466,7 +469,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.BallistaRod.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -490,7 +493,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xED5C5C)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Ballista Cane", "弩车手杖")
@@ -498,7 +501,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.BallistaCane.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -522,7 +525,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xF3485E)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Ballista Staff", "弩车法杖")
@@ -531,7 +534,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/pillager_outpost"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.BallistaStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -556,14 +559,14 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xCC5649)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Lightning Aura Rod", "闪电光环魔杖")
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/village/village_weaponsmith"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.LightningAuraRod.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -588,14 +591,14 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xCF5549)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Lightning Aura Cane", "闪电光环手杖")
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/village/village_weaponsmith"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.LightningAuraCane.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -620,7 +623,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xD75346)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Lightning Aura Staff", "闪电光环法杖")
@@ -628,7 +631,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/village/village_weaponsmith"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.LightningAuraStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -652,7 +655,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFCB200)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Ethereal Stellar Core Staff", "缥缈星核法杖")
@@ -661,7 +664,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.EtherealStellarCoreStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.02f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -674,7 +677,7 @@ public class SummonerWeaponRegister {
                             .damage(6f)
                             .knockback(0.2f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x077AFF)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Stardust Cell Staff", "星尘细胞法杖")
@@ -683,7 +686,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.StardustCellStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.02f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -727,7 +730,7 @@ public class SummonerWeaponRegister {
                                     }
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFFB400)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Stardust Dragon Staff", "星尘之龙法杖")
@@ -736,7 +739,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.StardustDragonStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.02f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -759,7 +762,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x22DD97)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Moon Portal Staff", "月亮传送门法杖")
@@ -767,7 +770,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/ender_dragon"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.MoonPortalStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.1f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.1f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -790,7 +793,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x994DFF)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Rainbow Crystal Staff", "七彩水晶法杖")
@@ -799,7 +802,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/ender_dragon"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.RainbowCrystalStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.1f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.1f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -822,7 +825,8 @@ public class SummonerWeaponRegister {
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC)
-                                    .component(SummonerDataComponentRegister.SCABBARD, ScabbardContainer.EMPTY))
+                                    .component(SummonerDataComponentRegister.SCABBARD, ScabbardContainer.EMPTY)
+                                    .component(LyraDataComponentRegister.RARITY, new LyraRarity(0xA66053)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Infinite Scabbard", "无限剑鞘")
@@ -876,7 +880,7 @@ public class SummonerWeaponRegister {
                                     }
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x955CAA)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Void Eater Marionette", "虚空吞噬者傀具")
@@ -887,7 +891,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/end_city_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.VoidEaterMarionette.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.005f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.005f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -909,7 +913,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x2978D3)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Thundercloud Bonsai", "雷云盆栽")
@@ -921,8 +925,8 @@ public class SummonerWeaponRegister {
                         return LootPool.lootPool()
                                 .setRolls(ConstantValue.exactly(1f))
                                 .add(LootItem.lootTableItem(SummonerWeaponRegister.ThundercloudBonsai.get())
-                                        .when(LootItemRandomChanceCondition.randomChance(0.01f))
-                                        .when(LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, EntityPredicate.Builder.entity().nbt(new NbtPredicate(tag)))))
+                                             .when(LootItemRandomChanceCondition.randomChance(0.01f))
+                                             .when(LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, EntityPredicate.Builder.entity().nbt(new NbtPredicate(tag)))))
                                 .build();
                     })
                     .itemModel(ItemModelProvider::handheldItem)
@@ -947,7 +951,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x07BA19)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Corn Cannon", "玉米加农炮")
@@ -973,7 +977,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xDA5152)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Necro Spirit Staff", "死魂灵巫术单元")
@@ -1000,7 +1004,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x0084E6)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Laser Minigun", "激光机枪")
@@ -1008,7 +1012,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/warden"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.LaserMinigunStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.01f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -1031,7 +1035,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x367A9C)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Barnacle Staff", "藤壶法杖")
@@ -1039,7 +1043,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/drowned"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.BarnacleStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.01f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -1062,7 +1066,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xA26632)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Eye Laser Turret Staff", "眼球激光塔魔杖")
@@ -1070,7 +1074,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/elder_guardian"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.EyeLaserTurretStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.02f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -1093,7 +1097,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x0F98EA)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Hydra Staff", "寒霜九头蛇法杖")
@@ -1101,7 +1105,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/stray"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.HydraStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.01f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -1125,14 +1129,14 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xB94BEB)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Inferno Rod", "爆炸烈焰魔杖")
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/bastion_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.InfernoRod.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.02f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -1156,14 +1160,14 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xB94BEB)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Inferno Cane", "爆炸烈焰手杖")
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/bastion_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.InfernoCane.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.02f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -1187,7 +1191,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.RARE))
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFFA91A)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Inferno Staff", "爆炸烈焰法杖")
@@ -1195,7 +1199,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/bastion_treasure"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.InfernoStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.02f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.02f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -1217,7 +1221,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.UNCOMMON))
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFF4242)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Sanguine Staff", "血红法杖")
@@ -1225,7 +1229,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/bat"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.SanguineStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.01f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.01f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
@@ -1247,7 +1251,7 @@ public class SummonerWeaponRegister {
                                     summonerHelper.add(slotType, minion);
                                 }
                             })
-                            .properties(properties -> properties.rarity(Rarity.EPIC))
+                            .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x9D6A0F)))
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Ruin Staff", "毁灭法杖")
@@ -1255,7 +1259,7 @@ public class SummonerWeaponRegister {
                     .lootTable(ResourceLocation.withDefaultNamespace("chests/desert_pyramid"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.RuinStaff.get())
-                                    .when(LootItemRandomChanceCondition.randomChance(0.05f)))
+                                         .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
