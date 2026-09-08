@@ -14,11 +14,12 @@ public class Summoner {
     public static final LyraItemRegistries REGISTRIES = LyraItemRegistries.create(MODID).languageInit(new SummonerLanguageRegister());
 
     public Summoner(IEventBus eventBus, ModContainer container) {
-        SummonerItemRegister.register();
-        SummonerArmorRegister.register();
-        SummonerCurioRegister.register();
-        SummonerWeaponRegister.register();
-        REGISTRIES.register(eventBus);
+        REGISTRIES.register(eventBus, () -> {
+            SummonerItemRegister.register();
+            SummonerArmorRegister.register();
+            SummonerCurioRegister.register();
+            SummonerWeaponRegister.register();
+        });
         SummonerCreativeTabRegister.register(eventBus);
         SummonerDataComponentRegister.register(eventBus);
         SummonerAttachmentEntityRegister.register(eventBus);

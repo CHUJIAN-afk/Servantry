@@ -8,24 +8,24 @@ public class SummonerLanguageRegister implements LyraItemRegistries.LanguageInit
         // ================= 模组基础 =================
         registries.language("modid.summoner", "Summoner", "召唤师");
         // ===================== 药水效果 =====================
-        registries.effectLanguage(SummonerMobEffectRegister.Obsession, "Obsession", "着魔");
-        registries.effectLanguage(SummonerMobEffectRegister.CellParasitism, "Cell Parasitism", "细胞寄生");
-        registries.effectLanguage(SummonerMobEffectRegister.CursedFlame, "Cursed Flame", "诅咒焰");
-        registries.effectLanguage(SummonerMobEffectRegister.SoulMight, "Soul Might", "灵魂力量");
-        registries.effectLanguage(SummonerMobEffectRegister.SoulDefense, "Soul Defense", "灵魂防御");
-        registries.effectLanguage(SummonerMobEffectRegister.SoulRecovery, "Soul Recovery", "灵魂恢复");
-        registries.effectLanguage(SummonerMobEffectRegister.HallowedMight, "Hallowed Might", "神圣之力");
-        registries.effectLanguage(SummonerMobEffectRegister.HallowedGrace, "Hallowed Grace", "神圣之佑");
-        registries.effectLanguage(SummonerMobEffectRegister.HallowedRadiance, "Hallowed Radiance", "神圣之辉");
-        registries.effectLanguage(SummonerMobEffectRegister.PhantasmalMight, "Phantasmal Might", "幻魂之力");
-        registries.effectLanguage(SummonerMobEffectRegister.PhantasmalBulwark, "Phantasmal Bulwark", "幻魂坚盾");
-        registries.effectLanguage(SummonerMobEffectRegister.PhantasmalRebirth, "Phantasmal Rebirth", "幻魂还生");
-        registries.effectLanguage(SummonerMobEffectRegister.Shadowflame, "Shadowflame", "暗影焰");
-        registries.effectLanguage(SummonerMobEffectRegister.MoonBite, "Moon Bite", "月噬");
-        registries.effectLanguage(SummonerMobEffectRegister.GodSlayerInferno, "God Slayer Inferno", "噬神怒焰");
-        registries.effectLanguage(SummonerMobEffectRegister.ArmorCrunch, "Armor Crunch", "碎甲");
+        registries.language(SummonerMobEffectRegister.Obsession.get().getDescriptionId(), "Obsession", "着魔");
+        registries.language(SummonerMobEffectRegister.CellParasitism.get().getDescriptionId(), "Cell Parasitism", "细胞寄生");
+        registries.language(SummonerMobEffectRegister.CursedFlame.get().getDescriptionId(), "Cursed Flame", "诅咒焰");
+        registries.language(SummonerMobEffectRegister.SoulMight.get().getDescriptionId(), "Soul Might", "灵魂力量");
+        registries.language(SummonerMobEffectRegister.SoulDefense.get().getDescriptionId(), "Soul Defense", "灵魂防御");
+        registries.language(SummonerMobEffectRegister.SoulRecovery.get().getDescriptionId(), "Soul Recovery", "灵魂恢复");
+        registries.language(SummonerMobEffectRegister.HallowedMight.get().getDescriptionId(), "Hallowed Might", "神圣之力");
+        registries.language(SummonerMobEffectRegister.HallowedGrace.get().getDescriptionId(), "Hallowed Grace", "神圣之佑");
+        registries.language(SummonerMobEffectRegister.HallowedRadiance.get().getDescriptionId(), "Hallowed Radiance", "神圣之辉");
+        registries.language(SummonerMobEffectRegister.PhantasmalMight.get().getDescriptionId(), "Phantasmal Might", "幻魂之力");
+        registries.language(SummonerMobEffectRegister.PhantasmalBulwark.get().getDescriptionId(), "Phantasmal Bulwark", "幻魂坚盾");
+        registries.language(SummonerMobEffectRegister.PhantasmalRebirth.get().getDescriptionId(), "Phantasmal Rebirth", "幻魂还生");
+        registries.language(SummonerMobEffectRegister.Shadowflame.get().getDescriptionId(), "Shadowflame", "暗影焰");
+        registries.language(SummonerMobEffectRegister.MoonBite.get().getDescriptionId(), "Moon Bite", "月噬");
+        registries.language(SummonerMobEffectRegister.GodSlayerInferno.get().getDescriptionId(), "God Slayer Inferno", "噬神怒焰");
+        registries.language(SummonerMobEffectRegister.ArmorCrunch.get().getDescriptionId(), "Armor Crunch", "碎甲");
         // ===================== 药水类物品 =====================
-        registries.potionLanguage(SummonerPotionRegister.Obsession, "Obsession", "着魔");
+        potionLanguage(registries, SummonerPotionRegister.Obsession.getId().getPath(), "Obsession", "着魔");
         // 附魔名字键
         registries.language("enchantment.summoner.food_chain", "Food Chain", "食物链");
         registries.language("enchantment.summoner.jungle_hunter", "Jungle Hunter", "丛林捕手");
@@ -82,5 +82,16 @@ public class SummonerLanguageRegister implements LyraItemRegistries.LanguageInit
         registries.language("mark.additional_damage", "Mark Damage", "标记伤害");
         registries.language("mark.additional_armor_pierce", "Armor Pierce", "护甲穿透");
         registries.language("mark.critical_hit_rate", "Crit Rate", "暴击率");
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private static void potionLanguage(LyraItemRegistries registries, String effectName, String enName, String zhName) {
+        for (String variant : new String[]{"", "long_", "strong_"}) {
+            String suffix = variant + effectName;
+            registries.language("item.minecraft.potion.effect." + suffix, "Potion of " + enName, zhName + "药水");
+            registries.language("item.minecraft.splash_potion.effect." + suffix, "Splash Potion of " + enName, "喷溅型" + zhName + "药水");
+            registries.language("item.minecraft.lingering_potion.effect." + suffix, "Lingering Potion of " + enName, "滞留型" + zhName + "药水");
+            registries.language("item.minecraft.tipped_arrow.effect." + suffix, "Arrow of " + enName, zhName + "之箭");
+        }
     }
 }
