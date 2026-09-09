@@ -3,12 +3,8 @@ package first.summoner.common.projectile;
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -24,15 +20,13 @@ import java.util.List;
 public class MiniChlorophyteCrystal extends Projectile implements IEntityCollision<MiniChlorophyteCrystal> {
 
     public MiniChlorophyteCrystal() {
-        super();
+        super(SummonerAttachmentEntityRegister.MINI_CHLOROPHYTE_CRYSTAL);
+        setDrag(1f);
+        setMaxLife(20);
     }
 
-    public MiniChlorophyteCrystal(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
-        setDrag(1f);
-        setMaxSpeed(4);
-        setMaxLife(20);
+    public int getTrailDuration() {
+        return 15;
     }
 
     @Override
@@ -80,20 +74,6 @@ public class MiniChlorophyteCrystal extends Projectile implements IEntityCollisi
                     .spread(Math.TAU)
                     .emit();
         }
-    }
-
-    @Override
-    public boolean isValidCollisionTarget(MiniChlorophyteCrystal entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
-            return minion.isTarget(target);
-        }
-        return false;
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.MINI_CHLOROPHYTE_CRYSTAL.get();
     }
 
     @Override

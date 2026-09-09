@@ -2,9 +2,7 @@ package first.summoner.common.minion;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.AttachmentEntityData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.minion.MinionGoalSelector;
-import first.lyra.common.minion.MomentumMinion;
 import first.summoner.common.minion.goal.stardustDragon.StardustDragonFollowGoal;
 import first.summoner.common.minion.goal.stardustDragon.StardustDragonIdleGoal;
 import first.summoner.common.minion.goal.voidEater.VoidEaterAttackGoal;
@@ -16,7 +14,7 @@ import java.util.List;
 public class VoidEater extends StardustDragon {
 
     public VoidEater(){
-        super();
+        super(SummonerAttachmentEntityRegister.VOID_EATER);
         setDrag(0.75f);
         setRotationSpeed(0);
     }
@@ -34,9 +32,7 @@ public class VoidEater extends StardustDragon {
     @Override
     public void onRemove() {
         if (isHead()) {
-            List<VoidEater> voidEaters = LyraHelper.get(owner)
-                    .getEntityData()
-                    .get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.VOID_EATER.get());
+            List<VoidEater> voidEaters = LyraHelper.get(owner).getEntityData().get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.VOID_EATER.get());
             for (VoidEater voidEater : voidEaters) {
                 voidEater.setRemove();
             }
@@ -87,10 +83,5 @@ public class VoidEater extends StardustDragon {
             }
         }
         return null;
-    }
-
-    @Override
-    public AttachmentEntityType<? extends MomentumMinion> getType() {
-        return SummonerAttachmentEntityRegister.VOID_EATER.get();
     }
 }

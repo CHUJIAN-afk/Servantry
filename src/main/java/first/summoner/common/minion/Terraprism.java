@@ -7,13 +7,15 @@ import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionGoalSelector;
+import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.common.minion.goal.terraprism.TerraprismAttackGoal;
 import first.summoner.common.minion.goal.terraprism.TerraprismIdleGoal;
 import first.summoner.common.minion.goal.terraprism.TerraprismPrepGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.core.Holder;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -27,14 +29,26 @@ import java.util.Set;
 public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
 
     public boolean attacking = false;
-    private boolean blend = false;
-    public int trailTimer = 0;
-    public float idleBlend = 0f;
-    public float idleBlendO = 0f;
     public final Set<LivingEntity> hitTargets = new HashSet<>();
 
+    public int trailTimer = 0;
+    public float lastIdleBlend = 0f;
+    public float idleBlend = 0f;
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(LyraStreamCodecs.INT, () -> trailTimer, value -> trailTimer = value);
+        fields.field(LyraStreamCodecs.FLOAT, () -> lastIdleBlend, value -> lastIdleBlend = value);
+        fields.field(LyraStreamCodecs.FLOAT, () -> idleBlend, value -> idleBlend = value);
+    }
+
     public Terraprism() {
-        super();
+        super(SummonerAttachmentEntityRegister.TERRA_PRISM);
+    }
+
+    protected Terraprism(Holder<AttachmentEntityType<?>> type) {
+        super(type);
     }
 
     @Override
@@ -89,35 +103,21 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     }
 
     @Override
-    public boolean isValidCollisionTarget(Terraprism entity, LivingEntity target) {
-        return isTarget(target);
-    }
-
-    @Override
     public void tick() {
-        if (owner.level().isClientSide()) {
-            idleBlendO = idleBlend;
-            if (blend) {
+        if (!owner.level().isClientSide()) {
+            lastIdleBlend = idleBlend;
+            if (attacking) {
                 trailTimer = Math.min(trailTimer + 1, 12);
-                idleBlend = Math.max(0.0f, idleBlend - 0.25f);
             } else {
-                trailTimer = Math.max(trailTimer - 1, 0);
+                trailTimer = 0;
+            }
+            if (getGoalSelector().getCurrentGoal() instanceof TerraprismIdleGoal) {
                 idleBlend = Math.min(1.0f, idleBlend + 0.1f);
+            } else {
+                idleBlend = Math.max(0.0f, idleBlend - 0.25f);
             }
         }
         super.tick();
-    }
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeBoolean(attacking);
-        buf.writeBoolean(!(getGoalSelector().getCurrentGoal() instanceof TerraprismIdleGoal));
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        this.attacking = buf.readBoolean();
-        this.blend = buf.readBoolean();
     }
 
     public int getColor(float partialTick) {
@@ -131,7 +131,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     @Override
     public PathNode getRenderNode(float partialTick) {
         PathNode renderNode = super.getRenderNode(partialTick);
-        return renderNode.lerp(getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, idleBlendO, idleBlend));
+        return renderNode.lerp(getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, lastIdleBlend, idleBlend));
     }
 
     @Override
@@ -166,10 +166,5 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
         Vec3 playerPos = owner.getPosition(partialTick);
         Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
         return new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends Minion> getType() {
-        return SummonerAttachmentEntityRegister.TERRA_PRISM.get();
     }
 }

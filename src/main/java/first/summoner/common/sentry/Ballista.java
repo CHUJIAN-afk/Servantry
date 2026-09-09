@@ -1,8 +1,7 @@
 package first.summoner.common.sentry;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.sound.Playable;
 import first.summoner.common.projectile.CrossbowBolt;
@@ -10,7 +9,7 @@ import first.summoner.register.SummonerArmorSetRegister;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
 import first.summoner.register.SummonerSoundRegister;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -23,8 +22,15 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
     private int cooldown = 0;
 
     public Ballista() {
+        super(SummonerAttachmentEntityRegister.BALLISTA);
         setGravity(-0.05f);
         setRotationSpeed(18f);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.INT, this::getLevel, this::setLevel);
     }
 
     @Override
@@ -75,16 +81,6 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
     }
 
     @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(level);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        level = buf.readInt();
-    }
-
-    @Override
     public void dimensionChange() {
         setRemove();
     }
@@ -100,7 +96,9 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
     public void fire() {
         Vec3 direction = getLookAngle();
         Vec3 start = getPos();
-        CrossbowBolt projectile = new CrossbowBolt(getDamageSource(), start, direction);
+        CrossbowBolt projectile = new CrossbowBolt();
+        projectile.copyDamageSource(this);
+        projectile.setPos(start);
         if (SummonerArmorSetRegister.ValhallaKnight.value().full(owner)) {
             projectile.setMaxPierceCount(6);
             projectile.setDamage(projectile.getDamage() * 1.33f);
@@ -109,11 +107,6 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
         projectile.setVelocity(direction.scale(2));
         projectile.join(owner);
         Playable.play(SummonerSoundRegister.BallistaShot, owner.level(), start, owner.getSoundSource());
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.BALLISTA.get();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package first.summoner.common.minion;
 
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -10,7 +10,7 @@ import first.summoner.common.minion.goal.stardustCell.StardustCellAttackGoal;
 import first.summoner.common.projectile.MiniStardustCell;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -33,36 +33,29 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
      * 拖尾计时器
      */
     private int trailTimer = 0;
-
     /**
      * 基础射击冷却
      */
     private int shootCooldown = 0;
-
     /**
      * 玩家攻击联动冷却
      */
     private int extraShootCooldown = 0;
 
-
     public StardustCell() {
-        super();
+        super(SummonerAttachmentEntityRegister.STARDUST_CELL);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.INT, this::getTrailTimer, this::setTrailTimer);
     }
 
     @Override
     public void registerGoals(MinionGoalSelector goalSelector) {
         goalSelector.addGoal(0, new StardustCellAttackGoal(this));
         goalSelector.addGoal(1, new MomentumMinionIdleGoal(this, 6, 0.01f, 64, false));
-    }
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(trailTimer);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        trailTimer = buf.readInt();
     }
 
     @Override
@@ -91,7 +84,9 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
     public void shootExtraAtTarget(LivingEntity target){
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
-        MiniStardustCell projectile = new MiniStardustCell(getDamageSource(), start);
+        MiniStardustCell projectile = new MiniStardustCell();
+        projectile.copyDamageSource(this);
+        projectile.setPos(start);
         projectile.setDamage(getDamage() * 0.67f);
         projectile.setChaseTarget(target);
         projectile.join(owner);
@@ -122,7 +117,9 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
     public void shootAtTarget(LivingEntity target) {
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
-        MiniStardustCell projectile = new MiniStardustCell(getDamageSource(), start);
+        MiniStardustCell projectile = new MiniStardustCell();
+        projectile.copyDamageSource(this);
+        projectile.setPos(start);
         projectile.setChaseTarget(target);
         projectile.join(owner);
         // 后坐力
@@ -154,11 +151,6 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
     public void teleportTo(Vec3 targetPos) {
         setTrailTimer(4);
         super.teleportTo(targetPos);
-    }
-
-    @Override
-    public AttachmentEntityType<StardustCell> getType() {
-        return SummonerAttachmentEntityRegister.STARDUST_CELL.get();
     }
 
     public int getShootCooldown() {

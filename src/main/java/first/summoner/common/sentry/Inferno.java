@@ -1,12 +1,11 @@
 package first.summoner.common.sentry;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.summoner.common.projectile.ExplosionFlameBall;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -28,10 +27,16 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
     private int cooldown = 0;
 
     public Inferno() {
-        super();
+        super(SummonerAttachmentEntityRegister.INFERNO);
         setGravity(-0.05f);
         setDrag(0.9f);
         setRotationSpeed(18f);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.INT, this::getLevel, this::setLevel);
     }
 
     @Override
@@ -83,7 +88,10 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
     private void fire(Vec3 targetPos) {
         Vec3 start = getPos();
         Vec3 direction = targetPos.subtract(start).normalize();
-        ExplosionFlameBall ball = new ExplosionFlameBall(getDamageSource(), start, direction);
+        ExplosionFlameBall ball = new ExplosionFlameBall();
+        ball.copyDamageSource(this);
+        ball.setPos(start);
+        ball.setVelocity(direction);
         ball.join(owner);
     }
 
@@ -103,16 +111,6 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
     }
 
     @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(level);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        level = buf.readInt();
-    }
-
-    @Override
     public void dimensionChange() {
         setRemove();
     }
@@ -123,11 +121,6 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
 
     public void setLevel(int level) {
         this.level = level;
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.INFERNO.get();
     }
 
     @Override

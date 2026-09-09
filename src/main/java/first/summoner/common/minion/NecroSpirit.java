@@ -1,6 +1,5 @@
 package first.summoner.common.minion;
 
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -21,7 +20,7 @@ public class NecroSpirit extends Minion {
     private int cooldown = 0;
 
     public NecroSpirit() {
-        super();
+        super(SummonerAttachmentEntityRegister.NECRO_SPIRIT);
     }
 
     @Override
@@ -58,7 +57,10 @@ public class NecroSpirit extends Minion {
         Vec3 targetCenter = target.getBoundingBox().getCenter();
         Vec3 direction = targetCenter.subtract(start).normalize();
 
-        MiniNecroSpirit projectile = new MiniNecroSpirit(getDamageSource(), start, direction);
+        MiniNecroSpirit projectile = new MiniNecroSpirit();
+        projectile.copyDamageSource(this);
+        projectile.setPos(start);
+        projectile.setVelocity(direction);
         projectile.setTrackingTarget(target);
         projectile.join(owner);
 
@@ -106,10 +108,5 @@ public class NecroSpirit extends Minion {
     @Override
     public int getSearchDistance() {
         return 32;
-    }
-
-    @Override
-    public AttachmentEntityType<? extends Minion> getType() {
-        return SummonerAttachmentEntityRegister.NECRO_SPIRIT.get();
     }
 }

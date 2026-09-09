@@ -1,11 +1,8 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -24,14 +21,8 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
     private LivingEntity chaseTarget = null;
 
     public ShatteredStellarCore() {
-        super();
-    }
-
-    public ShatteredStellarCore(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.SHATTERED_STELLAR_CORE);
         setDrag(0.8f);
-        setMaxSpeed(4);
         setMaxLife(100);
     }
 
@@ -42,9 +33,8 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
 
     @Override
     public boolean isValidCollisionTarget(ShatteredStellarCore entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
-            return minion.isTarget(target);
+        if (isTarget(target)) {
+            return true;
         }
         return target == chaseTarget;
     }
@@ -55,10 +45,7 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
         LivingEntity target = hit.entity();
         DamageSource source = getDamageSource();
         if (source != null) {
-            UUID uuid = null;
-            if (source instanceof MinionDamageSource minionDamageSource && minionDamageSource.getMinion() instanceof Minion minion) {
-                uuid = minion.getUuid();
-            }
+            UUID uuid = getUuid();
             InvincibleData.attack(target)
                     .attacker(uuid)
                     .damageSource(source)
@@ -73,7 +60,7 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
     public void tick() {
         if (!owner.level().isClientSide()) {
             if (chaseTarget != null && chaseTarget.isAlive()) {
-                if (life >= 15) {
+                if (getTickCount() >= 15) {
                     Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
                     applyForce(targetCenter.subtract(getPos()).normalize().scale(0.6));
                 }
@@ -108,14 +95,8 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
                 .emit();
     }
 
-    @Override
     public int getTrailDuration() {
         return 10;
-    }
-
-    @Override
-    public AttachmentEntityType<ShatteredStellarCore> getType() {
-        return SummonerAttachmentEntityRegister.SHATTERED_STELLAR_CORE.get();
     }
 
     public void setChaseTarget(LivingEntity chaseTarget) {

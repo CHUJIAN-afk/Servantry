@@ -1,7 +1,6 @@
 package first.summoner.common.minion;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.Ellipse;
 import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
@@ -30,7 +29,7 @@ public class BloodBat extends Minion implements IEntityCollision<BloodBat> {
     public final Set<LivingEntity> hitTargets = new HashSet<>();
 
     public BloodBat() {
-        super();
+        super(SummonerAttachmentEntityRegister.BLOOD_BAT);
     }
 
     @Override
@@ -82,11 +81,6 @@ public class BloodBat extends Minion implements IEntityCollision<BloodBat> {
         }
     }
 
-    @Override
-    public boolean isValidCollisionTarget(BloodBat entity, LivingEntity target) {
-        return isTarget(target);
-    }
-
     public void finishAttack() {
         progress = 0;
         hasDamaged = false;
@@ -128,10 +122,5 @@ public class BloodBat extends Minion implements IEntityCollision<BloodBat> {
         // 看向玩家看向的方向，无翻滚角
         float playerYaw = Mth.rotLerp(partialTick, player.yHeadRotO, player.yHeadRot);
         return new PathNode(targetPos, playerYaw, 0, 0);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends Minion> getType() {
-        return SummonerAttachmentEntityRegister.BLOOD_BAT.get();
     }
 }

@@ -1,17 +1,16 @@
 package first.summoner.common.minion;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
 import first.summoner.common.minion.goal.MomentumMinionIdleGoal;
 import first.summoner.common.minion.goal.twins.TwinsCursedFlameAttackGoal;
 import first.summoner.common.minion.goal.twins.TwinsLaserAttackGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,9 +36,16 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
     private int trailTimer = 0;
 
     public Twins() {
-        super();
+        super(SummonerAttachmentEntityRegister.TWINS);
         setDrag(0.75f);
         setRotationSpeed(20);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.BOOL, this::isLaserEye, value -> isLaserEye = value);
+        fields.field(ByteBufCodecs.INT, this::getTrailTimer, this::setTrailTimer);
     }
 
     @Override
@@ -75,11 +81,6 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
     }
 
     @Override
-    public boolean isValidCollisionTarget(Twins entity, LivingEntity target) {
-        return isTarget(target);
-    }
-
-    @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
             InvincibleData.attack(hit.entity())
@@ -106,23 +107,6 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
 
     public int getSearchDistance() {
         return 32;
-    }
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeBoolean(isLaserEye);
-        buf.writeInt(trailTimer);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        isLaserEye = buf.readBoolean();
-        trailTimer = buf.readInt();
-    }
-
-    @Override
-    public AttachmentEntityType<? extends MomentumMinion> getType() {
-        return SummonerAttachmentEntityRegister.TWINS.get();
     }
 
     public void setOther(Twins twins) {

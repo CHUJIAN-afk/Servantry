@@ -1,6 +1,5 @@
 package first.summoner.common.minion;
 
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionGoalSelector;
@@ -22,6 +21,7 @@ public class ScavengerFairy extends Minion {
     private Entity targetEntity;
 
     public ScavengerFairy() {
+        super(SummonerAttachmentEntityRegister.SCAVENGER_FAIRY);
     }
 
     @Override
@@ -38,11 +38,6 @@ public class ScavengerFairy extends Minion {
             }
         }
         super.tick();
-    }
-
-    @Override
-    public AttachmentEntityType<? extends Minion> getType() {
-        return SummonerAttachmentEntityRegister.SCAVENGER_FAIRY.get();
     }
     
     @Override

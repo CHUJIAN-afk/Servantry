@@ -5,6 +5,7 @@ import first.lyra.common.attachment.AttachmentEntityData;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -13,7 +14,8 @@ import first.summoner.common.minion.goal.stardustDragon.StardustDragonFollowGoal
 import first.summoner.common.minion.goal.stardustDragon.StardustDragonIdleGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.core.Holder;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -40,9 +42,22 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
     private float spiralPhase = 0;
 
     public StardustDragon() {
-        super();
+        super(SummonerAttachmentEntityRegister.STARDUST_DRAGON);
         setDrag(0.92f);
         setRotationSpeed(0);
+    }
+
+    protected StardustDragon(Holder<AttachmentEntityType<?>> type) {
+        super(type);
+        setDrag(0.92f);
+        setRotationSpeed(0);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.INT, this::getSegmentIndex, this::setSegmentIndex);
+        fields.field(ByteBufCodecs.INT, this::getTotalSegments, this::setTotalSegments);
     }
 
     @Override
@@ -171,15 +186,6 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
     }
 
     @Override
-    public boolean isValidCollisionTarget(StardustDragon entity, LivingEntity target) {
-        StardustDragon head = getHead();
-        if (head != null) {
-            return head.isTarget(target);
-        }
-        return false;
-    }
-
-    @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         StardustDragon head = getHead();
         if (head != null) {
@@ -195,25 +201,8 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
     }
 
     @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(segmentIndex);
-        buf.writeInt(totalSegments);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        segmentIndex = buf.readInt();
-        totalSegments = buf.readInt();
-    }
-
-    @Override
     public float getDamage() {
         return super.getDamage() * (1 + 0.23f * (getTotalSegments() - 1));
-    }
-
-    @Override
-    public AttachmentEntityType<? extends MomentumMinion> getType() {
-        return SummonerAttachmentEntityRegister.STARDUST_DRAGON.get();
     }
 
     public int getSegmentIndex() {

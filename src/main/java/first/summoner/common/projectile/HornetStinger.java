@@ -1,11 +1,8 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerCurioRegister;
@@ -14,9 +11,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -27,14 +22,8 @@ import java.util.List;
 public class HornetStinger extends Projectile implements IEntityCollision<HornetStinger>, IBlockCollision<HornetStinger> {
 
     public HornetStinger() {
-        super();
-    }
-
-    public HornetStinger(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.HORNET_STINGER);
         setDrag(1.0f);
-        setMaxSpeed(1.2f);
         setMaxLife(200);
         setGravity(0);
     }
@@ -57,14 +46,6 @@ public class HornetStinger extends Projectile implements IEntityCollision<Hornet
     }
 
     @Override
-    public boolean isValidCollisionTarget(HornetStinger entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof MinionDamageSource sds) {
-            return sds.getMinion().isTarget(target);
-        }
-        return IEntityCollision.super.isValidCollisionTarget(entity, target);
-    }
-
-    @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.1, -0.1, -0.1, 0.1, 0.1, 0.1);
     }
@@ -77,10 +58,5 @@ public class HornetStinger extends Projectile implements IEntityCollision<Hornet
     @Override
     public void onBlockCollision(CollisionContext context) {
         setRemove();
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.HORNET_STINGER.get();
     }
 }

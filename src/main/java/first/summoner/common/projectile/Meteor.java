@@ -2,12 +2,8 @@ package first.summoner.common.projectile;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -27,20 +23,9 @@ import java.util.List;
 public class Meteor extends Projectile implements IEntityCollision<Meteor>, IBlockCollision<Meteor> {
 
     public Meteor() {
-        super();
-    }
-
-    public Meteor(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.METEOR);
         setDrag(1);
-        setMaxSpeed(2.5f);
         setMaxLife(60);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.METEOR.get();
     }
 
     @Override
@@ -51,15 +36,6 @@ public class Meteor extends Projectile implements IEntityCollision<Meteor>, IBlo
     @Override
     public @NotNull AABB getBlockCollisionBox() {
         return new AABB(-0.12, -0.12, -0.12, 0.12, 0.12, 0.12);
-    }
-
-    @Override
-    public boolean isValidCollisionTarget(Meteor entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
-            return minion.isTarget(target);
-        }
-        return false;
     }
 
     @Override
@@ -108,10 +84,4 @@ public class Meteor extends Projectile implements IEntityCollision<Meteor>, IBlo
         setRemove();
     }
 
-    private static java.util.UUID getMinionUuid(DamageSource source) {
-        if (source instanceof MinionDamageSource minionDamageSource) {
-            return minionDamageSource.getMinion().getUuid();
-        }
-        return null;
-    }
 }

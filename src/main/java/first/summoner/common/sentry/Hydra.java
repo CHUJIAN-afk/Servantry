@@ -1,7 +1,5 @@
 package first.summoner.common.sentry;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.minion.MomentumMinion;
 import first.summoner.common.projectile.FrostBolt;
@@ -24,7 +22,7 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
     private int cooldown = 0;
 
     public Hydra() {
-        super();
+        super(SummonerAttachmentEntityRegister.HYDRA);
         setGravity(-0.05f);
         setDrag(0.9f);
         setRotationSpeed(18f);
@@ -62,7 +60,10 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
     private void fire(Vec3 targetPos) {
         Vec3 start = getPos();
         Vec3 direction = targetPos.subtract(start).normalize();
-        FrostBolt bolt = new FrostBolt(getDamageSource(), start, direction);
+        FrostBolt bolt = new FrostBolt();
+        bolt.copyDamageSource(this);
+        bolt.setPos(start);
+        bolt.setVelocity(direction);
         bolt.join(owner);
     }
 
@@ -84,11 +85,6 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
     @Override
     public @NotNull AABB getBlockCollisionBox() {
         return new AABB(-0.4, -0.4, -0.4, 0.4, 0.4, 0.4);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.HYDRA.get();
     }
 
     @Override

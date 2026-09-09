@@ -2,10 +2,7 @@ package first.summoner.common.projectile;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,16 +27,10 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
     private LivingEntity chaseTarget = null;
 
     public Petal() {
-        super();
-    }
-
-    public Petal(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.PETAL);
         setDrag(0.82f);
-        setMaxSpeed(1.2f);
         setMaxLife(40);
-        this.chaseDelay = 7; // 默认 0.35s，效果侧按随机 0.33~0.67s 覆盖
+        this.chaseDelay = 7;
     }
 
     @Override
@@ -78,28 +69,20 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
     }
 
     @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.PETAL.get();
-    }
-
-    @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.08, -0.08, -0.08, 0.08, 0.08, 0.08);
     }
 
     @Override
     public boolean isValidCollisionTarget(Petal entity, LivingEntity target) {
-        return getLife() > 10 && target != null && target.isAlive() && target != entity.getOwner();
+        return getTickCount() > 10 && target != null && target.isAlive() && target != entity.getOwner();
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
         if (source != null) {
-            UUID uuid = null;
-            if (source instanceof MinionDamageSource minionDamageSource) {
-                uuid = minionDamageSource.getMinion().getUuid();
-            }
+            UUID uuid = getUuid();
             for (HitContext hitContext : hitContexts) {
                 InvincibleData.attack(hitContext.entity())
                         .attacker(uuid)

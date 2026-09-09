@@ -24,14 +24,13 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
 
     @Override
     protected RenderContext<InfiniteShadow> createContext(InfiniteShadow infiniteShadow, float partialTick) {
-        int timer = infiniteShadow.attacking ? infiniteShadow.trailTimer : 0;
         ItemStack itemStack = infiniteShadow.getItemStack();
         if (!itemStack.isEmpty()) {
             int dominantColor = getDominantColor(itemStack);
             TrailConfig<InfiniteShadow, ?> trailConfig = null;
             if (!(itemStack.getItem() instanceof BlockItem)) {
                 trailConfig = new RibbonTrailConfig<InfiniteShadow>()
-                        .timer(timer)
+                        .timer(infiniteShadow.trailTimer)
                         .colorRGB(dominantColor)
                         .historyLength(4)
                         .upOffset(1.015f);

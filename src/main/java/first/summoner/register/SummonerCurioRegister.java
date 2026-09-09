@@ -366,7 +366,9 @@ public class SummonerCurioRegister {
                     .onPostDamage((minion, owner, target, damageSource) -> {
                         if (owner.getRandom().nextFloat() < 0.05f) {
                             Vec3 startPos = minion.getPos();
-                            MiniStardustCell projectile = new MiniStardustCell(minion.getDamageSource(), startPos);
+                            MiniStardustCell projectile = new MiniStardustCell();
+                            projectile.copyDamageSource(minion);
+                            projectile.setPos(startPos);
                             projectile.setVelocity(startPos.offsetRandom(owner.getRandom(), 1)
                                                            .subtract(startPos)
                                                            .normalize()

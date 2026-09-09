@@ -1,11 +1,9 @@
 package first.summoner.common.sentry;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.AttachmentEntityDamageSource;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.CustomLaser;
@@ -33,7 +31,7 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
     private int chargeTicks = 0;
 
     public EyeLaserTurret() {
-        super();
+        super(SummonerAttachmentEntityRegister.EYE_LASER_TURRET);
         setGravity(-0.05f);
         setDrag(0.9f);
         setRotationSpeed(18f);
@@ -86,9 +84,12 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
 
         if (laser == null || laser.isRemove()) {
             chargeTicks = Math.max(chargeTicks - 1, 0);
-            laser = new CustomLaser(getDamageSource(), new PathNode(pos, getYaw(), getPitch(), 0), 0xFF6B6B);
+            laser = new CustomLaser();
+            laser.copyDamageSource(this);
+            laser.setCurrentPathNode(new PathNode(pos, getYaw(), getPitch(), 0));
+            laser.setColor(0xFF6B6B);
             laser.setTickConsumer(l -> {
-                if (l.getDamageSource() instanceof MinionDamageSource minionDamageSource && minionDamageSource.getMinion().isRemove()) {
+                if (l.getDamageSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity().isRemove()) {
                     l.setRemove();
                 }
             });
@@ -171,11 +172,6 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
     @Override
     public @NotNull AABB getBlockCollisionBox() {
         return new AABB(-0.4, -0.4, -0.4, 0.4, 0.4, 0.4);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.EYE_LASER_TURRET.get();
     }
 
     @Override

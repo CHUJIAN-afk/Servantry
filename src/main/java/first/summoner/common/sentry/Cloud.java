@@ -1,7 +1,5 @@
 package first.summoner.common.sentry;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.minion.MomentumMinion;
 import first.summoner.common.projectile.Rain;
@@ -16,7 +14,7 @@ public class Cloud extends MomentumMinion implements IBlockCollision<Cloud> {
     private int cooldown = 4;
 
     public Cloud() {
-        super();
+        super(SummonerAttachmentEntityRegister.CLOUD);
         setDrag(0.8f);
     }
 
@@ -32,7 +30,10 @@ public class Cloud extends MomentumMinion implements IBlockCollision<Cloud> {
                 RandomSource random = owner.getRandom();
                 cooldown = random.nextInt(2, 4);
                 Vec3 start = getPos().offsetRandom(random, 0.25f);
-                Rain rain = new Rain(getDamageSource(), start, new Vec3(0, -0.5, 0));
+                Rain rain = new Rain();
+                rain.copyDamageSource(this);
+                rain.setPos(start);
+                rain.setVelocity(new Vec3(0, -0.5, 0));
                 rain.join(owner);
             }
         }
@@ -42,11 +43,6 @@ public class Cloud extends MomentumMinion implements IBlockCollision<Cloud> {
     @Override
     public void dimensionChange() {
         setRemove();
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.CLOUD.get();
     }
 
     @Override

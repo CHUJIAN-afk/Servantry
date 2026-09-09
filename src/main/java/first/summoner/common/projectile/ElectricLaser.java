@@ -1,18 +1,14 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -25,14 +21,8 @@ import java.util.UUID;
 public class ElectricLaser extends Projectile implements IEntityCollision<ElectricLaser>, IBlockCollision<ElectricLaser> {
 
     public ElectricLaser() {
-        super();
-    }
-
-    public ElectricLaser(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.ELECTRIC_LASER);
         setDrag(1);
-        setMaxSpeed(4);
         setMaxLife(34);
     }
 
@@ -42,10 +32,7 @@ public class ElectricLaser extends Projectile implements IEntityCollision<Electr
         LivingEntity target = hit.entity();
         DamageSource source = getDamageSource();
         if (source != null) {
-            UUID uuid = null;
-            if (source instanceof MinionDamageSource minionDamageSource && minionDamageSource.getMinion() instanceof Minion minion) {
-                uuid = minion.getUuid();
-            }
+            UUID uuid = getUuid();
             InvincibleData.attack(target)
                     .attacker(uuid)
                     .damageSource(source)
@@ -57,22 +44,8 @@ public class ElectricLaser extends Projectile implements IEntityCollision<Electr
     }
 
     @Override
-    public boolean isValidCollisionTarget(ElectricLaser entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
-            return minion.isTarget(target);
-        }
-        return IEntityCollision.super.isValidCollisionTarget(entity, target);
-    }
-
-    @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.03, -0.03, -1, 0.03, 0.03, 0);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends Projectile> getType() {
-        return SummonerAttachmentEntityRegister.ELECTRIC_LASER.get();
     }
 
     @Override

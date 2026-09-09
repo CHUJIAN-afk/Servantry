@@ -1,16 +1,13 @@
 package first.summoner.common.projectile;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.projectile.Projectile;
+import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.util.BiConsumer;
@@ -21,23 +18,35 @@ import java.util.function.Consumer;
 
 public class CustomLaser extends Projectile implements IEntityCollision<CustomLaser> {
 
+    private static final StreamCodec<RegistryFriendlyByteBuf, AABB> AABB_STREAM_CODEC = StreamCodec.composite(
+            LyraStreamCodecs.VEC_3, AABB::getMinPosition,
+            LyraStreamCodecs.VEC_3, AABB::getMaxPosition,
+            AABB::new
+    );
+
     private int color = 0;
     private float alpha = 1;
     private AABB hitbox = new AABB(0, 0, 0, 0, 0, 0);
     private Consumer<CustomLaser> tickConsumer = null;
     private BiConsumer<CustomLaser, List<HitContext>> hitConsumer = null;
 
+
+
     public CustomLaser() {
-        super();
+        super(SummonerAttachmentEntityRegister.CUSTOM_LASER);
+        setMaxLife(-1);
     }
 
-    public CustomLaser(DamageSource damageSource, PathNode pathNode, int color) {
-        super(pathNode.pos(), Vec3.directionFromRotation(pathNode.pitch(), pathNode.yaw()));
-        this.color = color;
-        setDamageSource(damageSource);
-        setDrag(1);
-        setMaxSpeed(0);
-        setMaxLife(-1);
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.INT, this::getColor, this::setColor);
+        fields.field(ByteBufCodecs.FLOAT, this::getAlpha, this::setAlpha);
+        fields.field(AABB_STREAM_CODEC, this::getHitbox, this::setHitbox);
+    }
+
+    public int getLife() {
+        return getTickCount();
     }
 
     public void setAlpha(float alpha) {
@@ -71,19 +80,8 @@ public class CustomLaser extends Projectile implements IEntityCollision<CustomLa
         this.hitConsumer = hitConsumer;
     }
 
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(color);
-        buf.writeFloat(alpha);
-        buf.writeVec3(hitbox.getMinPosition());
-        buf.writeVec3(hitbox.getMaxPosition());
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        color = buf.readInt();
-        alpha = buf.readFloat();
-        hitbox = new AABB(buf.readVec3(), buf.readVec3());
+    public void setHitbox(AABB hitbox) {
+        this.hitbox = hitbox;
     }
 
     public void setHitbox(Vec3 start, Vec3 end, float radius) {
@@ -99,22 +97,8 @@ public class CustomLaser extends Projectile implements IEntityCollision<CustomLa
     }
 
     @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.CUSTOM_LASER.get();
-    }
-
-    @Override
     public @NotNull AABB getHitbox() {
         return hitbox;
-    }
-
-    @Override
-    public boolean isValidCollisionTarget(CustomLaser entity, LivingEntity target) {
-        if (damageSource instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
-            return minion.isTarget(target);
-        }
-        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override

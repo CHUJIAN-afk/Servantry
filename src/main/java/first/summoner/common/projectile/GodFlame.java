@@ -1,16 +1,11 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -21,14 +16,8 @@ import java.util.List;
 public class GodFlame extends Projectile implements IEntityCollision<GodFlame> {
 
     public GodFlame() {
-        super();
-    }
-
-    public GodFlame(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.GOD_FLAME);
         setDrag(1);
-        setMaxSpeed(4);
         setMaxLife(34);
     }
 
@@ -48,25 +37,10 @@ public class GodFlame extends Projectile implements IEntityCollision<GodFlame> {
     }
 
     @Override
-    public boolean isValidCollisionTarget(GodFlame entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
-            return minion.isTarget(target);
-        }
-        return false;
-    }
-
-    @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.1, -0.1, -2, 0.1, 0.1, 0);
     }
 
-    @Override
-    public AttachmentEntityType<? extends Projectile> getType() {
-        return SummonerAttachmentEntityRegister.GOD_FLAME.get();
-    }
-
-    @Override
     public int getTrailDuration() {
         return 10;
     }

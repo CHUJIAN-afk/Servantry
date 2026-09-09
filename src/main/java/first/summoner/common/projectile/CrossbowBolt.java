@@ -1,15 +1,14 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.*;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
+import first.lyra.common.entity.IBlockCollision;
+import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.entity.PathNode;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -22,21 +21,10 @@ public class CrossbowBolt extends Projectile implements IBlockCollision<Crossbow
     public final Set<LivingEntity> hitTargets = new HashSet<>();
 
     public CrossbowBolt() {
-
-    }
-
-    public CrossbowBolt(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.CROSSBOW_BOLT);
         setDrag(0.97f);
-        setMaxSpeed(4);
         setMaxLife(40);
         setGravity(-0.01f);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.CROSSBOW_BOLT.get();
     }
 
     @Override
@@ -55,28 +43,20 @@ public class CrossbowBolt extends Projectile implements IBlockCollision<Crossbow
         return new AABB(-0.1, -0.1, -2, 0.1, 0.1, 0);
     }
 
-    @Override
-    public boolean isValidCollisionTarget(CrossbowBolt entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
-            return minion.isTarget(target);
-        }
-        return false;
-    }
-
     public void setMaxPierceCount(int maxPierceCount) {
         this.maxPierceCount = maxPierceCount;
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        if (damageSource != null) {
+        DamageSource source = getDamageSource();
+        if (source != null) {
             for (HitContext hitContext : hitContexts) {
                 LivingEntity living = hitContext.entity();
                 if (hitTargets.add(living)) {
                     InvincibleData.attack(living)
-                            .attacker(uuid)
-                            .damageSource(damageSource)
+                            .attacker(getUuid())
+                            .damageSource(source)
                             .damageAmount(getDamage())
                             .invincibleTime(20)
                             .apply();

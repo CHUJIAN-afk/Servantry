@@ -1,6 +1,5 @@
 package first.summoner.common.minion;
 
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -21,6 +20,10 @@ public class OreScout extends Minion {
     private BlockPos target = null;
     private int searchRadius = 1;
 
+    public OreScout() {
+        super(SummonerAttachmentEntityRegister.ORE_SCOUT);
+    }
+
     @Override
     public void tick() {
         Level level = getOwner().level();
@@ -36,11 +39,6 @@ public class OreScout extends Minion {
             }
         }
         super.tick();
-    }
-
-    @Override
-    public AttachmentEntityType<? extends Minion> getType() {
-        return SummonerAttachmentEntityRegister.ORE_SCOUT.get();
     }
 
     @Override
@@ -87,16 +85,8 @@ public class OreScout extends Minion {
         return null;
     }
 
-    private static final TagKey<Block>[] ORE_TAGS = new TagKey[]{
-            BlockTags.COAL_ORES,
-            BlockTags.COPPER_ORES,
-            BlockTags.DIAMOND_ORES,
-            BlockTags.EMERALD_ORES,
-            BlockTags.GOLD_ORES,
-            BlockTags.IRON_ORES,
-            BlockTags.LAPIS_ORES,
-            BlockTags.REDSTONE_ORES
-    };
+    @SuppressWarnings("unchecked")
+    private static final TagKey<Block>[] ORE_TAGS = (TagKey<Block>[]) new TagKey[]{BlockTags.COAL_ORES, BlockTags.COPPER_ORES, BlockTags.DIAMOND_ORES, BlockTags.EMERALD_ORES, BlockTags.GOLD_ORES, BlockTags.IRON_ORES, BlockTags.LAPIS_ORES, BlockTags.REDSTONE_ORES};
 
     private boolean isOre(BlockState state) {
         for (TagKey<Block> tag : ORE_TAGS) {

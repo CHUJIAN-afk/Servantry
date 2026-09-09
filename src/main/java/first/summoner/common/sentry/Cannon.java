@@ -1,14 +1,13 @@
 package first.summoner.common.sentry;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.sound.Playable;
 import first.summoner.common.projectile.Corn;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.Ballistics;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,8 +32,16 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
     private Vec3 targetPos = null;
 
     public Cannon() {
+        super(SummonerAttachmentEntityRegister.CANNON);
         setGravity(-0.05f);
         setRotationSpeed(18f);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.BOOL, () -> shooting, value -> shooting = value);
+        fields.field(ByteBufCodecs.BOOL, this::isHasCorn, value -> hasCorn = value);
     }
 
     @Override
@@ -99,27 +106,13 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
         Vec3 start = getPos().add(0, 1, -1.5);
         Vec3 velocity = Ballistics.solveVelocity(start, targetPos, 85f, 0.99f, -0.05f);
         if (velocity != null) {
-            Corn projectile = new Corn(getDamageSource(), start, velocity);
+            Corn projectile = new Corn();
+            projectile.setPos(start);
+            projectile.copyDamageSource(this);
+            projectile.setVelocity(velocity);
             projectile.join(owner);
             Playable.play(SoundEvents.GENERIC_EXPLODE, owner.level(), start, owner.getSoundSource());
         }
-    }
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeBoolean(shooting);
-        buf.writeBoolean(hasCorn);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        shooting = buf.readBoolean();
-        hasCorn = buf.readBoolean();
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.CANNON.get();
     }
 
     @Override

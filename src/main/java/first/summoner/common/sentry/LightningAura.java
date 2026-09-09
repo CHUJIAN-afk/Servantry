@@ -3,14 +3,13 @@ package first.summoner.common.sentry;
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -25,8 +24,15 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
     private int cooldown = 0;
 
     public LightningAura() {
+        super(SummonerAttachmentEntityRegister.LIGHTNING_AURA);
         setGravity(-0.05f);
         setRotationSpeed(18f);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.INT, this::getLevel, this::setLevel);
     }
 
     @Override
@@ -100,16 +106,6 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
     }
 
     @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(level);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        level = buf.readInt();
-    }
-
-    @Override
     public void dimensionChange() {
         setRemove();
     }
@@ -120,11 +116,6 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
 
     public void setLevel(int level) {
         this.level = level;
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.LIGHTNING_AURA.get();
     }
 
     @Override

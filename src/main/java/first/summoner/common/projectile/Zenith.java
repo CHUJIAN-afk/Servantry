@@ -1,12 +1,16 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.*;
+import first.lyra.common.entity.Ellipse;
+import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
+import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,12 +30,17 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
     public float progress = 0;
 
     public Zenith() {
-        super();
+        super(SummonerAttachmentEntityRegister.ZENITH);
+        setMaxLife(-1);
     }
 
-    public Zenith(DamageSource damageSource) {
-        super(Vec3.ZERO, null);
-        setDamageSource(damageSource);
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(LyraStreamCodecs.VEC_3, () -> direction, value -> direction = value);
+        fields.field(LyraStreamCodecs.VEC_3, () -> normal, value -> normal = value);
+        fields.field(ByteBufCodecs.FLOAT, () -> curvature, value -> curvature = value);
+        fields.field(ByteBufCodecs.INT, () -> chaseTarget != null ? chaseTarget.getId() : -1, (level, id) -> chaseTarget = id != -1 && level.getEntity(id) instanceof LivingEntity living ? living : null);
     }
 
     @Override
@@ -85,30 +94,6 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
         Vec3 ellipseCenter = ellipse.getCenter();
         Vec3 tipDir = point.subtract(ellipseCenter).normalize();
         return getEulerNode(point, tipDir, normal);
-    }
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeVec3(direction);
-        buf.writeVec3(normal);
-        buf.writeFloat(curvature);
-        buf.writeInt(chaseTarget != null ? chaseTarget.getId() : -1);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        direction = buf.readVec3();
-        normal = buf.readVec3();
-        curvature = buf.readFloat();
-        int targetId = buf.readInt();
-        if (targetId != -1 && owner != null && owner.level().getEntity(targetId) instanceof LivingEntity living) {
-            chaseTarget = living;
-        }
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.ZENITH.get();
     }
 
     @Override

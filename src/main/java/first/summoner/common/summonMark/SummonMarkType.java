@@ -1,6 +1,6 @@
 package first.summoner.common.summonMark;
 
-import first.lyra.common.minion.MinionDamageSource;
+import first.lyra.common.entity.AttachmentEntityDamageSource;
 import first.summoner.common.attachment.SummonMarkData;
 import first.summoner.register.SummonerSummonMarkRegister;
 import net.minecraft.ChatFormatting;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public record SummonMarkType(ResourceLocation identifier, float additionalDamage, float additionalArmorPierce, float criticalHitRate, @Nullable BiConsumer<LivingEntity, Player> tickConsumer, @Nullable SummonMarkDamageConsumer damageConsumer, @Nullable BiConsumer<LivingEntity, MinionDamageSource> killConsumer) {
+public record SummonMarkType(ResourceLocation identifier, float additionalDamage, float additionalArmorPierce, float criticalHitRate, @Nullable BiConsumer<LivingEntity, Player> tickConsumer, @Nullable SummonMarkDamageConsumer damageConsumer, @Nullable BiConsumer<LivingEntity, AttachmentEntityDamageSource> killConsumer) {
 
     public List<Component> getTooltips() {
         List<Component> toolTips = new ArrayList<>();
@@ -36,15 +36,15 @@ public record SummonMarkType(ResourceLocation identifier, float additionalDamage
         }
     }
 
-    public void damage(SummonMarkData summonMarkData, LivingEntity livingEntity, MinionDamageSource minionDamageSource, float damage) {
+    public void damage(SummonMarkData summonMarkData, LivingEntity livingEntity, AttachmentEntityDamageSource damageSource, float damage) {
         if (this.damageConsumer != null) {
-            this.damageConsumer.accept(summonMarkData, livingEntity, minionDamageSource, damage);
+            this.damageConsumer.accept(summonMarkData, livingEntity, damageSource, damage);
         }
     }
 
-    public void kill(LivingEntity livingEntity, MinionDamageSource minionDamageSource) {
+    public void kill(LivingEntity livingEntity, AttachmentEntityDamageSource damageSource) {
         if (this.killConsumer != null) {
-            this.killConsumer.accept(livingEntity, minionDamageSource);
+            this.killConsumer.accept(livingEntity, damageSource);
         }
     }
 
@@ -54,6 +54,6 @@ public record SummonMarkType(ResourceLocation identifier, float additionalDamage
 
     @FunctionalInterface
     public interface SummonMarkDamageConsumer {
-        void accept(SummonMarkData summonMark, LivingEntity livingEntity, MinionDamageSource minionDamageSource, float damage);
+        void accept(SummonMarkData summonMark, LivingEntity livingEntity, AttachmentEntityDamageSource damageSource, float damage);
     }
 }

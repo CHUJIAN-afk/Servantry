@@ -34,13 +34,6 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies."${mod_id}"]]
-modId = "geckolib"
-type = "required"
-versionRange = "*"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies."${mod_id}"]]
 modId = "lyra"
 type = "required"
 versionRange = "[1.21.1.8,)"

@@ -1,8 +1,8 @@
 package first.summoner.common.item;
 
 import com.google.common.collect.Multimap;
+import first.lyra.common.entity.AttachmentEntityDamageSource;
 import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.summoner.Summoner;
 import first.summoner.common.builder.CurioItemBuilder;
 import first.summoner.utils.CuriosUtil;
@@ -41,15 +41,14 @@ public class CurioItem extends Item implements ICurioItem {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
-        if (event.getSource() instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
+        if (event.getSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity() instanceof Minion minion) {
             Player owner = minion.getOwner();
             if (!owner.level().isClientSide()) {
                 Set<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
                 for (CurioItem curioItem : curiosItemList) {
                     PreDamageCallback callback = curioItem.preDamageCallback;
                     if (callback != null) {
-                        float result = callback.apply(minion, owner, event.getEntity(), event.getNewDamage(), minionDamageSource);
+                        float result = callback.apply(minion, owner, event.getEntity(), event.getNewDamage(), attachmentDamageSource);
                         if (result != event.getNewDamage()) {
                             event.setNewDamage(result);
                         }
@@ -61,15 +60,14 @@ public class CurioItem extends Item implements ICurioItem {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingDamageEventPost(LivingDamageEvent.Post event) {
-        if (event.getSource() instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
+        if (event.getSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity() instanceof Minion minion) {
             Player owner = minion.getOwner();
             if (!owner.level().isClientSide()) {
                 Set<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
                 for (CurioItem curioItem : curiosItemList) {
                     PostDamageCallback callback = curioItem.postDamageCallback;
                     if (callback != null) {
-                        callback.accept(minion, owner, event.getEntity(), minionDamageSource);
+                        callback.accept(minion, owner, event.getEntity(), attachmentDamageSource);
                     }
                 }
             }

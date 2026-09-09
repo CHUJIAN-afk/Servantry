@@ -1,9 +1,9 @@
 package first.summoner.common.minion;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -11,7 +11,10 @@ import first.summoner.common.minion.goal.MomentumMinionIdleGoal;
 import first.summoner.common.minion.goal.deadlysphere.DeadlySphereAttackGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,13 +29,22 @@ import java.util.List;
  */
 public class DeadlySphere extends MomentumMinion implements IEntityCollision<DeadlySphere>, IBlockCollision<DeadlySphere> {
 
+    private static final StreamCodec<RegistryFriendlyByteBuf, Appearance> APPEARANCE_STREAM_CODEC = StreamCodec.of(FriendlyByteBuf::writeEnum, buf -> buf.readEnum(Appearance.class));
+
     private int trailTimer = 0;
     private Appearance appearance = Appearance.FIRE;
     private int preTimer = 0;
 
     public DeadlySphere() {
-        super();
+        super(SummonerAttachmentEntityRegister.DEADLY_SPHERE);
         setDrag(0.75f);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.INT, this::getTrailTimer, this::setTrailTimer);
+        fields.field(APPEARANCE_STREAM_CODEC, this::getAppearance, value -> appearance = value);
     }
 
     @Override
@@ -54,11 +66,6 @@ public class DeadlySphere extends MomentumMinion implements IEntityCollision<Dea
     @Override
     public boolean canCollideAttack() {
         return isTarget(getTarget());
-    }
-
-    @Override
-    public boolean isValidCollisionTarget(DeadlySphere entity, LivingEntity target) {
-        return isTarget(target);
     }
 
     @Override
@@ -116,23 +123,6 @@ public class DeadlySphere extends MomentumMinion implements IEntityCollision<Dea
 
     public int getSearchDistance() {
         return 32;
-    }
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(trailTimer);
-        buf.writeEnum(appearance);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        trailTimer = buf.readInt();
-        appearance = buf.readEnum(Appearance.class);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends MomentumMinion> getType() {
-        return SummonerAttachmentEntityRegister.DEADLY_SPHERE.get();
     }
 
     public int getTrailTimer() {

@@ -1,9 +1,8 @@
 package first.summoner.common.minion.goal.voidEater;
 
 import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.entity.AttachmentEntityDamageSource;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.minion.MinionGoal;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.sound.Playable;
@@ -93,7 +92,10 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
                     Playable.play(SummonerSoundRegister.Laser, owner.level(), start, owner.getSoundSource());
                     for (int i = 0; i < 9; i++) {
                         Vec3 direction = targetPos.offsetRandom(owner.getRandom(), 2f).subtract(minion.getPos()).normalize();
-                        GodFlame projectile = new GodFlame(minion.getDamageSource(), start, direction.scale(3));
+                        GodFlame projectile = new GodFlame();
+                        projectile.copyDamageSource(minion);
+                        projectile.setPos(start);
+                        projectile.setVelocity(direction.scale(3));
                         projectile.setDamage(minion.getDamage() * 0.5f);
                         projectile.join(owner);
                     }
@@ -124,31 +126,19 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
             }
         } else {
             if (laser == null || laser.isRemove()) {
-                laser = new CustomLaser(minion.getDamageSource(), minion.getCurrentPathNode(), 0x6f19d4);
+                laser = new CustomLaser();
+                laser.copyDamageSource(minion);
+                laser.setCurrentPathNode(minion.getCurrentPathNode());
+                laser.setColor(0x6f19d4);
                 laser.setDamage(minion.getDamage() * 2);
                 Player owner = minion.getOwner();
                 laser.join(owner);
                 laser.setTickConsumer(laserProjectile -> {
-                    Minion minion = null;
-                    if (laserProjectile.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
-                        minion = minionDamageSource.getMinion();
-                        if (minion.isRemove()) {
-                            laserProjectile.setRemove();
-                            return;
-                        }
-                        if (minion instanceof VoidEater voidEater) {
-                            if (voidEater.getGoalSelector().getCurrentGoal() instanceof VoidEaterAttackGoal voidEaterAttackGoal) {
-                                if (voidEaterAttackGoal.mode != AttackMode.COSMIC_MAELSTROM) {
-                                    laserProjectile.setRemove();
-                                    return;
-                                }
-                            } else {
-                                laserProjectile.setRemove();
-                                return;
-                            }
-                        }
+                    if (laserProjectile.getDamageSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity().isRemove()) {
+                        laserProjectile.setRemove();
+                        return;
                     }
-                    if (minion == null) {
+                    if (!(minion.getGoalSelector().getCurrentGoal() instanceof VoidEaterAttackGoal voidEaterAttackGoal) || voidEaterAttackGoal.mode != AttackMode.COSMIC_MAELSTROM) {
                         laserProjectile.setRemove();
                         return;
                     }

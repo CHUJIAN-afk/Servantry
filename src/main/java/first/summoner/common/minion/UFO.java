@@ -1,8 +1,8 @@
 package first.summoner.common.minion;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.PathNode;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -10,7 +10,7 @@ import first.summoner.common.minion.goal.MomentumMinionIdleGoal;
 import first.summoner.common.minion.goal.ufo.UFOAttackGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -25,10 +25,16 @@ public class UFO extends MomentumMinion {
     private int trailTimer = 0;
 
     public UFO() {
-        super();
+        super(SummonerAttachmentEntityRegister.UFO);
         setDrag(0.75f);
         setGravity(0);
         setRotationSpeed(30f);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.INT, this::getTrailTimer, this::setTrailTimer);
     }
 
     @Override
@@ -39,8 +45,7 @@ public class UFO extends MomentumMinion {
 
     @Override
     public void tick() {
-        Level level = owner.level();
-        if (!level.isClientSide()) {
+        if (!owner.level().isClientSide()) {
             if (trailTimer > 0) {
                 trailTimer--;
                 if (trailTimer == 0) {
@@ -56,16 +61,6 @@ public class UFO extends MomentumMinion {
     @Override
     public int getSearchDistance() {
         return 32;
-    }
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(trailTimer);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        trailTimer = buf.readInt();
     }
 
     /**
@@ -137,10 +132,5 @@ public class UFO extends MomentumMinion {
     public int getLaserCooldown() {
         RandomSource random = owner.getRandom();
         return 7 + random.nextIntBetweenInclusive(1, 2);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends MomentumMinion> getType() {
-        return SummonerAttachmentEntityRegister.UFO.get();
     }
 }

@@ -1,7 +1,5 @@
 package first.summoner.common.sentry;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.sound.Playable;
@@ -18,7 +16,7 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
     private int cooldown = 0;
 
     public PulseTurret() {
-        super();
+        super(SummonerAttachmentEntityRegister.PULSE_TURRET);
         setGravity(-0.05f);
         setRotationSpeed(18f);
     }
@@ -63,14 +61,12 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
     public void fire() {
         Vec3 start = getPos();
         Vec3 direction = start.add(getLookAngle()).offsetRandom(owner.getRandom(), 0.05f).subtract(getPos()).normalize();
-        DestructionBullet projectile = new DestructionBullet(getDamageSource(), start, direction);
+        DestructionBullet projectile = new DestructionBullet();
+        projectile.copyDamageSource(this);
+        projectile.setPos(start);
+        projectile.setVelocity(direction);
         projectile.join(owner);
         Playable.play(SummonerSoundRegister.BallistaShot, owner.level(), start, owner.getSoundSource());
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.PULSE_TURRET.get();
     }
 
     @Override

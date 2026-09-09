@@ -2,11 +2,8 @@ package first.summoner.common.projectile;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -31,14 +28,8 @@ import java.util.List;
 public class ExplosionFlameBall extends Projectile implements IEntityCollision<ExplosionFlameBall>, IBlockCollision<ExplosionFlameBall> {
 
     public ExplosionFlameBall() {
-        super();
-    }
-
-    public ExplosionFlameBall(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.EXPLOSION_FLAME_BALL);
         setDrag(1.0f);
-        setMaxSpeed(1.2f);
         setMaxLife(60);
         setGravity(0);
     }
@@ -118,12 +109,7 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
      */
     private void explode(DamageSource source, Vec3 hitPoint) {
         List<LivingEntity> entities = LyraHelper.get(owner).getTargetCache()
-                .getEntitiesInRadius(hitPoint, 3, entity -> {
-                    if (source instanceof MinionDamageSource minionDamageSource) {
-                        return minionDamageSource.getMinion().isTarget(entity);
-                    }
-                    return true;
-                });
+                .getEntitiesInRadius(hitPoint, 3, this::isTarget);
         for (LivingEntity entity : entities) {
             InvincibleData.attack(entity)
                     .attacker(getUuid())
@@ -155,14 +141,6 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
     }
 
     @Override
-    public boolean isValidCollisionTarget(ExplosionFlameBall entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof MinionDamageSource sds) {
-            return sds.getMinion().isTarget(target);
-        }
-        return IEntityCollision.super.isValidCollisionTarget(entity, target);
-    }
-
-    @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.15, -0.15, -0.15, 0.15, 0.15, 0.15);
     }
@@ -170,10 +148,5 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
     @Override
     public @NotNull AABB getBlockCollisionBox() {
         return getHitbox();
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.EXPLOSION_FLAME_BALL.get();
     }
 }

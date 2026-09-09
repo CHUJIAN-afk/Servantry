@@ -1,19 +1,14 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -24,22 +19,10 @@ import java.util.List;
 public class PoisonSaliva extends Projectile implements IEntityCollision<PoisonSaliva>, IBlockCollision<PoisonSaliva> {
 
     public PoisonSaliva() {
-        super();
-    }
-
-    public PoisonSaliva(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.POISON_SALIVA);
         setDrag(1.0f);
-        setMaxSpeed(2f);
         setMaxLife(60);
         setGravity(0);
-        setTrailTimer(60);
-    }
-
-    @Override
-    public int getTrailDuration() {
-        return 60;
     }
 
     @Override
@@ -61,14 +44,6 @@ public class PoisonSaliva extends Projectile implements IEntityCollision<PoisonS
     }
 
     @Override
-    public boolean isValidCollisionTarget(PoisonSaliva entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof MinionDamageSource sds) {
-            return sds.getMinion().isTarget(target);
-        }
-        return IEntityCollision.super.isValidCollisionTarget(entity, target);
-    }
-
-    @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.15, -0.15, -0.15, 0.15, 0.15, 0.15);
     }
@@ -82,10 +57,5 @@ public class PoisonSaliva extends Projectile implements IEntityCollision<PoisonS
     public void onBlockCollision(CollisionContext context) {
         setCurrentPathNode(getCollisionAfterPathNode(context.position(), getCurrentPathNode()));
         setRemove();
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.POISON_SALIVA.get();
     }
 }

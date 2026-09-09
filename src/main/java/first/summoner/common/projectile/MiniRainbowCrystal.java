@@ -2,11 +2,6 @@ package first.summoner.common.projectile;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -21,21 +16,19 @@ import java.util.List;
 public class MiniRainbowCrystal extends Projectile {
 
     public MiniRainbowCrystal(){
-        super();
+        super(SummonerAttachmentEntityRegister.MINI_RAINBOW_CRYSTAL);
+        setDrag(1);
+        setMaxLife(20);
     }
 
-    public MiniRainbowCrystal(DamageSource damageSource, PathNode pathNode) {
-        super(pathNode.pos(), Vec3.directionFromRotation(pathNode.pitch(), pathNode.yaw()));
-        setDamageSource(damageSource);
-        setDrag(1);
-        setMaxSpeed(0);
-        setMaxLife(20);
+    public int getLife() {
+        return getTickCount();
     }
 
     @Override
     public void tick() {
         if (!owner.level().isClientSide()) {
-            if (life > 0 && life % 9 == 0) {
+            if (getTickCount() > 0 && getTickCount() % 9 == 0) {
                 Vec3 pos = getPos();
                 Vec3 direction = pos.subtract(pos.offsetRandom(owner.getRandom(), 1)).normalize();
                 ParticleHelper.create(owner.level())
@@ -57,12 +50,12 @@ public class MiniRainbowCrystal extends Projectile {
                         .speed(0.5)
                         .spread(2)
                         .emit();
-                if (damageSource instanceof MinionDamageSource minionDamageSource) {
-                    Minion minion = minionDamageSource.getMinion();
-                    List<LivingEntity> entities = LyraHelper.get(owner).getTargetCache().getEntitiesInRadius(pos, 3.5, minion::isTarget);
+                DamageSource damageSource = getDamageSource();
+                if (damageSource != null) {
+                    List<LivingEntity> entities = LyraHelper.get(owner).getTargetCache().getEntitiesInRadius(pos, 3.5, this::isTarget);
                     for (LivingEntity living : entities) {
                         InvincibleData.attack(living)
-                                .attacker(uuid)
+                                .attacker(getUuid())
                                 .damageSource(damageSource)
                                 .damageAmount(getDamage())
                                 .apply();
@@ -83,10 +76,5 @@ public class MiniRainbowCrystal extends Projectile {
 
     @Override
     protected void tickPhysics() {
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.MINI_RAINBOW_CRYSTAL.get();
     }
 }

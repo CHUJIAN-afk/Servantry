@@ -1,7 +1,5 @@
 package first.summoner.common.sentry;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.utils.EasingCurve;
@@ -18,7 +16,7 @@ public class RainbowCrystal extends Minion {
     private int cooldown = 0;
 
     public RainbowCrystal(){
-
+        super(SummonerAttachmentEntityRegister.RAINBOW_CRYSTAL);
     }
 
     @Override
@@ -54,15 +52,12 @@ public class RainbowCrystal extends Minion {
                 float progress = (float) j / 9;
                 list.add(startPathNode.lerp(endPathNode, EasingCurve.EASE_IN_OUT_CUBIC.apply(progress)));
             }
-            MiniRainbowCrystal projectile = new MiniRainbowCrystal(getDamageSource(), startPathNode);
+            MiniRainbowCrystal projectile = new MiniRainbowCrystal();
+            projectile.copyDamageSource(this);
+            projectile.setPos(startPathNode.pos());
             projectile.setPath(list);
             projectile.join(owner);
         }
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.RAINBOW_CRYSTAL.get();
     }
 
     @Override

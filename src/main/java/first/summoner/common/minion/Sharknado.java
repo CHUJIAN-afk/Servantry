@@ -1,7 +1,6 @@
 package first.summoner.common.minion;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
@@ -29,7 +28,7 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
     private int shootCooldown = 0;
 
     public Sharknado() {
-        super();
+        super(SummonerAttachmentEntityRegister.SHARKNADO);
         setDrag(0.92f);
         setRotationSpeed(0);
     }
@@ -82,13 +81,11 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
     public void shootAtTarget(LivingEntity target) {
         Vec3 start = getPos();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
-        SharkDragon projectile = new SharkDragon(getDamageSource(), start, direction);
+        SharkDragon projectile = new SharkDragon();
+        projectile.copyDamageSource(this);
+        projectile.setPos(start);
+        projectile.setVelocity(direction);
         projectile.join(owner);
-    }
-
-    @Override
-    public AttachmentEntityType<Sharknado> getType() {
-        return SummonerAttachmentEntityRegister.SHARKNADO.get();
     }
 
     // ===================== IEntityCollision 实现 =====================
@@ -101,11 +98,6 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
     @Override
     public boolean canCollideAttack() {
         return isTarget(getTarget());
-    }
-
-    @Override
-    public boolean isValidCollisionTarget(Sharknado entity, LivingEntity target) {
-        return isTarget(target);
     }
 
     @Override

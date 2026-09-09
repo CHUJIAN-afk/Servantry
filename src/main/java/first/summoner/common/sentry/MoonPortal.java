@@ -1,12 +1,10 @@
 package first.summoner.common.sentry;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.entity.AttachmentEntityDamageSource;
 import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.CustomLaser;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -27,7 +25,7 @@ public class MoonPortal extends Minion {
     private int cooldown = 0;
 
     public MoonPortal() {
-        super();
+        super(SummonerAttachmentEntityRegister.MOON_PORTAL);
     }
 
     @Override
@@ -80,7 +78,10 @@ public class MoonPortal extends Minion {
             pathNodes.add(middlePathNode.lerp(endPathNode, progress));
         }
 
-        CustomLaser projectile = new CustomLaser(getDamageSource(), pathNodes.getFirst(), 0x00fdd6);
+        CustomLaser projectile = new CustomLaser();
+        projectile.copyDamageSource(this);
+        projectile.setCurrentPathNode(pathNodes.getFirst());
+        projectile.setColor(0x00fdd6);
         projectile.setPath(pathNodes);
 
         projectile.setTickConsumer(laserProjectile -> {
@@ -88,12 +89,9 @@ public class MoonPortal extends Minion {
                 laserProjectile.setRemove();
                 return;
             }
-            if (laserProjectile.getDamageSource() instanceof MinionDamageSource minionDamageSource) {
-                Minion minion = minionDamageSource.getMinion();
-                if (minion.isRemove()) {
-                    laserProjectile.setRemove();
-                    return;
-                }
+            if (laserProjectile.getDamageSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity().isRemove()) {
+                laserProjectile.setRemove();
+                return;
             }
             // 沿当前朝向射线追踪方块，计算碰撞箱
             float pYaw = laserProjectile.getCurrentPathNode().yaw();
@@ -164,11 +162,6 @@ public class MoonPortal extends Minion {
             }
         });
         projectile.join(owner);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.MOON_PORTAL.get();
     }
 
     @Override

@@ -19,7 +19,7 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
     protected RenderContext<Terraprism> createContext(Terraprism minion, float partialTick) {
         return RenderContext.<Terraprism>builder()
                 .trail(new RibbonTrailConfig<Terraprism>()
-                               .timer(minion.attacking ? minion.trailTimer : 0)
+                               .timer(minion.trailTimer)
                                .colorRGB(minion.getColor(partialTick))
                                .segmentsPerNode(4)
                                .historyLength(6)

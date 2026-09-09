@@ -1,6 +1,5 @@
 package first.summoner.common.minion;
 
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
@@ -22,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 public class Hornet extends MomentumMinion implements IBlockCollision<Hornet> {
 
     public Hornet() {
-        super();
+        super(SummonerAttachmentEntityRegister.HORNET);
         setDrag(0.75f);
         setGravity(0);
         setRotationSpeed(15f);
@@ -50,11 +49,6 @@ public class Hornet extends MomentumMinion implements IBlockCollision<Hornet> {
     }
 
     @Override
-    public void tick() {
-        super.tick();
-    }
-
-    @Override
     public void lookAtDirection(Vec3 direction) {
         float targetYaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
         setDesiredRotation(targetYaw, 0, getRoll());
@@ -67,7 +61,10 @@ public class Hornet extends MomentumMinion implements IBlockCollision<Hornet> {
         Vec3 startPos = getPos();
         Vec3 targetCenter = target.getBoundingBox().getCenter();
         Vec3 direction = targetCenter.subtract(startPos).normalize();
-        HornetStinger stinger = new HornetStinger(getDamageSource(), startPos.add(direction.scale(-1)), direction);
+        HornetStinger stinger = new HornetStinger();
+        stinger.copyDamageSource(this);
+        stinger.setPos(startPos.add(direction.scale(-1)));
+        stinger.setVelocity(direction);
         if (CuriosUtil.isEquipped(owner, SummonerCurioRegister.HivePack.get())){
             stinger.setDamage(stinger.getDamage() * 1.15f);
         }
@@ -85,10 +82,5 @@ public class Hornet extends MomentumMinion implements IBlockCollision<Hornet> {
             cooldown = (int) (cooldown * 0.67);
         }
         return cooldown;
-    }
-
-    @Override
-    public AttachmentEntityType<? extends MomentumMinion> getType() {
-        return SummonerAttachmentEntityRegister.HORNET.get();
     }
 }

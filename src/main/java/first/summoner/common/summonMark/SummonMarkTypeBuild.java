@@ -1,6 +1,6 @@
 package first.summoner.common.summonMark;
 
-import first.lyra.common.minion.MinionDamageSource;
+import first.lyra.common.entity.AttachmentEntityDamageSource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -15,7 +15,7 @@ public class SummonMarkTypeBuild {
     private float criticalHitRate = 0;
     private BiConsumer<LivingEntity, Player> tickConsumer = null;
     private SummonMarkType.SummonMarkDamageConsumer damageConsumer = null;
-    private BiConsumer<LivingEntity, MinionDamageSource> killConsumer = null;
+    private BiConsumer<LivingEntity, AttachmentEntityDamageSource> killConsumer = null;
 
     public SummonMarkTypeBuild(ResourceLocation identifier) {
         this.identifier = identifier;
@@ -52,7 +52,7 @@ public class SummonMarkTypeBuild {
     }
 
     /** 标记目标被击杀时回调（target = 被标记实体，source = 伤害来源）。 */
-    public SummonMarkTypeBuild onKill(BiConsumer<LivingEntity, MinionDamageSource> killConsumer) {
+    public SummonMarkTypeBuild onKill(BiConsumer<LivingEntity, AttachmentEntityDamageSource> killConsumer) {
         this.killConsumer = killConsumer;
         return this;
     }

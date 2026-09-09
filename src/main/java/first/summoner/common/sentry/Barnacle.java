@@ -1,7 +1,5 @@
 package first.summoner.common.sentry;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -31,7 +29,7 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
     private int cooldown = ATTACK_COOLDOWN;
 
     public Barnacle() {
-        super();
+        super(SummonerAttachmentEntityRegister.BARNACLE);
         setDrag(0.9f);
         setGravity(0);
         setRotationSpeed(0);
@@ -69,7 +67,10 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
             LivingEntity target = getTarget();
             Vec3 targetCenter = target.getBoundingBox().getCenter();
             Vec3 direction = targetCenter.subtract(getPos()).normalize();
-            PoisonSaliva saliva = new PoisonSaliva(getDamageSource(), getPos(), direction.scale(2));
+            PoisonSaliva saliva = new PoisonSaliva();
+            saliva.copyDamageSource(this);
+            saliva.setPos(getPos());
+            saliva.setVelocity(direction.scale(2));
             saliva.join(owner);
             // 向前喷射绿色唾液粒子（粒子量/速度/阻力均高于激光眼）
             ParticleHelper.create(owner.level())
@@ -107,10 +108,5 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
             Vec3 velocity = getVelocity();
             setVelocity(new Vec3(velocity.x, 0, velocity.z));
         }
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.BARNACLE.get();
     }
 }

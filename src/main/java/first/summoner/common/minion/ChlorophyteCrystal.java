@@ -1,14 +1,11 @@
 package first.summoner.common.minion;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.MiniChlorophyteCrystal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +17,7 @@ public class ChlorophyteCrystal extends Minion {
     private int extraShootCooldown = 20;
 
     public ChlorophyteCrystal() {
-        super();
+        super(SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL);
     }
 
     @Override
@@ -47,16 +44,6 @@ public class ChlorophyteCrystal extends Minion {
         super.tick();
     }
 
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(shootCooldown);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        shootCooldown = buf.readInt();
-    }
-
     public int getExtraShootCooldown() {
         return extraShootCooldown;
     }
@@ -69,7 +56,10 @@ public class ChlorophyteCrystal extends Minion {
         Player owner = getOwner();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(getPos()).normalize();
         Vec3 startPos = getPos().add(direction.scale(0.25));
-        MiniChlorophyteCrystal projectile = new MiniChlorophyteCrystal(getDamageSource(), startPos, direction.scale(1.5));
+        MiniChlorophyteCrystal projectile = new MiniChlorophyteCrystal();
+        projectile.copyDamageSource(this);
+        projectile.setPos(startPos);
+        projectile.setVelocity(direction.scale(1.5));
         projectile.join(owner);
         ParticleHelper.create(owner.level())
                 .generic(GenericParticleBuilder.create()
@@ -95,10 +85,5 @@ public class ChlorophyteCrystal extends Minion {
     @Override
     public int getSearchDistance() {
         return 16;
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get();
     }
 }

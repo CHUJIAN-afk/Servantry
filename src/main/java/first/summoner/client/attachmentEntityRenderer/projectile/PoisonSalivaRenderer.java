@@ -17,7 +17,7 @@ public class PoisonSalivaRenderer extends AbstractAttachmentEntityRenderer<Poiso
     protected RenderContext<PoisonSaliva> createContext(PoisonSaliva projectile, float partialTick) {
         return RenderContext.<PoisonSaliva>builder()
                 .trail(new ConeTrailConfig<PoisonSaliva>()
-                        .timer(projectile.getTrailTimer())
+                        .timer(5)
                         .colorRGB(0x59ff3a)
                         .maxRadius(0.18f)
                         .minRadiusRatio(0.45f)

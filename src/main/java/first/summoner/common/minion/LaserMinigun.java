@@ -1,12 +1,13 @@
 package first.summoner.common.minion;
 
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.PathNode;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.ElectricLaser;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,9 +21,18 @@ import net.minecraft.world.phys.Vec3;
 public class LaserMinigun extends Minion {
 
     private int cooldown = 0;
+    private float animationTick = 0;
+    private float lastAnimationTick = 0;
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.FLOAT, () -> lastAnimationTick, var -> lastAnimationTick = var);
+        fields.field(ByteBufCodecs.FLOAT, () -> animationTick, var -> animationTick = var);
+    }
 
     public LaserMinigun() {
-        super();
+        super(SummonerAttachmentEntityRegister.LASER_MINIGUN);
     }
 
     @Override
@@ -31,26 +41,34 @@ public class LaserMinigun extends Minion {
             LivingEntity target = getTarget();
             PathNode idleNode = getInterpolatedIdleState(0);
             PathNode currentNode = getCurrentPathNode();
-
             cooldown--;
+            lastAnimationTick = animationTick;
             if (isTarget(target)) {
                 Vec3 targetCenter = target.getBoundingBox().getCenter();
                 Vec3 direction = targetCenter.subtract(getPos()).normalize();
                 float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
                 float pitch = (float) Math.toDegrees(Math.asin(-direction.y));
                 PathNode attackNode = new PathNode(idleNode.pos(), yaw, pitch, 0);
-
                 setCurrentPathNode(currentNode.lerp(attackNode, 0.5f));
-
                 if (cooldown <= 0) {
                     cooldown = 2;
                     fire(target);
                 }
+                animationTick += 2;
             } else {
+                animationTick++;
                 setCurrentPathNode(currentNode.lerp(idleNode, 0.5f));
             }
         }
         super.tick();
+    }
+
+    /**
+     * 客户端动画时间：平时每 tick +1，射击时每 tick +2；
+     * 速度切换不清零，渲染时在 last 与当前值之间插值保证衔接。
+     */
+    public float getRenderTick(float partialTick) {
+        return Mth.lerp(partialTick, lastAnimationTick, animationTick);
     }
 
     /**
@@ -66,7 +84,10 @@ public class LaserMinigun extends Minion {
             Vec3 laserTargetPos = targetPos.add(direction.scale(5)).offsetRandom(random, 3);
             Vec3 normalize = laserTargetPos.subtract(startPos).normalize();
 
-            ElectricLaser laser = new ElectricLaser(getDamageSource(), startPos.add(normalize.scale(random.nextFloat() * 0.5f)), normalize.scale(1.5));
+            ElectricLaser laser = new ElectricLaser();
+            laser.copyDamageSource(this);
+            laser.setPos(startPos.add(normalize.scale(random.nextFloat() * 0.5f)));
+            laser.setVelocity(normalize.scale(1.5));
             laser.join(owner);
         }
 
@@ -116,10 +137,5 @@ public class LaserMinigun extends Minion {
     @Override
     public int getSearchDistance() {
         return 32;
-    }
-
-    @Override
-    public AttachmentEntityType<? extends Minion> getType() {
-        return SummonerAttachmentEntityRegister.LASER_MINIGUN.get();
     }
 }

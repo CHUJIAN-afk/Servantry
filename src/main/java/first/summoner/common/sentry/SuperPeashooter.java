@@ -1,7 +1,5 @@
 package first.summoner.common.sentry;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.sound.Playable;
@@ -29,7 +27,7 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
     private ShootTask task = null;
 
     public SuperPeashooter() {
-        super();
+        super(SummonerAttachmentEntityRegister.SUPER_PEASHOOTER);
         setGravity(-0.05f);
         setRotationSpeed(18f);
     }
@@ -87,11 +85,6 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
     }
 
     @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.SUPER_PEASHOOTER.get();
-    }
-
-    @Override
     public void dimensionChange() {
         setRemove();
     }
@@ -144,7 +137,9 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
                 Vec3 dir = scatter ? scatterDirection(direction, shooter) : direction;
                 // 沿朝向错位起点，避免同 tick 多发重叠
                 Vec3 start = pos.add(dir.scale(i * 0.25));
-                BlitzBall projectile = new BlitzBall(shooter.getDamageSource(), start, dir);
+                BlitzBall projectile = new BlitzBall();
+                projectile.copyDamageSource(shooter);
+                projectile.setPos(start);
                 projectile.setVelocity(dir);
                 projectile.join(shooter.owner);
                 firedShots++;

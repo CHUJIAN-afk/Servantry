@@ -1,13 +1,11 @@
 package first.summoner.common.minion;
 
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.ShatteredStellarCore;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,7 +17,7 @@ public class EtherealStellarCore extends Minion {
     private int shootCooldown = 0;
 
     public EtherealStellarCore() {
-        super();
+        super(SummonerAttachmentEntityRegister.ETHEREAL_STELLAR_CORE);
     }
 
     @Override
@@ -37,16 +35,6 @@ public class EtherealStellarCore extends Minion {
         super.tick();
     }
 
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeInt(shootCooldown);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        shootCooldown = buf.readInt();
-    }
-
     public void shootTarget(LivingEntity target) {
         Player owner = getOwner();
         RandomSource random = owner.getRandom();
@@ -55,8 +43,10 @@ public class EtherealStellarCore extends Minion {
         for (int i = 0; i < count; i++) {
             Vec3 start = getPos();
             Vec3 direction = start.offsetRandom(random, 2f).subtract(start).normalize();
-            ShatteredStellarCore projectile = new ShatteredStellarCore(getDamageSource(), start.add(direction.scale(-0.75)), direction.scale(0.5f));
-            projectile.setDamage(getDamage());
+            ShatteredStellarCore projectile = new ShatteredStellarCore();
+            projectile.copyDamageSource(this);
+            projectile.setPos(start.add(direction.scale(-0.75)));
+            projectile.setVelocity(direction.scale(0.5f));
             projectile.setChaseTarget(target);
             projectile.join(owner);
             GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
@@ -88,11 +78,6 @@ public class EtherealStellarCore extends Minion {
     @Override
     public int getSearchDistance() {
         return 16;
-    }
-
-    @Override
-    public AttachmentEntityType<? extends Minion> getType() {
-        return SummonerAttachmentEntityRegister.ETHEREAL_STELLAR_CORE.get();
     }
 
     @Override

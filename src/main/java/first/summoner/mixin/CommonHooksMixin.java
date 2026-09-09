@@ -1,7 +1,7 @@
 package first.summoner.mixin;
 
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
+import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.entity.AttachmentEntityDamageSource;
 import first.summoner.common.attachment.SummonMarkData;
 import first.summoner.common.summonMark.SummonMarkType;
 import first.summoner.register.SummonerAttachmentRegister;
@@ -22,14 +22,14 @@ public class CommonHooksMixin {
     @Inject(method = "onLivingDeath", at = @At("RETURN"))
     private static void onLivingDeath(LivingEntity entity, DamageSource src, CallbackInfoReturnable<Boolean> cir) {
         if (!cir.getReturnValue()) {
-            if (!entity.level().isClientSide() && src instanceof MinionDamageSource minionDamageSource) {
-                Minion minion = minionDamageSource.getMinion();
+            if (!entity.level().isClientSide() && src instanceof AttachmentEntityDamageSource attachmentDamageSource) {
+                AttachmentEntity minion = attachmentDamageSource.getAttachmentEntity();
                 Player owner = minion.getOwner();
                 SummonMarkData summonMarkData = owner.getData(SummonerAttachmentRegister.SummonMarkData);
                 if (summonMarkData.isSummonMarkTarget(entity)) {
                     Set<SummonMarkType> markTypes = summonMarkData.getMarkTypes();
                     for (SummonMarkType markType : markTypes) {
-                        markType.kill(entity, minionDamageSource);
+                        markType.kill(entity, attachmentDamageSource);
                     }
                 }
             }

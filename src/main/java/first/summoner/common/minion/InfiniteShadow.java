@@ -4,11 +4,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.minion.Minion;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.core.Holder;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -33,7 +31,13 @@ public class InfiniteShadow extends Terraprism {
     private InfiniteShadowFakePlayer fakePlayer = null;
 
     public InfiniteShadow() {
-        super();
+        super(SummonerAttachmentEntityRegister.INFINITE_SHADOW);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ItemStack.STREAM_CODEC, this::getItemStack, this::setItemStack);
     }
 
     public ItemStack getItemStack() {
@@ -76,18 +80,6 @@ public class InfiniteShadow extends Terraprism {
     }
 
     @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        super.readAdditional(buf);
-        this.itemStack = ItemStack.STREAM_CODEC.decode(buf);
-    }
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        super.writeAdditional(buf);
-        ItemStack.STREAM_CODEC.encode(buf, this.itemStack);
-    }
-
-    @Override
     public void onRemove() {
         if (fakePlayer != null) {
             fakePlayer.remove(Entity.RemovalReason.DISCARDED);
@@ -112,11 +104,6 @@ public class InfiniteShadow extends Terraprism {
             }
         }
         return fakePlayer;
-    }
-
-    @Override
-    public AttachmentEntityType<? extends Minion> getType() {
-        return SummonerAttachmentEntityRegister.INFINITE_SHADOW.get();
     }
 
     public static class InfiniteShadowFakePlayer extends FakePlayer {

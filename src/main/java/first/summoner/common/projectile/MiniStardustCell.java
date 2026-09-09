@@ -1,15 +1,14 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.AttachingProjectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
 import first.summoner.utils.ParticleHelper;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -27,17 +26,30 @@ import java.util.List;
 public class MiniStardustCell extends AttachingProjectile implements IEntityCollision<MiniStardustCell> {
 
     private LivingEntity chaseTarget;
+    private int trailTimer = 0;
 
     public MiniStardustCell() {
-        super();
+        super(SummonerAttachmentEntityRegister.MINI_STARDUST_CELL);
+        setDrag(0.9f);
+        setMaxLife(100);
     }
 
-    public MiniStardustCell(DamageSource damageSource, Vec3 startPos) {
-        super(startPos, Vec3.ZERO);
-        setDamageSource(damageSource);
-        setDrag(0.9f);
-        setMaxSpeed(1.2f);
-        setMaxLife(100);
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.INT, this::getTrailTimer, this::setTrailTimer);
+    }
+
+    public int getTrailDuration() {
+        return 15;
+    }
+
+    public int getTrailTimer() {
+        return trailTimer;
+    }
+
+    public void setTrailTimer(int trailTimer) {
+        this.trailTimer = trailTimer;
     }
 
     @Override
@@ -48,16 +60,6 @@ public class MiniStardustCell extends AttachingProjectile implements IEntityColl
     @Override
     public boolean canCollideAttack() {
         return !isAttached();
-    }
-
-    @Override
-    public boolean isValidCollisionTarget(MiniStardustCell entity, LivingEntity target) {
-        DamageSource source = entity.getDamageSource();
-        if (source instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
-            return minion.isTarget(target);
-        }
-        return IEntityCollision.super.isValidCollisionTarget(entity, target);
     }
 
     @Override
@@ -91,6 +93,11 @@ public class MiniStardustCell extends AttachingProjectile implements IEntityColl
             } else {
                 tickFlying();
             }
+            if (trailTimer > 0) {
+                trailTimer--;
+            }
+        } else if (trailTimer > 0) {
+            trailTimer--;
         }
         super.tick();
     }
@@ -155,13 +162,7 @@ public class MiniStardustCell extends AttachingProjectile implements IEntityColl
         }
     }
 
-    @Override
-    public AttachmentEntityType<? extends AttachingProjectile> getType() {
-        return SummonerAttachmentEntityRegister.MINI_STARDUST_CELL.get();
-    }
-
     public void setChaseTarget(LivingEntity chaseTarget) {
         this.chaseTarget = chaseTarget;
     }
-
 }

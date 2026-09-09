@@ -1,6 +1,5 @@
 package first.summoner.common.minion;
 
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
@@ -24,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 public class Imp extends MomentumMinion implements IBlockCollision<Imp> {
 
     public Imp() {
-        super();
+        super(SummonerAttachmentEntityRegister.IMP);
         setDrag(0.75f);
         setGravity(0);
         setRotationSpeed(10f);
@@ -82,17 +81,15 @@ public class Imp extends MomentumMinion implements IBlockCollision<Imp> {
         Vec3 targetCenter = target.getBoundingBox().getCenter();
         Vec3 direction = targetCenter.subtract(start).normalize();
 
-        ImpFireball fireball = new ImpFireball(getDamageSource(), start.add(direction.scale(-1)), direction);
+        ImpFireball fireball = new ImpFireball();
+        fireball.copyDamageSource(this);
+        fireball.setPos(start.add(direction.scale(-1)));
+        fireball.setVelocity(direction);
         fireball.join(owner);
         Playable.play(SummonerSoundRegister.ImpFire, owner.level(), start, owner.getSoundSource());
     }
 
     public int getFireballCooldown() {
         return 20 + owner.getRandom().nextIntBetweenInclusive(0, 6);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends MomentumMinion> getType() {
-        return SummonerAttachmentEntityRegister.IMP.get();
     }
 }

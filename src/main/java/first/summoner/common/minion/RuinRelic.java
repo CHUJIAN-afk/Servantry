@@ -2,7 +2,6 @@ package first.summoner.common.minion;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.AttachmentEntityData;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
@@ -34,7 +33,7 @@ public class RuinRelic extends MomentumMinion {
     private int cooldown = 0;
 
     public RuinRelic() {
-        super();
+        super(SummonerAttachmentEntityRegister.RUIN_RELIC);
         setDrag(0.85f);
         setGravity(0);
         setRotationSpeed(0);
@@ -68,7 +67,10 @@ public class RuinRelic extends MomentumMinion {
     public void shootForbiddenOrb(LivingEntity target) {
         Vec3 start = getPos();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
-        ForbiddenOrb orb = new ForbiddenOrb(getDamageSource(), start, direction.scale(4));
+        ForbiddenOrb orb = new ForbiddenOrb();
+        orb.copyDamageSource(this);
+        orb.setPos(start);
+        orb.setVelocity(direction.scale(4));
         // 数量越多伤害越高：每多一个 +10%，至多 +200%
         int extra = Math.max(0, getSameSizeCache() - 1);
         float multiplier = 1.0f + 0.1f * Math.min(extra, 20);
@@ -118,7 +120,7 @@ public class RuinRelic extends MomentumMinion {
      */
     public int getSameTargetCount() {
         LivingEntity myTarget = getTarget();
-        List<RuinRelic> relics = LyraHelper.get(owner).getEntityData().get(AttachmentEntityData.Type.Minion, getType());
+        List<RuinRelic> relics = LyraHelper.get(owner).getEntityData().get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.RUIN_RELIC.get());
         int count = 0;
         for (RuinRelic relic : relics) {
             if (relic.getTarget() == myTarget) {
@@ -133,7 +135,7 @@ public class RuinRelic extends MomentumMinion {
      */
     public int getSameTargetOrder() {
         LivingEntity myTarget = getTarget();
-        List<RuinRelic> relics = LyraHelper.get(owner).getEntityData().get(AttachmentEntityData.Type.Minion, getType());
+        List<RuinRelic> relics = LyraHelper.get(owner).getEntityData().get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.RUIN_RELIC.get());
         int order = 0;
         for (RuinRelic relic : relics) {
             if (relic == this) {
@@ -211,10 +213,5 @@ public class RuinRelic extends MomentumMinion {
         float yaw = (float) Math.toDegrees(Math.atan2(-toTarget.x, toTarget.z));
         float pitch = (float) Math.toDegrees(Math.asin(-toTarget.y));
         return new PathNode(pos, yaw, pitch, 0);
-    }
-
-    @Override
-    public AttachmentEntityType<RuinRelic> getType() {
-        return SummonerAttachmentEntityRegister.RUIN_RELIC.get();
     }
 }

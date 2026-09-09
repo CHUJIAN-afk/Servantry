@@ -2,8 +2,8 @@ package first.summoner.common;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.AttachmentEntityData;
+import first.lyra.common.entity.AttachmentEntityDamageSource;
 import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.Summoner;
 import first.summoner.common.attachment.SummonMarkData;
@@ -54,14 +54,13 @@ public class Event {
     public static void damageHandler(LivingDamageEvent.Post event) {
         DamageSource source = event.getSource();
         LivingEntity target = event.getEntity();
-        if (!target.level().isClientSide() && source instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
+        if (!target.level().isClientSide() && source instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity() instanceof Minion minion) {
             Player owner = minion.getOwner();
             SummonMarkData summonMarkData = owner.getData(SummonerAttachmentRegister.SummonMarkData);
             if (summonMarkData.isSummonMarkTarget(target)) {
                 Set<SummonMarkType> summonMarks = summonMarkData.getMarkTypes();
                 for (SummonMarkType summonMark : summonMarks) {
-                    summonMark.damage(summonMarkData, target, minionDamageSource, event.getNewDamage());
+                    summonMark.damage(summonMarkData, target, attachmentDamageSource, event.getNewDamage());
                 }
             }
         }
@@ -138,7 +137,7 @@ public class Event {
         }
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player && target.isAlive()) {
             AttachmentEntityData entityData = player.getData(LyraAttachmentRegister.EntityData);
-            if (!(damageSource instanceof MinionDamageSource minionDamageSource) || !(minionDamageSource.getMinion() instanceof ChlorophyteCrystal)) {
+            if (!(damageSource instanceof AttachmentEntityDamageSource attachmentDamageSource) || !(attachmentDamageSource.getAttachmentEntity() instanceof ChlorophyteCrystal)) {
                 List<ChlorophyteCrystal> crystals = entityData.get(AttachmentEntityData.Type.ExtraMinion, SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get());
                 for (ChlorophyteCrystal crystal : crystals) {
                     if (crystal.getExtraShootCooldown() <= 0) {
@@ -147,7 +146,7 @@ public class Event {
                     }
                 }
             }
-            if (!(damageSource instanceof MinionDamageSource minionDamageSource) || !(minionDamageSource.getMinion() instanceof StardustCell)) {
+            if (!(damageSource instanceof AttachmentEntityDamageSource attachmentDamageSource) || !(attachmentDamageSource.getAttachmentEntity() instanceof StardustCell)) {
                 List<StardustCell> stardustCells = entityData.get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.STARDUST_CELL.get());
                 for (StardustCell cell : stardustCells) {
                     if (cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {

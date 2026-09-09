@@ -3,15 +3,15 @@ package first.summoner.common.minion;
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
 import first.lyra.common.entity.PathNode;
+import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.summoner.common.minion.goal.enchantedThrowingKnives.EnchantedThrowingKnivesAttackGoal;
 import first.summoner.common.minion.goal.enchantedThrowingKnives.EnchantedThrowingKnivesIdleGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -34,20 +34,20 @@ import java.util.List;
  */
 public class EnchantedThrowingKnives extends Minion implements IEntityCollision<EnchantedThrowingKnives> {
 
-    // ===================== 渲染状态 =====================
+    public boolean attacking = false;
 
-    /** 拖尾计时器 */
-    public int trailTimer = 0;
-
-    /** 空闲混合系数（用于平滑过渡到空闲状态） */
     public float idleBlend = 0f;
     public float idleBlendO = 0f;
 
-    /** 攻击状态标记 */
-    public boolean attacking = false;
-
     public EnchantedThrowingKnives() {
-        super();
+        super(SummonerAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES);
+    }
+
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(ByteBufCodecs.FLOAT, () -> idleBlendO, value -> idleBlendO = value);
+        fields.field(ByteBufCodecs.FLOAT, () -> idleBlend, value -> idleBlend = value);
     }
 
     // ===================== AI 目标注册 =====================
@@ -82,16 +82,11 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
         }
     }
 
-    @Override
-    public boolean isValidCollisionTarget(EnchantedThrowingKnives entity, LivingEntity target) {
-        return isTarget(target);
-    }
-
     // ===================== Tick 更新 =====================
 
     @Override
     public void tick() {
-        if (getOwner().level().isClientSide()) {
+        if (!getOwner().level().isClientSide()) {
             // 空闲混合系数更新
             idleBlendO = idleBlend;
             if (!attacking) {
@@ -125,16 +120,6 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
     }
 
     // ===================== 网络同步 =====================
-
-    @Override
-    public void writeAdditional(RegistryFriendlyByteBuf buf) {
-        buf.writeBoolean(attacking);
-    }
-
-    @Override
-    public void readAdditional(RegistryFriendlyByteBuf buf) {
-        this.attacking = buf.readBoolean();
-    }
 
     @Override
     public PathNode getRenderNode(float partialTick) {
@@ -172,10 +157,5 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
         Vec3 tipDir = new Vec3(0, -1, 0);
 
         return getEulerNode(targetPos, tipDir, toAxis);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends Minion> getType() {
-        return SummonerAttachmentEntityRegister.ENCHANTED_THROWING_KNIVES.get();
     }
 }

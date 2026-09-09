@@ -49,7 +49,10 @@ public class TwinsCursedFlameAttackGoal extends MinionGoal<Twins> {
                 wanderPos = minion.getWanderPos(wanderPos, targetPos, 4, 1);
                 double distance = minion.getPos().distanceTo(wanderPos);
                 minion.applyForce(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * 0.04, 0.4)));
-                DemonFlame demonFlame = new DemonFlame(minion.getDamageSource(), minion.getPos(), targetPos.subtract(minion.getPos()).normalize());
+                DemonFlame demonFlame = new DemonFlame();
+                demonFlame.copyDamageSource(minion);
+                demonFlame.setPos(minion.getPos());
+                demonFlame.setVelocity(targetPos.subtract(minion.getPos()).normalize());
                 demonFlame.join(owner);
                 GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                         .centerColor(0x24d509)

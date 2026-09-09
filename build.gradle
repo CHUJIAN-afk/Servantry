@@ -120,10 +120,8 @@ repositories {
 
 dependencies {
     // 独立库 mod Lyra (first.lyra.*)
-    implementation "first:Lyra:${lyra_version}"
-
-    implementation "top.theillusivec4.curios:curios-neoforge:${curios_version}"
-    implementation "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
+    api "first:Lyra:${lyra_version}"
+    api "top.theillusivec4.curios:curios-neoforge:${curios_version}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

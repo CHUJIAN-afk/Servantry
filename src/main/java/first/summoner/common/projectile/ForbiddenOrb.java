@@ -2,11 +2,8 @@ package first.summoner.common.projectile;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IBlockCollision;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -33,14 +30,8 @@ import java.util.List;
 public class ForbiddenOrb extends Projectile implements IEntityCollision<ForbiddenOrb>, IBlockCollision<ForbiddenOrb> {
 
     public ForbiddenOrb() {
-        super();
-    }
-
-    public ForbiddenOrb(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.FORBIDDEN_ORB);
         setDrag(1);
-        setMaxSpeed(3);
         setMaxLife(60);
         setGravity(0);
     }
@@ -106,12 +97,7 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
      */
     private void explode(DamageSource source, Vec3 hitPoint) {
         List<LivingEntity> entities = LyraHelper.get(owner).getTargetCache()
-                .getEntitiesInRadius(hitPoint, 3.5, entity -> {
-                    if (source instanceof MinionDamageSource minionDamageSource) {
-                        return minionDamageSource.getMinion().isTarget(entity);
-                    }
-                    return true;
-                });
+                .getEntitiesInRadius(hitPoint, 3.5, this::isTarget);
         for (LivingEntity entity : entities) {
             InvincibleData.attack(entity)
                     .attacker(getUuid())
@@ -142,14 +128,6 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
     }
 
     @Override
-    public boolean isValidCollisionTarget(ForbiddenOrb entity, LivingEntity target) {
-        if (entity.getDamageSource() instanceof MinionDamageSource sds) {
-            return sds.getMinion().isTarget(target);
-        }
-        return IEntityCollision.super.isValidCollisionTarget(entity, target);
-    }
-
-    @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.15, -0.15, -0.15, 0.15, 0.15, 0.15);
     }
@@ -157,10 +135,5 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
     @Override
     public @NotNull AABB getBlockCollisionBox() {
         return getHitbox();
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.FORBIDDEN_ORB.get();
     }
 }

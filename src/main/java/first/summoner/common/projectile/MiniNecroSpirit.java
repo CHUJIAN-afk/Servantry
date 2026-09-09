@@ -3,11 +3,7 @@ package first.summoner.common.projectile;
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.lyra.common.sound.Playable;
@@ -33,12 +29,7 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
     private Vec3 targetPos = null;
 
     public MiniNecroSpirit() {
-        super();
-    }
-
-    public MiniNecroSpirit(DamageSource damageSource, Vec3 startPos, Vec3 direction) {
-        super(startPos, direction);
-        setDamageSource(damageSource);
+        super(SummonerAttachmentEntityRegister.MINI_NECRO_SPIRIT);
         setDrag(1.0f);
         setMaxLife(200);
         setGravity(0);
@@ -77,11 +68,10 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source instanceof MinionDamageSource minionDamageSource) {
-            Minion minion = minionDamageSource.getMinion();
+        if (source != null) {
             LyraHelper summonerHelper = LyraHelper.get(owner);
             TargetCache targetCache = summonerHelper.getTargetCache();
-            List<LivingEntity> mainTargets = targetCache.getEntitiesInRadius(getPos(), 3, minion::isTarget);
+            List<LivingEntity> mainTargets = targetCache.getEntitiesInRadius(getPos(), 3, this::isTarget);
             for (LivingEntity living : mainTargets) {
                 float amount = getDamage();
                 if (living == trackingTarget) {
@@ -103,7 +93,7 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
                         .damageAmount(amount * 0.5f)
                         .apply();
                 List<LivingEntity> splashTargets = targetCache.getEntitiesInRadius(living.position(), 2,
-                        entity -> entity == living || minion.isTarget(entity));
+                        entity -> entity == living || isTarget(entity));
                 for (LivingEntity entity : splashTargets) {
                     InvincibleData.attack(living)
                             .attacker(getUuid())
@@ -176,10 +166,5 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
     @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.25, -0.25, -1, 0.25, 0.25, 1);
-    }
-
-    @Override
-    public AttachmentEntityType<? extends AttachmentEntity> getType() {
-        return SummonerAttachmentEntityRegister.MINI_NECRO_SPIRIT.get();
     }
 }

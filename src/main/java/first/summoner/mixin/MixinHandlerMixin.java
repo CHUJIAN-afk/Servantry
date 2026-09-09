@@ -2,8 +2,8 @@ package first.summoner.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionDamageSource;
+import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.entity.AttachmentEntityDamageSource;
 import first.lyra.mixinHandler.MixinHandler;
 import first.summoner.common.attachment.SummonMarkData;
 import first.summoner.common.summonMark.SummonMarkType;
@@ -19,7 +19,7 @@ import java.util.Set;
 public class MixinHandlerMixin {
 
     @WrapMethod(method = "getModifyDamage")
-    private static float getModifyDamage(LivingEntity living, Player owner, Minion minion, float damage, MinionDamageSource source, Operation<Float> original) {
+    private static float getModifyDamage(LivingEntity living, Player owner, AttachmentEntity minion, float damage, AttachmentEntityDamageSource source, Operation<Float> original) {
         SummonMarkData data = owner.getData(SummonerAttachmentRegister.SummonMarkData);
         if (data.isSummonMarkTarget(living)) {
             Set<SummonMarkType> summonMarks = data.getMarkTypes();
@@ -41,7 +41,7 @@ public class MixinHandlerMixin {
     }
 
     @WrapMethod(method = "getModifyArmorPierce")
-    private static float getModifyArmorPierce(LivingEntity living, Player owner, Minion minion, float totalArmor, MinionDamageSource source, Operation<Float> original) {
+    private static float getModifyArmorPierce(LivingEntity living, Player owner, AttachmentEntity minion, float totalArmor, AttachmentEntityDamageSource source, Operation<Float> original) {
         SummonMarkData data = owner.getData(SummonerAttachmentRegister.SummonMarkData);
         if (data.isSummonMarkTarget(living)) {
             totalArmor -= data.getCriticalArmorPierce();

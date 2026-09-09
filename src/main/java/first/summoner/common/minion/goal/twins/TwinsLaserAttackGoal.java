@@ -48,7 +48,10 @@ public class TwinsLaserAttackGoal extends MinionGoal<Twins> {
         Vec3 start = minion.getPos();
         RandomSource random = owner.getRandom();
         Vec3 direction = target.getBoundingBox().getCenter().offsetRandom(random, shotCount < 5 ? 0.3f : 1).subtract(start).normalize();
-        Laser projectile = new Laser(minion.getDamageSource(), start, direction);
+        Laser projectile = new Laser();
+        projectile.copyDamageSource(minion);
+        projectile.setPos(start);
+        projectile.setVelocity(direction);
         projectile.setDamage(minion.getDamage() * 1.1f);
         projectile.join(owner);
         ServerLevel level = (ServerLevel) owner.level();
