@@ -41,9 +41,33 @@ public class SummonerModelRegister {
     public static final ModelResourceLocation RAINBOW_CRYSTAL = standalone("rainbow_crystal");
     public static final ModelResourceLocation SCAVENGER_FAIRY = standalone("scavenger_fairy");
     public static final ModelResourceLocation SURVEY_DRONE = standalone("survey_drone");
+    public static final ModelResourceLocation SUPER_PEASHOOTER = standalone("super_peashooter");
+    public static final ModelResourceLocation CLOUD = standalone("cloud");
+    public static final ModelResourceLocation PULSE_TURRET = standalone("pulse_turret");
+    public static final ModelResourceLocation IMP = standalone("imp");
+    public static final ModelResourceLocation NECRO_SPIRIT = standalone("necro_spirit");
+    public static final ModelResourceLocation BARNACLE = standalone("barnacle");
+    public static final ModelResourceLocation HYDRA = standalone("hydra");
+    public static final ModelResourceLocation INFERNO = standalone("inferno");
+    public static final ModelResourceLocation RUIN_RELIC = standalone("ruin_relic");
+    public static final ModelResourceLocation EYE_LASER_TURRET = standalone("eye_laser_turret");
+    public static final ModelResourceLocation VOID_EATER_HEAD = standalone("void_eater_head");
+    public static final ModelResourceLocation VOID_EATER_BODY = standalone("void_eater_body");
+    public static final ModelResourceLocation VOID_EATER_TAIL = standalone("void_eater_tail");
+
+    public static final ModelResourceLocation CROSSBOW_BOLT = standaloneIn("projectile", "crossbow_bolt");
+    public static final ModelResourceLocation MINI_NECRO_SPIRIT = standaloneIn("projectile", "mini_necro_spirit");
+    public static final ModelResourceLocation FROST_BOLT = standaloneIn("projectile", "frost_bolt");
+    public static final ModelResourceLocation EXPLOSION_FLAME_BALL = standaloneIn("projectile", "explosion_flame_ball");
+    public static final ModelResourceLocation FORBIDDEN_ORB = standaloneIn("projectile", "forbidden_orb");
+    public static final ModelResourceLocation HORNET_STINGER = standaloneIn("projectile", "hornet_stinger");
 
     private static ModelResourceLocation standalone(String path) {
-        ModelResourceLocation location = ModelResourceLocation.standalone(Summoner.rl("minion/" + path));
+        return standaloneIn("minion", path);
+    }
+
+    private static ModelResourceLocation standaloneIn(String folder, String path) {
+        ModelResourceLocation location = ModelResourceLocation.standalone(Summoner.rl(folder + "/" + path));
         MODELS.add(location);
         return location;
     }

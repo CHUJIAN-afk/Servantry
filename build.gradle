@@ -36,6 +36,20 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
+        client1 {
+            client()
+            gameDirectory = file('run/client1')
+            programArguments.addAll '--username', 'LirxOwO'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
+        client2 {
+            client()
+            gameDirectory = file('run/client2')
+            programArguments.addAll '--username', '_yi_ran_'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+        }
+
         server {
             server()
             programArgument '--nogui'

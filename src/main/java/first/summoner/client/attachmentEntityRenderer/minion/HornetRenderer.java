@@ -1,0 +1,35 @@
+package first.summoner.client.attachmentEntityRenderer.minion;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.client.render.virtual.VirtualEntityPose;
+import first.lyra.client.render.virtual.VirtualEntityRenderer;
+import first.lyra.common.entity.PathNode;
+import first.summoner.common.minion.Hornet;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.entity.EntityType;
+
+public class HornetRenderer extends AbstractAttachmentEntityRenderer<Hornet> {
+
+    @Override
+    protected RenderContext<Hornet> createContext(Hornet hornet, float partialTick) {
+        return RenderContext.<Hornet>builder()
+                .model(new ModelConfig<Hornet>()
+                               .translateOffset(0, -0.5f, 0)
+                               .alphaDistanceFactor(1.5f))
+                .build();
+    }
+
+    @Override
+    protected void render(Hornet hornet, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Hornet> context, float partialTick, int packedLight, float alpha) {
+        VirtualEntityRenderer.render(EntityType.BEE, poseStack, bufferSource, partialTick, VirtualEntityPose.create()
+                .ageTicks(hornet.getTickCount())
+                .look(0, 0, 0)
+                .walk(hornet.getTickCount(), 1)
+                .attack(0)
+                .packedLight(packedLight)
+                .alpha(alpha));
+    }
+}
