@@ -36,7 +36,7 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
     @Override
     protected void registerSyncFields(SyncFieldDispatcher fields) {
         super.registerSyncFields(fields);
-        fields.field(ByteBufCodecs.INT, this::getLevel, this::setLevel);
+        fields.field(ByteBufCodecs.INT, this::getSentryLevel, this::setSentryLevel);
     }
 
     @Override
@@ -56,8 +56,8 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
-            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
                 setRemove();
             }
             LivingEntity target = getTarget();
@@ -92,7 +92,11 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
         ball.copyDamageSource(this);
         ball.setPos(start);
         ball.setVelocity(direction);
-        ball.join(owner);
+        if (owner != null) {
+            ball.join(owner);
+        } else {
+            ball.join(getLevel());
+        }
     }
 
     private double getAngleDeg(Vec3 a, Vec3 b) {
@@ -110,16 +114,15 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
         }
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 
-    public int getLevel() {
+    public int getSentryLevel() {
         return level;
     }
 
-    public void setLevel(int level) {
+    public void setSentryLevel(int level) {
         this.level = level;
     }
 

@@ -25,14 +25,17 @@ public class ScavengerFairyCollectItemGoal extends MinionGoal<ScavengerFairy> {
         Entity targetEntity = minion.getTargetEntity();
         if (targetEntity != null) {
             if (targetEntity instanceof ItemEntity itemEntity) {
-                Inventory inventory = minion.getOwner().getInventory();
-                for (int i = 0; i < inventory.getContainerSize(); i++) {
-                    ItemStack item = inventory.getItem(i);
-                    if (item.isEmpty()) {
-                        return true;
-                    }
-                    if (item.getCount() < item.getMaxStackSize() && itemEntity.getItem().is(item.getItem())) {
-                        return true;
+                Player owner = minion.getOwner();
+                if (owner != null) {
+                    Inventory inventory = owner.getInventory();
+                    for (int i = 0; i < inventory.getContainerSize(); i++) {
+                        ItemStack item = inventory.getItem(i);
+                        if (item.isEmpty()) {
+                            return true;
+                        }
+                        if (item.getCount() < item.getMaxStackSize() && itemEntity.getItem().is(item.getItem())) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -50,8 +53,10 @@ public class ScavengerFairyCollectItemGoal extends MinionGoal<ScavengerFairy> {
             }
             if (entity instanceof ExperienceOrb experienceOrb) {
                 Player owner = minion.getOwner();
-                owner.takeXpDelay = 0;
-                experienceOrb.playerTouch(owner);
+                if (owner != null) {
+                    owner.takeXpDelay = 0;
+                    experienceOrb.playerTouch(owner);
+                }
             }
             minion.setTargetEntity(minion.findNearestNewTargetEntity());
             return;

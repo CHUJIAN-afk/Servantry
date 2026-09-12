@@ -8,6 +8,7 @@ import first.summoner.common.summonMark.SummonMarkType;
 import first.summoner.register.SummonerAttachmentRegister;
 import first.summoner.register.SummonerEnchantmentSummonMarkTypeRegister;
 import first.summoner.register.SummonerSummonMarkRegister;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -31,7 +32,7 @@ public record GildedWandPacket(int id, InteractionHand hand) implements CustomPa
             ByteBufCodecs.INT,
             GildedWandPacket::id,
             StreamCodec.of(
-                    (buf, hand) -> buf.writeEnum(hand),
+                    FriendlyByteBuf::writeEnum,
                     buf -> buf.readEnum(InteractionHand.class)
             ),
             GildedWandPacket::hand,

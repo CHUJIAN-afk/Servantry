@@ -45,14 +45,14 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             updateDirection(chaseTarget, 1);
             setCurrentPathNode(getNode(progress, 1));
             if (progress >= 1) {
                 setRemove();
             }
         } else if (getHistoryNodes().size() > 2) {
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0xffffff)
                                      .edgeColor(0xb7b7b7)
@@ -79,14 +79,20 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
 
     public void updateDirection(LivingEntity chaseTarget, float partialTick) {
         if (chaseTarget != null && chaseTarget.isAlive()) {
-            Vec3 center = owner.getPosition(partialTick).add(0, owner.getBbHeight() / 2, 0);
+            Vec3 center = getPos();
+            if (owner != null) {
+                center = owner.getPosition(partialTick).add(0, owner.getBbHeight() / 2, 0);
+            }
             Vec3 endPos = chaseTarget.getPosition(partialTick).add(0, chaseTarget.getBbHeight() / 2, 0);
             direction = endPos.subtract(center);
         }
     }
 
     public PathNode getNode(float progress, float partialTick) {
-        Vec3 center = owner.getPosition(partialTick).add(0, owner.getBbHeight() / 2, 0);
+        Vec3 center = getPos();
+        if (owner != null) {
+            center = owner.getPosition(partialTick).add(0, owner.getBbHeight() / 2, 0);
+        }
         Vec3 endPos = center.add(direction);
         Vec3 startPos = center.add(direction.normalize().scale(-1));
         Ellipse ellipse = new Ellipse(endPos, startPos, normal, curvature);

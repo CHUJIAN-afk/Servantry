@@ -8,7 +8,6 @@ import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 public class ChlorophyteCrystal extends Minion {
@@ -22,7 +21,7 @@ public class ChlorophyteCrystal extends Minion {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             LivingEntity target = getTarget();
             if (shootCooldown > 0) {
                 shootCooldown--;
@@ -34,12 +33,14 @@ public class ChlorophyteCrystal extends Minion {
                 shootCooldown = 13;
                 shootTarget(target);
             }
-            float bob = Mth.sin((tickCount) * 0.12f) * 0.15f;
-            Vec3 targetPos = owner.getBoundingBox().getCenter().add(0, owner.getBbHeight() + bob, 0);
-            Vec3 lerpXZ = currentPathNode.pos().lerp(targetPos, 0.8f);
-            Vec3 lerpY = currentPathNode.pos().lerp(targetPos, 0.15f);
-            int yaw = isTarget(getTarget()) ? 30 : 15;
-            currentPathNode = new PathNode(new Vec3(lerpXZ.x(), lerpY.y(), lerpXZ.z()), currentPathNode.yaw() + yaw, currentPathNode.pitch(), currentPathNode.roll());
+            if (owner != null) {
+                float bob = Mth.sin((tickCount) * 0.12f) * 0.15f;
+                Vec3 targetPos = owner.getBoundingBox().getCenter().add(0, owner.getBbHeight() + bob, 0);
+                Vec3 lerpXZ = currentPathNode.pos().lerp(targetPos, 0.8f);
+                Vec3 lerpY = currentPathNode.pos().lerp(targetPos, 0.15f);
+                int yaw = isTarget(getTarget()) ? 30 : 15;
+                currentPathNode = new PathNode(new Vec3(lerpXZ.x(), lerpY.y(), lerpXZ.z()), currentPathNode.yaw() + yaw, currentPathNode.pitch(), currentPathNode.roll());
+            }
         }
         super.tick();
     }
@@ -53,15 +54,15 @@ public class ChlorophyteCrystal extends Minion {
     }
 
     public void shootTarget(LivingEntity target) {
-        Player owner = getOwner();
+        net.minecraft.world.level.Level level = getLevel();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(getPos()).normalize();
         Vec3 startPos = getPos().add(direction.scale(0.25));
         MiniChlorophyteCrystal projectile = new MiniChlorophyteCrystal();
         projectile.copyDamageSource(this);
         projectile.setPos(startPos);
         projectile.setVelocity(direction.scale(1.5));
-        projectile.join(owner);
-        ParticleHelper.create(owner.level())
+        projectile.join(level);
+        ParticleHelper.create(level)
                 .generic(GenericParticleBuilder.create()
                         .centerColor(0x1bff10)
                         .edgeColor(0x17b70e)

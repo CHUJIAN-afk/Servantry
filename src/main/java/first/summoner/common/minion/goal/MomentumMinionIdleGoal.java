@@ -29,7 +29,7 @@ public class MomentumMinionIdleGoal extends MinionGoal<MomentumMinion> {
     @Override
     public void tick() {
         Player owner = minion.getOwner();
-        Vec3 ownerPos = owner.position();
+        Vec3 ownerPos = owner != null ? owner.position() : minion.getPos();
         wanderPos = minion.getWanderPos(wanderPos, ownerPos, distance, 0);
         double distance = minion.getPos().distanceTo(wanderPos);
         minion.applyForce(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * force, force * 10)));
@@ -37,7 +37,7 @@ public class MomentumMinionIdleGoal extends MinionGoal<MomentumMinion> {
             minion.lookAtDirection(minion.getVelocity()
                                             .normalize());
         }
-        if (minion.getPos().distanceToSqr(ownerPos) > maxDistance * maxDistance) {
+        if (owner != null && minion.getPos().distanceToSqr(ownerPos) > maxDistance * maxDistance) {
             minion.teleportTo(ownerPos.add(minion.getVelocity().scale(10)));
         }
     }

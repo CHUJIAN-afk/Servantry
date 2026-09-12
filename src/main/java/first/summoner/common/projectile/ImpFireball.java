@@ -33,7 +33,7 @@ public class ImpFireball extends Projectile implements IEntityCollision<ImpFireb
     @Override
     public void tick() {
         super.tick();
-        Level level = getOwner().level();
+        Level level = getLevel();
         if (!level.isClientSide()) {
             ParticleHelper.create(level)
                     .generic(GenericParticleBuilder.create()

@@ -27,7 +27,7 @@ public class DestructionBullet extends Projectile implements IEntityCollision<De
 
     @Override
     public void onRemove() {
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                                  .centerColor(0xff3d00)
                                  .edgeColor(0xd22f00)
@@ -76,7 +76,7 @@ public class DestructionBullet extends Projectile implements IEntityCollision<De
                     .invincibleTime(20)
                     .effect(new MobEffectInstance(SummonerMobEffectRegister.ArmorCrunch, 100))
                     .apply();
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0xff3d00)
                                      .edgeColor(0xd22f00)

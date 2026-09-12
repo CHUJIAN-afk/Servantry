@@ -25,11 +25,13 @@ public class CommonHooksMixin {
             if (!entity.level().isClientSide() && src instanceof AttachmentEntityDamageSource attachmentDamageSource) {
                 AttachmentEntity minion = attachmentDamageSource.getAttachmentEntity();
                 Player owner = minion.getOwner();
-                SummonMarkData summonMarkData = owner.getData(SummonerAttachmentRegister.SummonMarkData);
-                if (summonMarkData.isSummonMarkTarget(entity)) {
-                    Set<SummonMarkType> markTypes = summonMarkData.getMarkTypes();
-                    for (SummonMarkType markType : markTypes) {
-                        markType.kill(entity, attachmentDamageSource);
+                if (owner != null) {
+                    SummonMarkData summonMarkData = owner.getData(SummonerAttachmentRegister.SummonMarkData);
+                    if (summonMarkData.isSummonMarkTarget(entity)) {
+                        Set<SummonMarkType> markTypes = summonMarkData.getMarkTypes();
+                        for (SummonMarkType markType : markTypes) {
+                            markType.kill(entity, attachmentDamageSource);
+                        }
                     }
                 }
             }

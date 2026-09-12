@@ -44,18 +44,18 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
-            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
                 setRemove();
             }
             LivingEntity target = getTarget();
             if (isTarget(target)) {
                 lookAtPos(target.getBoundingBox().getCenter());
-            } else if (getOwner().getBoundingBox().getCenter().distanceTo(getPos()) < 2) {
+            } else if (owner != null && owner.getBoundingBox().getCenter().distanceTo(getPos()) < 2) {
                 lookAtPos(owner.getEyePosition());
             }
         }
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             LivingEntity target = getTarget();
             if (isTarget(target)) {
                 updateLaser();
@@ -79,7 +79,7 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
         Vec3 pos = getPos();
         Vec3 dir = getLookAngle();
         Vec3 end = pos.add(dir.scale(Math.max(16, pos.distanceTo(getTarget().getBoundingBox().getCenter()))));
-        HitResult hit = owner.level().clip(new ClipContext(pos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner));
+        HitResult hit = getLevel().clip(new ClipContext(pos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner));
         Vec3 hitPos = hit.getType() != HitResult.Type.MISS ? hit.getLocation() : end;
 
         if (laser == null || laser.isRemove()) {
@@ -106,7 +106,11 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
                     }
                 }
             });
-            laser.join(owner);
+            if (owner != null) {
+                laser.join(owner);
+            } else {
+                laser.join(getLevel());
+            }
         } else {
             chargeTicks = Math.min(chargeTicks + 1, 60);
         }
@@ -119,7 +123,7 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
         laser.setHitbox(pos, hitPos, radius);
         laser.setDamage(getDamage() * (0.5f + 2.5f * progress));
         // 向前喷射红色粒子（效果与藤壶一致，仅颜色不同，数量随充能增长至 3 倍）
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                         .centerColor(0xff6b6b)
                         .edgeColor(0xff2a2a)
@@ -139,8 +143,8 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
                 .spread(0.25)
                 .emit();
         // 激光末端爆炸效果（与月亮传送门一致，遮挡激光末端渲染，数量随充能增长至 3 倍）
-        Vec3 direction = hitPos.offsetRandom(owner.getRandom(), 2).subtract(hitPos).normalize();
-        ParticleHelper.create(owner.level())
+        Vec3 direction = hitPos.offsetRandom(getRandom(), 2).subtract(hitPos).normalize();
+        ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                         .centerColor(0xff6b6b)
                         .edgeColor(0xff2a2a)
@@ -174,8 +178,7 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
         return new AABB(-0.4, -0.4, -0.4, 0.4, 0.4, 0.4);
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 }

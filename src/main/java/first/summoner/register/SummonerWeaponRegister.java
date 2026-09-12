@@ -8,6 +8,7 @@ import first.lyra.common.creativeTab.Section;
 import first.lyra.common.dataComponent.LyraRarity;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.item.SummonerWeaponItem;
+import first.lyra.common.minion.MinionSlotType;
 import first.lyra.register.LyraAttributeRegister;
 import first.lyra.register.LyraDataComponentRegister;
 import first.lyra.register.LyraItemRegistries;
@@ -161,11 +162,11 @@ public class SummonerWeaponRegister {
                             .summon((weapon, player, itemStack) -> {
                                 OreScout minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 AttachmentEntityData entityData = summonerHelper.getEntityData();
-                                if (entityData.get(slotType, weapon.getEntityType()).isEmpty() && summonerHelper.canSummon(slotType, minion.getSlotCost())) {
+                                if (entityData.get(weapon.getEntityType()).isEmpty() && summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(minion.getRenderNode(1.0f));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xAB5D66)))
@@ -186,11 +187,11 @@ public class SummonerWeaponRegister {
                             .summon((weapon, player, itemStack) -> {
                                 ScavengerFairy minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 AttachmentEntityData entityData = summonerHelper.getEntityData();
-                                if (entityData.get(slotType, weapon.getEntityType()).isEmpty() && summonerHelper.canSummon(slotType, minion.getSlotCost())) {
+                                if (entityData.get(weapon.getEntityType()).isEmpty() && summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(minion.getRenderNode(1.0f));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x936F20)))
@@ -218,12 +219,12 @@ public class SummonerWeaponRegister {
                             .summon((weapon, player, itemStack) -> {
                                 EnchantedThrowingKnives minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     PathNode idle = minion.getInterpolatedIdleState(1.0f);
                                     Vec3 center = player.getBoundingBox().getCenter();
                                     minion.init(new PathNode(new Vec3(center.x(), idle.pos().y(), center.z()), idle.yaw(), idle.pitch(), idle.roll()));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x636BAF)))
@@ -250,16 +251,16 @@ public class SummonerWeaponRegister {
     public static final DeferredItem<SummonerWeaponItem<Cloud>> RainCloudStaff =
             REGISTRIES.build("rain_cloud_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.CLOUD)
                             .damage(3f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseCloudStaff)
                             .summon((weapon, player, itemStack) -> {
                                 Cloud cloud = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, cloud.getSlotCost())) {
                                     cloud.init(new PathNode(player.getBoundingBox().getCenter(), 0, 0, 0));
                                     cloud.setVelocity(player.getLookAngle());
-                                    summonerHelper.add(slotType, cloud);
+                                    summonerHelper.add(cloud);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xA6670C)))
@@ -290,19 +291,19 @@ public class SummonerWeaponRegister {
                                 laserEye.setLaserEye(true);
                                 laserEye.setSlotCost(1);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, laserEye.getSlotCost())) {
                                     RandomSource random = player.getRandom();
                                     PathNode pathNode = new PathNode(player.getBoundingBox().getCenter().offsetRandom(random, 2), 0, 0, 0);
                                     laserEye.init(pathNode);
-                                    summonerHelper.add(slotType, laserEye);
+                                    summonerHelper.add(laserEye);
 
                                     Twins flameEye = weapon.createMinion(player, itemStack);
                                     flameEye.setFlameEye(true);
                                     flameEye.setSlotCost(0);
                                     flameEye.setOther(laserEye);
                                     flameEye.init(pathNode);
-                                    summonerHelper.add(slotType, flameEye);
+                                    summonerHelper.add(flameEye);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFF4040)))
@@ -366,17 +367,17 @@ public class SummonerWeaponRegister {
     public static final DeferredItem<SummonerWeaponItem<PulseTurret>> PulseTurretRemote =
             REGISTRIES.build("pulse_turret_remote", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.PULSE_TURRET)
                             .damage(2.5f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 PulseTurret minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 AttachmentEntityData entityData = summonerHelper.getEntityData();
-                                List<PulseTurret> pulseTurrets = entityData.get(slotType, weapon.getEntityType());
+                                List<PulseTurret> pulseTurrets = entityData.get(weapon.getEntityType());
                                 if (pulseTurrets.isEmpty() && summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xB16500)))
@@ -421,10 +422,10 @@ public class SummonerWeaponRegister {
                             .summon((weapon, player, itemStack) -> {
                                 Terraprism minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(minion.getInterpolatedIdleState(1));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x75A7D1)))
@@ -449,16 +450,16 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("ballista_rod", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BALLISTA)
                             .damage(3f)
                             .knockback(0.47f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 Ballista minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
-                                    minion.setLevel(1);
+                                    minion.setSentryLevel(1);
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xD25259)))
@@ -481,16 +482,16 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("ballista_cane", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BALLISTA)
                             .damage(7.4f)
                             .knockback(0.47f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 Ballista minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
-                                    minion.setLevel(2);
+                                    minion.setSentryLevel(2);
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xED5C5C)))
@@ -513,16 +514,16 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("ballista_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BALLISTA)
                             .damage(15.6f)
                             .knockback(0.47f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 Ballista minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
-                                    minion.setLevel(3);
+                                    minion.setSentryLevel(3);
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xF3485E)))
@@ -547,16 +548,16 @@ public class SummonerWeaponRegister {
                             .damage(0.4f)
                             .knockback(0.25f)
                             .armorPierce(1000f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 LightningAura minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
-                                    minion.setLevel(1);
+                                    minion.setSentryLevel(1);
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xCC5649)))
@@ -579,16 +580,16 @@ public class SummonerWeaponRegister {
                             .damage(1.1f)
                             .knockback(0.25f)
                             .armorPierce(1000f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 LightningAura minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
-                                    minion.setLevel(2);
+                                    minion.setSentryLevel(2);
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xCF5549)))
@@ -611,16 +612,16 @@ public class SummonerWeaponRegister {
                             .damage(3.4f)
                             .knockback(0.25f)
                             .armorPierce(1000f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 LightningAura minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
-                                    minion.setLevel(3);
+                                    minion.setSentryLevel(3);
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xD75346)))
@@ -647,12 +648,12 @@ public class SummonerWeaponRegister {
                             .summon((weapon, player, itemStack) -> {
                                 EtherealStellarCore minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 AttachmentEntityData entityData = summonerHelper.getEntityData();
-                                List<EtherealStellarCore> etherealStellarCores = entityData.get(slotType, weapon.getEntityType());
+                                List<EtherealStellarCore> etherealStellarCores = entityData.get(weapon.getEntityType());
                                 if (etherealStellarCores.size() < 9 && summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(minion.getInterpolatedIdleState(1.0f));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFCB200)))
@@ -701,9 +702,9 @@ public class SummonerWeaponRegister {
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 LyraHelper helper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (helper.canSummon(slotType, 1)) {
-                                    List<StardustDragon> existing = helper.getEntityData().get(slotType, weapon.getEntityType());
+                                    List<StardustDragon> existing = helper.getEntityData().get(weapon.getEntityType());
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
                                             StardustDragon minion = weapon.createMinion(player, itemStack);
@@ -713,7 +714,7 @@ public class SummonerWeaponRegister {
                                             }
                                             minion.setTotalSegments(3);
                                             minion.init(new PathNode(player.position().add(0, 3, -i * minion.getSegmentDistance()), 0, 0, 0));
-                                            helper.add(slotType, minion);
+                                            helper.add(minion);
                                         }
                                     } else {
                                         StardustDragon minion = weapon.createMinion(player, itemStack);
@@ -726,7 +727,7 @@ public class SummonerWeaponRegister {
                                         PathNode pathNode = last.getCurrentPathNode();
                                         Vec3 pos = pathNode.pos().add(last.getLookAngle().scale(-minion.getSegmentDistance()));
                                         minion.init(new PathNode(pos, pathNode.yaw(), pathNode.pitch(), pathNode.roll()));
-                                        helper.add(slotType, minion);
+                                        helper.add(minion);
                                     }
                                 }
                             })
@@ -751,15 +752,15 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("moon_portal_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.MOON_PORTAL)
                             .damage(10f)
                             .knockback(0.75f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player, itemStack) -> {
                                 MoonPortal minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(new PathNode(player.position().add(0, 2, 0), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x22DD97)))
@@ -782,15 +783,15 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("rainbow_crystal_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.RAINBOW_CRYSTAL)
                             .damage(13f)
                             .knockback(0.75f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player, itemStack) -> {
                                 RainbowCrystal minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(new PathNode(player.position().add(0, 2, 0), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x994DFF)))
@@ -816,12 +817,12 @@ public class SummonerWeaponRegister {
                             .summon((weapon, player, itemStack) -> {
                                 InfiniteShadow minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 ScabbardContainer container = player.getMainHandItem().getComponents().getOrDefault(SummonerDataComponentRegister.SCABBARD.get(), ScabbardContainer.EMPTY);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost()) && !container.isEmpty()) {
                                     minion.setItemStack(container.itemStack());
                                     minion.init(minion.getInterpolatedIdleState(1));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC)
@@ -851,9 +852,9 @@ public class SummonerWeaponRegister {
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 LyraHelper helper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (helper.canSummon(slotType, 1)) {
-                                    List<VoidEater> existing = helper.getEntityData().get(slotType, weapon.getEntityType());
+                                    List<VoidEater> existing = helper.getEntityData().get(weapon.getEntityType());
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
                                             VoidEater minion = weapon.createMinion(player, itemStack);
@@ -863,7 +864,7 @@ public class SummonerWeaponRegister {
                                             }
                                             minion.setTotalSegments(3);
                                             minion.init(new PathNode(player.position().add(0, 3, -i * minion.getSegmentDistance()), 0, 0, 0));
-                                            helper.add(slotType, minion);
+                                            helper.add(minion);
                                         }
                                     } else {
                                         VoidEater minion = weapon.createMinion(player, itemStack);
@@ -876,7 +877,7 @@ public class SummonerWeaponRegister {
                                         PathNode pathNode = last.getCurrentPathNode();
                                         Vec3 pos = pathNode.pos().add(last.getLookAngle().scale(-minion.getSegmentDistance()));
                                         minion.init(new PathNode(pos, pathNode.yaw(), pathNode.pitch(), pathNode.roll()));
-                                        helper.add(slotType, minion);
+                                        helper.add(minion);
                                     }
                                 }
                             })
@@ -902,15 +903,15 @@ public class SummonerWeaponRegister {
     public static final DeferredItem<SummonerWeaponItem<SuperPeashooter>> ThundercloudBonsai =
             REGISTRIES.build("thundercloud_bonsai", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SUPER_PEASHOOTER)
                             .damage(12f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseMoonPortalStaff)
                             .summon((weapon, player, itemStack) -> {
                                 SuperPeashooter minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x2978D3)))
@@ -939,16 +940,16 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("corn_cannon", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.CANNON)
                             .damage(6400f)
                             .armorPierce(3600f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 Cannon minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 minion.setSlotCost(2);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x07BA19)))
@@ -970,11 +971,11 @@ public class SummonerWeaponRegister {
                             .summon((weapon, player, itemStack) -> {
                                 NecroSpirit minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 AttachmentEntityData entityData = summonerHelper.getEntityData();
-                                if (entityData.get(slotType, weapon.getEntityType()).isEmpty() && summonerHelper.canSummon(slotType, minion.getSlotCost())) {
+                                if (entityData.get(weapon.getEntityType()).isEmpty() && summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(minion.getInterpolatedIdleState(1.0f));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xDA5152)))
@@ -997,11 +998,11 @@ public class SummonerWeaponRegister {
                             .summon((weapon, player, itemStack) -> {
                                 LaserMinigun minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 AttachmentEntityData entityData = summonerHelper.getEntityData();
-                                if (entityData.get(slotType, weapon.getEntityType()).isEmpty() && summonerHelper.canSummon(slotType, minion.getSlotCost())) {
+                                if (entityData.get(weapon.getEntityType()).isEmpty() && summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(minion.getInterpolatedIdleState(1.0f));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x0084E6)))
@@ -1024,15 +1025,15 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("barnacle_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BARNACLE)
                             .damage(3.3f)
                             .knockback(0.75f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 Barnacle minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x367A9C)))
@@ -1055,15 +1056,15 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("eye_laser_turret_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.EYE_LASER_TURRET)
                             .damage(1.2f)
                             .knockback(0.25f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 EyeLaserTurret minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xA26632)))
@@ -1086,15 +1087,15 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("hydra_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.HYDRA)
                             .damage(10f)
                             .knockback(0.75f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
                                 Hydra minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x0F98EA)))
@@ -1117,16 +1118,16 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("inferno_rod", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFERNO)
                             .damage(1.7f)
                             .knockback(0.3f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 Inferno minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
-                                    minion.setLevel(1);
+                                    minion.setSentryLevel(1);
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xB94BEB)))
@@ -1148,16 +1149,16 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("inferno_cane", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFERNO)
                             .damage(4.2f)
                             .knockback(0.3f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 Inferno minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
-                                    minion.setLevel(2);
+                                    minion.setSentryLevel(2);
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xB94BEB)))
@@ -1179,16 +1180,16 @@ public class SummonerWeaponRegister {
             REGISTRIES.build("inferno_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.INFERNO)
                             .damage(8.8f)
                             .knockback(0.3f)
-                            .slotType(AttachmentEntityData.Type.Sentry)
+                            .slotType(MinionSlotType.Sentry)
                             .sound(SummonerSoundRegister.UseBallistaStaff)
                             .summon((weapon, player, itemStack) -> {
                                 Inferno minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
-                                    minion.setLevel(3);
+                                    minion.setSentryLevel(3);
                                     minion.init(new PathNode(player.position().add(0, 1, 0), 0, 1, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFFA91A)))
@@ -1215,10 +1216,10 @@ public class SummonerWeaponRegister {
                             .summon((weapon, player, itemStack) -> {
                                 BloodBat minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(new PathNode(player.getBoundingBox().getCenter().offsetRandom(player.getRandom(), 2), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFF4242)))
@@ -1245,10 +1246,10 @@ public class SummonerWeaponRegister {
                             .summon((weapon, player, itemStack) -> {
                                 RuinRelic minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
-                                AttachmentEntityData.Type slotType = weapon.getSlotType(itemStack);
+                                MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
                                     minion.init(new PathNode(player.getBoundingBox().getCenter().offsetRandom(player.getRandom(), 2), 0, 0, 0));
-                                    summonerHelper.add(slotType, minion);
+                                    summonerHelper.add(minion);
                                 }
                             })
                             .properties(properties -> properties.rarity(Rarity.EPIC).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x9D6A0F)))

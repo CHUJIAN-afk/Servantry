@@ -7,6 +7,7 @@ import first.summoner.common.projectile.DemonFlame;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class TwinsCursedFlameAttackGoal extends MinionGoal<Twins> {
@@ -31,6 +32,7 @@ public class TwinsCursedFlameAttackGoal extends MinionGoal<Twins> {
         Vec3 targetPos = target.getBoundingBox().getCenter();
         Vec3 toTarget = targetPos.subtract(minion.getPos());
         Player owner = minion.getOwner();
+        Level level = minion.getLevel();
         minion.lookAtPos(targetPos);
         if (!emited) {
             if (--cooldown <= 0) {
@@ -38,8 +40,8 @@ public class TwinsCursedFlameAttackGoal extends MinionGoal<Twins> {
                 if (emit > 40) {
                     emited = true;
                 } else {
-                    cooldown = 12 + owner.getRandom().nextInt(-2, 2);
-                    Vec3 direction = toTarget.offsetRandom(owner.getRandom(), (float) target.getBoundingBox().getSize()).normalize();
+                    cooldown = 12 + level.getRandom().nextInt(-2, 2);
+                    Vec3 direction = toTarget.offsetRandom(level.getRandom(), (float) target.getBoundingBox().getSize()).normalize();
                     minion.applyForce(direction.scale(2));
                     minion.setTrailTimer(10);
                 }
@@ -53,11 +55,15 @@ public class TwinsCursedFlameAttackGoal extends MinionGoal<Twins> {
                 demonFlame.copyDamageSource(minion);
                 demonFlame.setPos(minion.getPos());
                 demonFlame.setVelocity(targetPos.subtract(minion.getPos()).normalize());
-                demonFlame.join(owner);
+                if (owner != null) {
+                    demonFlame.join(owner);
+                } else {
+                    demonFlame.join(level);
+                }
                 GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                         .centerColor(0x24d509)
                         .edgeColor(0x1FF109);
-                ParticleHelper.create(owner.level())
+                ParticleHelper.create(level)
                         .generic(genericParticleBuilder
                                 .lifetime(5)
                                 .lifetimeRandom(15)

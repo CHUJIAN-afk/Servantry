@@ -26,7 +26,7 @@ public class OreScout extends Minion {
 
     @Override
     public void tick() {
-        Level level = getOwner().level();
+        Level level = getLevel();
         if (!level.isClientSide()) {
             setPath(Collections.singletonList(getRenderNode(1.0f)));
             if (target == null) {
@@ -53,16 +53,20 @@ public class OreScout extends Minion {
 
     @Override
     public PathNode getRenderNode(float partialTick) {
-        double px = Mth.lerp(partialTick, owner.xo, owner.getX());
-        double py = Mth.lerp(partialTick, owner.yo, owner.getY());
-        double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
-        float bob = Mth.sin((tickCount + partialTick) * 0.12f) * 0.05f;
-        Vec3 targetPos = new Vec3(px, py, pz).add(0, owner.getBbHeight() + 1.05f + bob, 0);
-        return new PathNode(targetPos, 0, 0, 0);
+        PathNode node = getCurrentPathNode();
+        if (owner != null) {
+            double px = Mth.lerp(partialTick, owner.xo, owner.getX());
+            double py = Mth.lerp(partialTick, owner.yo, owner.getY());
+            double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
+            float bob = Mth.sin((tickCount + partialTick) * 0.12f) * 0.05f;
+            Vec3 targetPos = new Vec3(px, py, pz).add(0, owner.getBbHeight() + 1.05f + bob, 0);
+            node = new PathNode(targetPos, 0, 0, 0);
+        }
+        return node;
     }
 
     private BlockPos getNearestOrePos(int radius) {
-        Level level = getOwner().level();
+        Level level = getLevel();
         BlockPos center = BlockPos.containing(getPos());
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         int radiusSquared = radius * radius;

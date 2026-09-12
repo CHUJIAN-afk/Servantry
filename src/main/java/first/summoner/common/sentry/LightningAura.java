@@ -32,7 +32,7 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
     @Override
     protected void registerSyncFields(SyncFieldDispatcher fields) {
         super.registerSyncFields(fields);
-        fields.field(ByteBufCodecs.INT, this::getLevel, this::setLevel);
+        fields.field(ByteBufCodecs.INT, this::getSentryLevel, this::setSentryLevel);
     }
 
     @Override
@@ -42,8 +42,8 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
-            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
                 setRemove();
             }
             spawnParticles();
@@ -61,7 +61,7 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
      * 击退/护甲穿透由 MinionDamageSource 统一应用（击退 0.25、穿透 1000）。
      */
     private void attack() {
-        TargetCache targetCache = LyraHelper.get(owner).getTargetCache();
+        TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
         List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 6);
         for (LivingEntity entity : entities) {
             InvincibleData.attack(entity)
@@ -75,12 +75,12 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
      * 每 tick 在半径 4 格的球面上生成 10 个位置不同的闪电色粒子，无速度，约 0.5 秒消散。
      */
     private void spawnParticles() {
-        RandomSource random = owner.getRandom();
+        RandomSource random = getRandom();
         Vec3 center = getPos();
         for (int i = 0; i < 10; i++) {
             Vec3 dir = new Vec3(random.nextDouble() - 0.5, random.nextDouble() - 0.5, random.nextDouble() - 0.5).normalize();
             Vec3 pos = center.add(dir.scale(6));
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                             .centerColor(0xcfeaff)
                             .edgeColor(0x5aa7ff)
@@ -105,16 +105,15 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
         }
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 
-    public int getLevel() {
+    public int getSentryLevel() {
         return level;
     }
 
-    public void setLevel(int level) {
+    public void setSentryLevel(int level) {
         this.level = level;
     }
 

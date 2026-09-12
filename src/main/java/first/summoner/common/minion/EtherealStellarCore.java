@@ -22,7 +22,7 @@ public class EtherealStellarCore extends Minion {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             if (shootCooldown > 0) {
                 shootCooldown--;
             }
@@ -36,8 +36,7 @@ public class EtherealStellarCore extends Minion {
     }
 
     public void shootTarget(LivingEntity target) {
-        Player owner = getOwner();
-        RandomSource random = owner.getRandom();
+        RandomSource random = getRandom();
         shootCooldown = 18 + random.nextInt(-2, 2);
         int count = random.nextInt(2, 5);
         for (int i = 0; i < count; i++) {
@@ -48,11 +47,11 @@ public class EtherealStellarCore extends Minion {
             projectile.setPos(start.add(direction.scale(-0.75)));
             projectile.setVelocity(direction.scale(0.5f));
             projectile.setChaseTarget(target);
-            projectile.join(owner);
+            projectile.join(getLevel());
             GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                              .centerColor(0x2fb2e1)
                              .edgeColor(0x33ccff);
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(genericParticleBuilder
                                      .lifetime(4)
                                      .lifetimeRandom(8)
@@ -90,17 +89,21 @@ public class EtherealStellarCore extends Minion {
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
         Player owner = getOwner();
-        int total = Math.max(1, getSameSizeCache());
-        int order = getOrderCache();
-        float angle = (owner.tickCount + partialTick) * 0.02f + (order * Mth.TWO_PI / total);
-        float radius = 1.5f;
+        PathNode node = getCurrentPathNode();
+        if (owner != null) {
+            int total = Math.max(1, getSameSizeCache());
+            int order = getOrderCache();
+            float angle = (owner.tickCount + partialTick) * 0.02f + (order * Mth.TWO_PI / total);
+            float radius = 1.5f;
 
-        double px = Mth.lerp(partialTick, owner.xo, owner.getX());
-        double py = Mth.lerp(partialTick, owner.yo, owner.getY());
-        double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
+            double px = Mth.lerp(partialTick, owner.xo, owner.getX());
+            double py = Mth.lerp(partialTick, owner.yo, owner.getY());
+            double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
 
-        Vec3 orbitPos = new Vec3(px, py, pz).add(Math.cos(angle) * radius, owner.getBbHeight() / 2, Math.sin(angle) * radius);
-        float cos = (float) Math.cos(angle) * 180;
-        return new PathNode(orbitPos, cos, cos, cos);
+            Vec3 orbitPos = new Vec3(px, py, pz).add(Math.cos(angle) * radius, owner.getBbHeight() / 2, Math.sin(angle) * radius);
+            float cos = (float) Math.cos(angle) * 180;
+            node = new PathNode(orbitPos, cos, cos, cos);
+        }
+        return node;
     }
 }

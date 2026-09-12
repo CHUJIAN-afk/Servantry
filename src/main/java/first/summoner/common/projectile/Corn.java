@@ -53,7 +53,7 @@ public class Corn extends Projectile implements IEntityCollision<Corn>, IBlockCo
      */
     private void explodeAt(Vec3 explosionPos) {
         // 通过TargetCache获取附近实体
-        LyraHelper helper = LyraHelper.get(owner);
+        LyraHelper helper = LyraHelper.get(getLevel());
         TargetCache targetCache = helper.getTargetCache();
         List<LivingEntity> nearbyEntities = targetCache.getEntitiesInRadius(explosionPos, AOE_RADIUS, this::isTarget);
         for (LivingEntity entity : nearbyEntities) {
@@ -65,17 +65,21 @@ public class Corn extends Projectile implements IEntityCollision<Corn>, IBlockCo
                     .apply();
         }
         Vec3 pos = getPos();
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .type(ParticleTypes.EXPLOSION)
                 .pos(pos)
                 .count(10)
                 .emit();
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .type(ParticleTypes.EXPLOSION_EMITTER)
                 .pos(pos)
                 .count(10)
                 .emit();
-        Playable.play(SoundEvents.GENERIC_EXPLODE, owner.level(), pos, owner.getSoundSource());
+        if (owner != null) {
+            Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), pos, owner.getSoundSource());
+        } else {
+            Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), pos, net.minecraft.sounds.SoundSource.PLAYERS);
+        }
         setRemove();
     }
 

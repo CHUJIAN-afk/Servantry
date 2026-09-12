@@ -37,7 +37,7 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
     @Override
     public void tick() {
         super.tick();
-        Level level = getOwner().level();
+        Level level = getLevel();
         if (!level.isClientSide()) {
             // 火焰色粒子拖尾（参考小鬼火球）
             ParticleHelper.create(level)
@@ -80,9 +80,9 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
 
     @Override
     public void onRemove() {
-        if (!owner.level().isClientSide() && getDamageSource() != null) {
+        if (!getLevel().isClientSide() && getDamageSource() != null) {
             // 未命中目标消失（自然消散）时爆发少量火焰色粒子
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                             .centerColor(0xe1c316)
                             .edgeColor(0xff7506)
@@ -119,7 +119,7 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
             entity.igniteForTicks(200);
         }
         // 命中时爆发散射粒子
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                         .centerColor(0xe1c316)
                         .edgeColor(0xff7506)

@@ -20,21 +20,23 @@ public class MixinHandlerMixin {
 
     @WrapMethod(method = "getModifyDamage")
     private static float getModifyDamage(LivingEntity living, Player owner, AttachmentEntity minion, float damage, AttachmentEntityDamageSource source, Operation<Float> original) {
-        SummonMarkData data = owner.getData(SummonerAttachmentRegister.SummonMarkData);
-        if (data.isSummonMarkTarget(living)) {
-            Set<SummonMarkType> summonMarks = data.getMarkTypes();
-            damage += data.getCriticalDamage();
-            if (data.isDamageCritical(source)) {
-                float base = 2f;
-                // 水蓝色黎明：暴击伤害 +50%
-                if (summonMarks.contains(SummonerSummonMarkRegister.CeruleanDawn.get())) {
-                    base += 0.5f;
+        if (owner != null) {
+            SummonMarkData data = owner.getData(SummonerAttachmentRegister.SummonMarkData);
+            if (data.isSummonMarkTarget(living)) {
+                Set<SummonMarkType> summonMarks = data.getMarkTypes();
+                damage += data.getCriticalDamage();
+                if (data.isDamageCritical(source)) {
+                    float base = 2f;
+                    // 水蓝色黎明：暴击伤害 +50%
+                    if (summonMarks.contains(SummonerSummonMarkRegister.CeruleanDawn.get())) {
+                        base += 0.5f;
+                    }
+                    // 秘仪：暴击伤害 +15%，每 2% 标记暴击率额外 +1% 暴击伤害
+                    if (summonMarks.contains(SummonerSummonMarkRegister.ArcaneRite.get())) {
+                        base += 0.15f + data.getCriticalHitRate() * 0.5f;
+                    }
+                    damage *= base;
                 }
-                // 秘仪：暴击伤害 +15%，每 2% 标记暴击率额外 +1% 暴击伤害
-                if (summonMarks.contains(SummonerSummonMarkRegister.ArcaneRite.get())) {
-                    base += 0.15f + data.getCriticalHitRate() * 0.5f;
-                }
-                damage *= base;
             }
         }
         return original.call(living, owner, minion, damage, source);
@@ -42,9 +44,11 @@ public class MixinHandlerMixin {
 
     @WrapMethod(method = "getModifyArmorPierce")
     private static float getModifyArmorPierce(LivingEntity living, Player owner, AttachmentEntity minion, float totalArmor, AttachmentEntityDamageSource source, Operation<Float> original) {
-        SummonMarkData data = owner.getData(SummonerAttachmentRegister.SummonMarkData);
-        if (data.isSummonMarkTarget(living)) {
-            totalArmor -= data.getCriticalArmorPierce();
+        if (owner != null) {
+            SummonMarkData data = owner.getData(SummonerAttachmentRegister.SummonMarkData);
+            if (data.isSummonMarkTarget(living)) {
+                totalArmor -= data.getCriticalArmorPierce();
+            }
         }
         return original.call(living, owner, minion, totalArmor, source);
     }

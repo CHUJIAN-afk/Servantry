@@ -15,6 +15,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -85,19 +86,28 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
             }
         } else {
             Player owner = minion.getOwner();
+            Level level = minion.getLevel();
             if (minion.getTickCount() % 5 == 0) {
                 double dot = minion.getLookAngle().dot(targetPos.subtract(minion.getPos()).normalize());
                 if (dot > 0 && Math.acos((float) Math.min(1, dot)) < Mth.DEG_TO_RAD * 30) {
                     Vec3 start = minion.getPos();
-                    Playable.play(SummonerSoundRegister.Laser, owner.level(), start, owner.getSoundSource());
+                    if (owner != null) {
+                        Playable.play(SummonerSoundRegister.Laser, level, start, owner.getSoundSource());
+                    } else {
+                        Playable.play(SummonerSoundRegister.Laser, level, start, net.minecraft.sounds.SoundSource.PLAYERS);
+                    }
                     for (int i = 0; i < 9; i++) {
-                        Vec3 direction = targetPos.offsetRandom(owner.getRandom(), 2f).subtract(minion.getPos()).normalize();
+                        Vec3 direction = targetPos.offsetRandom(level.getRandom(), 2f).subtract(minion.getPos()).normalize();
                         GodFlame projectile = new GodFlame();
                         projectile.copyDamageSource(minion);
                         projectile.setPos(start);
                         projectile.setVelocity(direction.scale(3));
                         projectile.setDamage(minion.getDamage() * 0.5f);
-                        projectile.join(owner);
+                        if (owner != null) {
+                            projectile.join(owner);
+                        } else {
+                            projectile.join(level);
+                        }
                     }
                 }
             }
@@ -132,7 +142,12 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
                 laser.setColor(0x6f19d4);
                 laser.setDamage(minion.getDamage() * 2);
                 Player owner = minion.getOwner();
-                laser.join(owner);
+                Level level = minion.getLevel();
+                if (owner != null) {
+                    laser.join(owner);
+                } else {
+                    laser.join(level);
+                }
                 laser.setTickConsumer(laserProjectile -> {
                     if (laserProjectile.getDamageSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity().isRemove()) {
                         laserProjectile.setRemove();
@@ -161,11 +176,11 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
                                     .damageAmount(laserProjectile.getDamage())
                                     .apply();
                             Vec3 hitPoint = living.getBoundingBox().getCenter();
-                            Vec3 direction = hitPoint.offsetRandom(owner.getRandom(), 2).subtract(hitPoint).normalize();
+                            Vec3 direction = hitPoint.offsetRandom(level.getRandom(), 2).subtract(hitPoint).normalize();
                             GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                                              .centerColor(0x841af3)
                                              .edgeColor(0x6f19d4);
-                            ParticleHelper.create(owner.level())
+                            ParticleHelper.create(level)
                                     .generic(genericParticleBuilder
                                                      .lifetime(5)
                                                      .lifetimeRandom(5)
@@ -186,7 +201,7 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
                     }
                 });
             }
-            ParticleHelper.create(minion.getOwner().level())
+            ParticleHelper.create(minion.getLevel())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0x841af3)
                                      .edgeColor(0x6f19d4)

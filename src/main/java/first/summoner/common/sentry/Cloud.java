@@ -25,23 +25,22 @@ public class Cloud extends MomentumMinion implements IBlockCollision<Cloud> {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             if (--cooldown <= 0) {
-                RandomSource random = owner.getRandom();
+                RandomSource random = getRandom();
                 cooldown = random.nextInt(2, 4);
                 Vec3 start = getPos().offsetRandom(random, 0.25f);
                 Rain rain = new Rain();
                 rain.copyDamageSource(this);
                 rain.setPos(start);
                 rain.setVelocity(new Vec3(0, -0.5, 0));
-                rain.join(owner);
+                rain.join(getLevel());
             }
         }
         super.tick();
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 

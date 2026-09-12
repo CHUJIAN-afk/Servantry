@@ -76,7 +76,7 @@ public class Hornet extends MomentumMinion implements IBlockCollision<Hornet> {
      * 装备蜂巢背包时冷却缩短。
      */
     public int getStingerCooldown() {
-        RandomSource random = owner.getRandom();
+        RandomSource random = getRandom();
         int cooldown = 13 + random.nextIntBetweenInclusive(0, 4);
         if (CuriosUtil.isEquipped(owner, SummonerCurioRegister.HivePack.get())) {
             cooldown = (int) (cooldown * 0.67);

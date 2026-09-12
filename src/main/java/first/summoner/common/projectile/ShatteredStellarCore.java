@@ -58,7 +58,7 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             if (chaseTarget != null && chaseTarget.isAlive()) {
                 if (getTickCount() >= 15) {
                     Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
@@ -76,7 +76,7 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
         GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                          .centerColor(0x2fb2e1)
                          .edgeColor(0x33ccff);
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(genericParticleBuilder
                                  .lifetime(4)
                                  .lifetimeRandom(8)

@@ -30,7 +30,7 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
     @Override
     protected void registerSyncFields(SyncFieldDispatcher fields) {
         super.registerSyncFields(fields);
-        fields.field(ByteBufCodecs.INT, this::getLevel, this::setLevel);
+        fields.field(ByteBufCodecs.INT, this::getSentryLevel, this::setSentryLevel);
     }
 
     @Override
@@ -40,8 +40,8 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
-            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
                 setRemove();
             }
             LivingEntity target = getTarget();
@@ -54,16 +54,20 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
                 aiming++;
                 if (cooldown < 0 && aiming > 10) {
                     cooldown = 53;
-                    boolean full = SummonerArmorSetRegister.ValhallaKnight.value().full(owner);
-                    if (full) {
-                        cooldown -= 20;
-                    }
-                    boolean hasEffect = owner.hasEffect(SummonerMobEffectRegister.BallistaPanicked);
-                    if (hasEffect) {
-                        cooldown -= 13;
-                    }
-                    if (full && hasEffect) {
-                        cooldown -= 10;
+                    boolean full = false;
+                    boolean hasEffect = false;
+                    if (owner != null) {
+                        full = SummonerArmorSetRegister.ValhallaKnight.value().full(owner);
+                        if (full) {
+                            cooldown -= 20;
+                        }
+                        hasEffect = owner.hasEffect(SummonerMobEffectRegister.BallistaPanicked);
+                        if (hasEffect) {
+                            cooldown -= 13;
+                        }
+                        if (full && hasEffect) {
+                            cooldown -= 10;
+                        }
                     }
                     fire();
                 }
@@ -80,16 +84,15 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
         }
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 
-    public int getLevel() {
+    public int getSentryLevel() {
         return level;
     }
 
-    public void setLevel(int level) {
+    public void setSentryLevel(int level) {
         this.level = level;
     }
 
@@ -99,14 +102,21 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
         CrossbowBolt projectile = new CrossbowBolt();
         projectile.copyDamageSource(this);
         projectile.setPos(start);
-        if (SummonerArmorSetRegister.ValhallaKnight.value().full(owner)) {
-            projectile.setMaxPierceCount(6);
-            projectile.setDamage(projectile.getDamage() * 1.33f);
-            direction = direction.scale(1.33f);
+        if (owner != null) {
+            if (SummonerArmorSetRegister.ValhallaKnight.value().full(owner)) {
+                projectile.setMaxPierceCount(6);
+                projectile.setDamage(projectile.getDamage() * 1.33f);
+                direction = direction.scale(1.33f);
+            }
         }
         projectile.setVelocity(direction.scale(2));
-        projectile.join(owner);
-        Playable.play(SummonerSoundRegister.BallistaShot, owner.level(), start, owner.getSoundSource());
+        if (owner != null) {
+            projectile.join(owner);
+            Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), start, owner.getSoundSource());
+        } else {
+            projectile.join(getLevel());
+            Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), start, net.minecraft.sounds.SoundSource.PLAYERS);
+        }
     }
 
     @Override

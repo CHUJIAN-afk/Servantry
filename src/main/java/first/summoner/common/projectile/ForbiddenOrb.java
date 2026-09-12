@@ -39,7 +39,7 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
     @Override
     public void tick() {
         super.tick();
-        Level level = getOwner().level();
+        Level level = getLevel();
         if (!level.isClientSide()) {
             // 金黄色粒子轨迹
             ParticleHelper.create(level)
@@ -87,7 +87,7 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
     public void onRemove() {
         // 在空气中消失（自然消散）时也会爆炸
         DamageSource source = getDamageSource();
-        if (!owner.level().isClientSide() && source != null) {
+        if (!getLevel().isClientSide() && source != null) {
             explode(source, getPos());
         }
     }
@@ -106,7 +106,7 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
                     .apply();
         }
         // 命中时爆出大量金黄色粒子
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                         .centerColor(0xffd700)
                         .edgeColor(0xffa500)

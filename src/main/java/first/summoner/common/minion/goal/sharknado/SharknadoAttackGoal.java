@@ -27,7 +27,7 @@ public class SharknadoAttackGoal extends MinionGoal<Sharknado> {
         minion.applyForce(targetPos.subtract(startPos).normalize().scale(0.075));
         if (minion.getShootCooldown() <= 0) {
             minion.shootAtTarget(target);
-            minion.setShootCooldown(10 + minion.getOwner().getRandom().nextIntBetweenInclusive(-1, 1));
+            minion.setShootCooldown(10 + minion.getRandom().nextIntBetweenInclusive(-1, 1));
         }
     }
 }

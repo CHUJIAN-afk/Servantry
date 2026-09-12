@@ -84,7 +84,7 @@ public class MiniStardustCell extends AttachingProjectile implements IEntityColl
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             if (isAttached()) {
                 LivingEntity target = getAttachedTarget();
                 if (target == null || !target.isAlive()) {
@@ -114,10 +114,10 @@ public class MiniStardustCell extends AttachingProjectile implements IEntityColl
 
     @Override
     public void onRemove() {
-        Level level = owner.level();
+        Level level = getLevel();
         if (!level.isClientSide()) {
             Vec3 pos = getPos();
-            RandomSource random = owner.getRandom();
+            RandomSource random = getRandom();
             int count = random.nextInt(2, 3);
             double baseSpeed = 0.2;
             if (isAttached()) {
@@ -142,7 +142,7 @@ public class MiniStardustCell extends AttachingProjectile implements IEntityColl
             GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                     .centerColor(0x2fb2e1)
                     .edgeColor(0x33ccff);
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(genericParticleBuilder
                             .lifetime(5)
                             .lifetimeRandom(25)

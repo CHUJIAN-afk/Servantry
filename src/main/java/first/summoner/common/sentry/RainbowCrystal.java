@@ -21,12 +21,12 @@ public class RainbowCrystal extends Minion {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
-            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
                 setRemove();
             }
             if (--cooldown < 0 && isTarget(getTarget())) {
-                cooldown = owner.getRandom().nextInt(6, 8);
+                cooldown = getRandom().nextInt(6, 8);
                 fire(getTarget());
             }
         }
@@ -41,7 +41,7 @@ public class RainbowCrystal extends Minion {
     public void fire(LivingEntity target) {
         for (int i = 0; i < 3; i++) {
             Vec3 center = target.getBoundingBox().getCenter();
-            Vec3 endPos = center.offsetRandom(owner.getRandom(), 4);
+            Vec3 endPos = center.offsetRandom(getRandom(), 4);
             Vec3 direction = endPos.subtract(getPos()).normalize();
             float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
             float pitch = (float) Math.toDegrees(Math.asin(-direction.y));
@@ -56,12 +56,11 @@ public class RainbowCrystal extends Minion {
             projectile.copyDamageSource(this);
             projectile.setPos(startPathNode.pos());
             projectile.setPath(list);
-            projectile.join(owner);
+            projectile.join(getLevel());
         }
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 }

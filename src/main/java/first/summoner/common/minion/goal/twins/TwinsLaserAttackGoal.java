@@ -11,6 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class TwinsLaserAttackGoal extends MinionGoal<Twins> {
@@ -32,30 +33,40 @@ public class TwinsLaserAttackGoal extends MinionGoal<Twins> {
     public void tick() {
         LivingEntity target = minion.getTarget();
         Player owner = minion.getOwner();
+        Level level = minion.getLevel();
         Vec3 targetPos = target.getBoundingBox().getCenter();
         wanderPos = minion.getWanderPos(wanderPos, targetPos, 6, 3);
         double distance = minion.getPos().distanceTo(wanderPos);
         minion.applyForce(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * 0.04, 0.4)));
         minion.lookAtPos(targetPos);
         if (--shootCooldown <= 0) {
-            shootAtTarget(owner, target);
+            shootAtTarget(owner, target, level);
             shotCount = (shotCount + 1) % 12;
-            shootCooldown = shotCount < 5 ? 18 + owner.getRandom().nextInt(-2, 2) : 1;
+            shootCooldown = shotCount < 5 ? 18 + level.getRandom().nextInt(-2, 2) : 1;
         }
     }
 
-    private void shootAtTarget(Player owner, LivingEntity target) {
+    private void shootAtTarget(Player owner, LivingEntity target, Level level) {
         Vec3 start = minion.getPos();
-        RandomSource random = owner.getRandom();
+        RandomSource random = level.getRandom();
         Vec3 direction = target.getBoundingBox().getCenter().offsetRandom(random, shotCount < 5 ? 0.3f : 1).subtract(start).normalize();
         Laser projectile = new Laser();
         projectile.copyDamageSource(minion);
         projectile.setPos(start);
         projectile.setVelocity(direction);
         projectile.setDamage(minion.getDamage() * 1.1f);
-        projectile.join(owner);
-        ServerLevel level = (ServerLevel) owner.level();
-        Playable.play(SummonerSoundRegister.Laser, level, start, owner.getSoundSource());
+        if (owner != null) {
+            projectile.join(owner);
+        } else {
+            projectile.join(level);
+        }
+        if (level instanceof ServerLevel serverLevel) {
+            if (owner != null) {
+                Playable.play(SummonerSoundRegister.Laser, serverLevel, start, owner.getSoundSource());
+            } else {
+                Playable.play(SummonerSoundRegister.Laser, serverLevel, start, net.minecraft.sounds.SoundSource.PLAYERS);
+            }
+        }
         // 后坐力
         minion.applyForce(direction.scale(-0.1));
         GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()

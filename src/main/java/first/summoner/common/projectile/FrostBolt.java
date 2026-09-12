@@ -38,8 +38,8 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
     @Override
     public void tick() {
         super.tick();
-        if (!owner.level().isClientSide()) {
-            ParticleHelper.create(owner.level())
+        if (!getLevel().isClientSide()) {
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                             .centerColor(0x8fe3ff)
                             .edgeColor(0x4fc1f5)
@@ -82,7 +82,7 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
                 if (applied) {
                     hitCount++;
                     // 命中时目标爆出淡蓝色粒子（参考雷电球）
-                    ParticleHelper.create(owner.level())
+                    ParticleHelper.create(getLevel())
                             .generic(GenericParticleBuilder.create()
                                     .centerColor(0x8fe3ff)
                                     .edgeColor(0x4fc1f5)
@@ -122,8 +122,8 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
     @Override
     public void onRemove() {
         // 命中方块或在空气中消失时爆出少量淡蓝色粒子
-        if (!owner.level().isClientSide()) {
-            ParticleHelper.create(owner.level())
+        if (!getLevel().isClientSide()) {
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                             .centerColor(0x8fe3ff)
                             .edgeColor(0x4fc1f5)

@@ -1,7 +1,6 @@
 package first.summoner.common.minion;
 
 import first.lyra.api.LyraHelper;
-import first.lyra.common.attachment.AttachmentEntityData;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
@@ -52,7 +51,7 @@ public class RuinRelic extends MomentumMinion {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide() && cooldown > 0) {
+        if (!getLevel().isClientSide() && cooldown > 0) {
             cooldown--;
         }
         super.tick();
@@ -75,11 +74,15 @@ public class RuinRelic extends MomentumMinion {
         int extra = Math.max(0, getSameSizeCache() - 1);
         float multiplier = 1.0f + 0.1f * Math.min(extra, 20);
         orb.setDamage(getDamage() * multiplier);
-        orb.join(owner);
+        if (owner != null) {
+            orb.join(owner);
+        } else {
+            orb.join(getLevel());
+        }
         // 后坐力
         applyForce(direction.scale(-0.4));
         // 发射粒子
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                         .centerColor(0xffd700)
                         .edgeColor(0xffa500)
@@ -104,7 +107,7 @@ public class RuinRelic extends MomentumMinion {
      */
     public int getAttackCooldown() {
         int extra = Math.max(0, getSameSizeCache() - 1);
-        return 35 + owner.getRandom().nextInt(Math.min(extra, 20) + 4);
+        return 35 + getRandom().nextInt(Math.min(extra, 20) + 4);
     }
 
     public int getCooldown() {
@@ -120,7 +123,7 @@ public class RuinRelic extends MomentumMinion {
      */
     public int getSameTargetCount() {
         LivingEntity myTarget = getTarget();
-        List<RuinRelic> relics = LyraHelper.get(owner).getEntityData().get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.RUIN_RELIC.get());
+        List<RuinRelic> relics = LyraHelper.get(getLevel()).getEntityData().get(SummonerAttachmentEntityRegister.RUIN_RELIC.get());
         int count = 0;
         for (RuinRelic relic : relics) {
             if (relic.getTarget() == myTarget) {
@@ -135,7 +138,7 @@ public class RuinRelic extends MomentumMinion {
      */
     public int getSameTargetOrder() {
         LivingEntity myTarget = getTarget();
-        List<RuinRelic> relics = LyraHelper.get(owner).getEntityData().get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.RUIN_RELIC.get());
+        List<RuinRelic> relics = LyraHelper.get(getLevel()).getEntityData().get(SummonerAttachmentEntityRegister.RUIN_RELIC.get());
         int order = 0;
         for (RuinRelic relic : relics) {
             if (relic == this) {
@@ -154,25 +157,29 @@ public class RuinRelic extends MomentumMinion {
      */
     public PathNode getIdleRingNode(float partialTick) {
         Player player = getOwner();
-        int total = getSameTargetCount();
-        int order = getSameTargetOrder();
-        // 玩家视线水平方向（圆环法向量）
-        float playerYaw = Mth.rotLerp(partialTick, player.yHeadRotO, player.yHeadRot);
-        float rad = (float) Math.toRadians(-playerYaw);
-        Vec3 n = new Vec3(Mth.sin(rad), 0, Mth.cos(rad));
-        // 竖直圆环面内正交基：v 竖直向上，u = n × v（水平垂直于视线）
-        Vec3 v = new Vec3(0, 1, 0);
-        Vec3 u = n.cross(v).normalize();
-        // 圆环中心在玩家背后偏移
-        double px = Mth.lerp(partialTick, player.xo, player.getX());
-        double py = Mth.lerp(partialTick, player.yo, player.getY());
-        double pz = Mth.lerp(partialTick, player.zo, player.getZ());
-        Vec3 center = new Vec3(px, py + player.getBbHeight() * 0.5, pz).add(n.scale(-0.8));
-        // 每只遗迹按顺序分配角度并随时间旋转；只存在一个时占据轴心
-        float angle = (player.tickCount + partialTick) * 0.06f + (order * Mth.TWO_PI / total);
-        float radius = total > 1 ? 1.6f : 0f;
-        Vec3 pos = center.add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
-        return new PathNode(pos, playerYaw, 0, 0);
+        PathNode node = getCurrentPathNode();
+        if (player != null) {
+            int total = getSameTargetCount();
+            int order = getSameTargetOrder();
+            // 玩家视线水平方向（圆环法向量）
+            float playerYaw = Mth.rotLerp(partialTick, player.yHeadRotO, player.yHeadRot);
+            float rad = (float) Math.toRadians(-playerYaw);
+            Vec3 n = new Vec3(Mth.sin(rad), 0, Mth.cos(rad));
+            // 竖直圆环面内正交基：v 竖直向上，u = n × v（水平垂直于视线）
+            Vec3 v = new Vec3(0, 1, 0);
+            Vec3 u = n.cross(v).normalize();
+            // 圆环中心在玩家背后偏移
+            double px = Mth.lerp(partialTick, player.xo, player.getX());
+            double py = Mth.lerp(partialTick, player.yo, player.getY());
+            double pz = Mth.lerp(partialTick, player.zo, player.getZ());
+            Vec3 center = new Vec3(px, py + player.getBbHeight() * 0.5, pz).add(n.scale(-0.8));
+            // 每只遗迹按顺序分配角度并随时间旋转；只存在一个时占据轴心
+            float angle = (player.tickCount + partialTick) * 0.06f + (order * Mth.TWO_PI / total);
+            float radius = total > 1 ? 1.6f : 0f;
+            Vec3 pos = center.add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
+            node = new PathNode(pos, playerYaw, 0, 0);
+        }
+        return node;
     }
 
     /**
@@ -182,36 +189,41 @@ public class RuinRelic extends MomentumMinion {
      */
     public PathNode getAttackRingNode(LivingEntity target, float partialTick) {
         Player player = getOwner();
-        int total = getSameTargetCount();
-        int order = getSameTargetOrder();
-        Vec3 playerPos = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0);
-        Vec3 targetPos = target.getPosition(partialTick).add(0, target.getBbHeight() * 0.5, 0);
-        double distance = playerPos.distanceTo(targetPos);
-        if (distance <= 8) {
-            // 目标距离玩家不超过 8 格：在待机位置看向目标
-            PathNode idleNode = getIdleRingNode(partialTick);
-            Vec3 toTarget = target.getBoundingBox().getCenter().subtract(idleNode.pos());
-            float yaw = (float) Math.toDegrees(Math.atan2(-toTarget.x, toTarget.z));
-            float pitch = (float) Math.toDegrees(Math.asin(-toTarget.y));
-            return new PathNode(idleNode.pos(), yaw, pitch, 0);
+        PathNode node = getCurrentPathNode();
+        if (player != null) {
+            int total = getSameTargetCount();
+            int order = getSameTargetOrder();
+            Vec3 playerPos = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0);
+            Vec3 targetPos = target.getPosition(partialTick).add(0, target.getBbHeight() * 0.5, 0);
+            double distance = playerPos.distanceTo(targetPos);
+            if (distance <= 8) {
+                // 目标距离玩家不超过 8 格：在待机位置看向目标
+                PathNode idleNode = getIdleRingNode(partialTick);
+                Vec3 toTarget = target.getBoundingBox().getCenter().subtract(idleNode.pos());
+                float yaw = (float) Math.toDegrees(Math.atan2(-toTarget.x, toTarget.z));
+                float pitch = (float) Math.toDegrees(Math.asin(-toTarget.y));
+                node = new PathNode(idleNode.pos(), yaw, pitch, 0);
+            } else {
+                Vec3 axis = targetPos.subtract(playerPos).normalize();
+                // 圆环面内正交基（垂直于连线）
+                Vec3 v = axis.cross(new Vec3(0, 1, 0)).normalize();
+                if (v.lengthSqr() < 1e-5) {
+                    v = axis.cross(new Vec3(1, 0, 0)).normalize();
+                }
+                Vec3 u = axis.cross(v).normalize();
+                // 圆环中心在连线上，偏玩家侧 20%
+                Vec3 center = playerPos.add(axis.scale(Math.min(4, distance * 0.2)));
+                // 每只遗迹按顺序分配角度并随时间旋转；只存在一个时占据轴心
+                float angle = (player.tickCount + partialTick) * 0.06f + (order * Mth.TWO_PI / total);
+                float radius = total > 1 ? 1.6f : 0f;
+                Vec3 pos = center.add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
+                // 看向目标
+                Vec3 toTarget = target.getBoundingBox().getCenter().subtract(pos);
+                float yaw = (float) Math.toDegrees(Math.atan2(-toTarget.x, toTarget.z));
+                float pitch = (float) Math.toDegrees(Math.asin(-toTarget.y));
+                node = new PathNode(pos, yaw, pitch, 0);
+            }
         }
-        Vec3 axis = targetPos.subtract(playerPos).normalize();
-        // 圆环面内正交基（垂直于连线）
-        Vec3 v = axis.cross(new Vec3(0, 1, 0)).normalize();
-        if (v.lengthSqr() < 1e-5) {
-            v = axis.cross(new Vec3(1, 0, 0)).normalize();
-        }
-        Vec3 u = axis.cross(v).normalize();
-        // 圆环中心在连线上，偏玩家侧 20%
-        Vec3 center = playerPos.add(axis.scale(Math.min(4, distance * 0.2)));
-        // 每只遗迹按顺序分配角度并随时间旋转；只存在一个时占据轴心
-        float angle = (player.tickCount + partialTick) * 0.06f + (order * Mth.TWO_PI / total);
-        float radius = total > 1 ? 1.6f : 0f;
-        Vec3 pos = center.add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
-        // 看向目标
-        Vec3 toTarget = target.getBoundingBox().getCenter().subtract(pos);
-        float yaw = (float) Math.toDegrees(Math.atan2(-toTarget.x, toTarget.z));
-        float pitch = (float) Math.toDegrees(Math.asin(-toTarget.y));
-        return new PathNode(pos, yaw, pitch, 0);
+        return node;
     }
 }

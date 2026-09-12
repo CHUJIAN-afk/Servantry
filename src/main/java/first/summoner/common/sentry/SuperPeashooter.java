@@ -39,8 +39,8 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
-            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
                 setRemove();
             }
             if (isTargetChange()) {
@@ -51,7 +51,11 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
             }
             if (task != null) {
                 if (task.tick(this)) {
-                    Playable.play(SummonerSoundRegister.BallistaShot, owner.level(), getPos(), owner.getSoundSource());
+                    if (owner != null) {
+                        Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), getPos(), owner.getSoundSource());
+                    } else {
+                        Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), getPos(), net.minecraft.sounds.SoundSource.PLAYERS);
+                    }
                 } else {
                     task = null;
                 }
@@ -62,7 +66,7 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
                 AABB box = target.getBoundingBox();
                 lookAtPos(box.getCenter());
                 if (task == null && cooldown < 0 && aiming > 10) {
-                    RandomSource random = owner.getRandom();
+                    RandomSource random = getRandom();
                     cooldown = 20 + random.nextInt(2);
                     if (random.nextInt(10) == 0) {
                         task = new ShootTask(225, 60, true);
@@ -84,8 +88,7 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
         }
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 
@@ -141,7 +144,7 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
                 projectile.copyDamageSource(shooter);
                 projectile.setPos(start);
                 projectile.setVelocity(dir);
-                projectile.join(shooter.owner);
+                projectile.join(shooter.getLevel());
                 firedShots++;
             }
             elapsedTicks++;
@@ -150,7 +153,7 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
 
         // 散射方向：在朝向基础上叠加小幅随机偏转
         private static Vec3 scatterDirection(Vec3 direction, SuperPeashooter shooter) {
-            RandomSource random = shooter.owner.getRandom();
+            RandomSource random = shooter.getRandom();
             double spread = 0.15;
             Vec3 perp = new Vec3(-direction.z, 0, direction.x);
             if (perp.lengthSqr() < 1e-6) {

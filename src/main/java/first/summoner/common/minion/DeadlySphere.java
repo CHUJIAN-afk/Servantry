@@ -106,7 +106,7 @@ public class DeadlySphere extends MomentumMinion implements IEntityCollision<Dea
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             if (trailTimer > 0) {
                 trailTimer--;
             }
@@ -157,7 +157,7 @@ public class DeadlySphere extends MomentumMinion implements IEntityCollision<Dea
             dir = dir.yRot(yaw).xRot(pitch);
             if (roll != 0) dir = dir.zRot(roll);
 
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                             .centerColor(color)
                             .edgeColor(edgeColor)

@@ -57,7 +57,7 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
                     OverlayTexture.NO_OVERLAY,
                     poseStack,
                     bufferSource,
-                    infiniteShadow.getOwner().level(),
+                    infiniteShadow.getLevel(),
                     0
             );
             DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);

@@ -41,7 +41,7 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             // 冷却衰减
             if (shootCooldown > 0) {
                 shootCooldown--;
@@ -51,7 +51,7 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
             GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                     .centerColor(0x04c7e3)
                     .edgeColor(0x047a95);
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(genericParticleBuilder
                             .lifetime(5)
                             .lifetimeRandom(10)

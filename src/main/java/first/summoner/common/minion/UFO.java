@@ -45,7 +45,7 @@ public class UFO extends MomentumMinion {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             if (trailTimer > 0) {
                 trailTimer--;
                 if (trailTimer == 0) {
@@ -88,7 +88,7 @@ public class UFO extends MomentumMinion {
                 .apply();
 
         // 粒子模拟激光线：从UFO到目标之间均匀生成蓝色粒子
-        Level level = owner.level();
+        Level level = getLevel();
         Vec3 direction = targetPos.subtract(startPos);
         double distance = direction.length();
         direction = direction.normalize();
@@ -130,7 +130,7 @@ public class UFO extends MomentumMinion {
      * 激光攻击冷却：8 tick（Terraria 0.4秒=24嘀嗒，ceil(24/3)=8）。
      */
     public int getLaserCooldown() {
-        RandomSource random = owner.getRandom();
+        RandomSource random = getRandom();
         return 7 + random.nextIntBetweenInclusive(1, 2);
     }
 }

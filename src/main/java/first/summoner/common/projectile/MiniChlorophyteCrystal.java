@@ -31,7 +31,7 @@ public class MiniChlorophyteCrystal extends Projectile implements IEntityCollisi
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             currentPathNode = new PathNode(currentPathNode.pos(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll() + 30);
         }
         super.tick();
@@ -54,7 +54,7 @@ public class MiniChlorophyteCrystal extends Projectile implements IEntityCollisi
             }
             setCurrentPathNode(getCollisionAfterPathNode(context.hitPoint(), getCurrentPathNode()));
             setRemove();
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                             .centerColor(0x1bff10)
                             .edgeColor(0x17b70e)

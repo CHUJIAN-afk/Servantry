@@ -3,7 +3,6 @@ package first.summoner.common.minion.goal.stardustCell;
 import first.lyra.common.minion.MinionGoal;
 import first.summoner.common.minion.StardustCell;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Random;
@@ -32,7 +31,6 @@ public class StardustCellAttackGoal extends MinionGoal<StardustCell> {
         if (distanceToSqr > 14 * 14 && distanceToSqr < 26 * 26) {
             minion.teleportTo(target.getBoundingBox().getCenter());
         } else {
-            Player owner = minion.getOwner();
             Vec3 wanderPos = getHaloAnchorPos(target);
             double distance = minion.getPos().distanceTo(wanderPos);
             minion.applyForce(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * 0.1, 0.6)));
@@ -41,11 +39,11 @@ public class StardustCellAttackGoal extends MinionGoal<StardustCell> {
             if (!minion.isExecutingPath()) {
                 if (minion.getShootCooldown() <= 0) {
                     minion.shootAtTarget(target);
-                    minion.setShootCooldown(12 + owner.getRandom().nextInt(4));
+                    minion.setShootCooldown(12 + minion.getRandom().nextInt(4));
                 }
             } else if (minion.getTrailTimer() == 1) {
                 minion.shootAtTarget(target);
-                minion.setShootCooldown(12 + owner.getRandom().nextInt(4));
+                minion.setShootCooldown(12 + minion.getRandom().nextInt(4));
             }
         }
     }

@@ -35,8 +35,8 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
-            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
                 setRemove();
             }
             LivingEntity target = getTarget();
@@ -64,7 +64,11 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
         bolt.copyDamageSource(this);
         bolt.setPos(start);
         bolt.setVelocity(direction);
-        bolt.join(owner);
+        if (owner != null) {
+            bolt.join(owner);
+        } else {
+            bolt.join(getLevel());
+        }
     }
 
     private double getAngleDeg(Vec3 a, Vec3 b) {
@@ -87,8 +91,7 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
         return new AABB(-0.4, -0.4, -0.4, 0.4, 0.4, 0.4);
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 }

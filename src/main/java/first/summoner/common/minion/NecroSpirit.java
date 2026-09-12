@@ -25,7 +25,7 @@ public class NecroSpirit extends Minion {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             LivingEntity target = getTarget();
             PathNode idleNode = getInterpolatedIdleState(0);
             PathNode currentNode = getCurrentPathNode();
@@ -62,10 +62,14 @@ public class NecroSpirit extends Minion {
         projectile.setPos(start);
         projectile.setVelocity(direction);
         projectile.setTrackingTarget(target);
-        projectile.join(owner);
+        if (owner != null) {
+            projectile.join(owner);
+        } else {
+            projectile.join(getLevel());
+        }
 
         // 发射粒子效果
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                                  .centerColor(0xff1200)
                                  .edgeColor(0xd40f00)
@@ -89,20 +93,24 @@ public class NecroSpirit extends Minion {
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
         Player owner = getOwner();
-        double px = Mth.lerp(partialTick, owner.xo, owner.getX());
-        double py = Mth.lerp(partialTick, owner.yo, owner.getY());
-        double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
-        float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
-        float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);
-        float playerYaw = Mth.wrapDegrees(bodyYaw + Mth.wrapDegrees(headYaw - bodyYaw) * 0.5f);
-        float rad = (float) Math.toRadians(-playerYaw + 180);
-        float backX = Mth.sin(rad);
-        float backZ = Mth.cos(rad);
-        float rightX = Mth.cos(rad);
-        float rightZ = -Mth.sin(rad);
-        float bob = Mth.sin((tickCount + partialTick) * 0.16f) * 0.035f;
-        Vec3 pos = new Vec3(px, py, pz).add(rightX * 0.35 + backX * 0.12, owner.getBbHeight() + 0.45 + bob, rightZ * 0.35 + backZ * 0.12);
-        return new PathNode(pos, playerYaw, 0, 0);
+        PathNode node = getCurrentPathNode();
+        if (owner != null) {
+            double px = Mth.lerp(partialTick, owner.xo, owner.getX());
+            double py = Mth.lerp(partialTick, owner.yo, owner.getY());
+            double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
+            float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
+            float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);
+            float playerYaw = Mth.wrapDegrees(bodyYaw + Mth.wrapDegrees(headYaw - bodyYaw) * 0.5f);
+            float rad = (float) Math.toRadians(-playerYaw + 180);
+            float backX = Mth.sin(rad);
+            float backZ = Mth.cos(rad);
+            float rightX = Mth.cos(rad);
+            float rightZ = -Mth.sin(rad);
+            float bob = Mth.sin((tickCount + partialTick) * 0.16f) * 0.035f;
+            Vec3 pos = new Vec3(px, py, pz).add(rightX * 0.35 + backX * 0.12, owner.getBbHeight() + 0.45 + bob, rightZ * 0.35 + backZ * 0.12);
+            node = new PathNode(pos, playerYaw, 0, 0);
+        }
+        return node;
     }
 
     @Override

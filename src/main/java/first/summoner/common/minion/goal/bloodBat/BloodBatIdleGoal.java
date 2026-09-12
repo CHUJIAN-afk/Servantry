@@ -26,7 +26,7 @@ public class BloodBatIdleGoal extends MinionGoal<BloodBat> {
 
     @Override
     public void start() {
-        prepTick = 5 + minion.getOwner().getRandom().nextIntBetweenInclusive(0, 5);
+        prepTick = 5 + minion.getRandom().nextIntBetweenInclusive(0, 5);
     }
 
     @Override

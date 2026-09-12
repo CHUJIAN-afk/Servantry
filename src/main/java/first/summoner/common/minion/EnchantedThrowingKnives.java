@@ -86,7 +86,7 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
 
     @Override
     public void tick() {
-        if (!getOwner().level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             // 空闲混合系数更新
             idleBlendO = idleBlend;
             if (!attacking) {
@@ -102,13 +102,11 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
     public LivingEntity searchTarget() {
         int distance = this.getSearchDistance();
         if (distance > 0) {
-            LyraHelper helper = LyraHelper.get(this.owner);
+            LyraHelper helper = LyraHelper.get(getLevel());
             TargetCache targetCache = helper.getTargetCache();
-            if (!targetCache.isEmpty()) {
-                List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), targetCache.getSummonSearchRange(this.getOwner(), (float) distance), (living) -> (attacking || targetCache.isVisibility(this.owner, living)) && this.isTarget(living));
-                if (!targets.isEmpty()) {
-                    return targetCache.getNewTarget(this, targets, 8, false);
-                }
+            List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), targetCache.getSummonSearchRange(this.getOwner(), (float) distance), (living) -> (attacking || targetCache.isVisibility(this, living)) && this.isTarget(living));
+            if (!targets.isEmpty()) {
+                return targetCache.getNewTarget(this, targets, 8, false);
             }
         }
         return null;
@@ -140,22 +138,25 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
         Player owner = getOwner();
-        int total = Math.max(1, getSameSizeCache());
-        int order = getOrderCache();
-        float angle = (owner.tickCount + partialTick) * 0.05f + (order * Mth.TWO_PI / total);
-        float radius = 1.2f + (total > 4 ? (total - 4) * 0.025f : 0f);
+        PathNode node = getCurrentPathNode();
+        if (owner != null) {
+            int total = Math.max(1, getSameSizeCache());
+            int order = getOrderCache();
+            float angle = (owner.tickCount + partialTick) * 0.05f + (order * Mth.TWO_PI / total);
+            float radius = 1.2f + (total > 4 ? (total - 4) * 0.025f : 0f);
 
-        double px = Mth.lerp(partialTick, owner.xo, owner.getX());
-        double py = Mth.lerp(partialTick, owner.yo, owner.getY());
-        double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
+            double px = Mth.lerp(partialTick, owner.xo, owner.getX());
+            double py = Mth.lerp(partialTick, owner.yo, owner.getY());
+            double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
 
-        Vec3 targetPos = new Vec3(px, py, pz).add(Math.cos(angle) * radius, owner.getBbHeight() + 1.2, Math.sin(angle) * radius);
-        Vec3 centerAxis = new Vec3(px, py + owner.getBbHeight() + 1.2, pz);
+            Vec3 targetPos = new Vec3(px, py, pz).add(Math.cos(angle) * radius, owner.getBbHeight() + 1.2, Math.sin(angle) * radius);
+            Vec3 centerAxis = new Vec3(px, py + owner.getBbHeight() + 1.2, pz);
 
-        Vec3 toAxis = centerAxis.subtract(targetPos).normalize();
-        if (toAxis.lengthSqr() < 1e-4) toAxis = new Vec3(1, 0, 0);
-        Vec3 tipDir = new Vec3(0, -1, 0);
-
-        return getEulerNode(targetPos, tipDir, toAxis);
+            Vec3 toAxis = centerAxis.subtract(targetPos).normalize();
+            if (toAxis.lengthSqr() < 1e-4) toAxis = new Vec3(1, 0, 0);
+            Vec3 tipDir = new Vec3(0, -1, 0);
+            node = getEulerNode(targetPos, tipDir, toAxis);
+        }
+        return node;
     }
 }

@@ -31,7 +31,7 @@ public class PoisonSaliva extends Projectile implements IEntityCollision<PoisonS
         HitContext hit = hitContexts.getFirst();
         if (source != null) {
             // 中毒持续 5~10 秒（100~200 tick）
-            int duration = 100 + getOwner().getRandom().nextInt(101);
+            int duration = 100 + getRandom().nextInt(101);
             InvincibleData.attack(hit.entity())
                     .attacker(getUuid())
                     .damageSource(source)

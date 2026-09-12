@@ -17,7 +17,7 @@ public class TerraprismPrepGoal extends MinionGoal<Terraprism> {
 
     @Override
     public boolean canUse() {
-        return minion.isTarget(minion.getTarget()) && !minion.attacking && minion.getOwner().getRandom().nextDouble() < 0.1;
+        return minion.isTarget(minion.getTarget()) && !minion.attacking && minion.getRandom().nextDouble() < 0.1;
     }
 
     @Override

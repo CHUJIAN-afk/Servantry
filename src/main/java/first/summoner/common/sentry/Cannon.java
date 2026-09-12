@@ -51,8 +51,8 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
-            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
                 setRemove();
             }
             LivingEntity target = getTarget();
@@ -97,8 +97,7 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
         }
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 
@@ -110,8 +109,13 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
             projectile.setPos(start);
             projectile.copyDamageSource(this);
             projectile.setVelocity(velocity);
-            projectile.join(owner);
-            Playable.play(SoundEvents.GENERIC_EXPLODE, owner.level(), start, owner.getSoundSource());
+            if (owner != null) {
+                projectile.join(owner);
+                Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), start, owner.getSoundSource());
+            } else {
+                projectile.join(getLevel());
+                Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), start, net.minecraft.sounds.SoundSource.PLAYERS);
+            }
         }
     }
 

@@ -35,7 +35,7 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             if (chaseDelay > 0) {
                 chaseDelay--;
             } else if (chaseTarget == null || !chaseTarget.isAlive()) {

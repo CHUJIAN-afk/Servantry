@@ -62,7 +62,7 @@ public class Meteor extends Projectile implements IEntityCollision<Meteor>, IBlo
                         .apply();
             }
         }
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                                  .centerColor(0xea9900)
                                  .edgeColor(0xea5700)
@@ -76,7 +76,7 @@ public class Meteor extends Projectile implements IEntityCollision<Meteor>, IBlo
                 )
                 .pos(pos)
                 .offset(0.15)
-                .velocity(pos.offsetRandom(owner.getRandom(), 5).subtract(pos).normalize())
+                .velocity(pos.offsetRandom(getRandom(), 5).subtract(pos).normalize())
                 .count(80)
                 .speed(0.35)
                 .spread(Math.TAU)

@@ -33,8 +33,8 @@ public class HornetStinger extends Projectile implements IEntityCollision<Hornet
         DamageSource source = getDamageSource();
         if (source != null) {
             HitContext hit = hitContexts.getFirst();
-            boolean equipped = CuriosUtil.isEquipped(owner, SummonerCurioRegister.HivePack.get());
-            RandomSource random = getOwner().getRandom();
+            boolean equipped = owner != null && CuriosUtil.isEquipped(owner, SummonerCurioRegister.HivePack.get());
+            RandomSource random = getRandom();
             InvincibleData.attack(hit.entity())
                     .attacker(getUuid())
                     .damageSource(source)

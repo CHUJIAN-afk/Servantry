@@ -61,8 +61,9 @@ public class InfiniteShadow extends Terraprism {
             for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
                 if (this.hitTargets.add(living)) {
+                    UUID attackerId = owner != null ? owner.getUUID() : getUuid();
                     InvincibleData.get(living)
-                            .recordHit(owner.getUUID(), 100);
+                            .recordHit(attackerId, 100);
                     int invulnerableTime = living.invulnerableTime;
                     living.invulnerableTime = 0;
                     if (!itemStack.is(Items.TNT)) {
@@ -70,7 +71,7 @@ public class InfiniteShadow extends Terraprism {
                         player.attack(living);
                     } else {
                         Vec3 point = hit.hitPoint();
-                        Level level = owner.level();
+                        Level level = getLevel();
                         level.explode(owner, getDamageSource(), null, point.x(), point.y(), point.z(), 1, false, Level.ExplosionInteraction.TNT);
                     }
                     living.invulnerableTime = invulnerableTime;
@@ -88,13 +89,13 @@ public class InfiniteShadow extends Terraprism {
 
     public InfiniteShadowFakePlayer getFakePlayer() {
         Player player = getOwner();
-        if (player != null && !player.level().isClientSide()) {
-            Level level = player.level();
+        Level level = player != null ? player.level() : getLevel();
+        if (!level.isClientSide() && level instanceof ServerLevel serverLevel) {
             if (fakePlayer != null && !fakePlayer.isAlive()) {
                 fakePlayer = null;
             }
             if (fakePlayer == null) {
-                fakePlayer = new InfiniteShadowFakePlayer((ServerLevel) level, this);
+                fakePlayer = new InfiniteShadowFakePlayer(serverLevel, this);
                 fakePlayer.setItemSlot(EquipmentSlot.MAINHAND, itemStack.copy());
                 Multimap<Holder<Attribute>, AttributeModifier> modifiers = ArrayListMultimap.create();
                 for (ItemAttributeModifiers.Entry entry : itemStack.getAttributeModifiers().modifiers()) {

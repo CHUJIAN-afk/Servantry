@@ -53,9 +53,9 @@ public class BlitzBall extends Projectile {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             idList.clear();
-            TargetCache targetCache = owner.getData(LyraAttachmentRegister.TargetCache);
+            TargetCache targetCache = getLevel().getData(LyraAttachmentRegister.TargetCache);
             List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 3, this::isTarget);
             for (LivingEntity living : entities) {
                 idList.add(living.getId());
@@ -65,7 +65,7 @@ public class BlitzBall extends Projectile {
                         .damageAmount(getDamage())
                         .invincibleTime(3)
                         .apply();
-                ParticleHelper.create(owner.level())
+                ParticleHelper.create(getLevel())
                         .generic(GenericParticleBuilder.create()
                                          .centerColor(0x38ffec)
                                          .edgeColor(0x2fc1ae)
@@ -91,7 +91,7 @@ public class BlitzBall extends Projectile {
 
     @Override
     public void onRemove() {
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                                  .centerColor(0x38ffec)
                                  .edgeColor(0x2fc1ae)

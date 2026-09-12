@@ -43,14 +43,16 @@ public class CurioItem extends Item implements ICurioItem {
     public static void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
         if (event.getSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity() instanceof Minion minion) {
             Player owner = minion.getOwner();
-            if (!owner.level().isClientSide()) {
-                Set<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
-                for (CurioItem curioItem : curiosItemList) {
-                    PreDamageCallback callback = curioItem.preDamageCallback;
-                    if (callback != null) {
-                        float result = callback.apply(minion, owner, event.getEntity(), event.getNewDamage(), attachmentDamageSource);
-                        if (result != event.getNewDamage()) {
-                            event.setNewDamage(result);
+            if (owner != null) {
+                if (!owner.level().isClientSide()) {
+                    Set<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
+                    for (CurioItem curioItem : curiosItemList) {
+                        PreDamageCallback callback = curioItem.preDamageCallback;
+                        if (callback != null) {
+                            float result = callback.apply(minion, owner, event.getEntity(), event.getNewDamage(), attachmentDamageSource);
+                            if (result != event.getNewDamage()) {
+                                event.setNewDamage(result);
+                            }
                         }
                     }
                 }
@@ -62,12 +64,14 @@ public class CurioItem extends Item implements ICurioItem {
     public static void onLivingDamageEventPost(LivingDamageEvent.Post event) {
         if (event.getSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity() instanceof Minion minion) {
             Player owner = minion.getOwner();
-            if (!owner.level().isClientSide()) {
-                Set<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
-                for (CurioItem curioItem : curiosItemList) {
-                    PostDamageCallback callback = curioItem.postDamageCallback;
-                    if (callback != null) {
-                        callback.accept(minion, owner, event.getEntity(), attachmentDamageSource);
+            if (owner != null) {
+                if (!owner.level().isClientSide()) {
+                    Set<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
+                    for (CurioItem curioItem : curiosItemList) {
+                        PostDamageCallback callback = curioItem.postDamageCallback;
+                        if (callback != null) {
+                            callback.accept(minion, owner, event.getEntity(), attachmentDamageSource);
+                        }
                     }
                 }
             }

@@ -1,7 +1,6 @@
 package first.summoner.common.minion;
 
 import first.lyra.api.LyraHelper;
-import first.lyra.common.attachment.AttachmentEntityData;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.entity.AttachmentEntityType;
@@ -62,13 +61,11 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     public LivingEntity searchTarget() {
         int distance = this.getSearchDistance();
         if (distance > 0) {
-            LyraHelper helper = LyraHelper.get(this.owner);
+            LyraHelper helper = LyraHelper.get(getLevel());
             TargetCache targetCache = helper.getTargetCache();
-            if (!targetCache.isEmpty()) {
-                List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), targetCache.getSummonSearchRange(this.getOwner(), (float) distance), (living) -> (attacking || targetCache.isVisibility(this.owner, living)) && this.isTarget(living));
-                if (!targets.isEmpty()) {
-                    return targetCache.getNewTarget(this, targets, 8, false);
-                }
+            List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), targetCache.getSummonSearchRange(this.getOwner(), (float) distance), (living) -> (attacking || targetCache.isVisibility(this, living)) && this.isTarget(living));
+            if (!targets.isEmpty()) {
+                return targetCache.getNewTarget(this, targets, 8, false);
             }
         }
         return null;
@@ -104,7 +101,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             lastIdleBlend = idleBlend;
             if (attacking) {
                 trailTimer = Math.min(trailTimer + 1, 12);
@@ -123,7 +120,8 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     public int getColor(float partialTick) {
         int order = getOrderCache();
         int total = Math.max(1, getSameSizeCache());
-        float hueShift = ((float) order / total + (owner.tickCount + partialTick) * 0.015f) % 1.0f;
+        int animationTick = owner != null ? owner.tickCount : tickCount;
+        float hueShift = ((float) order / total + (animationTick + partialTick) * 0.015f) % 1.0f;
         float breathFactor = 0.5f + 0.5f * Mth.sin(hueShift * Mth.TWO_PI);
         return Mth.hsvToRgb(hueShift, 0.75f - 0.35f * breathFactor, 1.0f);
     }
@@ -136,35 +134,39 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
 
     @Override
     public int getOrder() {
-        return LyraHelper.get(owner)
+        return LyraHelper.get(getLevel())
                 .getEntityData()
-                .get(AttachmentEntityData.Type.Minion, Terraprism.class)
+                .get(Terraprism.class)
                 .indexOf(this);
     }
 
     @Override
     public int getSameSize() {
-        return LyraHelper.get(owner)
+        return LyraHelper.get(getLevel())
                 .getEntityData()
-                .get(AttachmentEntityData.Type.Minion, Terraprism.class)
+                .get(Terraprism.class)
                 .size();
     }
 
     public PathNode getInterpolatedIdleState(float partialTick) {
-        float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
-        float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);
-        float playerYaw = Mth.wrapDegrees(bodyYaw + Mth.wrapDegrees(headYaw - bodyYaw) * 0.5f);
-        float rad = (float) Math.toRadians(-playerYaw + 180);
-        float backX = (float) Math.sin(rad);
-        float backZ = (float) Math.cos(rad);
-        float rightX = (float) Math.cos(rad);
-        float rightZ = (float) -Math.sin(rad);
-        int order = getOrderCache();
-        double localZ = 0.75 + order * 0.12;
-        double floatSpeed = 0.08 + order * 0.01;
-        double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;
-        Vec3 playerPos = owner.getPosition(partialTick);
-        Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
-        return new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
+        PathNode node = getCurrentPathNode();
+        if (owner != null) {
+            float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
+            float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);
+            float playerYaw = Mth.wrapDegrees(bodyYaw + Mth.wrapDegrees(headYaw - bodyYaw) * 0.5f);
+            float rad = (float) Math.toRadians(-playerYaw + 180);
+            float backX = (float) Math.sin(rad);
+            float backZ = (float) Math.cos(rad);
+            float rightX = (float) Math.cos(rad);
+            float rightZ = (float) -Math.sin(rad);
+            int order = getOrderCache();
+            double localZ = 0.75 + order * 0.12;
+            double floatSpeed = 0.08 + order * 0.01;
+            double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;
+            Vec3 playerPos = owner.getPosition(partialTick);
+            Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
+            node = new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
+        }
+        return node;
     }
 }

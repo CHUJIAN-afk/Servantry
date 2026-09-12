@@ -37,7 +37,7 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             LivingEntity target = getTrackingTarget();
             if (target != null && target.isAlive()) {
                 AABB box = trackingTarget.getBoundingBox();
@@ -47,7 +47,7 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
                 applyForce(targetPos.subtract(getPos()).normalize());
             }
             // 粒子拖尾
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0xff1200)
                                      .edgeColor(0xd40f00)
@@ -69,7 +69,7 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
         if (source != null) {
-            LyraHelper summonerHelper = LyraHelper.get(owner);
+            LyraHelper summonerHelper = LyraHelper.get(getLevel());
             TargetCache targetCache = summonerHelper.getTargetCache();
             List<LivingEntity> mainTargets = targetCache.getEntitiesInRadius(getPos(), 3, this::isTarget);
             for (LivingEntity living : mainTargets) {
@@ -104,7 +104,7 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
             }
             // 命中粒子效果
             Vec3 hitPoint = hitContexts.getFirst().hitPoint();
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0xff1200)
                                      .edgeColor(0xd40f00)
@@ -122,7 +122,7 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
                     .speed(1)
                     .spread(3)
                     .emit();
-            ParticleHelper.create(owner.level())
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0xff7c00)
                                      .edgeColor(0xd66b00)
@@ -140,7 +140,11 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
                     .speed(1)
                     .spread(3)
                     .emit();
-            Playable.play(SoundEvents.GENERIC_EXPLODE, owner.level(), hitPoint, owner.getSoundSource());
+            if (owner != null) {
+                Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), hitPoint, owner.getSoundSource());
+            } else {
+                Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), hitPoint, net.minecraft.sounds.SoundSource.PLAYERS);
+            }
         }
         setRemove();
     }

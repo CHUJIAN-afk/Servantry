@@ -31,12 +31,12 @@ public class MoonPortal extends Minion {
     @Override
     public void tick() {
         super.tick();
-        if (!owner.level().isClientSide()) {
-            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
                 setRemove();
             }
             if (--cooldown < 0 && isTarget(getTarget())) {
-                cooldown = owner.getRandom().nextInt(9, 11);
+                cooldown = getRandom().nextInt(9, 11);
                 fireLaser(getTarget());
             }
         }
@@ -98,11 +98,11 @@ public class MoonPortal extends Minion {
             float pPitch = laserProjectile.getCurrentPathNode().pitch();
             Vec3 dir = Vec3.directionFromRotation(pPitch, pYaw);
             Vec3 end = pos.add(dir.scale(Math.max(pos.distanceTo(target.getBoundingBox().getCenter()),  32)));
-            HitResult hit = owner.level().clip(new ClipContext(pos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner));
+            HitResult hit = getLevel().clip(new ClipContext(pos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner));
             Vec3 hitPos = hit.getType() != HitResult.Type.MISS ? hit.getLocation() : end;
             laserProjectile.setHitbox(pos, hitPos, 0.15f);
-            Vec3 direction = hitPos.offsetRandom(owner.getRandom(), 2).subtract(hitPos).normalize();
-            ParticleHelper.create(owner.level())
+            Vec3 direction = hitPos.offsetRandom(getRandom(), 2).subtract(hitPos).normalize();
+            ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0x00fdd6)
                                      .edgeColor(0x00d4b0)
@@ -137,11 +137,11 @@ public class MoonPortal extends Minion {
                             .apply();
                     Vec3 hitPoint = living.getBoundingBox()
                             .getCenter();
-                    Vec3 direction = hitPoint.offsetRandom(owner.getRandom(), 2).subtract(hitPoint).normalize();
+                    Vec3 direction = hitPoint.offsetRandom(getRandom(), 2).subtract(hitPoint).normalize();
                     GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                                      .centerColor(0x00fdd6)
                                      .edgeColor(0x00d4b0);
-                    ParticleHelper.create(owner.level())
+                    ParticleHelper.create(getLevel())
                             .generic(genericParticleBuilder
                                              .lifetime(5)
                                              .lifetimeRandom(5)
@@ -161,11 +161,14 @@ public class MoonPortal extends Minion {
                 }
             }
         });
-        projectile.join(owner);
+        if (owner != null) {
+            projectile.join(owner);
+        } else {
+            projectile.join(getLevel());
+        }
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 }

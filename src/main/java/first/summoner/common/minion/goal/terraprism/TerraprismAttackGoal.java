@@ -54,7 +54,7 @@ public class TerraprismAttackGoal extends MinionGoal<Terraprism> {
                 firstStrike = false;
                 lastEllipse = false;
             } else {
-                if (minion.getOwner().getRandom().nextDouble() < 0.75 && !flipRoll) {
+                if (minion.getRandom().nextDouble() < 0.75 && !flipRoll) {
                     planEllipseSlash();
                     lastEllipse = true;
                 } else {
@@ -108,7 +108,7 @@ public class TerraprismAttackGoal extends MinionGoal<Terraprism> {
         // 获取当前运动状态
         Vec3 currentVel = minion.getCurrentVelocity();
 
-        Vec3 planeNormal = lastEllipse ? minion.getCurrentNormal() : Ellipse.randomPlaneNormal(minion.getOwner().getRandom(), lastTargetPos, attackPrepPos);
+        Vec3 planeNormal = lastEllipse ? minion.getCurrentNormal() : Ellipse.randomPlaneNormal(minion.getRandom(), lastTargetPos, attackPrepPos);
 
         Ellipse ellipse = new Ellipse(lastTargetPos, attackPrepPos, planeNormal, 0.45f);
 
@@ -137,7 +137,7 @@ public class TerraprismAttackGoal extends MinionGoal<Terraprism> {
             nodes.add(minion.getEulerNode(point, tipDir, planeNormal));
         }
 
-        flipRoll = minion.getOwner().getRandom().nextDouble() < 0.25;
+        flipRoll = minion.getRandom().nextDouble() < 0.25;
         Ellipse flipEllipse = null;
         if (flipRoll) {
             Vec3 mirrorPos = lastTargetPos.add(lastTargetPos.x - attackPrepPos.x, attackPrepPos.y - lastTargetPos.y, lastTargetPos.z - attackPrepPos.z);

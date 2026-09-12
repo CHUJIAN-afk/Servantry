@@ -37,7 +37,7 @@ public class LaserMinigun extends Minion {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             LivingEntity target = getTarget();
             PathNode idleNode = getInterpolatedIdleState(0);
             PathNode currentNode = getCurrentPathNode();
@@ -78,7 +78,7 @@ public class LaserMinigun extends Minion {
         Vec3 startPos = getPos();
         Vec3 targetPos = target.getBoundingBox().getCenter();
         Vec3 direction = targetPos.subtract(startPos).normalize();
-        RandomSource random = owner.getRandom();
+        RandomSource random = getRandom();
 
         for (int i = 0; i < 4; i++) {
             Vec3 laserTargetPos = targetPos.add(direction.scale(5)).offsetRandom(random, 3);
@@ -88,10 +88,10 @@ public class LaserMinigun extends Minion {
             laser.copyDamageSource(this);
             laser.setPos(startPos.add(normalize.scale(random.nextFloat() * 0.5f)));
             laser.setVelocity(normalize.scale(1.5));
-            laser.join(owner);
+            laser.join(getLevel());
         }
 
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                                  .centerColor(0x4488ff)
                                  .edgeColor(0x2266dd)
@@ -118,20 +118,24 @@ public class LaserMinigun extends Minion {
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
         Player owner = getOwner();
-        double px = Mth.lerp(partialTick, owner.xo, owner.getX());
-        double py = Mth.lerp(partialTick, owner.yo, owner.getY());
-        double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
-        float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
-        float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);
-        float playerYaw = Mth.wrapDegrees(bodyYaw + Mth.wrapDegrees(headYaw - bodyYaw) * 0.5f);
-        float rad = (float) Math.toRadians(-playerYaw + 180);
-        float backX = Mth.sin(rad);
-        float backZ = Mth.cos(rad);
-        float leftX = -Mth.cos(rad);
-        float leftZ = Mth.sin(rad);
-        float bob = Mth.sin((tickCount + partialTick) * 0.16f) * 0.035f;
-        Vec3 pos = new Vec3(px, py, pz).add(leftX * 0.35 + backX * 0.12, owner.getBbHeight() + 0.45 + bob, leftZ * 0.35 + backZ * 0.12);
-        return new PathNode(pos, playerYaw, 0, 0);
+        PathNode node = getCurrentPathNode();
+        if (owner != null) {
+            double px = Mth.lerp(partialTick, owner.xo, owner.getX());
+            double py = Mth.lerp(partialTick, owner.yo, owner.getY());
+            double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
+            float bodyYaw = Mth.rotLerp(partialTick, owner.yBodyRotO, owner.yBodyRot);
+            float headYaw = Mth.rotLerp(partialTick, owner.yHeadRotO, owner.yHeadRot);
+            float playerYaw = Mth.wrapDegrees(bodyYaw + Mth.wrapDegrees(headYaw - bodyYaw) * 0.5f);
+            float rad = (float) Math.toRadians(-playerYaw + 180);
+            float backX = Mth.sin(rad);
+            float backZ = Mth.cos(rad);
+            float leftX = -Mth.cos(rad);
+            float leftZ = Mth.sin(rad);
+            float bob = Mth.sin((tickCount + partialTick) * 0.16f) * 0.035f;
+            Vec3 pos = new Vec3(px, py, pz).add(leftX * 0.35 + backX * 0.12, owner.getBbHeight() + 0.45 + bob, leftZ * 0.35 + backZ * 0.12);
+            node = new PathNode(pos, playerYaw, 0, 0);
+        }
+        return node;
     }
 
     @Override

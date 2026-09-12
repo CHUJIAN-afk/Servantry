@@ -94,7 +94,7 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             if (other == null || other.isRemove()) {
                 setRemove();
             }

@@ -1,7 +1,6 @@
 package first.summoner.common.minion;
 
 import first.lyra.api.LyraHelper;
-import first.lyra.common.attachment.AttachmentEntityData;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.summoner.common.minion.goal.stardustDragon.StardustDragonFollowGoal;
 import first.summoner.common.minion.goal.stardustDragon.StardustDragonIdleGoal;
@@ -32,7 +31,7 @@ public class VoidEater extends StardustDragon {
     @Override
     public void onRemove() {
         if (isHead()) {
-            List<VoidEater> voidEaters = LyraHelper.get(owner).getEntityData().get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.VOID_EATER.get());
+            List<VoidEater> voidEaters = LyraHelper.get(owner).getEntityData().get(SummonerAttachmentEntityRegister.VOID_EATER.get());
             for (VoidEater voidEater : voidEaters) {
                 voidEater.setRemove();
             }
@@ -50,7 +49,7 @@ public class VoidEater extends StardustDragon {
     public @Nullable StardustDragon getHead() {
         List<VoidEater> voidEaters = LyraHelper.get(owner)
                 .getEntityData()
-                .get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.VOID_EATER.get());
+                .get(SummonerAttachmentEntityRegister.VOID_EATER.get());
         if (!voidEaters.isEmpty()) {
             return voidEaters.getFirst();
         }
@@ -62,7 +61,7 @@ public class VoidEater extends StardustDragon {
         if (!isHead()) {
             List<VoidEater> voidEaters = LyraHelper.get(owner)
                     .getEntityData()
-                    .get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.VOID_EATER.get());
+                    .get(SummonerAttachmentEntityRegister.VOID_EATER.get());
             int index = getSegmentIndex() - 1;
             if (index >= 0 && index < voidEaters.size()) {
                 return voidEaters.get(index);
@@ -76,7 +75,7 @@ public class VoidEater extends StardustDragon {
         if (getSegmentIndex() < getTotalSegments() - 1) {
             List<VoidEater> voidEaters = LyraHelper.get(owner)
                     .getEntityData()
-                    .get(AttachmentEntityData.Type.Minion, SummonerAttachmentEntityRegister.VOID_EATER.get());
+                    .get(SummonerAttachmentEntityRegister.VOID_EATER.get());
             int index = getSegmentIndex() + 1;
             if (index >= 0 && index < voidEaters.size()) {
                 return voidEaters.get(index);

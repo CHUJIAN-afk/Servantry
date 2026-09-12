@@ -65,7 +65,7 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
 
     @Override
     public void tick() {
-        if (!getOwner().level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             // 冷却衰减
             if (shootCooldown > 0) {
                 shootCooldown--;
@@ -96,7 +96,7 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
         GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                          .centerColor(0x2fb2e1)
                          .edgeColor(0x33ccff);
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(genericParticleBuilder
                                  .lifetime(5)
                                  .lifetimeRandom(25)
@@ -129,7 +129,7 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
         GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                 .centerColor(0x2fb2e1)
                 .edgeColor(0x33ccff);
-        ParticleHelper.create(owner.level())
+        ParticleHelper.create(getLevel())
                 .generic(genericParticleBuilder
                         .lifetime(5)
                         .lifetimeRandom(25)

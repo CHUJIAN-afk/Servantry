@@ -47,7 +47,7 @@ public class ZenithItem extends SwordItem {
                 Vec3 startPos = center.add(lookAngle.scale(-1));
                 for (int i = 0; i < 3; i++) {
                     Zenith projectile = new Zenith();
-                    projectile.setDamageSourceSupplier(ignored -> damageSource);
+                    projectile.setDamageSourceSupplier((sourceLevel, sourceOwner) -> damageSource);
                     projectile.setDamage(19);
                     projectile.setKnockback(0.65f);
                     Vec3 endPos = computeEndPos(player);

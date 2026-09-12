@@ -27,11 +27,11 @@ public class MiniRainbowCrystal extends Projectile {
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
+        if (!getLevel().isClientSide()) {
             if (getTickCount() > 0 && getTickCount() % 9 == 0) {
                 Vec3 pos = getPos();
-                Vec3 direction = pos.subtract(pos.offsetRandom(owner.getRandom(), 1)).normalize();
-                ParticleHelper.create(owner.level())
+                Vec3 direction = pos.subtract(pos.offsetRandom(getRandom(), 1)).normalize();
+                ParticleHelper.create(getLevel())
                         .generic(GenericParticleBuilder.create()
                                          .centerColor(getColor(0))
                                          .edgeColor(getColor(0))

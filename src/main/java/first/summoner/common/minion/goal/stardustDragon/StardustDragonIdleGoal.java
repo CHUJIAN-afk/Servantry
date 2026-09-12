@@ -24,11 +24,16 @@ public class StardustDragonIdleGoal extends MinionGoal<StardustDragon> {
     @Override
     public void tick() {
         Player owner = minion.getOwner();
-        do {
-            wanderPos = minion.getWanderPos(wanderPos, owner.position(), 8, 0);
-        } while (wanderPos.distanceToSqr(minion.getPos()) < 2);
+        Vec3 anchor = owner != null ? owner.position() : minion.getPos();
+        if (owner != null) {
+            do {
+                wanderPos = minion.getWanderPos(wanderPos, anchor, 8, 0);
+            } while (wanderPos.distanceToSqr(minion.getPos()) < 2);
+        } else {
+            wanderPos = minion.getWanderPos(wanderPos, anchor, 8, 0);
+        }
         minion.orbitToward(wanderPos, 120f, 0.05 + minion.getPos().distanceTo(wanderPos) * 0.005);
-        if (owner.distanceToSqr(minion.getPos()) > 128 * 128) {
+        if (owner != null && owner.distanceToSqr(minion.getPos()) > 128 * 128) {
             minion.teleportTo(owner.getBoundingBox().getCenter());
             wanderPos = Vec3.ZERO;
         }

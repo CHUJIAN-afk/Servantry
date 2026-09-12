@@ -28,8 +28,8 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
 
     @Override
     public void tick() {
-        if (!owner.level().isClientSide()) {
-            if (getPos().distanceToSqr(owner.position()) > 128 * 128) {
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
                 setRemove();
             }
             LivingEntity target = getTarget();
@@ -41,7 +41,7 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
                     Vec3 targetDirection = targetPos.subtract(getPos());
                     Vec3 lookAngle = getLookAngle();
                     if (getAngleDeg(targetDirection, lookAngle) < 5) {
-                        cooldown = 10 + owner.getRandom().nextInt(-1, 1);
+                        cooldown = 10 + getRandom().nextInt(-1, 1);
                         fire();
                     }
                 }
@@ -60,17 +60,20 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
 
     public void fire() {
         Vec3 start = getPos();
-        Vec3 direction = start.add(getLookAngle()).offsetRandom(owner.getRandom(), 0.05f).subtract(getPos()).normalize();
+        Vec3 direction = start.add(getLookAngle()).offsetRandom(getRandom(), 0.05f).subtract(getPos()).normalize();
         DestructionBullet projectile = new DestructionBullet();
         projectile.copyDamageSource(this);
         projectile.setPos(start);
         projectile.setVelocity(direction);
-        projectile.join(owner);
-        Playable.play(SummonerSoundRegister.BallistaShot, owner.level(), start, owner.getSoundSource());
+        projectile.join(getLevel());
+        if (owner != null) {
+            Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), start, owner.getSoundSource());
+        } else {
+            Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), start, net.minecraft.sounds.SoundSource.PLAYERS);
+        }
     }
 
-    @Override
-    public void dimensionChange() {
+        public void dimensionChange() {
         setRemove();
     }
 

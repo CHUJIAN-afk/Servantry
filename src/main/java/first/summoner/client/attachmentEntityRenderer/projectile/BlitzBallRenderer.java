@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
@@ -30,8 +29,7 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
     protected void modelModify(BlitzBall blitzBall, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BlitzBall> context, float partialTick, int packedLight, float alpha) {
         super.modelModify(blitzBall, poseStack, bufferSource, visualNode, context, partialTick, packedLight, alpha);
         Set<Integer> list = blitzBall.getIdList();
-        Player owner = blitzBall.getOwner();
-        Level level = owner.level();
+        Level level = blitzBall.getLevel();
         for (Integer id : list) {
             Entity entity = level.getEntity(id);
             if (entity instanceof LivingEntity living) {

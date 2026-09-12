@@ -37,7 +37,7 @@ public class Imp extends MomentumMinion implements IBlockCollision<Imp> {
 
     @Override
     public void tick() {
-        Level level = owner.level();
+        Level level = getLevel();
         if (!level.isClientSide()){
             ParticleHelper.create(level)
                     .generic(GenericParticleBuilder.create()
@@ -85,11 +85,16 @@ public class Imp extends MomentumMinion implements IBlockCollision<Imp> {
         fireball.copyDamageSource(this);
         fireball.setPos(start.add(direction.scale(-1)));
         fireball.setVelocity(direction);
-        fireball.join(owner);
-        Playable.play(SummonerSoundRegister.ImpFire, owner.level(), start, owner.getSoundSource());
+        if (owner != null) {
+            fireball.join(owner);
+            Playable.play(SummonerSoundRegister.ImpFire, getLevel(), start, owner.getSoundSource());
+        } else {
+            fireball.join(getLevel());
+            Playable.play(SummonerSoundRegister.ImpFire, getLevel(), start, net.minecraft.sounds.SoundSource.PLAYERS);
+        }
     }
 
     public int getFireballCooldown() {
-        return 20 + owner.getRandom().nextIntBetweenInclusive(0, 6);
+        return 20 + getRandom().nextIntBetweenInclusive(0, 6);
     }
 }
