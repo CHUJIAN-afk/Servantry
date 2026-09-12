@@ -9,7 +9,7 @@ import first.lyra.client.render.trail.ConeTrailConfig;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
-import first.summoner.common.minion.StardustCell;
+import first.summoner.common.minion.minion.StardustCell;
 import first.summoner.register.SummonerModelRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.client.Minecraft;

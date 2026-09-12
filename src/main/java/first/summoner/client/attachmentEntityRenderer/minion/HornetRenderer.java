@@ -7,7 +7,7 @@ import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.client.render.virtual.VirtualEntityPose;
 import first.lyra.client.render.virtual.VirtualEntityRenderer;
 import first.lyra.common.entity.PathNode;
-import first.summoner.common.minion.Hornet;
+import first.summoner.common.minion.minion.Hornet;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.EntityType;
 

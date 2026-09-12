@@ -8,7 +8,7 @@ import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.client.render.trail.RibbonTrailConfig;
 import first.lyra.client.render.trail.TrailConfig;
 import first.lyra.common.entity.PathNode;
-import first.summoner.common.minion.InfiniteShadow;
+import first.summoner.common.minion.minion.InfiniteShadow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;

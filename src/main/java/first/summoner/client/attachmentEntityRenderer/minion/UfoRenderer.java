@@ -9,7 +9,7 @@ import first.lyra.client.render.animated.AnimatedRenderOptions;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
 import first.summoner.Summoner;
-import first.summoner.common.minion.UFO;
+import first.summoner.common.minion.minion.UFO;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.FastColor;
 

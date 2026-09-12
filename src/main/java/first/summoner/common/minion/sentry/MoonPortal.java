@@ -1,0 +1,174 @@
+package first.summoner.common.minion.sentry;
+
+import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.entity.AttachmentEntityDamageSource;
+import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.entity.PathNode;
+import first.lyra.common.minion.Minion;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.summoner.common.projectile.CustomLaser;
+import first.summoner.register.SummonerAttachmentEntityRegister;
+import first.summoner.register.SummonerMobEffectRegister;
+import first.summoner.utils.ParticleHelper;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MoonPortal extends Minion {
+
+    private int cooldown = 0;
+
+    public MoonPortal() {
+        super(SummonerAttachmentEntityRegister.MOON_PORTAL);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (!getLevel().isClientSide()) {
+            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
+                setRemove();
+            }
+            if (--cooldown < 0 && isTarget(getTarget())) {
+                cooldown = getRandom().nextInt(9, 11);
+                fireLaser(getTarget());
+            }
+        }
+    }
+
+    @Override
+    public int getSearchDistance() {
+        return 32;
+    }
+
+    private void fireLaser(LivingEntity target) {
+        Vec3 pos = getPos();
+        Vec3 middlePos = target.getBoundingBox().getCenter();
+        Vec3 startPos = middlePos.offsetRandom(target.getRandom(), 3);
+        Vec3 endPos = middlePos.add(middlePos.subtract(startPos));
+
+        Vec3 startDirection = pos.subtract(startPos).scale(-1).normalize();
+        float startYaw = (float) Math.toDegrees(Math.atan2(-startDirection.x, startDirection.z));
+        float startPitch = (float) Math.toDegrees(Math.asin(-startDirection.y));
+        PathNode startPathNode = new PathNode(pos, startYaw, startPitch, 0);
+
+        Vec3 middleDirection = pos.subtract(middlePos).scale(-1).normalize();
+        float middleYaw = (float) Math.toDegrees(Math.atan2(-middleDirection.x, middleDirection.z));
+        float middlePitch = (float) Math.toDegrees(Math.asin(-middleDirection.y));
+        PathNode middlePathNode = new PathNode(pos, middleYaw, middlePitch, 0);
+
+        Vec3 endDirection = pos.subtract(endPos).scale(-1).normalize();
+        float endYaw = (float) Math.toDegrees(Math.atan2(-endDirection.x, endDirection.z));
+        float endPitch = (float) Math.toDegrees(Math.asin(-endDirection.y));
+        PathNode endPathNode = new PathNode(pos, endYaw, endPitch, 0);
+
+        List<PathNode> pathNodes = new ArrayList<>(40);
+        for (int i = 0; i < 10; i++) {
+            float progress = (float) i / 9;
+            pathNodes.add(startPathNode.lerp(middlePathNode, progress));
+        }
+        for (int i = 0; i < 10; i++) {
+            float progress = (float) i / 9;
+            pathNodes.add(middlePathNode.lerp(endPathNode, progress));
+        }
+
+        CustomLaser projectile = new CustomLaser();
+        projectile.copyDamageSource(this);
+        projectile.setCurrentPathNode(pathNodes.getFirst());
+        projectile.setColor(0x00fdd6);
+        projectile.setPath(pathNodes);
+
+        projectile.setTickConsumer(laserProjectile -> {
+            if (laserProjectile.getLife() >= 20) {
+                laserProjectile.setRemove();
+                return;
+            }
+            if (laserProjectile.getDamageSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity().isRemove()) {
+                laserProjectile.setRemove();
+                return;
+            }
+            // 沿当前朝向射线追踪方块，计算碰撞箱
+            float pYaw = laserProjectile.getCurrentPathNode().yaw();
+            float pPitch = laserProjectile.getCurrentPathNode().pitch();
+            Vec3 dir = Vec3.directionFromRotation(pPitch, pYaw);
+            Vec3 end = pos.add(dir.scale(Math.max(pos.distanceTo(target.getBoundingBox().getCenter()),  32)));
+            HitResult hit = getLevel().clip(new ClipContext(pos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner));
+            Vec3 hitPos = hit.getType() != HitResult.Type.MISS ? hit.getLocation() : end;
+            laserProjectile.setHitbox(pos, hitPos, 0.15f);
+            Vec3 direction = hitPos.offsetRandom(getRandom(), 2).subtract(hitPos).normalize();
+            ParticleHelper.create(getLevel())
+                    .generic(GenericParticleBuilder.create()
+                                     .centerColor(0x00fdd6)
+                                     .edgeColor(0x00d4b0)
+                                     .lifetime(5)
+                                     .lifetimeRandom(5)
+                                     .spin(0.1f)
+                                     .spinRandom(0.05F)
+                                     .friction(0.75F)
+                                     .scale(0.045f)
+                                     .scaleRandom(0.005f)
+                    )
+                    .pos(hitPos)
+                    .offset(0.25)
+                    .velocity(direction)
+                    .count(10)
+                    .speed(0.35)
+                    .spread(2)
+                    .emit();
+        });
+
+        projectile.setHitConsumer((laser, hitContexts) -> {
+            DamageSource source = getDamageSource();
+            if (source != null) {
+                for (IEntityCollision.HitContext hitContext : hitContexts) {
+                    LivingEntity living = hitContext.entity();
+                    InvincibleData.attack(living)
+                            .attacker(laser.getUuid())
+                            .damageSource(source)
+                            .damageAmount(getDamage())
+                            .invincibleTime(3)
+                            .effect(new MobEffectInstance(SummonerMobEffectRegister.MoonBite, 60))
+                            .apply();
+                    Vec3 hitPoint = living.getBoundingBox()
+                            .getCenter();
+                    Vec3 direction = hitPoint.offsetRandom(getRandom(), 2).subtract(hitPoint).normalize();
+                    GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                                     .centerColor(0x00fdd6)
+                                     .edgeColor(0x00d4b0);
+                    ParticleHelper.create(getLevel())
+                            .generic(genericParticleBuilder
+                                             .lifetime(5)
+                                             .lifetimeRandom(5)
+                                             .spin(0.1f)
+                                             .spinRandom(0.05F)
+                                             .friction(0.75F)
+                                             .scale(0.045f)
+                                             .scaleRandom(0.005f)
+                            )
+                            .pos(hitPoint)
+                            .offset(0.35)
+                            .velocity(direction)
+                            .count(2)
+                            .speed(0.65)
+                            .spread(2)
+                            .emit();
+                }
+            }
+        });
+        if (owner != null) {
+            projectile.join(owner);
+        } else {
+            projectile.join(getLevel());
+        }
+    }
+
+        public void dimensionChange() {
+        setRemove();
+    }
+}

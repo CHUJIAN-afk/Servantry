@@ -6,7 +6,7 @@ import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.entity.PathNode;
-import first.summoner.common.sentry.Barnacle;
+import first.summoner.common.minion.sentry.Barnacle;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.FastColor;

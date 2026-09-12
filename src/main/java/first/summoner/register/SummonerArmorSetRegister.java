@@ -5,7 +5,7 @@ import first.lyra.common.armorSet.ArmorSet;
 import first.lyra.register.LyraAttributeRegister;
 import first.lyra.register.LyraRegistries;
 import first.summoner.Summoner;
-import first.summoner.common.minion.ChlorophyteCrystal;
+import first.summoner.common.minion.minion.ChlorophyteCrystal;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.IEventBus;
