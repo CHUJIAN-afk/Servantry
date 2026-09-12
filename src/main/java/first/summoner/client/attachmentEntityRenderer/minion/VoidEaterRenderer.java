@@ -29,8 +29,8 @@ public class VoidEaterRenderer extends AbstractAttachmentEntityRenderer<VoidEate
 
     @Override
     protected void render(VoidEater eater, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<VoidEater> context, float partialTick, int packedLight, float alpha) {
-        int total = eater.getTotalSegments();
-        int index = eater.getSegmentIndex();
+        int total = Math.max(1, eater.getSameSize());
+        int index = eater.getSameOrder();
         ModelResourceLocation model = index == 0
                 ? SummonerModelRegister.VOID_EATER_HEAD
                 : index == total - 1 ? SummonerModelRegister.VOID_EATER_TAIL : SummonerModelRegister.VOID_EATER_BODY;

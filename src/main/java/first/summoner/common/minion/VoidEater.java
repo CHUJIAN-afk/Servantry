@@ -62,7 +62,7 @@ public class VoidEater extends StardustDragon {
             List<VoidEater> voidEaters = LyraHelper.get(owner)
                     .getEntityData()
                     .get(SummonerAttachmentEntityRegister.VOID_EATER.get());
-            int index = getSegmentIndex() - 1;
+            int index = getSameOrder() - 1;
             if (index >= 0 && index < voidEaters.size()) {
                 return voidEaters.get(index);
             }
@@ -72,11 +72,11 @@ public class VoidEater extends StardustDragon {
 
     @Override
     public @Nullable VoidEater getNextSegment() {
-        if (getSegmentIndex() < getTotalSegments() - 1) {
+        if (getSameOrder() < getSameSize() - 1) {
             List<VoidEater> voidEaters = LyraHelper.get(owner)
                     .getEntityData()
                     .get(SummonerAttachmentEntityRegister.VOID_EATER.get());
-            int index = getSegmentIndex() + 1;
+            int index = getSameOrder() + 1;
             if (index >= 0 && index < voidEaters.size()) {
                 return voidEaters.get(index);
             }

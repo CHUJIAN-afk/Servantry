@@ -708,21 +708,14 @@ public class SummonerWeaponRegister {
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
                                             StardustDragon minion = weapon.createMinion(player, itemStack);
-                                            minion.setSegmentIndex(i);
                                             if (i < 2) {
                                                 minion.setSlotCost(0);
                                             }
-                                            minion.setTotalSegments(3);
                                             minion.init(new PathNode(player.position().add(0, 3, -i * minion.getSegmentDistance()), 0, 0, 0));
                                             helper.add(minion);
                                         }
                                     } else {
                                         StardustDragon minion = weapon.createMinion(player, itemStack);
-                                        minion.setSegmentIndex(existing.size());
-                                        minion.setTotalSegments(existing.size() + 1);
-                                        for (StardustDragon dragon : existing) {
-                                            dragon.setTotalSegments(existing.size() + 1);
-                                        }
                                         StardustDragon last = existing.getLast();
                                         PathNode pathNode = last.getCurrentPathNode();
                                         Vec3 pos = pathNode.pos().add(last.getLookAngle().scale(-minion.getSegmentDistance()));
@@ -858,21 +851,14 @@ public class SummonerWeaponRegister {
                                     if (existing.isEmpty()) {
                                         for (int i = 0; i < 3; i++) {
                                             VoidEater minion = weapon.createMinion(player, itemStack);
-                                            minion.setSegmentIndex(i);
                                             if (i < 2) {
                                                 minion.setSlotCost(0);
                                             }
-                                            minion.setTotalSegments(3);
                                             minion.init(new PathNode(player.position().add(0, 3, -i * minion.getSegmentDistance()), 0, 0, 0));
                                             helper.add(minion);
                                         }
                                     } else {
                                         VoidEater minion = weapon.createMinion(player, itemStack);
-                                        minion.setSegmentIndex(existing.size());
-                                        minion.setTotalSegments(existing.size() + 1);
-                                        for (VoidEater dragon : existing) {
-                                            dragon.setTotalSegments(existing.size() + 1);
-                                        }
                                         VoidEater last = existing.getLast();
                                         PathNode pathNode = last.getCurrentPathNode();
                                         Vec3 pos = pathNode.pos().add(last.getLookAngle().scale(-minion.getSegmentDistance()));

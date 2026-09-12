@@ -108,8 +108,8 @@ public class BloodBat extends Minion implements IEntityCollision<BloodBat> {
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
         Player player = getOwner();
-        int total = Math.max(1, getSameSizeCache());
-        int order = getOrderCache();
+        int total = Math.max(1, getSameSize());
+        int order = getSameOrder();
         float angle = (player.tickCount + partialTick) * 0.05f + (order * Mth.TWO_PI / total);
         float radius = 1.2f;
 

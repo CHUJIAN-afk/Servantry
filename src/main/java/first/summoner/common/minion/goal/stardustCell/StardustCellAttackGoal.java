@@ -54,7 +54,7 @@ public class StardustCellAttackGoal extends MinionGoal<StardustCell> {
     public Vec3 getHaloAnchorPos(LivingEntity target) {
         int tickCount = minion.getTickCount();
 
-        long seed = target.getId() * 31337L + minion.getOrderCache() * 1021L;
+        long seed = target.getId() * 31337L + minion.getSameOrder() * 1021L;
         Random rand = new Random(seed);
         double baseTheta = rand.nextDouble() * Math.PI * 2;
         double phi = Math.acos(1.0 - rand.nextDouble() * 1.4);

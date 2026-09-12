@@ -29,8 +29,8 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
 
     @Override
     protected RenderContext<StardustDragon> createContext(StardustDragon dragon, float partialTick) {
-        int total = dragon.getTotalSegments();
-        int index = dragon.getSegmentIndex();
+        int total = Math.max(1, dragon.getSameSize());
+        int index = dragon.getSameOrder();
         boolean isTail = index == total - 1;
         return RenderContext.<StardustDragon>builder()
                 .model(new ModelConfig<StardustDragon>()
@@ -41,8 +41,8 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
 
     @Override
     protected void render(StardustDragon dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustDragon> context, float partialTick, int packedLight, float alpha) {
-        int total = dragon.getTotalSegments();
-        int index = dragon.getSegmentIndex();
+        int total = Math.max(1, dragon.getSameSize());
+        int index = dragon.getSameOrder();
         ModelResourceLocation model;
         if (index == 0) {
             model = SummonerModelRegister.STARDUST_DRAGON_HEAD;

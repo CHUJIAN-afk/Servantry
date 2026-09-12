@@ -2,19 +2,19 @@ package first.summoner.common.minion;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.SyncFieldDispatcher;
 import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.common.minion.goal.stardustDragon.StardustDragonAttackGoal;
 import first.summoner.common.minion.goal.stardustDragon.StardustDragonFollowGoal;
 import first.summoner.common.minion.goal.stardustDragon.StardustDragonIdleGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.core.Holder;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -33,10 +33,6 @@ import java.util.List;
  */
 public class StardustDragon extends MomentumMinion implements IEntityCollision<StardustDragon> {
 
-    /** 当前体节索引 */
-    private int segmentIndex = 0;
-    /** 总体节数 */
-    private int totalSegments = 1;
     /** 螺旋相位 */
     private float spiralPhase = 0;
 
@@ -53,13 +49,6 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
     }
 
     @Override
-    protected void registerSyncFields(SyncFieldDispatcher fields) {
-        super.registerSyncFields(fields);
-        fields.field(ByteBufCodecs.INT, this::getSegmentIndex, this::setSegmentIndex);
-        fields.field(ByteBufCodecs.INT, this::getTotalSegments, this::setTotalSegments);
-    }
-
-    @Override
     public void registerGoals(MinionGoalSelector goalSelector) {
         goalSelector.addGoal(0, new StardustDragonAttackGoal(this));
         goalSelector.addGoal(1, new StardustDragonIdleGoal(this));
@@ -69,7 +58,15 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
     @Override
     public LivingEntity searchTarget() {
         if (isHead()) {
-            return super.searchTarget();
+            int distance = this.getSearchDistance();
+            if (distance > 0 && this.owner != null) {
+                TargetCache targetCache = this.level.getData(LyraAttachmentRegister.TargetCache);
+                List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.owner.getBoundingBox().getCenter(), targetCache.getSummonSearchRange(this.getOwner(), distance), this::isTarget);
+                if (!targets.isEmpty()) {
+                    return targetCache.getNewTarget(this, targets, 0.0F, true);
+                }
+            }
+            return null;
         }
         return null;
     }
@@ -133,7 +130,7 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
     }
 
     public boolean isHead() {
-        return segmentIndex == 0;
+        return getSameOrder() == 0;
     }
 
     @Nullable
@@ -142,7 +139,7 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
             List<StardustDragon> dragons = LyraHelper.get(owner)
                     .getEntityData()
                     .get(SummonerAttachmentEntityRegister.STARDUST_DRAGON.get());
-            int index = segmentIndex - 1;
+            int index = getSameOrder() - 1;
             if (index >= 0 && index < dragons.size()) {
                 return dragons.get(index);
             }
@@ -152,11 +149,11 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
 
     @Nullable
     public StardustDragon getNextSegment() {
-        if (segmentIndex < totalSegments - 1) {
+        if (getSameOrder() < getSameSize() - 1) {
             List<StardustDragon> dragons = LyraHelper.get(owner)
                     .getEntityData()
                     .get(SummonerAttachmentEntityRegister.STARDUST_DRAGON.get());
-            int index = segmentIndex + 1;
+            int index = getSameOrder() + 1;
             if (index >= 0 && index < dragons.size()) {
                 return dragons.get(index);
             }
@@ -166,8 +163,8 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
 
     @Override
     public @NotNull AABB getHitbox() {
-        int segment = getSegmentIndex();
-        int total = getTotalSegments();
+        int segment = getSameOrder();
+        int total = Math.max(1, getSameSize());
         boolean isHead = segment == 0;
         boolean isTail = segment == total - 1;
         double minZ = isHead ? -0.3 : isTail ? -1.45 : -0.35;
@@ -201,23 +198,7 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
 
     @Override
     public float getDamage() {
-        return super.getDamage() * (1 + 0.23f * (getTotalSegments() - 1));
-    }
-
-    public int getSegmentIndex() {
-        return segmentIndex;
-    }
-
-    public void setSegmentIndex(int index) {
-        this.segmentIndex = index;
-    }
-
-    public int getTotalSegments() {
-        return totalSegments;
-    }
-
-    public void setTotalSegments(int total) {
-        this.totalSegments = total;
+        return super.getDamage() * (1 + 0.23f * (getSameSize() - 1));
     }
 
     public double getSegmentDistance() {
@@ -275,7 +256,7 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
             }
         }
 
-        double amplitude = spiral ? Math.max(0.15, Math.min(0.4, distance * 0.08)) : 0;
+        double amplitude = spiral ? Math.clamp(distance * 0.08, 0.15, 0.4) : 0;
 
         if (spiral) {
             Vec3 right = forward.cross(new Vec3(0, 1, 0));

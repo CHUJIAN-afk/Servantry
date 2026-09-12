@@ -140,8 +140,8 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
         Player owner = getOwner();
         PathNode node = getCurrentPathNode();
         if (owner != null) {
-            int total = Math.max(1, getSameSizeCache());
-            int order = getOrderCache();
+            int total = Math.max(1, getSameSize());
+            int order = getSameOrder();
             float angle = (owner.tickCount + partialTick) * 0.05f + (order * Mth.TWO_PI / total);
             float radius = 1.2f + (total > 4 ? (total - 4) * 0.025f : 0f);
 

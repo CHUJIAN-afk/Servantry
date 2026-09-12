@@ -71,7 +71,7 @@ public class RuinRelic extends MomentumMinion {
         orb.setPos(start);
         orb.setVelocity(direction.scale(4));
         // 数量越多伤害越高：每多一个 +10%，至多 +200%
-        int extra = Math.max(0, getSameSizeCache() - 1);
+        int extra = Math.max(0, getSameSize() - 1);
         float multiplier = 1.0f + 0.1f * Math.min(extra, 20);
         orb.setDamage(getDamage() * multiplier);
         if (owner != null) {
@@ -106,7 +106,7 @@ public class RuinRelic extends MomentumMinion {
      * 获取攻击冷却：基础 1.75~1.92 秒（35~38 tick），每多一个同类仆从随机上限 +1 tick，最多额外 +20 tick。
      */
     public int getAttackCooldown() {
-        int extra = Math.max(0, getSameSizeCache() - 1);
+        int extra = Math.max(0, getSameSize() - 1);
         return 35 + getRandom().nextInt(Math.min(extra, 20) + 4);
     }
 

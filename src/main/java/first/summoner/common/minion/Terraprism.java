@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
@@ -118,8 +119,8 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     }
 
     public int getColor(float partialTick) {
-        int order = getOrderCache();
-        int total = Math.max(1, getSameSizeCache());
+        int order = getSameOrder();
+        int total = Math.max(1, getSameSize());
         int animationTick = owner != null ? owner.tickCount : tickCount;
         float hueShift = ((float) order / total + (animationTick + partialTick) * 0.015f) % 1.0f;
         float breathFactor = 0.5f + 0.5f * Mth.sin(hueShift * Mth.TWO_PI);
@@ -133,19 +134,8 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     }
 
     @Override
-    public int getOrder() {
-        return LyraHelper.get(getLevel())
-                .getEntityData()
-                .get(Terraprism.class)
-                .indexOf(this);
-    }
-
-    @Override
-    public int getSameSize() {
-        return LyraHelper.get(getLevel())
-                .getEntityData()
-                .get(Terraprism.class)
-                .size();
+    public long getSameHash() {
+        return Objects.hash(Terraprism.class) * 43L;
     }
 
     public PathNode getInterpolatedIdleState(float partialTick) {
@@ -159,7 +149,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
             float backZ = (float) Math.cos(rad);
             float rightX = (float) Math.cos(rad);
             float rightZ = (float) -Math.sin(rad);
-            int order = getOrderCache();
+            int order = getSameOrder();
             double localZ = 0.75 + order * 0.12;
             double floatSpeed = 0.08 + order * 0.01;
             double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;

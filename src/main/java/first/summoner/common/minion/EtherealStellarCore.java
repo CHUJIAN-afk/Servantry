@@ -91,8 +91,8 @@ public class EtherealStellarCore extends Minion {
         Player owner = getOwner();
         PathNode node = getCurrentPathNode();
         if (owner != null) {
-            int total = Math.max(1, getSameSizeCache());
-            int order = getOrderCache();
+            int total = Math.max(1, getSameSize());
+            int order = getSameOrder();
             float angle = (owner.tickCount + partialTick) * 0.02f + (order * Mth.TWO_PI / total);
             float radius = 1.5f;
 
