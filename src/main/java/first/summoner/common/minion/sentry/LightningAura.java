@@ -62,7 +62,7 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
      */
     private void attack() {
         TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
-        List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 6);
+        List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 6, null);
         for (LivingEntity entity : entities) {
             InvincibleData.attack(entity)
                     .damageSource(getDamageSource())

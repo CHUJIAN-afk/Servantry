@@ -66,6 +66,7 @@
   "enchantment.summoner.starfall.desc.1": "召唤物命中时，消耗30标记能量，召唤流星，流星对半径2格内目标造成133%召唤伤害",
   "enchantment.summoner.vein": "脉管",
   "enchantment.summoner.vein.desc.1": "召唤物击杀时，为你恢复12%已损生命值，最多8点",
+  "entity.summoner.doomsday_star": "末世星",
   "item.minecraft.lingering_potion.effect.long_obsession": "滞留型着魔药水",
   "item.minecraft.lingering_potion.effect.obsession": "滞留型着魔药水",
   "item.minecraft.lingering_potion.effect.strong_obsession": "滞留型着魔药水",

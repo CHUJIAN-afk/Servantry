@@ -53,7 +53,7 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
     private LivingEntity findNearestTarget() {
         LivingEntity nearest = null;
         double nearestDist = Double.MAX_VALUE;
-        for (LivingEntity candidate : LyraHelper.get(owner).getTargetCache().getEntitiesInRadius(getPos(), 8)) {
+        for (LivingEntity candidate : LyraHelper.get(owner).getTargetCache().getEntitiesInRadius(getPos(), 8, null)) {
             double dist = candidate.position().distanceToSqr(getPos());
             if (dist < nearestDist) {
                 nearestDist = dist;

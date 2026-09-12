@@ -51,16 +51,14 @@ public class Meteor extends Projectile implements IEntityCollision<Meteor>, IBlo
     private void explode(LivingEntity primary) {
         Vec3 pos = getPos();
         DamageSource source = getDamageSource();
-        if (source != null) {
-            List<LivingEntity> targets = LyraHelper.get(owner).getTargetCache()
-                    .getEntitiesInRadius(pos, 2);
-            for (LivingEntity target : targets) {
-                InvincibleData.attack(target)
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .apply();
-            }
+        List<LivingEntity> targets = LyraHelper.get(owner).getTargetCache()
+                .getEntitiesInRadius(pos, 2, null);
+        for (LivingEntity target : targets) {
+            InvincibleData.attack(target)
+                    .attacker(getUuid())
+                    .damageSource(source)
+                    .damageAmount(getDamage())
+                    .apply();
         }
         ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()

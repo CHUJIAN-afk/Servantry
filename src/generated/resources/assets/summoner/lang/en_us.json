@@ -66,6 +66,7 @@
   "enchantment.summoner.starfall.desc.1": "On minion hit: consume 30 mark energy to summon a meteor dealing 133% summon damage to targets within 2 blocks",
   "enchantment.summoner.vein": "Vein",
   "enchantment.summoner.vein.desc.1": "On minion kill: restore 12% of missing health (up to 8 HP)",
+  "entity.summoner.doomsday_star": "Doomsday Star",
   "item.minecraft.lingering_potion.effect.long_obsession": "Lingering Potion of Obsession",
   "item.minecraft.lingering_potion.effect.obsession": "Lingering Potion of Obsession",
   "item.minecraft.lingering_potion.effect.strong_obsession": "Lingering Potion of Obsession",
