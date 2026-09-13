@@ -3,7 +3,7 @@ package first.summoner.client.entityRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import first.lyra.common.entity.PathNode;
-import first.summoner.common.master.AbstractMaster;
+import first.summoner.common.master.PlannedPathEntity;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -11,11 +11,11 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractMasterRenderer<T extends AbstractMaster, M extends EntityModel<T>> extends MobRenderer<T, M> {
+public abstract class AbstractBossRenderer<T extends PlannedPathEntity, M extends EntityModel<T>> extends MobRenderer<T, M> {
 
     private static final float MODEL_Y_OFFSET = 1.501F;
 
-    public AbstractMasterRenderer(EntityRendererProvider.Context context, M model, float shadowRadius) {
+    public AbstractBossRenderer(EntityRendererProvider.Context context, M model, float shadowRadius) {
         super(context, model, shadowRadius);
     }
 
@@ -36,12 +36,7 @@ public abstract class AbstractMasterRenderer<T extends AbstractMaster, M extends
         PathNode renderNode = entity.getRenderNode(partialTick);
         poseStack.mulPose(Axis.YN.rotationDegrees(renderNode.yaw()));
         poseStack.mulPose(Axis.XP.rotationDegrees(renderNode.pitch()));
-        poseStack.rotateAround(
-                Axis.ZP.rotationDegrees(renderNode.roll()),
-                0.0F,
-                getRollPivotY(entity),
-                0.0F
-        );
+        poseStack.rotateAround(Axis.ZP.rotationDegrees(renderNode.roll()), 0.0F, getRollPivotY(entity), 0.0F);
     }
 
     protected float getModelScaleY(T entity) {
@@ -49,7 +44,7 @@ public abstract class AbstractMasterRenderer<T extends AbstractMaster, M extends
     }
 
     private float getRollPivotY(T entity) {
-        // LivingEntityRenderer applies the model baseline offset after the renderer's Y scale.
+        // LivingEntityRenderer 在渲染器的 Y 缩放之后应用模型基线偏移。
         return MODEL_Y_OFFSET - entity.getBbHeight() / (2.0F * getModelScaleY(entity));
     }
 }

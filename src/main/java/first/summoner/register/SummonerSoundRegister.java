@@ -21,6 +21,8 @@ public class SummonerSoundRegister {
     public static final DeferredHolder<SoundEvent, SoundEvent> BallistaShot = create("ballista_shot");
     public static final DeferredHolder<SoundEvent, SoundEvent> Laser = create("laser");
     public static final DeferredHolder<SoundEvent, SoundEvent> ImpFire = create("imp_fire");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DoomsdayStarPhase1 = create("doomsday_star_phase_1");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DoomsdayStarPhase2 = create("doomsday_star_phase_2");
 
     private static DeferredHolder<SoundEvent, SoundEvent> create(String name) {
         return Register.register(name, () -> SoundEvent.createVariableRangeEvent(Summoner.rl(name)));

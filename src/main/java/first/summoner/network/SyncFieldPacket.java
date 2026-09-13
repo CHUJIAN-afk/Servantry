@@ -1,7 +1,7 @@
 package first.summoner.network;
 
 import first.summoner.Summoner;
-import first.summoner.common.master.AbstractMaster;
+import first.summoner.common.master.PlannedPathEntity;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -27,7 +27,7 @@ public record SyncFieldPacket(int id, byte[] bytes) implements CustomPacketPaylo
             Player player = context.player();
             Level level = player.level();
             Entity entity = level.getEntity(payload.id());
-            if (entity instanceof AbstractMaster master) {
+            if (entity instanceof PlannedPathEntity master) {
                 master.enqueueSyncPayload(payload.bytes());
             }
         });

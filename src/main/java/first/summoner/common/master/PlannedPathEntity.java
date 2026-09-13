@@ -23,23 +23,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class AbstractMaster extends Mob implements Enemy {
-
-    private static final String PHYSICS_PATH_IDENTIFIER = "physics";
-    private static final double MIN_MOVEMENT_SQR = 1.0E-10;
+public abstract class PlannedPathEntity extends Mob implements Enemy {
 
     protected final ArrayList<PathNode> historyNodes = new ArrayList<>();
     protected final AtomicReference<List<byte[]>> pendingPayloads = new AtomicReference<>(List.of());
     protected PlannedPath currentPlannedPath = null;
     protected SyncFieldDispatcher syncFields = null;
+    private Vec3 velocity = Vec3.ZERO;
 
     protected PathNode currentPathNode = new PathNode(Vec3.ZERO, 0.0F, 0.0F, 0.0F);
-    private Vec3 velocity = Vec3.ZERO;
     private float drag = 0.95F;
     private float gravity = 0.0F;
-    private boolean applyingPathPosition = false;
 
-    protected AbstractMaster(EntityType<? extends Mob> entityType, Level level) {
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        fields.field(LyraStreamCodecs.PATH_NODE, this::getCurrentPathNode, this::setCurrentPathNode);
+    }
+
+    protected PlannedPathEntity(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
         setNoGravity(true);
         resetHistory(currentPathNode);
@@ -83,9 +83,6 @@ public abstract class AbstractMaster extends Mob implements Enemy {
     private void tickPhysics() {
         velocity = velocity.add(0.0, gravity, 0.0).scale(drag);
         Vec3 movement = resolveBlockCollisions(velocity);
-        if (movement.lengthSqr() < MIN_MOVEMENT_SQR) {
-            movement = Vec3.ZERO;
-        }
         velocity = movement;
 
         PathNode physicsNode = new PathNode(
@@ -94,15 +91,11 @@ public abstract class AbstractMaster extends Mob implements Enemy {
                 currentPathNode.pitch(),
                 currentPathNode.roll()
         );
-        currentPlannedPath = new PlannedPath(PHYSICS_PATH_IDENTIFIER, List.of(physicsNode));
+        currentPlannedPath = new PlannedPath("physics", List.of(physicsNode));
         currentPathNode = physicsNode;
     }
 
     private Vec3 resolveBlockCollisions(Vec3 movement) {
-        if (movement.lengthSqr() < MIN_MOVEMENT_SQR) {
-            return Vec3.ZERO;
-        }
-
         Vec3 corrected = Entity.collideBoundingBox(this, movement, getBoundingBox(), level(), List.of());
         boolean collidedY = Math.abs(corrected.y - movement.y) > 1.0E-7;
         if (collidedY && movement.y < 0.0) {
@@ -118,12 +111,7 @@ public abstract class AbstractMaster extends Mob implements Enemy {
     }
 
     private void syncEntityToPathNode() {
-        applyingPathPosition = true;
-        try {
-            super.setPos(currentPathNode.pos());
-        } finally {
-            applyingPathPosition = false;
-        }
+        super.setPos(currentPathNode.pos());
         setYRot(currentPathNode.yaw());
         setYHeadRot(currentPathNode.yaw());
         setXRot(currentPathNode.pitch());
@@ -138,7 +126,7 @@ public abstract class AbstractMaster extends Mob implements Enemy {
     @Override
     public void setPos(double x, double y, double z) {
         super.setPos(x, y, z);
-        if (!applyingPathPosition && currentPathNode != null && !level().isClientSide()) {
+        if (currentPathNode != null && !level().isClientSide()) {
             seedPathFromEntity();
         }
     }
@@ -166,10 +154,6 @@ public abstract class AbstractMaster extends Mob implements Enemy {
     public void startSeenByPlayer(@NotNull ServerPlayer player) {
         super.startSeenByPlayer(player);
         PacketDistributor.sendToPlayer(player, new SyncFieldPacket(getId(), encodeSyncPayload(true)));
-    }
-
-    protected void registerSyncFields(SyncFieldDispatcher fields) {
-        fields.field(LyraStreamCodecs.PATH_NODE, this::getCurrentPathNode, this::setCurrentPathNode);
     }
 
     public SyncFieldDispatcher syncFieldRegistrar() {
@@ -234,9 +218,7 @@ public abstract class AbstractMaster extends Mob implements Enemy {
     }
 
     public boolean isExecutingPath() {
-        return currentPlannedPath != null
-                && !currentPlannedPath.isFinished()
-                && !PHYSICS_PATH_IDENTIFIER.equals(currentPlannedPath.getIdentifier());
+        return currentPlannedPath != null && !currentPlannedPath.isFinished() && !"physics".equals(currentPlannedPath.getIdentifier());
     }
 
     public void setGravity(float gravity) {
@@ -271,9 +253,7 @@ public abstract class AbstractMaster extends Mob implements Enemy {
 
     public void applyForce(Vec3 targetPos, float force) {
         Vec3 direction = targetPos.subtract(currentPathNode.pos());
-        if (direction.lengthSqr() > MIN_MOVEMENT_SQR) {
-            applyForce(direction.normalize().scale(force));
-        }
+        applyForce(direction.normalize().scale(force));
     }
 
     public void setPathRotation(float yaw, float pitch, float roll) {
@@ -285,9 +265,6 @@ public abstract class AbstractMaster extends Mob implements Enemy {
 
     public void lookAtPathTarget(Vec3 targetPos) {
         Vec3 direction = targetPos.subtract(currentPathNode.pos());
-        if (direction.lengthSqr() <= MIN_MOVEMENT_SQR) {
-            return;
-        }
         direction = direction.normalize();
         float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
         float pitch = (float) Math.toDegrees(Math.asin(-direction.y));

@@ -43,5 +43,21 @@
     "sounds": [
       "summoner:imp_fire"
     ]
+  },
+  "doomsday_star_phase_1": {
+    "sounds": [
+      {
+        "name": "summoner:doomsday_star_phase_1",
+        "stream": true
+      }
+    ]
+  },
+  "doomsday_star_phase_2": {
+    "sounds": [
+      {
+        "name": "summoner:doomsday_star_phase_2",
+        "stream": true
+      }
+    ]
   }
 }

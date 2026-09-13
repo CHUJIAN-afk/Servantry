@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.layers.SlimeOuterLayer;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
-public class DoomsdayStarRenderer extends AbstractMasterRenderer<DoomsdayStar, SlimeModel<DoomsdayStar>> {
+public class DoomsdayStarRenderer extends AbstractBossRenderer<DoomsdayStar, SlimeModel<DoomsdayStar>> {
 
     public DoomsdayStarRenderer(EntityRendererProvider.Context context) {
         super(context, new SlimeModel<>(context.bakeLayer(ModelLayers.SLIME)), 1.0F);

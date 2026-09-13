@@ -7,11 +7,13 @@
     "CommonHooksMixin",
     "DamageSourcesMixin",
     "MixinHandlerMixin",
+    "SoundEngineAccessor",
     "TargetCacheMixin"
   ],
   "client": [
     "ItemEnchantmentsMixin",
-    "LocalPlayerMixin"
+    "LocalPlayerMixin",
+    "SoundManagerAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
