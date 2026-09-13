@@ -7,6 +7,7 @@ public class SummonerLanguageRegister implements LyraItemRegistries.LanguageInit
     public void init(LyraItemRegistries registries) {
         // ================= 模组基础 =================
         registries.language("modid.summoner", "Summoner", "召唤师");
+        registries.language("entity.summoner.doomsday_star", "Doomsday Star", "末世星");
         // ===================== 药水效果 =====================
         registries.language(SummonerMobEffectRegister.Obsession.get().getDescriptionId(), "Obsession", "着魔");
         registries.language(SummonerMobEffectRegister.CellParasitism.get().getDescriptionId(), "Cell Parasitism", "细胞寄生");
