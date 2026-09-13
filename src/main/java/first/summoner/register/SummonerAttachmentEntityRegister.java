@@ -4,6 +4,7 @@ import first.lyra.common.entity.AttachmentEntity;
 import first.lyra.common.entity.AttachmentEntityType;
 import first.lyra.register.LyraRegistries;
 import first.summoner.Summoner;
+import first.summoner.common.master.DoomsdayStar;
 import first.summoner.common.minion.minion.*;
 import first.summoner.common.minion.sentry.*;
 import first.summoner.common.projectile.*;
@@ -23,6 +24,11 @@ import java.util.function.Supplier;
 public class SummonerAttachmentEntityRegister {
 
     private static final DeferredRegister<AttachmentEntityType<?>> Register = DeferredRegister.create(LyraRegistries.ATTACHMENT_ENTITY_TYPES, Summoner.MODID);
+
+    // ===================== Boss =====================
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DoomsdayStar>> DOOMSDAY_STAR =
+            register("doomsday_star", DoomsdayStar::new);
 
     // ===================== 仆从类型 =====================
 
@@ -201,6 +207,12 @@ public class SummonerAttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StarlightShockwave>> STARLIGHT_SHOCKWAVE =
             register("starlight_shockwave", StarlightShockwave::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DoomsdayStarGel>> DOOMSDAY_STAR_GEL =
+            register("doomsday_star_gel", DoomsdayStarGel::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MeltdownStar>> MELTDOWN_STAR =
+            register("meltdown_star", MeltdownStar::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, ResourceLocation -> new AttachmentEntityType<>(ResourceLocation, supplier));

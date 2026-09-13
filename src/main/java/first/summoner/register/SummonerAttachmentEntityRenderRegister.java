@@ -10,6 +10,7 @@ import first.summoner.Summoner;
 import first.summoner.client.attachmentEntityRenderer.SimpleRenderer;
 import first.summoner.client.attachmentEntityRenderer.minion.*;
 import first.summoner.client.attachmentEntityRenderer.projectile.*;
+import first.summoner.client.entityRenderer.DoomsdayStarRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.neoforged.api.distmarker.Dist;
@@ -35,6 +36,9 @@ public class SummonerAttachmentEntityRenderRegister {
 
     @SubscribeEvent
     public static void register(FMLClientSetupEvent event) {
+        // ===================== Boss =====================
+        register(SummonerAttachmentEntityRegister.DOOMSDAY_STAR, DoomsdayStarRenderer::new);
+
         // ===================== 仆从 =====================
         register(SummonerAttachmentEntityRegister.INFINITE_SHADOW, InfiniteShadowRenderer::new);
         register(SummonerAttachmentEntityRegister.TERRA_PRISM, TerraprismRenderer::new);
@@ -96,6 +100,8 @@ public class SummonerAttachmentEntityRenderRegister {
         register(SummonerAttachmentEntityRegister.EXPLOSION_FLAME_BALL, ExplosionFlameBallRenderer::new);
         register(SummonerAttachmentEntityRegister.FORBIDDEN_ORB, ForbiddenOrbRenderer::new);
         register(SummonerAttachmentEntityRegister.STARLIGHT_SHOCKWAVE, null);
+        register(SummonerAttachmentEntityRegister.DOOMSDAY_STAR_GEL, null);
+        register(SummonerAttachmentEntityRegister.MELTDOWN_STAR, null);
     }
 
     private static <T extends AttachmentEntity> void register(DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> type, @Nullable Supplier<IAttachmentEntityRenderer<T>> renderer) {

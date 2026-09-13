@@ -1,7 +1,8 @@
 package first.summoner.common.item;
 
+import first.lyra.api.LyraHelper;
 import first.summoner.common.master.DoomsdayStar;
-import first.summoner.register.SummonerEntityRegister;
+import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public class DoomsdayStarDebugItem extends Item {
@@ -37,28 +39,22 @@ public class DoomsdayStarDebugItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        DoomsdayStar doomsdayStar = SummonerEntityRegister.DOOMSDAY_STAR.get().create(serverLevel);
-        if (doomsdayStar == null) {
-            return InteractionResult.FAIL;
-        }
-
         BlockPos spawnPos = context.getClickedPos().relative(context.getClickedFace());
-        doomsdayStar.moveTo(
+        DoomsdayStar doomsdayStar = new DoomsdayStar();
+        doomsdayStar.setPos(new Vec3(
                 spawnPos.getX() + 0.5D,
                 spawnPos.getY() + level.getMaxBuildHeight(),
-                spawnPos.getZ() + 0.5D,
-                player.getYRot(),
-                0.0F
-        );
-        serverLevel.addFreshEntity(doomsdayStar);
+                spawnPos.getZ() + 0.5D
+        ));
+        doomsdayStar.setPathRotation(player.getYRot(), 0.0F, 0.0F);
+        doomsdayStar.setTarget(context.getPlayer());
+        LyraHelper.get(serverLevel).add(doomsdayStar);
         return InteractionResult.SUCCESS;
     }
 
     private static void removeAll(MinecraftServer server) {
         for (ServerLevel level : server.getAllLevels()) {
-            for (DoomsdayStar doomsdayStar : level.getEntities(SummonerEntityRegister.DOOMSDAY_STAR.get(), entity -> true)) {
-                doomsdayStar.discard();
-            }
+            LyraHelper.get(level).remove(SummonerAttachmentEntityRegister.DOOMSDAY_STAR.get());
         }
     }
 }

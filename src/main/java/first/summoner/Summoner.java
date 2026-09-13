@@ -22,7 +22,6 @@ public class Summoner {
         });
         SummonerCreativeTabRegister.register(eventBus);
         SummonerDataComponentRegister.register(eventBus);
-        SummonerEntityRegister.register(eventBus);
         SummonerAttachmentEntityRegister.register(eventBus);
         SummonerArmorMaterialRegister.register(eventBus);
         SummonerEnchantmentRegister.register(eventBus);

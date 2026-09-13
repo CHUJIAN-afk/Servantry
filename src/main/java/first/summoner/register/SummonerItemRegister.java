@@ -4,6 +4,7 @@ import first.lyra.register.LyraItemRegistries;
 import first.summoner.Summoner;
 import first.summoner.common.item.DoomsdayStarDebugItem;
 import first.summoner.common.item.ZenithItem;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.Tiers;
@@ -28,7 +29,9 @@ public class SummonerItemRegister {
                     .itemLanguageTooltip(1, "Right-click a block to summon a Doomsday Star", "右键方块召唤末世星")
                     .itemLanguageTooltip(2, "Sneak-right-click a block to remove all Doomsday Stars", "潜行右键方块清除所有末世星")
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeaponTool)
-                    .itemModel(ItemModelProvider::handheldItem)
+                    .itemModel((provider, item) -> provider
+                            .withExistingParent(item.getPath(), ResourceLocation.withDefaultNamespace("item/handheld"))
+                            .texture("layer0", Summoner.rl("item/entity/test_boss")))
                     .build();
 
     public static void register() {
