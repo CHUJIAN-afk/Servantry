@@ -1,4 +1,4 @@
-// 1.21.1	2026-09-02T14:47:40.1718504	Item Models: summoner
+// 1.21.1	2026-09-13T12:25:08.787903	Item Models: summoner
 dfd235cedf5a4c6ed82a229e3aea00f38c65a735 assets/summoner/models/item/apprentices_scarf.json
 eaa95ce6bcf921e88836c38085395aa77d00a18a assets/summoner/models/item/ballista_cane.json
 7f4b58794f5d75080a2787052e62b231324f4f2b assets/summoner/models/item/ballista_rod.json
@@ -15,6 +15,7 @@ c5dbbbb1268170d8866c8e644725e1429722cc5e assets/summoner/models/item/chlorophyte
 ea8fa60eb7ccb8e0214f9365db61e416d372238f assets/summoner/models/item/chlorophyte_leggings.json
 b03ffffbe0fd9a1f29364991145dec2129f59d74 assets/summoner/models/item/corn_cannon.json
 1b851958fcb507533231e969d896986b37c7726b assets/summoner/models/item/deadly_sphere_staff.json
+f93d589bf9c941ab9257042e232e44c62ddef2a7 assets/summoner/models/item/doomsday_star_debug.json
 10fd8f228c02cc8fde1f356b3e48ac3ecc2ed961 assets/summoner/models/item/eclipse_ring.json
 a8b09b8c98b95311ae24c2f486852599cfbc6f75 assets/summoner/models/item/ethereal_stellar_core_staff.json
 39230db8b05f68adab9c2d2fe79bffa5f370c825 assets/summoner/models/item/eye_laser_turret_staff.json

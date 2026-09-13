@@ -95,6 +95,7 @@ public class SummonerAttachmentEntityRenderRegister {
         register(SummonerAttachmentEntityRegister.FROST_BOLT, FrostBoltRenderer::new);
         register(SummonerAttachmentEntityRegister.EXPLOSION_FLAME_BALL, ExplosionFlameBallRenderer::new);
         register(SummonerAttachmentEntityRegister.FORBIDDEN_ORB, ForbiddenOrbRenderer::new);
+        register(SummonerAttachmentEntityRegister.STARLIGHT_SHOCKWAVE, null);
     }
 
     private static <T extends AttachmentEntity> void register(DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> type, @Nullable Supplier<IAttachmentEntityRenderer<T>> renderer) {

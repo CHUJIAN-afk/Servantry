@@ -2,6 +2,7 @@ package first.summoner.register;
 
 import first.lyra.register.LyraItemRegistries;
 import first.summoner.Summoner;
+import first.summoner.common.item.DoomsdayStarDebugItem;
 import first.summoner.common.item.ZenithItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -19,6 +20,16 @@ public class SummonerItemRegister {
             .itemLanguage("Zenith", "天顶剑")
             .itemModel(ItemModelProvider::handheldItem)
             .build();
+
+    public static final DeferredItem<DoomsdayStarDebugItem> DoomsdayStarDebug =
+            REGISTRIES.build("doomsday_star_debug", () -> new DoomsdayStarDebugItem(new Item.Properties()
+                            .stacksTo(1)))
+                    .itemLanguage("Doomsday Star Debugger", "末世星调试器")
+                    .itemLanguageTooltip(1, "Right-click a block to summon a Doomsday Star", "右键方块召唤末世星")
+                    .itemLanguageTooltip(2, "Sneak-right-click a block to remove all Doomsday Stars", "潜行右键方块清除所有末世星")
+                    .itemTag(SummonerItemTagsRegister.SectionMinionWeaponTool)
+                    .itemModel(ItemModelProvider::handheldItem)
+                    .build();
 
     public static void register() {
     }

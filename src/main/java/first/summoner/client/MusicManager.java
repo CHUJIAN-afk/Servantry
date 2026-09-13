@@ -21,7 +21,7 @@ public class MusicManager {
 
     public static void play(Holder<SoundEvent> soundEvent) {
         MusicInstance musicInstance = MusicSoundData.computeIfAbsent(soundEvent.value(), MusicInstance::new);
-        musicInstance.time = Math.min(musicInstance.time + 2, 100);
+        musicInstance.time = 10;
     }
 
     public static void stop(Holder<SoundEvent> soundEvent) {

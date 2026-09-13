@@ -199,6 +199,9 @@ public class SummonerAttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ForbiddenOrb>> FORBIDDEN_ORB =
             register("forbidden_orb", ForbiddenOrb::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StarlightShockwave>> STARLIGHT_SHOCKWAVE =
+            register("starlight_shockwave", StarlightShockwave::new);
+
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, ResourceLocation -> new AttachmentEntityType<>(ResourceLocation, supplier));
     }

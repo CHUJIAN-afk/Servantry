@@ -34,6 +34,7 @@ public abstract class PlannedPathEntity extends Mob implements Enemy {
     protected PathNode currentPathNode = new PathNode(Vec3.ZERO, 0.0F, 0.0F, 0.0F);
     private float drag = 0.95F;
     private float gravity = 0.0F;
+    private boolean blockCollision = true;
 
     protected void registerSyncFields(SyncFieldDispatcher fields) {
         fields.field(LyraStreamCodecs.PATH_NODE, this::getCurrentPathNode, this::setCurrentPathNode);
@@ -47,17 +48,14 @@ public abstract class PlannedPathEntity extends Mob implements Enemy {
 
     @Override
     public void tick() {
+        if (level().isClientSide()) {
+            applyPendingSync();
+        }
+        super.tick();
         if (!level().isClientSide()) {
             if (!isExecutingPath()) {
                 tickPhysics();
             }
-        } else {
-            applyPendingSync();
-        }
-
-        super.tick();
-
-        if (!level().isClientSide()) {
             if (currentPlannedPath != null && !currentPlannedPath.isFinished()) {
                 currentPathNode = currentPlannedPath.advance();
             }
@@ -96,6 +94,11 @@ public abstract class PlannedPathEntity extends Mob implements Enemy {
     }
 
     private Vec3 resolveBlockCollisions(Vec3 movement) {
+        if (!blockCollision) {
+            setOnGround(false);
+            return movement;
+        }
+
         Vec3 corrected = Entity.collideBoundingBox(this, movement, getBoundingBox(), level(), List.of());
         boolean collidedY = Math.abs(corrected.y - movement.y) > 1.0E-7;
         if (collidedY && movement.y < 0.0) {
@@ -235,6 +238,14 @@ public abstract class PlannedPathEntity extends Mob implements Enemy {
 
     public float getDrag() {
         return drag;
+    }
+
+    public void setBlockCollision(boolean blockCollision) {
+        this.blockCollision = blockCollision;
+    }
+
+    public boolean hasBlockCollision() {
+        return blockCollision;
     }
 
     public void setVelocity(Vec3 velocity) {
