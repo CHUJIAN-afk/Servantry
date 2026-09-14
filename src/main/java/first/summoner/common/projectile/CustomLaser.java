@@ -1,13 +1,12 @@
 package first.summoner.common.projectile;
 
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.SyncFieldDispatcher;
+
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import first.summoner.utils.SummonerStreamCodecs;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.util.BiConsumer;
@@ -18,23 +17,16 @@ import java.util.function.Consumer;
 
 public class CustomLaser extends Projectile implements IEntityCollision<CustomLaser> {
 
-    private static final StreamCodec<RegistryFriendlyByteBuf, AABB> AABB_STREAM_CODEC = StreamCodec.composite(
-            LyraStreamCodecs.VEC_3, AABB::getMinPosition,
-            LyraStreamCodecs.VEC_3, AABB::getMaxPosition,
-            AABB::new
-    );
-
     private int color = 0;
     private float alpha = 1;
     private AABB hitbox = new AABB(0, 0, 0, 0, 0, 0);
     private Consumer<CustomLaser> tickConsumer = null;
     private BiConsumer<CustomLaser, List<HitContext>> hitConsumer = null;
 
-
-
     public CustomLaser() {
         super(SummonerAttachmentEntityRegister.CUSTOM_LASER);
-        setMaxLife(-1);
+        setPhysics(false);
+        setMaxTickCount(-1);
     }
 
     @Override
@@ -42,7 +34,7 @@ public class CustomLaser extends Projectile implements IEntityCollision<CustomLa
         super.registerSyncFields(fields);
         fields.field(ByteBufCodecs.INT, this::getColor, this::setColor);
         fields.field(ByteBufCodecs.FLOAT, this::getAlpha, this::setAlpha);
-        fields.field(AABB_STREAM_CODEC, this::getHitbox, this::setHitbox);
+        fields.field(SummonerStreamCodecs.AABB, this::getHitbox, this::setHitbox);
     }
 
     public int getLife() {
@@ -58,18 +50,13 @@ public class CustomLaser extends Projectile implements IEntityCollision<CustomLa
     }
 
     @Override
-    protected void tickPhysics() {
-
-    }
-
-    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             if (tickConsumer != null) {
                 tickConsumer.accept(this);
             }
         }
-        super.tick();
     }
 
     public void setTickConsumer(Consumer<CustomLaser> tickConsumer) {

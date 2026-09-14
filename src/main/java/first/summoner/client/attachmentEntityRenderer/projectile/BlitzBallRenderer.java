@@ -6,7 +6,7 @@ import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.rendererHelper.LightningRendererHelper;
 import first.lyra.client.render.rendererHelper.SphereRendererHelper;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.projectile.BlitzBall;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.RandomSource;

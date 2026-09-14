@@ -1,6 +1,7 @@
 package first.summoner.common.minion.sentry;
 
-import first.lyra.common.entity.PathNode;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.utils.EasingCurve;
 import first.summoner.common.projectile.MiniRainbowCrystal;
@@ -20,17 +21,19 @@ public class RainbowCrystal extends Minion {
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && getPos().distanceToSqr(owner.position()) <= 128 * 128;
+    }
+
+    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
-            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
-                setRemove();
-            }
-            if (--cooldown < 0 && isTarget(getTarget())) {
+            if (--cooldown < 0 && getTarget() != null) {
                 cooldown = getRandom().nextInt(6, 8);
                 fire(getTarget());
             }
         }
-        super.tick();
     }
 
     @Override
@@ -53,10 +56,11 @@ public class RainbowCrystal extends Minion {
                 list.add(startPathNode.lerp(endPathNode, EasingCurve.EASE_IN_OUT_CUBIC.apply(progress)));
             }
             MiniRainbowCrystal projectile = new MiniRainbowCrystal();
-            projectile.copyDamageSource(this);
-            projectile.setPos(startPathNode.pos());
+            projectile.setOwner(owner);
+            projectile.init(startPathNode);
+            projectile.copyAttributes(this);
             projectile.setPath(list);
-            projectile.join(getLevel());
+            LyraHelper.get(level).add(projectile);
         }
     }
 

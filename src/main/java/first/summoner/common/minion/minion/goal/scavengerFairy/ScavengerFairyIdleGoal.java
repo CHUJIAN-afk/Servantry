@@ -1,11 +1,11 @@
 package first.summoner.common.minion.minion.goal.scavengerFairy;
 
-import first.lyra.common.minion.MinionGoal;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.summoner.common.minion.minion.ScavengerFairy;
 
 import java.util.List;
 
-public class ScavengerFairyIdleGoal extends MinionGoal<ScavengerFairy> {
+public class ScavengerFairyIdleGoal extends AttachmentEntityGoal<ScavengerFairy> {
 
     public ScavengerFairyIdleGoal(ScavengerFairy minion) {
         super(minion);

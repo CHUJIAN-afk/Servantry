@@ -1,9 +1,10 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.lyra.common.sound.Playable;
@@ -31,12 +32,13 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
     public MiniNecroSpirit() {
         super(SummonerAttachmentEntityRegister.MINI_NECRO_SPIRIT);
         setDrag(1.0f);
-        setMaxLife(200);
+        setMaxTickCount(200);
         setGravity(0);
     }
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             LivingEntity target = getTrackingTarget();
             if (target != null && target.isAlive()) {
@@ -44,7 +46,7 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
                 targetPos = box.getCenter();
             }
             if (targetPos != null) {
-                applyForce(targetPos.subtract(getPos()).normalize());
+                addVelocity(targetPos.subtract(getPos()).normalize());
             }
             // 粒子拖尾
             ParticleHelper.create(getLevel())
@@ -62,16 +64,14 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
                     .offset(0.05)
                     .emit();
         }
-        super.tick();
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            LyraHelper summonerHelper = LyraHelper.get(getLevel());
+                LyraHelper summonerHelper = LyraHelper.get(getLevel());
             TargetCache targetCache = summonerHelper.getTargetCache();
-            List<LivingEntity> mainTargets = targetCache.getEntitiesInRadius(getPos(), 3, this::isTarget);
+            List<LivingEntity> mainTargets = targetCache.getEntitiesInRadius(getPos(), 3, living -> targetCache.isTarget(owner, living));
             for (LivingEntity living : mainTargets) {
                 float amount = getDamage();
                 if (living == trackingTarget) {
@@ -93,7 +93,7 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
                         .damageAmount(amount * 0.5f)
                         .apply();
                 List<LivingEntity> splashTargets = targetCache.getEntitiesInRadius(living.position(), 2,
-                        entity -> entity == living || isTarget(entity));
+                        entity -> entity == living || targetCache.isTarget(owner, entity));
                 for (LivingEntity entity : splashTargets) {
                     InvincibleData.attack(living)
                             .attacker(getUuid())
@@ -145,7 +145,6 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
             } else {
                 Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), hitPoint, net.minecraft.sounds.SoundSource.PLAYERS);
             }
-        }
         setRemove();
     }
 

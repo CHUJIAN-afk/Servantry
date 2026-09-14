@@ -1,6 +1,7 @@
 package first.summoner.common.minion.minion.goal.deadlysphere;
 
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.summoner.common.minion.minion.DeadlySphere;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -8,7 +9,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * 致命球冲刺攻击Goal，AI与魔焰眼完全一致。
  */
-public class DeadlySphereAttackGoal extends MinionGoal<DeadlySphere> {
+public class DeadlySphereAttackGoal extends AttachmentEntityGoal<DeadlySphere> {
 
     private int cooldown;
     private int combat = 0;
@@ -19,7 +20,7 @@ public class DeadlySphereAttackGoal extends MinionGoal<DeadlySphere> {
 
     @Override
     public boolean canUse() {
-        return minion.isTarget(minion.getTarget());
+        return minion.getTarget() != null;
     }
 
     @Override
@@ -36,7 +37,7 @@ public class DeadlySphereAttackGoal extends MinionGoal<DeadlySphere> {
             } else {
                 cooldown = 8 + minion.getRandom().nextInt(-2, 2);
             }
-            minion.applyForce(direction.scale(3));
+            minion.addVelocity(direction.scale(3));
             minion.setTrailTimer(10);
         }
     }

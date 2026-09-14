@@ -1,11 +1,12 @@
 package first.summoner.common.minion.minion;
 
+
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.Ellipse;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
+import first.lyra.common.attachmentEntity.Ellipse;
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionGoalSelector;
 import first.summoner.common.minion.minion.goal.bloodBat.BloodBatAttackGoal;
 import first.summoner.common.minion.minion.goal.bloodBat.BloodBatIdleGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -33,7 +34,7 @@ public class BloodBat extends Minion implements IEntityCollision<BloodBat> {
     }
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new BloodBatAttackGoal(this));
         goalSelector.addGoal(1, new BloodBatIdleGoal(this));
     }
@@ -48,7 +49,7 @@ public class BloodBat extends Minion implements IEntityCollision<BloodBat> {
         if (!prep) {
             return null;
         }
-        if (isTarget(getTarget())) {
+        if (getTarget() != null) {
             return getTarget();
         }
         return super.searchTarget();
@@ -61,7 +62,7 @@ public class BloodBat extends Minion implements IEntityCollision<BloodBat> {
 
     @Override
     public boolean canCollideAttack() {
-        return isTarget(getTarget());
+        return getTarget() != null;
     }
 
     @Override
@@ -107,9 +108,9 @@ public class BloodBat extends Minion implements IEntityCollision<BloodBat> {
      * 待机状态：环绕玩家（比附魔飞刀低一段距离），看向玩家看向的方向。
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
-        Player player = getOwner();
+        Player player = getOwner() instanceof Player owner ? owner : null;
         int total = Math.max(1, getSameSize());
-        int order = getSameOrder();
+        int order = getOrder();
         float angle = (player.tickCount + partialTick) * 0.05f + (order * Mth.TWO_PI / total);
         float radius = 1.2f;
 

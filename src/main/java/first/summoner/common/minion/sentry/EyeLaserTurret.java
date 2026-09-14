@@ -1,9 +1,10 @@
 package first.summoner.common.minion.sentry;
 
+import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityDamageSource;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.CustomLaser;
@@ -32,9 +33,6 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
 
     public EyeLaserTurret() {
         super(SummonerAttachmentEntityRegister.EYE_LASER_TURRET);
-        setGravity(-0.05f);
-        setDrag(0.9f);
-        setRotationSpeed(18f);
     }
 
     @Override
@@ -43,28 +41,30 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && getPos().distanceToSqr(owner.position()) <= 128 * 128;
+    }
+
+    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
-            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
-                setRemove();
-            }
             LivingEntity target = getTarget();
-            if (isTarget(target)) {
+            if (target != null) {
                 lookAtPos(target.getBoundingBox().getCenter());
-            } else if (owner != null && owner.getBoundingBox().getCenter().distanceTo(getPos()) < 2) {
+            } else if (owner.getBoundingBox().getCenter().distanceTo(getPos()) < 2) {
                 lookAtPos(owner.getEyePosition());
             }
         }
         if (!getLevel().isClientSide()) {
             LivingEntity target = getTarget();
-            if (isTarget(target)) {
+            if (target != null) {
                 updateLaser();
             } else if (laser != null) {
                 laser.setRemove();
                 laser = null;
             }
         }
-        super.tick();
     }
 
     /**
@@ -85,8 +85,9 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
         if (laser == null || laser.isRemove()) {
             chargeTicks = Math.max(chargeTicks - 1, 0);
             laser = new CustomLaser();
-            laser.copyDamageSource(this);
-            laser.setCurrentPathNode(new PathNode(pos, getYaw(), getPitch(), 0));
+            laser.setOwner(owner);
+            laser.init(new PathNode(pos, getYaw(), getPitch(), 0));
+            laser.copyAttributes(this);
             laser.setColor(0xFF6B6B);
             laser.setTickConsumer(l -> {
                 if (l.getDamageSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity().isRemove()) {
@@ -95,8 +96,7 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
             });
             laser.setHitConsumer((l, hitContexts) -> {
                 DamageSource source = getDamageSource();
-                if (source != null) {
-                    for (var hitContext : hitContexts) {
+                                for (var hitContext : hitContexts) {
                         InvincibleData.attack(hitContext.entity())
                                 .attacker(l.getUuid())
                                 .damageSource(source)
@@ -104,13 +104,8 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
                                 .invincibleTime(5)
                                 .apply();
                     }
-                }
             });
-            if (owner != null) {
-                laser.join(owner);
-            } else {
-                laser.join(getLevel());
-            }
+            LyraHelper.get(level).add(laser);
         } else {
             chargeTicks = Math.min(chargeTicks + 1, 60);
         }
@@ -163,14 +158,6 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
                 .speed(0.35)
                 .spread(Math.TAU)
                 .emit();
-    }
-
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        if (context.bottomSupported()) {
-            Vec3 v = getVelocity();
-            setVelocity(new Vec3(v.x(), 0, v.z()));
-        }
     }
 
     @Override

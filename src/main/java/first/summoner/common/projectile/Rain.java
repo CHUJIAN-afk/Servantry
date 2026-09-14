@@ -1,9 +1,7 @@
 package first.summoner.common.projectile;
 
-import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -17,8 +15,7 @@ public class Rain extends Projectile implements IBlockCollision<Rain>, IEntityCo
 
     public Rain(){
         super(SummonerAttachmentEntityRegister.RAIN);
-        setDrag(1f);
-        setMaxLife(400);
+        setMaxTickCount(400);
     }
 
     @Override
@@ -28,7 +25,6 @@ public class Rain extends Projectile implements IBlockCollision<Rain>, IEntityCo
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        currentPathNode = new PathNode(context.position(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
         setRemove();
     }
 
@@ -40,17 +36,10 @@ public class Rain extends Projectile implements IBlockCollision<Rain>, IEntityCo
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            for (HitContext hitContext : hitContexts) {
-                LivingEntity living = hitContext.entity();
-                InvincibleData.attack(living)
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .invincibleTime(20)
-                        .apply();
-                living.setRemainingFireTicks(0);
-            }
+        for (HitContext hitContext : hitContexts) {
+            LivingEntity living = hitContext.entity();
+            attack(living, getDamage(), 20);
+            living.setRemainingFireTicks(0);
         }
     }
 }

@@ -1,6 +1,8 @@
 package first.summoner.common.minion.sentry;
 
-import first.lyra.common.entity.IBlockCollision;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.sound.Playable;
 import first.summoner.common.projectile.BlitzBall;
@@ -28,8 +30,6 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
 
     public SuperPeashooter() {
         super(SummonerAttachmentEntityRegister.SUPER_PEASHOOTER);
-        setGravity(-0.05f);
-        setRotationSpeed(18f);
     }
 
     @Override
@@ -38,11 +38,14 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && getPos().distanceToSqr(owner.position()) <= 128 * 128;
+    }
+
+    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
-            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
-                setRemove();
-            }
             if (isTargetChange()) {
                 aiming = 0;
             }
@@ -51,17 +54,13 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
             }
             if (task != null) {
                 if (task.tick(this)) {
-                    if (owner != null) {
-                        Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), getPos(), owner.getSoundSource());
-                    } else {
-                        Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), getPos(), net.minecraft.sounds.SoundSource.PLAYERS);
-                    }
+                    Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), getPos(), getSoundSource());
                 } else {
                     task = null;
                 }
             }
             LivingEntity target = getTarget();
-            if (isTarget(target)) {
+            if (target != null) {
                 aiming++;
                 AABB box = target.getBoundingBox();
                 lookAtPos(box.getCenter());
@@ -75,16 +74,6 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
                     }
                 }
             }
-        }
-        super.tick();
-    }
-
-    // 落地清零向下加速度，防止重力持续堆积
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        if (context.bottomSupported()) {
-            Vec3 v = getVelocity();
-            setVelocity(new Vec3(v.x(), 0, v.z()));
         }
     }
 
@@ -141,10 +130,11 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
                 // 沿朝向错位起点，避免同 tick 多发重叠
                 Vec3 start = pos.add(dir.scale(i * 0.25));
                 BlitzBall projectile = new BlitzBall();
-                projectile.copyDamageSource(shooter);
-                projectile.setPos(start);
+                projectile.setOwner(shooter.getOwner());
+                projectile.init(new PathNode(start, dir));
+                projectile.copyAttributes(shooter);
                 projectile.setVelocity(dir);
-                projectile.join(shooter.getLevel());
+                LyraHelper.get(shooter.getLevel()).add(projectile);
                 firedShots++;
             }
             elapsedTicks++;

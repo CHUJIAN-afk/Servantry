@@ -1,7 +1,10 @@
 package first.summoner.register;
 
+
 import com.google.common.collect.ImmutableMultimap;
+import first.lyra.api.LyraHelper;
 import first.lyra.client.creativeTab.AnimBanner;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.creativeTab.Section;
 import first.lyra.register.LyraAttributeRegister;
 import first.lyra.register.LyraItemRegistries;
@@ -255,7 +258,7 @@ public class SummonerCurioRegister {
                             effects.add(SummonerMobEffectRegister.SoulMight);
                             effects.add(SummonerMobEffectRegister.SoulDefense);
                             effects.add(SummonerMobEffectRegister.SoulRecovery);
-                            RandomSource random = owner.getRandom();
+                            RandomSource random = minion.getRandom();
                             owner.addEffect(new MobEffectInstance(effects.get(random.nextInt(effects.size())), 60));
                         }
                     })
@@ -280,7 +283,7 @@ public class SummonerCurioRegister {
                             effects.add(SummonerMobEffectRegister.HallowedMight);
                             effects.add(SummonerMobEffectRegister.HallowedGrace);
                             effects.add(SummonerMobEffectRegister.HallowedRadiance);
-                            RandomSource random = owner.getRandom();
+                            RandomSource random = minion.getRandom();
                             owner.addEffect(new MobEffectInstance(effects.get(random.nextInt(effects.size())), 60));
                         }
                     })
@@ -305,7 +308,7 @@ public class SummonerCurioRegister {
                         effects.add(SummonerMobEffectRegister.PhantasmalMight);
                         effects.add(SummonerMobEffectRegister.PhantasmalBulwark);
                         effects.add(SummonerMobEffectRegister.PhantasmalRebirth);
-                        RandomSource random = owner.getRandom();
+                        RandomSource random = minion.getRandom();
                         owner.addEffect(new MobEffectInstance(effects.get(random.nextInt(effects.size())), 60));
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))
@@ -364,17 +367,16 @@ public class SummonerCurioRegister {
      */
     public static final DeferredItem<CurioItem> StardustFragment = REGISTRIES.build("stardust_fragment", (location) -> CurioItem.builder()
                     .onPostDamage((minion, owner, target, damageSource) -> {
-                        if (owner.getRandom().nextFloat() < 0.05f) {
+                        if (minion.getRandom().nextFloat() < 0.05f) {
                             Vec3 startPos = minion.getPos();
+                            Vec3 direction = startPos.offsetRandom(minion.getRandom(), 1).subtract(startPos).normalize();
                             MiniStardustCell projectile = new MiniStardustCell();
-                            projectile.copyDamageSource(minion);
-                            projectile.setPos(startPos);
-                            projectile.setVelocity(startPos.offsetRandom(owner.getRandom(), 1)
-                                                           .subtract(startPos)
-                                                           .normalize()
-                                                           .scale(0.25f));
+                            projectile.setOwner(owner);
+                            projectile.init(new PathNode(startPos, direction));
+                            projectile.copyAttributes(minion);
+                            projectile.setVelocity(direction.scale(0.25f));
                             projectile.setChaseTarget(target);
-                            projectile.join(owner);
+                            LyraHelper.get(owner.level()).add(projectile);
                         }
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))

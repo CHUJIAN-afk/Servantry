@@ -8,7 +8,7 @@ import first.lyra.client.render.rendererHelper.LaserRendererHelper;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.client.render.virtual.VirtualEntityPose;
 import first.lyra.client.render.virtual.VirtualEntityRenderer;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.master.DoomsdayStar;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;

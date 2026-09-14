@@ -7,7 +7,7 @@ import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.client.render.trail.RibbonTrailConfig;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.Terraprism;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;

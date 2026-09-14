@@ -30,7 +30,7 @@ public class DataGeneratorEvent {
         DatapackBuiltinEntriesProvider enchantmentEntriesProvider = new DatapackBuiltinEntriesProvider(packOutput, lookupProvider, new RegistrySetBuilder().add(Registries.ENCHANTMENT, SummonerEnchantmentRegister::bootstrap), Set.of(Summoner.MODID));
         generator.addProvider(event.includeServer(), enchantmentEntriesProvider);
         CompletableFuture<HolderLookup.Provider> registryProvider = enchantmentEntriesProvider.getRegistryProvider();
-        generator.addProvider(event.includeServer(), new SummonerEnchantmentTagsProvider(packOutput, registryProvider, Summoner.MODID, existingFileHelper));
+        generator.addProvider(event.includeServer(), new SummonerEnchantmentTagsProvider(packOutput, registryProvider, existingFileHelper));
         generator.addProvider(event.includeServer(), new SummonerCuriosDataProvider(packOutput, existingFileHelper, lookupProvider));
     }
 }

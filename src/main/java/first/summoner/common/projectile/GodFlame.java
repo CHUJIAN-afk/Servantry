@@ -1,7 +1,7 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -18,14 +18,13 @@ public class GodFlame extends Projectile implements IEntityCollision<GodFlame> {
     public GodFlame() {
         super(SummonerAttachmentEntityRegister.GOD_FLAME);
         setDrag(1);
-        setMaxLife(34);
+        setMaxTickCount(34);
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            for (HitContext hitContext : hitContexts) {
+                for (HitContext hitContext : hitContexts) {
                 InvincibleData.attack(hitContext.entity())
                         .attacker(getUuid())
                         .damageSource(source)
@@ -33,7 +32,6 @@ public class GodFlame extends Projectile implements IEntityCollision<GodFlame> {
                         .invincibleTime(20)
                         .apply();
             }
-        }
     }
 
     @Override

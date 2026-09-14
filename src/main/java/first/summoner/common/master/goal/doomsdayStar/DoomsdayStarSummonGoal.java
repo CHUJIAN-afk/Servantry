@@ -22,7 +22,7 @@ public class DoomsdayStarSummonGoal extends DoomsdayStarGoal {
     @Override
     public void tick() {
         if (!landed) {
-            doomsdayStar.applyForce(new Vec3(0, -0.1, 0));
+            doomsdayStar.addVelocity(new Vec3(0, -0.1, 0));
             if (doomsdayStar.onGround()) {
                 landed = true;
                 doomsdayStar.setFallLaserIndicatorRender(false);

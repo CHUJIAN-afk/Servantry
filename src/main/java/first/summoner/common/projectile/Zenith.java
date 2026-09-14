@@ -1,10 +1,11 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.Ellipse;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.entity.SyncFieldDispatcher;
+import first.lyra.common.attachmentEntity.Ellipse;
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.lyra.utils.LyraStreamCodecs;
@@ -31,7 +32,7 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
 
     public Zenith() {
         super(SummonerAttachmentEntityRegister.ZENITH);
-        setMaxLife(-1);
+        setMaxTickCount(-1);
     }
 
     @Override
@@ -45,6 +46,7 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             updateDirection(chaseTarget, 1);
             setCurrentPathNode(getNode(progress, 1));
@@ -74,7 +76,6 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
         }
         lastProgress = progress;
         progress = Math.min(progress + (float) 1 / 14, 1);
-        super.tick();
     }
 
     public void updateDirection(LivingEntity chaseTarget, float partialTick) {
@@ -103,7 +104,7 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
     }
 
     @Override
-    protected void tickPhysics() {
+    public void tickPhysics() {
     }
 
     @Override
@@ -126,8 +127,7 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            for (HitContext hit : hitContexts) {
+                for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
                 InvincibleData.attack(living)
                         .attacker(getUuid())
@@ -136,6 +136,5 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
                         .invincibleTime(2)
                         .apply();
             }
-        }
     }
 }

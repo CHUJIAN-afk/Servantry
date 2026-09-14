@@ -1,9 +1,12 @@
 package first.summoner.common.minion.minion.goal.voidEater;
 
+
+import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityDamageSource;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.MinionGoal;
+import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.sound.Playable;
 import first.summoner.common.minion.minion.VoidEater;
@@ -11,6 +14,7 @@ import first.summoner.common.projectile.CustomLaser;
 import first.summoner.common.projectile.GodFlame;
 import first.summoner.register.SummonerSoundRegister;
 import first.summoner.utils.ParticleHelper;
+import first.summoner.utils.Utils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,7 +25,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * 虚空吞噬者攻击目标。
  */
-public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
+public class VoidEaterAttackGoal extends AttachmentEntityGoal<VoidEater> {
 
     private CustomLaser laser = null;
     private AttackMode mode = AttackMode.GOD_DASH;
@@ -35,7 +39,7 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
 
     @Override
     public boolean canUse() {
-        return minion.isHead() && minion.isTarget(minion.getTarget());
+        return minion.isHead() && minion.getTarget() != null;
     }
 
     @Override
@@ -52,7 +56,7 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
     private void tickGodDash(Vec3 targetPos) {
         if (approaching) {
             if (prepPos.equals(Vec3.ZERO)) {
-                prepPos = minion.getWanderPos(prepPos, targetPos, 8, 0);
+                prepPos = Utils.getWanderPos(minion, prepPos, targetPos, 8, 0);
             }
             minion.orbitToward(prepPos, 120f, 0.4f);
             if (minion.getPos().distanceTo(prepPos) < 1) {
@@ -76,7 +80,7 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
         if (approaching) {
             if (prepPos.equals(Vec3.ZERO)) {
                 do {
-                    prepPos = minion.getWanderPos(prepPos, targetPos, 16, 0);
+                    prepPos = Utils.getWanderPos(minion, prepPos, targetPos, 16, 0);
                 } while (prepPos.distanceTo(minion.getPos()) < 8);
             }
             minion.orbitToward(prepPos, 120f, 0.4f);
@@ -85,30 +89,23 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
                 prepPos = Vec3.ZERO;
             }
         } else {
-            Player owner = minion.getOwner();
+            Player owner = minion.getOwner() instanceof Player player ? player : null;
             Level level = minion.getLevel();
             if (minion.getTickCount() % 5 == 0) {
                 double dot = minion.getLookAngle().dot(targetPos.subtract(minion.getPos()).normalize());
                 if (dot > 0 && Math.acos((float) Math.min(1, dot)) < Mth.DEG_TO_RAD * 30) {
                     Vec3 start = minion.getPos();
-                    if (owner != null) {
-                        Playable.play(SummonerSoundRegister.Laser, level, start, owner.getSoundSource());
-                    } else {
-                        Playable.play(SummonerSoundRegister.Laser, level, start, net.minecraft.sounds.SoundSource.PLAYERS);
-                    }
                     for (int i = 0; i < 9; i++) {
                         Vec3 direction = targetPos.offsetRandom(level.getRandom(), 2f).subtract(minion.getPos()).normalize();
                         GodFlame projectile = new GodFlame();
-                        projectile.copyDamageSource(minion);
-                        projectile.setPos(start);
+                        projectile.setOwner(minion.getOwner());
+                        projectile.init(new PathNode(start, direction));
+                        projectile.copyAttributes(minion);
                         projectile.setVelocity(direction.scale(3));
                         projectile.setDamage(minion.getDamage() * 0.5f);
-                        if (owner != null) {
-                            projectile.join(owner);
-                        } else {
-                            projectile.join(level);
-                        }
+                        LyraHelper.get(level).add(projectile);
                     }
+                    Playable.play(SummonerSoundRegister.Laser, level, start, minion.getSoundSource());
                 }
             }
             minion.orbitToward(targetPos, 120f, 0.25f, false);
@@ -127,7 +124,7 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
         Vec3 pos = minion.getPos();
         if (approaching) {
             if (prepPos.equals(Vec3.ZERO)) {
-                prepPos = minion.getWanderPos(prepPos, targetPos, 16, 2);
+                prepPos = Utils.getWanderPos(minion, prepPos, targetPos, 16, 2);
             }
             minion.orbitToward(prepPos, 120f, 0.4f);
             if (pos.distanceTo(prepPos) < 3) {
@@ -137,17 +134,13 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
         } else {
             if (laser == null || laser.isRemove()) {
                 laser = new CustomLaser();
-                laser.copyDamageSource(minion);
-                laser.setCurrentPathNode(minion.getCurrentPathNode());
+                laser.setOwner(minion.getOwner());
+                laser.init(minion.getCurrentPathNode());
+                laser.copyAttributes(minion);
                 laser.setColor(0x6f19d4);
                 laser.setDamage(minion.getDamage() * 2);
-                Player owner = minion.getOwner();
                 Level level = minion.getLevel();
-                if (owner != null) {
-                    laser.join(owner);
-                } else {
-                    laser.join(level);
-                }
+                LyraHelper.get(level).add(laser);
                 laser.setTickConsumer(laserProjectile -> {
                     if (laserProjectile.getDamageSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity().isRemove()) {
                         laserProjectile.setRemove();
@@ -167,8 +160,7 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
                 });
                 laser.setHitConsumer((laserProjectile, hitContexts) -> {
                     DamageSource source = laserProjectile.getDamageSource();
-                    if (source != null) {
-                        for (IEntityCollision.HitContext hitContext : hitContexts) {
+                                        for (IEntityCollision.HitContext hitContext : hitContexts) {
                             LivingEntity living = hitContext.entity();
                             InvincibleData.attack(living)
                                     .attacker(laserProjectile.getUuid())
@@ -198,7 +190,6 @@ public class VoidEaterAttackGoal extends MinionGoal<VoidEater> {
                                     .spread(2)
                                     .emit();
                         }
-                    }
                 });
             }
             ParticleHelper.create(minion.getLevel())

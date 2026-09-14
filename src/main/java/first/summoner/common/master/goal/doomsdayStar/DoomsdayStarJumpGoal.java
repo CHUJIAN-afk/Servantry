@@ -1,6 +1,6 @@
 package first.summoner.common.master.goal.doomsdayStar;
 
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.master.DoomsdayStar;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;

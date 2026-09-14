@@ -1,6 +1,7 @@
 package first.summoner.common.minion.minion.goal.enchantedThrowingKnives;
 
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.summoner.common.minion.minion.EnchantedThrowingKnives;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -8,7 +9,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * 附魔飞刀攻击目标。
  */
-public class EnchantedThrowingKnivesAttackGoal extends MinionGoal<EnchantedThrowingKnives> {
+public class EnchantedThrowingKnivesAttackGoal extends AttachmentEntityGoal<EnchantedThrowingKnives> {
 
     /**
      * 上一次记录的目标位置，用于位置修正
@@ -23,7 +24,7 @@ public class EnchantedThrowingKnivesAttackGoal extends MinionGoal<EnchantedThrow
 
     @Override
     public boolean canUse() {
-        return minion.isTarget(minion.getTarget());
+        return minion.getTarget() != null;
     }
 
     @Override
@@ -38,7 +39,7 @@ public class EnchantedThrowingKnivesAttackGoal extends MinionGoal<EnchantedThrow
         if (minion.isTargetChange() || progress >= 1) {
             refreshTarget(target);
         }
-        progress += 0.1f + target.getRandom().nextFloat() * 0.1f;
+        progress += 0.2f + minion.getRandom().nextFloat() * 0.1f;
         Vec3 currentNormal = minion.getCurrentNormal();
         minion.setCurrentPathNode(
                 minion.getEulerNode(
@@ -50,7 +51,7 @@ public class EnchantedThrowingKnivesAttackGoal extends MinionGoal<EnchantedThrow
 
     private void refreshTarget(LivingEntity target) {
         startPos = minion.getPos();
-        Vec3 center = target.getBoundingBox().getCenter().offsetRandom(target.getRandom(), 0.5f);
+        Vec3 center = target.getBoundingBox().getCenter().offsetRandom(minion.getRandom(), 0.5f);
         endPos = center.add(center.subtract(startPos).normalize().scale(2));
         progress = 0;
     }

@@ -1,6 +1,6 @@
 package first.summoner.mixin;
 
-import first.lyra.common.entity.AttachmentEntityDamageSource;
+import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.summoner.common.minion.minion.InfiniteShadow;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;

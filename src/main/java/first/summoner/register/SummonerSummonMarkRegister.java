@@ -1,10 +1,12 @@
 package first.summoner.register;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.attachmentEntity.AttachmentEntity;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.minion.Minion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
-import first.lyra.register.LyraDamageRegister;
 import first.summoner.Summoner;
 import first.summoner.common.projectile.Meteor;
 import first.summoner.common.projectile.Petal;
@@ -13,11 +15,9 @@ import first.summoner.common.summonMark.SummonMarkType;
 import first.summoner.common.summonMark.SummonMarkTypeBuild;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -35,7 +35,7 @@ public class SummonerSummonMarkRegister {
     public static final DeferredHolder<SummonMarkType, SummonMarkType> FoodChain = Register.register("food_chain", ResourceLocation -> new SummonMarkTypeBuild(ResourceLocation)
             .damage(0.2f)
             .onDamage((mark, target, source, damage) -> {
-                Player owner = source.getAttachmentEntity().getOwner();
+                LivingEntity owner = source.getAttachmentEntity() instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                 if (owner != null) {
                     owner.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60, 0));
                 }
@@ -75,20 +75,17 @@ public class SummonerSummonMarkRegister {
             .onDamage((data, target, source, damage) -> {
                 if (data.usePower(30)) {
                     AttachmentEntity minion = source.getAttachmentEntity();
-                    Player owner = source.getAttachmentEntity().getOwner();
-                    RandomSource random = owner != null ? owner.getRandom() : target.getRandom();
+                    LivingEntity owner = source.getAttachmentEntity() instanceof Minion minionOwner ? minionOwner.getOwner() : null;
+                    RandomSource random = minion.getRandom();
                     Vec3 pos = target.position().add(0, 8, 0).offsetRandom(random, 3);
                     Vec3 dir = target.position().add(0, 0.5f, 0).subtract(pos).normalize();
                     Meteor meteor = new Meteor();
-                    meteor.setDamageSourceSupplier((sourceLevel, sourceOwner) -> source);
-                    meteor.setPos(pos);
+                    meteor.setOwner(owner);
+                    meteor.init(new PathNode(pos, dir));
+                    meteor.copyAttributes(minion);
                     meteor.setVelocity(dir);
                     meteor.setDamage(damage * 1.33f);
-                    if (owner != null) {
-                        meteor.join(owner);
-                    } else {
-                        meteor.join(minion.getLevel());
-                    }
+                    LyraHelper.get(minion.getLevel()).add(meteor);
                 }
             })
             .build());
@@ -97,9 +94,9 @@ public class SummonerSummonMarkRegister {
     public static final DeferredHolder<SummonMarkType, SummonMarkType> Bramble = Register.register("bramble", ResourceLocation -> new SummonMarkTypeBuild(ResourceLocation)
             .damage(0.6f)
             .onDamage((mark, target, source, damage) -> {
-                Player owner = source.getAttachmentEntity().getOwner();
+                LivingEntity owner = source.getAttachmentEntity() instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                 if (owner != null) {
-                    owner.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40 + target.getRandom().nextInt(41), 0));
+                    owner.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 40 + source.getAttachmentEntity().getRandom().nextInt(41), 0));
                 }
                 target.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 0));
                 target.addEffect(new MobEffectInstance(MobEffects.WITHER, 60, 0));
@@ -110,7 +107,7 @@ public class SummonerSummonMarkRegister {
     public static final DeferredHolder<SummonMarkType, SummonMarkType> Vein = Register.register("vein", ResourceLocation -> new SummonMarkTypeBuild(ResourceLocation)
             .damage(0.5f)
             .onKill((target, source) -> {
-                Player owner = source.getAttachmentEntity().getOwner();
+                LivingEntity owner = source.getAttachmentEntity() instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                 if (owner != null) {
                     float missing = owner.getMaxHealth() - owner.getHealth();
                     owner.heal(Math.min(8, missing * 0.12f));
@@ -162,7 +159,7 @@ public class SummonerSummonMarkRegister {
                             )
                             .pos(pos)
                             .offset(0.25)
-                            .velocity(pos.offsetRandom(target.getRandom(), 5).subtract(pos).normalize())
+                            .velocity(pos.offsetRandom(minion.getRandom(), 5).subtract(pos).normalize())
                             .count(200)
                             .speed(0.75)
                             .spread(Math.TAU)
@@ -200,25 +197,22 @@ public class SummonerSummonMarkRegister {
             .onDamage((mark, target, source, damage) -> {
                 if (mark.usePower(30)) {
                     AttachmentEntity minion = source.getAttachmentEntity();
-                    Player owner = minion.getOwner();
+                    LivingEntity owner = minion instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                     Vec3 pos = target.getBoundingBox().getCenter();
-                    RandomSource random = target.getRandom();
+                    RandomSource random = minion.getRandom();
                     int count = 3 + random.nextInt(4);
                     for (int i = 0; i < count; i++) {
                         Vec3 direction = pos.offsetRandom(random, 5).subtract(pos).normalize();
                         Petal petal = new Petal();
-                        petal.setDamageSourceSupplier((level, player) -> new DamageSource(LyraDamageRegister.getDamageTypeHolder(LyraDamageRegister.Summon, level), null, player, minion.getPos()));
-                        petal.setPos(pos);
+                        petal.setOwner(owner);
+                        petal.init(new PathNode(pos, direction));
+                        petal.copyAttributes(minion);
                         petal.setVelocity(direction);
                         petal.setDamage(damage * 2.25f / count);
                         petal.setArmorPierce(50);
                         petal.setKnockback(0);
                         petal.setChaseDelay(7 + random.nextInt(7));
-                        if (owner != null) {
-                            petal.join(owner);
-                        } else {
-                            petal.join(minion.getLevel());
-                        }
+                        LyraHelper.get(minion.getLevel()).add(petal);
                     }
                 }
             })
@@ -231,25 +225,21 @@ public class SummonerSummonMarkRegister {
             .onDamage((mark, target, source, damage) -> {
                 if (mark.usePower(10)) {
                     AttachmentEntity minion = source.getAttachmentEntity();
-                    Player owner = minion.getOwner();
+                    LivingEntity owner = minion instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                     RandomSource random = minion.getRandom();
                     for (int i = 0; i < 9; i++) {
                         Vec3 pos = target.getBoundingBox().getCenter().offsetRandom(random, 10);
                         Vec3 dir = pos.subtract(pos.offsetRandom(random, 10)).normalize();
-                        DamageSource damageSource = new DamageSource(LyraDamageRegister.getDamageTypeHolder(LyraDamageRegister.Summon, minion.getLevel()), null, owner, minion.getPos());
                         ShatteredStellarCore core = new ShatteredStellarCore();
-                        core.setDamageSourceSupplier((sourceLevel, sourceOwner) -> damageSource);
-                        core.setPos(pos);
+                        core.setOwner(owner);
+                        core.init(new PathNode(pos, dir));
+                        core.copyAttributes(minion);
                         core.setVelocity(dir);
                         core.setTickCount(15);
                         core.setDamage(damage * 0.2f);
                         core.setArmorPierce(50);
                         core.setChaseTarget(target);
-                        if (owner != null) {
-                            core.join(owner);
-                        } else {
-                            core.join(minion.getLevel());
-                        }
+                        LyraHelper.get(minion.getLevel()).add(core);
                     }
                 }
             })
@@ -282,25 +272,21 @@ public class SummonerSummonMarkRegister {
             .onDamage((mark, target, source, damage) -> {
                 if (mark.usePower(30)) {
                     AttachmentEntity minion = source.getAttachmentEntity();
-                    Player owner = minion.getOwner();
-                    RandomSource random = owner != null ? owner.getRandom() : target.getRandom();
+                    LivingEntity owner = minion instanceof Minion minionOwner ? minionOwner.getOwner() : null;
+                    RandomSource random = minion.getRandom();
                     for (int i = 0; i < 6; i++) {
                         Vec3 pos = target.getBoundingBox().getCenter().offsetRandom(random, 5);
                         Vec3 dir = pos.subtract(pos.offsetRandom(random, 5)).normalize();
-                        DamageSource damageSource = new DamageSource(LyraDamageRegister.getDamageTypeHolder(LyraDamageRegister.Summon, minion.getLevel()), null, owner, minion.getPos());
                         ShatteredStellarCore core = new ShatteredStellarCore();
-                        core.setDamageSourceSupplier((sourceLevel, sourceOwner) -> damageSource);
-                        core.setPos(pos);
+                        core.setOwner(owner);
+                        core.init(new PathNode(pos, dir));
+                        core.copyAttributes(minion);
                         core.setVelocity(dir);
                         core.setDamage(damage * 0.3f);
                         core.setArmorPierce(minion.getArmorPierce());
                         core.setKnockback(minion.getKnockback());
                         core.setChaseTarget(target);
-                        if (owner != null) {
-                            core.join(owner);
-                        } else {
-                            core.join(minion.getLevel());
-                        }
+                        LyraHelper.get(minion.getLevel()).add(core);
                     }
                 }
             })
@@ -332,7 +318,7 @@ public class SummonerSummonMarkRegister {
                             )
                             .pos(center)
                             .offset(0.15)
-                            .velocity(center.offsetRandom(target.getRandom(), 5).subtract(center).normalize())
+                            .velocity(center.offsetRandom(minion.getRandom(), 5).subtract(center).normalize())
                             .count(160)
                             .speed(0.55)
                             .spread(Math.TAU)
@@ -442,7 +428,7 @@ public class SummonerSummonMarkRegister {
                         )
                         .pos(center)
                         .offset(0.15)
-                        .velocity(center.offsetRandom(target.getRandom(), 5).subtract(center).normalize())
+                        .velocity(center.offsetRandom(minion.getRandom(), 5).subtract(center).normalize())
                         .count(160)
                         .speed(0.55)
                         .spread(Math.TAU)
@@ -453,7 +439,7 @@ public class SummonerSummonMarkRegister {
     /** 天使 - 命中时生命不满则消耗20标记能量，恢复5%已损生命值+2点（最多10点） */
     public static final DeferredHolder<SummonMarkType, SummonMarkType> Angel = Register.register("angel", ResourceLocation -> new SummonMarkTypeBuild(ResourceLocation)
             .onDamage((mark, target, source, damage) -> {
-                Player owner = source.getAttachmentEntity().getOwner();
+                LivingEntity owner = source.getAttachmentEntity() instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                 if (owner != null) {
                     float missing = owner.getMaxHealth() - owner.getHealth();
                     if (missing > 0 && mark.usePower(20)) {

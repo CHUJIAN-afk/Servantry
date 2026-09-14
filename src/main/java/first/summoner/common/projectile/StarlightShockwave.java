@@ -1,7 +1,7 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -18,7 +18,7 @@ public class StarlightShockwave extends Projectile implements IEntityCollision<S
         super(SummonerAttachmentEntityRegister.STARLIGHT_SHOCKWAVE);
         setDrag(1.0F);
         setGravity(0.0F);
-        setMaxLife(200);
+        setMaxTickCount(200);
     }
 
     @Override

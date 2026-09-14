@@ -1,8 +1,8 @@
 package first.summoner.common.projectile;
 
-import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
+
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -26,8 +26,8 @@ public class ImpFireball extends Projectile implements IEntityCollision<ImpFireb
     public ImpFireball() {
         super(SummonerAttachmentEntityRegister.IMP_FIREBALL);
         setDrag(1.0f);
-        setMaxLife(50);
         setGravity(0);
+        setMaxTickCount(50);
     }
 
     @Override
@@ -56,26 +56,16 @@ public class ImpFireball extends Projectile implements IEntityCollision<ImpFireb
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            for (HitContext hit : hitContexts) {
-                if (hitCount >= 4) {
-                    setCurrentPathNode(getCollisionAfterPathNode(hit.hitPoint(), getCurrentPathNode()));
-                    setRemove();
-                    return;
-                }
-                LivingEntity living = hit.entity();
-                boolean applied = InvincibleData.attack(living)
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .invincibleTime(2)
-                        .global()
-                        .apply();
-                if (applied) {
-                    living.igniteForTicks(60);
-                    hitCount++;
-                }
+        for (HitContext hit : hitContexts) {
+            if (hitCount >= 4) {
+                setCurrentPathNode(getCurrentPathNode().modifyPos(hit.hitPoint()));
+                setRemove();
+                return;
             }
+            LivingEntity living = hit.entity();
+            attack(living, getDamage(), 2);
+            living.igniteForTicks(60);
+            hitCount++;
         }
     }
 

@@ -1,7 +1,9 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.minion.MinionGoalSelector;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.sound.Playable;
@@ -24,19 +26,18 @@ public class Imp extends MomentumMinion implements IBlockCollision<Imp> {
 
     public Imp() {
         super(SummonerAttachmentEntityRegister.IMP);
-        setDrag(0.75f);
         setGravity(0);
-        setRotationSpeed(10f);
     }
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new ImpAttackGoal(this));
         goalSelector.addGoal(1, new MomentumMinionIdleGoal(this, 4, 0.02f, 48, true));
     }
 
     @Override
     public void tick() {
+        super.tick();
         Level level = getLevel();
         if (!level.isClientSide()){
             ParticleHelper.create(level)
@@ -54,7 +55,6 @@ public class Imp extends MomentumMinion implements IBlockCollision<Imp> {
                     .offset(0.2)
                     .emit();
         }
-        super.tick();
     }
 
     @Override
@@ -82,16 +82,12 @@ public class Imp extends MomentumMinion implements IBlockCollision<Imp> {
         Vec3 direction = targetCenter.subtract(start).normalize();
 
         ImpFireball fireball = new ImpFireball();
-        fireball.copyDamageSource(this);
-        fireball.setPos(start.add(direction.scale(-1)));
+        fireball.setOwner(owner);
+        fireball.init(new PathNode(start, direction));
+        fireball.copyAttributes(this);
         fireball.setVelocity(direction);
-        if (owner != null) {
-            fireball.join(owner);
-            Playable.play(SummonerSoundRegister.ImpFire, getLevel(), start, owner.getSoundSource());
-        } else {
-            fireball.join(getLevel());
-            Playable.play(SummonerSoundRegister.ImpFire, getLevel(), start, net.minecraft.sounds.SoundSource.PLAYERS);
-        }
+        LyraHelper.get(level).add(fireball);
+        Playable.play(SummonerSoundRegister.ImpFire, level, start, getSoundSource());
     }
 
     public int getFireballCooldown() {

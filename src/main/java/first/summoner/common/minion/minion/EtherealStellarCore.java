@@ -1,6 +1,9 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.common.entity.PathNode;
+
+
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.ShatteredStellarCore;
@@ -22,17 +25,17 @@ public class EtherealStellarCore extends Minion {
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             if (shootCooldown > 0) {
                 shootCooldown--;
             }
             LivingEntity target = getTarget();
-            if (getShootCooldown() <= 0 && isTarget(target)) {
+            if (getShootCooldown() <= 0 && target != null) {
                 shootTarget(target);
             }
             setCurrentPathNode(getInterpolatedIdleState(1f));
         }
-        super.tick();
     }
 
     public void shootTarget(LivingEntity target) {
@@ -42,12 +45,14 @@ public class EtherealStellarCore extends Minion {
         for (int i = 0; i < count; i++) {
             Vec3 start = getPos();
             Vec3 direction = start.offsetRandom(random, 2f).subtract(start).normalize();
+            Vec3 spawnPos = start.add(direction.scale(-0.75));
             ShatteredStellarCore projectile = new ShatteredStellarCore();
-            projectile.copyDamageSource(this);
-            projectile.setPos(start.add(direction.scale(-0.75)));
+            projectile.setOwner(owner);
+            projectile.init(new PathNode(spawnPos, direction));
+            projectile.copyAttributes(this);
             projectile.setVelocity(direction.scale(0.5f));
             projectile.setChaseTarget(target);
-            projectile.join(getLevel());
+            LyraHelper.get(getLevel()).add(projectile);
             GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                              .centerColor(0x2fb2e1)
                              .edgeColor(0x33ccff);
@@ -88,11 +93,11 @@ public class EtherealStellarCore extends Minion {
      * 计算环绕位置，保持当前朝向不变。
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
-        Player owner = getOwner();
+        Player owner = getOwner() instanceof Player player ? player : null;
         PathNode node = getCurrentPathNode();
         if (owner != null) {
             int total = Math.max(1, getSameSize());
-            int order = getSameOrder();
+            int order = getOrder();
             float angle = (owner.tickCount + partialTick) * 0.02f + (order * Mth.TWO_PI / total);
             float radius = 1.5f;
 

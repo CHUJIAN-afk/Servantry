@@ -1,10 +1,11 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.lyra.common.sound.Playable;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -29,7 +30,7 @@ public class Corn extends Projectile implements IEntityCollision<Corn>, IBlockCo
     public Corn() {
         super(SummonerAttachmentEntityRegister.CORN);
         setDrag(0.99f);
-        setMaxLife(200);
+        setMaxTickCount(200);
         setGravity(-0.05f);
     }
 
@@ -55,7 +56,7 @@ public class Corn extends Projectile implements IEntityCollision<Corn>, IBlockCo
         // 通过TargetCache获取附近实体
         LyraHelper helper = LyraHelper.get(getLevel());
         TargetCache targetCache = helper.getTargetCache();
-        List<LivingEntity> nearbyEntities = targetCache.getEntitiesInRadius(explosionPos, AOE_RADIUS, this::isTarget);
+        List<LivingEntity> nearbyEntities = targetCache.getEntitiesInRadius(explosionPos, AOE_RADIUS, living -> targetCache.isTarget(owner, living));
         for (LivingEntity entity : nearbyEntities) {
             InvincibleData.attack(entity)
                     .attacker(getUuid())

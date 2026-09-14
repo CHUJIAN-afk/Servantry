@@ -1,9 +1,8 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -21,7 +20,8 @@ public class Laser extends Projectile implements IEntityCollision<Laser>, IBlock
     public Laser() {
         super(SummonerAttachmentEntityRegister.LASER);
         setDrag(1);
-        setMaxLife(34);
+        setGravity(0);
+        setMaxTickCount(34);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class Laser extends Projectile implements IEntityCollision<Laser>, IBlock
                 .damageAmount(getDamage())
                 .apply();
         target.setRemainingFireTicks(Math.min(target.getRemainingFireTicks() + 20, 120));
-        currentPathNode = new PathNode(hit.hitPoint(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        currentPathNode = currentPathNode.modifyPos(hit.hitPoint());
         setRemove();
     }
 
@@ -51,7 +51,7 @@ public class Laser extends Projectile implements IEntityCollision<Laser>, IBlock
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        currentPathNode = new PathNode(context.position(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        currentPathNode = currentPathNode.modifyPos(context.position());
         setRemove();
     }
 }

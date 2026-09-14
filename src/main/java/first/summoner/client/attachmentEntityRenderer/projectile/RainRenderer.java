@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.rendererHelper.LaserRendererHelper;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.projectile.Rain;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.AABB;

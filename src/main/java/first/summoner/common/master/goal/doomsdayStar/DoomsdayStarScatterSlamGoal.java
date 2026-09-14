@@ -1,6 +1,6 @@
 package first.summoner.common.master.goal.doomsdayStar;
 
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.master.DoomsdayStar;
 import first.summoner.common.projectile.MeltdownStar;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,7 +39,7 @@ public class DoomsdayStarScatterSlamGoal extends DoomsdayStarGoal {
             if (doomsdayStar.getVelocity().y() < 0.0D) {
                 doomsdayStar.setVelocity(doomsdayStar.getVelocity().scale(0.9));
                 if (doomsdayStar.getVelocity().y() < -0.2D) {
-                    doomsdayStar.applyForce(new Vec3(0.0D, -0.1D, 0.0D));
+                    doomsdayStar.addVelocity(new Vec3(0.0D, -0.1D, 0.0D));
                     for (MeltdownStar star : orbitingStars) {
                         star.launch();
                     }

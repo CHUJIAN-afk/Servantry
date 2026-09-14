@@ -4,6 +4,7 @@ import first.summoner.common.attachment.CurioData;
 import first.summoner.common.item.CurioItem;
 import first.summoner.register.SummonerAttachmentRegister;
 import net.minecraft.world.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 
 import java.util.Set;
@@ -22,8 +23,11 @@ public class CuriosUtil {
         }
     }
 
-    public static boolean isEquipped(LivingEntity livingEntity, CurioItem curioItem) {
-        return livingEntity.getData(SummonerAttachmentRegister.CurioData).isEquipped(curioItem);
+    public static boolean isEquipped(@Nullable LivingEntity livingEntity, CurioItem curioItem) {
+        if (livingEntity != null) {
+            return livingEntity.getData(SummonerAttachmentRegister.CurioData).isEquipped(curioItem);
+        }
+        return false;
     }
 
     public static Set<CurioItem> getCuriosItemList(LivingEntity livingEntity) {

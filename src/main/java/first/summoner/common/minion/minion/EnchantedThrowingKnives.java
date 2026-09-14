@@ -1,20 +1,20 @@
 package first.summoner.common.minion.minion;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.entity.SyncFieldDispatcher;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionGoalSelector;
 import first.summoner.common.minion.minion.goal.enchantedThrowingKnives.EnchantedThrowingKnivesAttackGoal;
 import first.summoner.common.minion.minion.goal.enchantedThrowingKnives.EnchantedThrowingKnivesIdleGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +53,7 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
     // ===================== AI 目标注册 =====================
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new EnchantedThrowingKnivesAttackGoal(this));
         goalSelector.addGoal(1, new EnchantedThrowingKnivesIdleGoal(this));
     }
@@ -67,7 +67,7 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
 
     @Override
     public boolean canCollideAttack() {
-        return isTarget(getTarget());
+        return getTarget() != null;
     }
 
     @Override
@@ -86,6 +86,7 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             // 空闲混合系数更新
             idleBlendO = idleBlend;
@@ -95,7 +96,6 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
                 idleBlend = Math.max(0.0f, idleBlend - 0.1f);
             }
         }
-        super.tick();
     }
 
     @Override
@@ -104,7 +104,7 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
         if (distance > 0) {
             LyraHelper helper = LyraHelper.get(getLevel());
             TargetCache targetCache = helper.getTargetCache();
-            List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), targetCache.getSummonSearchRange(this.getOwner(), (float) distance), (living) -> (attacking || targetCache.isVisibility(this, living)) && this.isTarget(living));
+            List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), (float) distance, (living) -> (attacking || (targetCache.isVisibility(owner, living))) && targetCache.isTarget(owner, living));
             if (!targets.isEmpty()) {
                 return targetCache.getNewTarget(this, targets, 8, false);
             }
@@ -137,26 +137,23 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
      * @return 插值后的空闲状态节点
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
-        Player owner = getOwner();
-        PathNode node = getCurrentPathNode();
-        if (owner != null) {
-            int total = Math.max(1, getSameSize());
-            int order = getSameOrder();
-            float angle = (owner.tickCount + partialTick) * 0.05f + (order * Mth.TWO_PI / total);
-            float radius = 1.2f + (total > 4 ? (total - 4) * 0.025f : 0f);
+        int total = Math.max(1, getSameSize());
+        int order = getOrder();
+        float angle = (owner.tickCount + partialTick) * 0.015f + (order * Mth.TWO_PI / total);
+        float radius = 1.2f + (total > 4 ? (total - 4) * 0.025f : 0f);
 
-            double px = Mth.lerp(partialTick, owner.xo, owner.getX());
-            double py = Mth.lerp(partialTick, owner.yo, owner.getY());
-            double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
+        double px = Mth.lerp(partialTick, owner.xo, owner.getX());
+        double py = Mth.lerp(partialTick, owner.yo, owner.getY());
+        double pz = Mth.lerp(partialTick, owner.zo, owner.getZ());
 
-            Vec3 targetPos = new Vec3(px, py, pz).add(Math.cos(angle) * radius, owner.getBbHeight() + 1.2, Math.sin(angle) * radius);
-            Vec3 centerAxis = new Vec3(px, py + owner.getBbHeight() + 1.2, pz);
+        Vec3 targetPos = new Vec3(px, py, pz).add(Math.cos(angle) * radius, owner.getBbHeight() + 1.2, Math.sin(angle) * radius);
+        Vec3 centerAxis = new Vec3(px, py + owner.getBbHeight() + 1.2, pz);
 
-            Vec3 toAxis = centerAxis.subtract(targetPos).normalize();
-            if (toAxis.lengthSqr() < 1e-4) toAxis = new Vec3(1, 0, 0);
-            Vec3 tipDir = new Vec3(0, -1, 0);
-            node = getEulerNode(targetPos, tipDir, toAxis);
+        Vec3 toAxis = centerAxis.subtract(targetPos).normalize();
+        if (toAxis.lengthSqr() < 1e-4) {
+            toAxis = new Vec3(1, 0, 0);
         }
-        return node;
+        Vec3 tipDir = new Vec3(0, -1, 0);
+        return getEulerNode(targetPos, tipDir, toAxis);
     }
 }

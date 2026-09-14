@@ -1,13 +1,14 @@
 package first.summoner.mixin;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityDamageSource;
+
+import first.lyra.common.attachmentEntity.AttachmentEntity;
+import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
+import first.lyra.common.minion.Minion;
 import first.summoner.common.attachment.SummonMarkData;
 import first.summoner.common.summonMark.SummonMarkType;
 import first.summoner.register.SummonerAttachmentRegister;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.CommonHooks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +25,7 @@ public class CommonHooksMixin {
         if (!cir.getReturnValue()) {
             if (!entity.level().isClientSide() && src instanceof AttachmentEntityDamageSource attachmentDamageSource) {
                 AttachmentEntity minion = attachmentDamageSource.getAttachmentEntity();
-                Player owner = minion.getOwner();
+                LivingEntity owner = minion instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                 if (owner != null) {
                     SummonMarkData summonMarkData = owner.getData(SummonerAttachmentRegister.SummonMarkData);
                     if (summonMarkData.isSummonMarkTarget(entity)) {

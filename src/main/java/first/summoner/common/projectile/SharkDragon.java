@@ -1,9 +1,9 @@
 package first.summoner.common.projectile;
 
+import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -18,9 +18,9 @@ public class SharkDragon extends Projectile implements IEntityCollision<SharkDra
 
     public SharkDragon() {
         super(SummonerAttachmentEntityRegister.SHARK_DRAGON);
-        setDrag(1f);
-        setGravity(-0.002f);
-        setMaxLife(100);
+        setDrag(1);
+        setGravity(0);
+        setMaxTickCount(100);
     }
 
     @Override
@@ -30,7 +30,6 @@ public class SharkDragon extends Projectile implements IEntityCollision<SharkDra
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        currentPathNode = new PathNode(context.position(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
         setRemove();
     }
 
@@ -40,20 +39,22 @@ public class SharkDragon extends Projectile implements IEntityCollision<SharkDra
     }
 
     @Override
+    public boolean isValidCollisionTarget(SharkDragon entity, LivingEntity target) {
+        return LyraHelper.get(level).getTargetCache().isTarget(owner, target);
+    }
+
+    @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         HitContext hit = hitContexts.getFirst();
         LivingEntity target = hit.entity();
         DamageSource source = getDamageSource();
-        if (source != null) {
-            UUID uuid = getUuid();
-            InvincibleData.attack(target)
-                    .attacker(uuid)
-                    .damageSource(source)
-                    .damageAmount(getDamage())
-                    .apply();
-        }
-        currentPathNode = new PathNode(hit.hitPoint().add(getVelocity().scale(0.5)), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        UUID uuid = getUuid();
+        InvincibleData.attack(target)
+                .attacker(uuid)
+                .damageSource(source)
+                .damageAmount(getDamage())
+                .apply();
+        currentPathNode = currentPathNode.modifyPos(hit.hitPoint().add(getVelocity().scale(0.5)));
         setRemove();
     }
-
 }

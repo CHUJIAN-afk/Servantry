@@ -2,7 +2,8 @@ package first.summoner.common.projectile;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachment.TargetCache;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -29,12 +30,13 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
     public Petal() {
         super(SummonerAttachmentEntityRegister.PETAL);
         setDrag(0.82f);
-        setMaxLife(40);
+        setMaxTickCount(40);
         this.chaseDelay = 7;
     }
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             if (chaseDelay > 0) {
                 chaseDelay--;
@@ -43,17 +45,17 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
             }
             if (chaseTarget != null && chaseTarget.isAlive()) {
                 Vec3 dir = chaseTarget.getBoundingBox().getCenter().subtract(getPos()).normalize();
-                applyForce(dir);
+                addVelocity(dir);
             }
         }
-        super.tick();
     }
 
     /** 寻找 8 格半径内最近的有效目标（TargetCache 目标选择）。 */
     private LivingEntity findNearestTarget() {
         LivingEntity nearest = null;
         double nearestDist = Double.MAX_VALUE;
-        for (LivingEntity candidate : LyraHelper.get(owner).getTargetCache().getEntitiesInRadius(getPos(), 8, null)) {
+        TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
+        for (LivingEntity candidate : targetCache.getEntitiesInRadius(getPos(), 8, living -> targetCache.isTarget(owner, living))) {
             double dist = candidate.position().distanceToSqr(getPos());
             if (dist < nearestDist) {
                 nearestDist = dist;
@@ -75,14 +77,13 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
 
     @Override
     public boolean isValidCollisionTarget(Petal entity, LivingEntity target) {
-        return getTickCount() > 10 && target != null && target.isAlive() && target != entity.getOwner();
+        return getTickCount() > 10 && LyraHelper.get(getLevel()).getTargetCache().isTarget(owner, target);
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            UUID uuid = getUuid();
+                UUID uuid = getUuid();
             for (HitContext hitContext : hitContexts) {
                 InvincibleData.attack(hitContext.entity())
                         .attacker(uuid)
@@ -91,7 +92,6 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
                         .invincibleTime(3)
                         .apply();
             }
-        }
         setRemove();
     }
 }

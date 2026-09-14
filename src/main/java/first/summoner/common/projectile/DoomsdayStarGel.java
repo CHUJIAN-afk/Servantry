@@ -1,11 +1,12 @@
 package first.summoner.common.projectile;
 
+
+
+import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityDamageSource;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.register.LyraDamageRegister;
 import first.summoner.common.master.DoomsdayStar;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,7 +31,7 @@ public class DoomsdayStarGel extends Projectile implements IEntityCollision<Doom
         super(SummonerAttachmentEntityRegister.DOOMSDAY_STAR_GEL);
         setDrag(1.0F);
         setGravity(0.0F);
-        setMaxLife(100);
+        setMaxTickCount(100);
     }
 
     public static void fire(DoomsdayStar doomsdayStar, LivingEntity target) {
@@ -39,7 +40,8 @@ public class DoomsdayStarGel extends Projectile implements IEntityCollision<Doom
         for (int i = 0; i < count; i++) {
             Vec3 direction = Vec3.ZERO.offsetRandom(doomsdayStar.getRandom(), 1);
             DoomsdayStarGel gel = new DoomsdayStarGel();
-            gel.setCurrentPathNode(new PathNode(
+            gel.setOwner(doomsdayStar.getHurtEntity());
+            gel.init(new PathNode(
                     origin,
                     (float) Math.toDegrees(Math.atan2(-direction.x, direction.z)),
                     (float) Math.toDegrees(Math.asin(-direction.y)),
@@ -48,14 +50,7 @@ public class DoomsdayStarGel extends Projectile implements IEntityCollision<Doom
             gel.setVelocity(direction.normalize().scale(SPRAY_SPEED));
             gel.setTarget(target);
             gel.setDamage(doomsdayStar.getAttackDamage());
-            gel.setDamageSourceSupplier((level, player) -> new AttachmentEntityDamageSource(
-                    LyraDamageRegister.getDamageTypeHolder(LyraDamageRegister.Summon, level),
-                    doomsdayStar.getHurtEntity(),
-                    doomsdayStar.getHurtEntity(),
-                    gel.getPos(),
-                    gel
-            ));
-            gel.join(doomsdayStar.getLevel());
+            LyraHelper.get(doomsdayStar.getLevel()).add(gel);
         }
     }
 
@@ -65,14 +60,14 @@ public class DoomsdayStarGel extends Projectile implements IEntityCollision<Doom
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide() && launchDelay > 0) {
             launchDelay--;
             if (launchDelay == 0 && target != null && target.isAlive()) {
-                applyForce(target.getBoundingBox().getCenter().subtract(getPos()).normalize().scale(BOOST_SPEED));
+                addVelocity(target.getBoundingBox().getCenter().subtract(getPos()).normalize().scale(BOOST_SPEED));
                 target = null;
             }
         }
-        super.tick();
     }
 
     @Override

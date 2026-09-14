@@ -1,7 +1,8 @@
 package first.summoner.common.minion.minion.goal.bloodBat;
 
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.BloodBat;
 
 import java.util.Random;
@@ -9,7 +10,7 @@ import java.util.Random;
 /**
  * 血蝙蝠空闲Goal - 位置保持在待机位置（环绕玩家）。
  */
-public class BloodBatIdleGoal extends MinionGoal<BloodBat> {
+public class BloodBatIdleGoal extends AttachmentEntityGoal<BloodBat> {
 
     private final float speed;
     private int prepTick = 0;
@@ -21,7 +22,7 @@ public class BloodBatIdleGoal extends MinionGoal<BloodBat> {
 
     @Override
     public boolean canUse() {
-        return !minion.isTarget(minion.getTarget());
+        return minion.getTarget() == null;
     }
 
     @Override

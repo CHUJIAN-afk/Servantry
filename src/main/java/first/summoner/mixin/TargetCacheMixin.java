@@ -1,5 +1,6 @@
 package first.summoner.mixin;
 
+
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.minion.Minion;
 import first.summoner.common.attachment.SummonMarkData;
@@ -22,7 +23,7 @@ public class TargetCacheMixin {
             cancellable = true
     )
     private void getNewTarget(Minion minion, List<LivingEntity> targets, float ownerWarningDistance, boolean selfCenter, CallbackInfoReturnable<LivingEntity> cir) {
-        Player owner = minion.getOwner();
+        Player owner = minion.getOwner() instanceof Player player ? player : null;
         if (owner != null) {
             SummonMarkData data = owner.getData(SummonerAttachmentRegister.SummonMarkData);
             LivingEntity markTarget = data.getMarkTarget();

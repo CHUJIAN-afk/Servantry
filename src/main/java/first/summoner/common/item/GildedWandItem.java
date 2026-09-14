@@ -2,7 +2,7 @@ package first.summoner.common.item;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.AttachmentEntityData;
-import first.lyra.common.entity.AttachmentEntity;
+import first.lyra.common.attachmentEntity.AttachmentEntity;
 import first.lyra.common.sound.Playable;
 import first.summoner.register.SummonerSoundRegister;
 import net.minecraft.world.InteractionHand;
@@ -30,7 +30,7 @@ public class GildedWandItem extends Item {
             return InteractionResultHolder.consume(itemStack);
         } else {
             if (!level.isClientSide()) {
-                AttachmentEntityData entityData = LyraHelper.get(player).getEntityData();
+                AttachmentEntityData entityData = LyraHelper.get(player.level()).getEntityData();
                 entityData.get(AttachmentEntity.class).forEach(AttachmentEntity::setRemove);
                 entityData.get(AttachmentEntity.class).forEach(AttachmentEntity::setRemove);
                 Playable.play(SummonerSoundRegister.UseMinionWeapon, level, player.position(), player.getSoundSource());

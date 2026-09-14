@@ -1,10 +1,11 @@
 package first.summoner.common.minion.minion;
 
+
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.SyncFieldDispatcher;
-import first.lyra.common.minion.MinionGoalSelector;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.minion.minion.goal.MomentumMinionIdleGoal;
@@ -38,6 +39,7 @@ public class DeadlySphere extends MomentumMinion implements IEntityCollision<Dea
     public DeadlySphere() {
         super(SummonerAttachmentEntityRegister.DEADLY_SPHERE);
         setDrag(0.75f);
+        setGravity(0);
     }
 
     @Override
@@ -48,7 +50,7 @@ public class DeadlySphere extends MomentumMinion implements IEntityCollision<Dea
     }
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new DeadlySphereAttackGoal(this));
         goalSelector.addGoal(1, new MomentumMinionIdleGoal(this, 6, 0.01f, 64, false));
     }
@@ -65,7 +67,7 @@ public class DeadlySphere extends MomentumMinion implements IEntityCollision<Dea
 
     @Override
     public boolean canCollideAttack() {
-        return isTarget(getTarget());
+        return getTarget() != null;
     }
 
     @Override
@@ -100,12 +102,13 @@ public class DeadlySphere extends MomentumMinion implements IEntityCollision<Dea
     }
 
     @Override
-    public void onBlockCollision(CollisionContext context) {
-        setVelocity(IBlockCollision.bounceVelocity(getVelocity(), context, 0.98, 0.01));
+    public float getElasticity() {
+        return 0.98f;
     }
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             if (trailTimer > 0) {
                 trailTimer--;
@@ -118,7 +121,6 @@ public class DeadlySphere extends MomentumMinion implements IEntityCollision<Dea
             }
             setDesiredRotation(currentPathNode.yaw() + 8, currentPathNode.pitch() + 8, currentPathNode.roll() + 8);
         }
-        super.tick();
     }
 
     public int getSearchDistance() {

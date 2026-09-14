@@ -1,9 +1,11 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachment.TargetCache;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -25,7 +27,7 @@ public class Meteor extends Projectile implements IEntityCollision<Meteor>, IBlo
     public Meteor() {
         super(SummonerAttachmentEntityRegister.METEOR);
         setDrag(1);
-        setMaxLife(60);
+        setMaxTickCount(60);
     }
 
     @Override
@@ -51,8 +53,8 @@ public class Meteor extends Projectile implements IEntityCollision<Meteor>, IBlo
     private void explode(LivingEntity primary) {
         Vec3 pos = getPos();
         DamageSource source = getDamageSource();
-        List<LivingEntity> targets = LyraHelper.get(owner).getTargetCache()
-                .getEntitiesInRadius(pos, 2, null);
+        TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
+        List<LivingEntity> targets = targetCache.getEntitiesInRadius(pos, 2, living -> targetCache.isTarget(owner, living));
         for (LivingEntity target : targets) {
             InvincibleData.attack(target)
                     .attacker(getUuid())

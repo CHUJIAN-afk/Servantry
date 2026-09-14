@@ -1,9 +1,8 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -23,8 +22,8 @@ public class CrossbowBolt extends Projectile implements IBlockCollision<Crossbow
     public CrossbowBolt() {
         super(SummonerAttachmentEntityRegister.CROSSBOW_BOLT);
         setDrag(0.97f);
-        setMaxLife(40);
         setGravity(-0.01f);
+        setMaxTickCount(40);
     }
 
     @Override
@@ -34,7 +33,7 @@ public class CrossbowBolt extends Projectile implements IBlockCollision<Crossbow
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        setCurrentPathNode(new PathNode(context.position(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll()));
+        setCurrentPathNode(currentPathNode.modifyPos(context.position()));
         setRemove();
     }
 
@@ -50,8 +49,7 @@ public class CrossbowBolt extends Projectile implements IBlockCollision<Crossbow
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            for (HitContext hitContext : hitContexts) {
+                for (HitContext hitContext : hitContexts) {
                 LivingEntity living = hitContext.entity();
                 if (hitTargets.add(living)) {
                     InvincibleData.attack(living)
@@ -66,6 +64,5 @@ public class CrossbowBolt extends Projectile implements IBlockCollision<Crossbow
                     break;
                 }
             }
-        }
     }
 }

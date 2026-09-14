@@ -1,8 +1,9 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -21,7 +22,7 @@ public class PoisonSaliva extends Projectile implements IEntityCollision<PoisonS
     public PoisonSaliva() {
         super(SummonerAttachmentEntityRegister.POISON_SALIVA);
         setDrag(1.0f);
-        setMaxLife(60);
+        setMaxTickCount(60);
         setGravity(0);
     }
 
@@ -29,8 +30,7 @@ public class PoisonSaliva extends Projectile implements IEntityCollision<PoisonS
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
         HitContext hit = hitContexts.getFirst();
-        if (source != null) {
-            // 中毒持续 5~10 秒（100~200 tick）
+                // 中毒持续 5~10 秒（100~200 tick）
             int duration = 100 + getRandom().nextInt(101);
             InvincibleData.attack(hit.entity())
                     .attacker(getUuid())
@@ -38,8 +38,7 @@ public class PoisonSaliva extends Projectile implements IEntityCollision<PoisonS
                     .damageAmount(getDamage())
                     .effect(new MobEffectInstance(MobEffects.POISON, duration, 0))
                     .apply();
-        }
-        setCurrentPathNode(getCollisionAfterPathNode(hit.hitPoint(), getCurrentPathNode()));
+        setCurrentPathNode(getCurrentPathNode().modifyPos(hit.hitPoint()));
         setRemove();
     }
 
@@ -55,7 +54,7 @@ public class PoisonSaliva extends Projectile implements IEntityCollision<PoisonS
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        setCurrentPathNode(getCollisionAfterPathNode(context.position(), getCurrentPathNode()));
+        setCurrentPathNode(getCurrentPathNode().modifyPos(context.position()));
         setRemove();
     }
 }

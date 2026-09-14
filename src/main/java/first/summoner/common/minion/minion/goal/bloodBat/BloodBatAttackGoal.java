@@ -1,12 +1,13 @@
 package first.summoner.common.minion.minion.goal.bloodBat;
 
-import first.lyra.common.entity.Ellipse;
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
+import first.lyra.common.attachmentEntity.Ellipse;
 import first.summoner.common.minion.minion.BloodBat;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
-public class BloodBatAttackGoal extends MinionGoal<BloodBat> {
+public class BloodBatAttackGoal extends AttachmentEntityGoal<BloodBat> {
 
     public BloodBatAttackGoal(BloodBat minion) {
         super(minion);
@@ -14,7 +15,7 @@ public class BloodBatAttackGoal extends MinionGoal<BloodBat> {
 
     @Override
     public boolean canUse() {
-        return minion.isTarget(minion.getTarget());
+        return minion.getTarget() != null;
     }
 
     @Override
@@ -25,7 +26,7 @@ public class BloodBatAttackGoal extends MinionGoal<BloodBat> {
         Vec3 idlePos = minion.getInterpolatedIdleState(1).pos();
         LivingEntity target = minion.getTarget();
         Vec3 targetPos = target.getBoundingBox().getCenter();
-        minion.normal = Ellipse.randomPlaneNormal(target.getRandom(), targetPos, idlePos);
+        minion.normal = Ellipse.randomPlaneNormal(minion.getRandom(), targetPos, idlePos);
     }
 
     @Override

@@ -6,7 +6,7 @@ import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.rendererHelper.LaserRendererHelper;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.projectile.StarlightShockwave;
 import net.minecraft.client.renderer.MultiBufferSource;
 

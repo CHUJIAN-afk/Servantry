@@ -1,14 +1,16 @@
 package first.summoner.common.item;
 
+
+
+import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.Ellipse;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.Ellipse;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.common.projectile.Zenith;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -41,13 +43,11 @@ public class ZenithItem extends SwordItem {
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
         if (usedHand == InteractionHand.MAIN_HAND) {
             if (!level.isClientSide()) {
-                DamageSource damageSource = player.damageSources().playerAttack(player);
                 Vec3 lookAngle = player.getLookAngle();
                 Vec3 center = player.getPosition(1).add(0, player.getBbHeight() / 2, 0);
                 Vec3 startPos = center.add(lookAngle.scale(-1));
                 for (int i = 0; i < 3; i++) {
                     Zenith projectile = new Zenith();
-                    projectile.setDamageSourceSupplier((sourceLevel, sourceOwner) -> damageSource);
                     projectile.setDamage(19);
                     projectile.setKnockback(0.65f);
                     Vec3 endPos = computeEndPos(player);
@@ -66,7 +66,8 @@ public class ZenithItem extends SwordItem {
                     projectile.progress += random.nextFloat() * 0.05f;
                     PathNode node = projectile.getNode(projectile.progress, 1);
                     projectile.setCurrentPathNode(node);
-                    projectile.join(player);
+                    projectile.init(projectile.getCurrentPathNode());
+                    LyraHelper.get(player.level()).add(projectile);
                 }
             }
             return InteractionResultHolder.success(player.getItemInHand(usedHand));

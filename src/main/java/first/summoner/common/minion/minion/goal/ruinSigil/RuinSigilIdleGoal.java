@@ -1,13 +1,14 @@
 package first.summoner.common.minion.minion.goal.ruinSigil;
 
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.RuinRelic;
 
 /**
  * 禁戒遗迹空闲Goal - 在玩家背后竖直圆环上环绕。
  */
-public class RuinSigilIdleGoal extends MinionGoal<RuinRelic> {
+public class RuinSigilIdleGoal extends AttachmentEntityGoal<RuinRelic> {
 
     public RuinSigilIdleGoal(RuinRelic minion) {
         super(minion);
@@ -15,7 +16,7 @@ public class RuinSigilIdleGoal extends MinionGoal<RuinRelic> {
 
     @Override
     public boolean canUse() {
-        return !minion.isTarget(minion.getTarget());
+        return minion.getTarget() == null;
     }
 
     @Override

@@ -1,10 +1,11 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -22,7 +23,7 @@ public class MiniChlorophyteCrystal extends Projectile implements IEntityCollisi
     public MiniChlorophyteCrystal() {
         super(SummonerAttachmentEntityRegister.MINI_CHLOROPHYTE_CRYSTAL);
         setDrag(1f);
-        setMaxLife(20);
+        setMaxTickCount(20);
     }
 
     public int getTrailDuration() {
@@ -31,17 +32,16 @@ public class MiniChlorophyteCrystal extends Projectile implements IEntityCollisi
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             currentPathNode = new PathNode(currentPathNode.pos(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll() + 30);
         }
-        super.tick();
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            TargetCache targetCache = LyraHelper.get(owner).getTargetCache();
+                TargetCache targetCache = LyraHelper.get(owner.level()).getTargetCache();
             HitContext context = hitContexts.getFirst();
             LivingEntity target = context.entity();
             Vec3 pos = target.getBoundingBox().getCenter();
@@ -52,7 +52,7 @@ public class MiniChlorophyteCrystal extends Projectile implements IEntityCollisi
                         .damageAmount(getDamage())
                         .apply();
             }
-            setCurrentPathNode(getCollisionAfterPathNode(context.hitPoint(), getCurrentPathNode()));
+            setCurrentPathNode(getCurrentPathNode().modifyPos(context.hitPoint()));
             setRemove();
             ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
@@ -73,7 +73,6 @@ public class MiniChlorophyteCrystal extends Projectile implements IEntityCollisi
                     .speed(0.85)
                     .spread(Math.TAU)
                     .emit();
-        }
     }
 
     @Override

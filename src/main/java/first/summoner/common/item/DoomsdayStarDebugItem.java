@@ -54,7 +54,7 @@ public class DoomsdayStarDebugItem extends Item {
 
     private static void removeAll(MinecraftServer server) {
         for (ServerLevel level : server.getAllLevels()) {
-            LyraHelper.get(level).remove(SummonerAttachmentEntityRegister.DOOMSDAY_STAR.get());
+            LyraHelper.get(level).getEntityData().remove(SummonerAttachmentEntityRegister.DOOMSDAY_STAR.get());
         }
     }
 }

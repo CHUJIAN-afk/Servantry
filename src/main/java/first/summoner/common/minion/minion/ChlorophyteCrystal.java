@@ -1,6 +1,9 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.common.entity.PathNode;
+
+
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.MiniChlorophyteCrystal;
@@ -21,6 +24,7 @@ public class ChlorophyteCrystal extends Minion {
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             LivingEntity target = getTarget();
             if (shootCooldown > 0) {
@@ -29,20 +33,17 @@ public class ChlorophyteCrystal extends Minion {
             if (extraShootCooldown > 0) {
                 extraShootCooldown--;
             }
-            if (shootCooldown <= 0 && isTarget(target)) {
+            if (shootCooldown <= 0 && target != null) {
                 shootCooldown = 13;
                 shootTarget(target);
             }
-            if (owner != null) {
-                float bob = Mth.sin((tickCount) * 0.12f) * 0.15f;
-                Vec3 targetPos = owner.getBoundingBox().getCenter().add(0, owner.getBbHeight() + bob, 0);
-                Vec3 lerpXZ = currentPathNode.pos().lerp(targetPos, 0.8f);
-                Vec3 lerpY = currentPathNode.pos().lerp(targetPos, 0.15f);
-                int yaw = isTarget(getTarget()) ? 30 : 15;
-                currentPathNode = new PathNode(new Vec3(lerpXZ.x(), lerpY.y(), lerpXZ.z()), currentPathNode.yaw() + yaw, currentPathNode.pitch(), currentPathNode.roll());
-            }
+            float bob = Mth.sin((tickCount) * 0.12f) * 0.15f;
+            Vec3 targetPos = owner.getBoundingBox().getCenter().add(0, owner.getBbHeight() + bob, 0);
+            Vec3 lerpXZ = currentPathNode.pos().lerp(targetPos, 0.8f);
+            Vec3 lerpY = currentPathNode.pos().lerp(targetPos, 0.15f);
+            int yaw = getTarget() != null ? 30 : 15;
+            currentPathNode = new PathNode(new Vec3(lerpXZ.x(), lerpY.y(), lerpXZ.z()), currentPathNode.yaw() + yaw, currentPathNode.pitch(), currentPathNode.roll());
         }
-        super.tick();
     }
 
     public int getExtraShootCooldown() {
@@ -58,10 +59,11 @@ public class ChlorophyteCrystal extends Minion {
         Vec3 direction = target.getBoundingBox().getCenter().subtract(getPos()).normalize();
         Vec3 startPos = getPos().add(direction.scale(0.25));
         MiniChlorophyteCrystal projectile = new MiniChlorophyteCrystal();
-        projectile.copyDamageSource(this);
-        projectile.setPos(startPos);
+        projectile.setOwner(owner);
+        projectile.init(new PathNode(startPos, direction));
+        projectile.copyAttributes(this);
         projectile.setVelocity(direction.scale(1.5));
-        projectile.join(level);
+        LyraHelper.get(level).add(projectile);
         ParticleHelper.create(level)
                 .generic(GenericParticleBuilder.create()
                         .centerColor(0x1bff10)

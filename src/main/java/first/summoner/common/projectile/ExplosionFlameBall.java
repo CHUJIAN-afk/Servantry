@@ -1,9 +1,11 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachment.TargetCache;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -30,8 +32,8 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
     public ExplosionFlameBall() {
         super(SummonerAttachmentEntityRegister.EXPLOSION_FLAME_BALL);
         setDrag(1.0f);
-        setMaxLife(60);
         setGravity(0);
+        setMaxTickCount(60);
     }
 
     @Override
@@ -61,26 +63,22 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            Vec3 hitPoint = hitContexts.getFirst().hitPoint();
+                Vec3 hitPoint = hitContexts.getFirst().hitPoint();
             explode(source, hitPoint);
-            setCurrentPathNode(getCollisionAfterPathNode(hitPoint, getCurrentPathNode()));
+            setCurrentPathNode(getCurrentPathNode().modifyPos(hitPoint));
             setRemove();
-        }
     }
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        if (getDamageSource() != null) {
-            explode(getDamageSource(), context.position());
-        }
-        setCurrentPathNode(getCollisionAfterPathNode(context.position(), getCurrentPathNode()));
+                explode(getDamageSource(), context.position());
+        setCurrentPathNode(getCurrentPathNode().modifyPos(context.position()));
         setRemove();
     }
 
     @Override
     public void onRemove() {
-        if (!getLevel().isClientSide() && getDamageSource() != null) {
+        if (!getLevel().isClientSide()) {
             // 未命中目标消失（自然消散）时爆发少量火焰色粒子
             ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
@@ -108,8 +106,8 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
      * 爆炸：对命中点半径 3 格内所有敌人造成等量伤害并点燃 10 秒，爆发散射粒子。
      */
     private void explode(DamageSource source, Vec3 hitPoint) {
-        List<LivingEntity> entities = LyraHelper.get(owner).getTargetCache()
-                .getEntitiesInRadius(hitPoint, 3, this::isTarget);
+        TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
+        List<LivingEntity> entities = targetCache.getEntitiesInRadius(hitPoint, 3, living -> targetCache.isTarget(owner, living));
         for (LivingEntity entity : entities) {
             InvincibleData.attack(entity)
                     .attacker(getUuid())

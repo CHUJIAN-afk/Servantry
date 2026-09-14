@@ -1,7 +1,8 @@
 package first.summoner.common.master.goal.doomsdayStar;
 
-import first.lyra.common.entity.AttachmentEntityDamageSource;
-import first.lyra.register.LyraDamageRegister;
+
+
+import first.lyra.api.LyraHelper;
 import first.summoner.common.master.DoomsdayStar;
 import first.summoner.common.projectile.StellarDebris;
 import net.minecraft.world.entity.LivingEntity;
@@ -54,14 +55,8 @@ public class DoomsdayStarOrbitGoal extends DoomsdayStarGoal {
             for (int i = 0; i < DEBRIS_PER_RING; i++) {
                 double angle = Math.TAU * i / DEBRIS_PER_RING;
                 StellarDebris piece = new StellarDebris();
+                piece.setOwner(doomsdayStar.getHurtEntity());
                 piece.setDamage(doomsdayStar.getAttackDamage());
-                piece.setDamageSourceSupplier((level, player) -> new AttachmentEntityDamageSource(
-                        LyraDamageRegister.getDamageTypeHolder(LyraDamageRegister.Summon, level),
-                        doomsdayStar.getHurtEntity(),
-                        doomsdayStar.getHurtEntity(),
-                        piece.getPos(),
-                        piece
-                ));
                 piece.orbit(
                         doomsdayStar,
                         DEBRIS_RADIUS_X,
@@ -70,7 +65,8 @@ public class DoomsdayStarOrbitGoal extends DoomsdayStarGoal {
                         DEBRIS_SPEEDS[ring]
                 );
                 piece.setRingFrame(ringAxisA[ring], ringAxisB[ring]);
-                piece.join(doomsdayStar.getLevel());
+                piece.init(piece.getCurrentPathNode());
+                LyraHelper.get(doomsdayStar.getLevel()).add(piece);
                 debris.add(piece);
             }
         }

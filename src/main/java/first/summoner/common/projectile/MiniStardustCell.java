@@ -1,10 +1,11 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.SyncFieldDispatcher;
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
-import first.lyra.common.projectile.AttachingProjectile;
+import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
 import first.summoner.utils.ParticleHelper;
@@ -17,21 +18,28 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * 星细胞射弹 - 追踪目标并黏着施加寄生效果。
  */
-public class MiniStardustCell extends AttachingProjectile implements IEntityCollision<MiniStardustCell> {
+public class MiniStardustCell extends Projectile implements IEntityCollision<MiniStardustCell> {
 
     private LivingEntity chaseTarget;
+    @Nullable
+    private LivingEntity attachedTarget;
+    private float attachedYaw;
+    private double attachedRadius;
+    private double attachedVerticalOffset;
     private int trailTimer = 0;
 
     public MiniStardustCell() {
         super(SummonerAttachmentEntityRegister.MINI_STARDUST_CELL);
         setDrag(0.9f);
-        setMaxLife(100);
+        setMaxTickCount(100);
     }
 
     @Override
@@ -62,6 +70,43 @@ public class MiniStardustCell extends AttachingProjectile implements IEntityColl
         return !isAttached();
     }
 
+    public boolean isAttached() {
+        return attachedTarget != null;
+    }
+
+    @Nullable
+    public LivingEntity getAttachedTarget() {
+        return attachedTarget;
+    }
+
+    public void setAttachedTarget(@Nullable LivingEntity attachedTarget) {
+        this.attachedTarget = attachedTarget;
+    }
+
+    public void attachTo(Vec3 position) {
+        if (attachedTarget == null) {
+            return;
+        }
+        Vec3 offset = position.subtract(attachedTarget.getBoundingBox().getCenter());
+        this.attachedYaw = (float) Math.atan2(offset.z, offset.x);
+        this.attachedRadius = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
+        this.attachedVerticalOffset = offset.y;
+        setVelocity(Vec3.ZERO);
+    }
+
+    public void detach() {
+        this.attachedTarget = null;
+        this.attachedRadius = 0;
+        this.attachedVerticalOffset = 0;
+    }
+
+    @Override
+    public boolean isAlive() {
+        return super.isAlive() && (isAttached()
+                ? attachedTarget != null && attachedTarget.isAlive()
+                : chaseTarget != null && chaseTarget.isAlive());
+    }
+
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         HitContext hit = hitContexts.getFirst();
@@ -69,43 +114,51 @@ public class MiniStardustCell extends AttachingProjectile implements IEntityColl
         setAttachedTarget(target);
         attachTo(hit.hitPoint());
         DamageSource source = getDamageSource();
-        if (source != null) {
-            MobEffectInstance existing = target.getEffect(SummonerMobEffectRegister.CellParasitism);
-            int amplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, 9);
-            MobEffectInstance effectInstance = new MobEffectInstance(SummonerMobEffectRegister.CellParasitism, 100, amplifier);
-            InvincibleData.attack(target)
-                    .attacker(getUuid())
-                    .damageSource(source)
-                    .damageAmount(getDamage())
-                    .effect(effectInstance)
-                    .apply();
-        }
+        MobEffectInstance existing = target.getEffect(SummonerMobEffectRegister.CellParasitism);
+        int amplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, 9);
+        MobEffectInstance effectInstance = new MobEffectInstance(SummonerMobEffectRegister.CellParasitism, 100, amplifier);
+        InvincibleData.attack(target)
+                .attacker(getUuid())
+                .damageSource(source)
+                .damageAmount(getDamage())
+                .effect(effectInstance)
+                .apply();
     }
 
     @Override
     public void tick() {
-        if (!getLevel().isClientSide()) {
-            if (isAttached()) {
-                LivingEntity target = getAttachedTarget();
-                if (target == null || !target.isAlive()) {
-                    setRemove();
-                }
-            } else {
-                tickFlying();
-            }
-            if (trailTimer > 0) {
-                trailTimer--;
-            }
-        } else if (trailTimer > 0) {
+        super.tick();
+        if (!getLevel().isClientSide() && !isAttached()) {
+            tickFlying();
+        }
+        if (trailTimer > 0) {
             trailTimer--;
         }
-        super.tick();
+    }
+
+    @Override
+    public void tickPhysics() {
+        super.tickPhysics();
+        if (!isAttached()) {
+            return;
+        }
+        LivingEntity target = attachedTarget;
+        if (target == null || !target.isAlive()) {
+            return;
+        }
+        Vec3 center = target.getBoundingBox().getCenter();
+        Vec3 attachedPosition = center.add(
+                Math.cos(attachedYaw) * attachedRadius,
+                attachedVerticalOffset,
+                Math.sin(attachedYaw) * attachedRadius
+        );
+        setPath(Collections.singletonList(new PathNode(attachedPosition, getYaw(), getPitch(), getRoll())));
     }
 
     private void tickFlying() {
         if (chaseTarget != null && chaseTarget.isAlive()) {
             Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
-            applyForce(targetCenter.subtract(getPos()).normalize().scale(0.3));
+            addVelocity(targetCenter.subtract(getPos()).normalize().scale(0.3));
             setTrailTimer(getTrailDuration());
         } else {
             setRemove();
@@ -123,7 +176,7 @@ public class MiniStardustCell extends AttachingProjectile implements IEntityColl
             if (isAttached()) {
                 DamageSource source = getDamageSource();
                 LivingEntity target = getAttachedTarget();
-                if (source != null && target != null && target.isAlive()) {
+                if (target != null && target.isAlive()) {
                     InvincibleData.attack(target)
                             .attacker(getUuid())
                             .damageSource(source)

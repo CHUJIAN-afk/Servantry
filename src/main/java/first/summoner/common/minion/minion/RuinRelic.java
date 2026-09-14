@@ -1,8 +1,9 @@
 package first.summoner.common.minion.minion;
 
+
 import first.lyra.api.LyraHelper;
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.MinionGoalSelector;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.minion.minion.goal.ruinSigil.RuinSigilAttackGoal;
@@ -33,13 +34,11 @@ public class RuinRelic extends MomentumMinion {
 
     public RuinRelic() {
         super(SummonerAttachmentEntityRegister.RUIN_RELIC);
-        setDrag(0.85f);
         setGravity(0);
-        setRotationSpeed(0);
     }
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new RuinSigilAttackGoal(this));
         goalSelector.addGoal(1, new RuinSigilIdleGoal(this));
     }
@@ -51,10 +50,10 @@ public class RuinRelic extends MomentumMinion {
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide() && cooldown > 0) {
             cooldown--;
         }
-        super.tick();
     }
 
     /**
@@ -67,20 +66,17 @@ public class RuinRelic extends MomentumMinion {
         Vec3 start = getPos();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
         ForbiddenOrb orb = new ForbiddenOrb();
-        orb.copyDamageSource(this);
-        orb.setPos(start);
+        orb.setOwner(owner);
+        orb.init(new PathNode(start, direction));
+        orb.copyAttributes(this);
         orb.setVelocity(direction.scale(4));
         // 数量越多伤害越高：每多一个 +10%，至多 +200%
         int extra = Math.max(0, getSameSize() - 1);
         float multiplier = 1.0f + 0.1f * Math.min(extra, 20);
         orb.setDamage(getDamage() * multiplier);
-        if (owner != null) {
-            orb.join(owner);
-        } else {
-            orb.join(getLevel());
-        }
+        LyraHelper.get(level).add(orb);
         // 后坐力
-        applyForce(direction.scale(-0.4));
+        addVelocity(direction.scale(-0.4));
         // 发射粒子
         ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
@@ -156,7 +152,7 @@ public class RuinRelic extends MomentumMinion {
      * 只有目标一致的遗迹参与总数与次序；只存在一个时占据轴心。
      */
     public PathNode getIdleRingNode(float partialTick) {
-        Player player = getOwner();
+        LivingEntity player = getOwner();
         PathNode node = getCurrentPathNode();
         if (player != null) {
             int total = getSameTargetCount();
@@ -188,7 +184,7 @@ public class RuinRelic extends MomentumMinion {
      * 只有目标一致的遗迹参与总数与次序；只存在一个时占据轴心。
      */
     public PathNode getAttackRingNode(LivingEntity target, float partialTick) {
-        Player player = getOwner();
+        Player player = getOwner() instanceof Player owner ? owner : null;
         PathNode node = getCurrentPathNode();
         if (player != null) {
             int total = getSameTargetCount();

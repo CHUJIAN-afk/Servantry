@@ -1,7 +1,7 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.common.master.DoomsdayStar;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -28,7 +28,7 @@ public class StellarDebris extends Projectile implements IEntityCollision<Stella
         super(SummonerAttachmentEntityRegister.STELLAR_DEBRIS);
         setDrag(1.0F);
         setGravity(0.0F);
-        setMaxLife(-1);
+        setMaxTickCount(-1);
     }
 
     public void orbit(DoomsdayStar source, double orbitRadiusX, double orbitRadiusY, double orbitAngle, double orbitSpeed) {
@@ -45,24 +45,25 @@ public class StellarDebris extends Projectile implements IEntityCollision<Stella
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && (source == null || !source.isRemove());
+    }
+
+    @Override
     public void tick() {
-        if (!getLevel().isClientSide()) {
-            if (source == null || source.isRemove()) {
-                setRemove();
-            } else {
-                orbitAngle += orbitSpeed;
-                Vec3 center = source.getPos();
-                Vec3 orbitOffset = ringAxisA.scale(Math.cos(orbitAngle) * orbitRadiusX)
-                        .add(ringAxisB.scale(Math.sin(orbitAngle) * orbitRadiusY));
-                setPos(new Vec3(
-                        center.x + orbitOffset.x,
-                        center.y + orbitOffset.y,
-                        center.z + orbitOffset.z
-                ));
-                setVelocity(Vec3.ZERO);
-            }
-        }
         super.tick();
+        if (!getLevel().isClientSide()) {
+            orbitAngle += orbitSpeed;
+            Vec3 center = source.getPos();
+            Vec3 orbitOffset = ringAxisA.scale(Math.cos(orbitAngle) * orbitRadiusX)
+                    .add(ringAxisB.scale(Math.sin(orbitAngle) * orbitRadiusY));
+            setPos(new Vec3(
+                    center.x + orbitOffset.x,
+                    center.y + orbitOffset.y,
+                    center.z + orbitOffset.z
+            ));
+            setVelocity(Vec3.ZERO);
+        }
     }
 
     @Override

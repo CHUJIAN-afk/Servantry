@@ -1,10 +1,11 @@
 package first.summoner.common.minion.minion;
 
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.SyncFieldDispatcher;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
@@ -49,11 +50,6 @@ public class InfiniteShadow extends Terraprism {
     }
 
     @Override
-    public boolean isTarget(LivingEntity target) {
-        return super.isTarget(target);
-    }
-
-    @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         InfiniteShadowFakePlayer player = getFakePlayer();
         if (!itemStack.isEmpty() && player != null) {
@@ -88,7 +84,7 @@ public class InfiniteShadow extends Terraprism {
     }
 
     public InfiniteShadowFakePlayer getFakePlayer() {
-        Player player = getOwner();
+        Player player = getOwner() instanceof Player owner ? owner : null;
         Level level = player != null ? player.level() : getLevel();
         if (!level.isClientSide() && level instanceof ServerLevel serverLevel) {
             if (fakePlayer != null && !fakePlayer.isAlive()) {
@@ -129,7 +125,7 @@ public class InfiniteShadow extends Terraprism {
         private static GameProfile buildProfile(InfiniteShadow infiniteShadow) {
             UUID id = infiniteShadow.getUuid();
             String name = "infinite_shadow_fake_player";
-            Player owner = infiniteShadow.getOwner();
+            Player owner = infiniteShadow.getOwner() instanceof Player player ? player : null;
             if (owner != null) {
                 id = owner.getUUID();
                 String lastKnownUsername = UsernameCache.getLastKnownUsername(owner.getUUID());

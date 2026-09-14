@@ -1,6 +1,10 @@
 package first.summoner.common.minion.sentry;
 
-import first.lyra.common.entity.IBlockCollision;
+
+
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.summoner.common.projectile.Rain;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -15,7 +19,7 @@ public class Cloud extends MomentumMinion implements IBlockCollision<Cloud> {
 
     public Cloud() {
         super(SummonerAttachmentEntityRegister.CLOUD);
-        setDrag(0.8f);
+        setGravity(0);
     }
 
     @Override
@@ -25,22 +29,23 @@ public class Cloud extends MomentumMinion implements IBlockCollision<Cloud> {
 
     @Override
     public void tick() {
-        if (!getLevel().isClientSide()) {
+        super.tick();
+        if (!level.isClientSide()) {
             if (--cooldown <= 0) {
                 RandomSource random = getRandom();
                 cooldown = random.nextInt(2, 4);
-                Vec3 start = getPos().offsetRandom(random, 0.25f);
+                Vec3 start = getPos().add(0, -0.25, 0).offsetRandom(random, 0.25f);
                 Rain rain = new Rain();
-                rain.copyDamageSource(this);
-                rain.setPos(start);
+                rain.setOwner(owner);
+                rain.init(new PathNode(start, 0, 90, 0));
+                rain.copyAttributes(this);
                 rain.setVelocity(new Vec3(0, -0.5, 0));
-                rain.join(getLevel());
+                LyraHelper.get(level).add(rain);
             }
         }
-        super.tick();
     }
 
-        public void dimensionChange() {
+    public void dimensionChange() {
         setRemove();
     }
 

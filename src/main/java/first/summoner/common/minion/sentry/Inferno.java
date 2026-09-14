@@ -1,7 +1,9 @@
 package first.summoner.common.minion.sentry;
 
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.SyncFieldDispatcher;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.summoner.common.projectile.ExplosionFlameBall;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -28,9 +30,6 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
 
     public Inferno() {
         super(SummonerAttachmentEntityRegister.INFERNO);
-        setGravity(-0.05f);
-        setDrag(0.9f);
-        setRotationSpeed(18f);
     }
 
     @Override
@@ -44,9 +43,8 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
         return 32;
     }
 
-    @Override
-    public boolean isTarget(LivingEntity target) {
-        if (!super.isTarget(target)) {
+    private boolean isValidTarget(LivingEntity target) {
+        if (target == null) {
             return false;
         }
         Vec3 toTarget = target.getBoundingBox().getCenter().subtract(getPos());
@@ -55,17 +53,20 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && getPos().distanceToSqr(owner.position()) <= 128 * 128;
+    }
+
+    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
-            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
-                setRemove();
-            }
             LivingEntity target = getTarget();
             cooldown--;
             if (isTargetChange()) {
                 aiming = 0;
             }
-            if (isTarget(target)) {
+            if (isValidTarget(target)) {
                 lookAtPos(target.getBoundingBox().getCenter());
                 aiming++;
                 if (cooldown < 0 && aiming > 10) {
@@ -82,21 +83,17 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
                 }
             }
         }
-        super.tick();
     }
 
     private void fire(Vec3 targetPos) {
         Vec3 start = getPos();
         Vec3 direction = targetPos.subtract(start).normalize();
         ExplosionFlameBall ball = new ExplosionFlameBall();
-        ball.copyDamageSource(this);
-        ball.setPos(start);
+        ball.setOwner(owner);
+        ball.init(new PathNode(start, direction));
+        ball.copyAttributes(this);
         ball.setVelocity(direction);
-        if (owner != null) {
-            ball.join(owner);
-        } else {
-            ball.join(getLevel());
-        }
+        LyraHelper.get(getLevel()).add(ball);
     }
 
     private double getAngleDeg(Vec3 a, Vec3 b) {
@@ -104,14 +101,6 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
             return Math.toDegrees(Math.atan2(a.cross(b).length(), a.dot(b)));
         }
         return 0.0;
-    }
-
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        if (context.bottomSupported()) {
-            Vec3 v = getVelocity();
-            setVelocity(new Vec3(v.x(), 0, v.z()));
-        }
     }
 
         public void dimensionChange() {

@@ -1,8 +1,11 @@
 package first.summoner.common.minion.minion;
 
+
+import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.minion.MinionGoalSelector;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.minion.minion.goal.MomentumMinionIdleGoal;
@@ -29,18 +32,18 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
 
     public Sharknado() {
         super(SummonerAttachmentEntityRegister.SHARKNADO);
-        setDrag(0.92f);
-        setRotationSpeed(0);
+        setGravity(0);
     }
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new SharknadoAttackGoal(this));
         goalSelector.addGoal(1, new MomentumMinionIdleGoal(this, 6, 0.01f, 64, false));
     }
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             // 冷却衰减
             if (shootCooldown > 0) {
@@ -68,7 +71,6 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
                     .spread(1.5)
                     .emit();
         }
-        super.tick();
     }
 
     public int getSearchDistance() {
@@ -82,10 +84,11 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
         Vec3 start = getPos();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
         SharkDragon projectile = new SharkDragon();
-        projectile.copyDamageSource(this);
-        projectile.setPos(start);
+        projectile.setOwner(owner);
+        projectile.init(new PathNode(start, direction));
+        projectile.copyAttributes(this);
         projectile.setVelocity(direction);
-        projectile.join(owner);
+        LyraHelper.get(level).add(projectile);
     }
 
     // ===================== IEntityCollision 实现 =====================
@@ -97,7 +100,12 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
 
     @Override
     public boolean canCollideAttack() {
-        return isTarget(getTarget());
+        return getTarget() != null;
+    }
+
+    @Override
+    public boolean isValidCollisionTarget(Sharknado entity, LivingEntity target) {
+        return LyraHelper.get(level).getTargetCache().isTarget(owner, target);
     }
 
     @Override

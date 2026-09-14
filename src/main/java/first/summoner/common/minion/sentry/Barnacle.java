@@ -1,6 +1,8 @@
 package first.summoner.common.minion.sentry;
 
-import first.lyra.common.entity.IBlockCollision;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.PoisonSaliva;
@@ -32,7 +34,6 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
         super(SummonerAttachmentEntityRegister.BARNACLE);
         setDrag(0.9f);
         setGravity(0);
-        setRotationSpeed(0);
     }
 
     @Override
@@ -41,43 +42,47 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
     }
 
     @Override
+    public boolean isAlive() {
+        if (!super.isAlive()) {
+            return false;
+        }
+        Vec3 pos = getPos();
+        Vec3 ownerPos = owner.position();
+        double horizontalDistanceSqr = (pos.x - ownerPos.x) * (pos.x - ownerPos.x) + (pos.z - ownerPos.z) * (pos.z - ownerPos.z);
+        return pos.y - ownerPos.y <= 64 && horizontalDistanceSqr <= 128 * 128;
+    }
+
+    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             Vec3 pos = getPos();
             for (int i = 1; i <= 15; i++) {
-                if (getLevel().getBlockState(BlockPos.containing(pos.add(0, -i, 0))).isSolid()) {
-                    applyForce(new Vec3(0, (float) (0.04 * (1.0 - i / 15.0)), 0));
+                BlockPos supportPos = BlockPos.containing(pos.add(0, -i, 0));
+                if (getLevel().getBlockState(supportPos).isCollisionShapeFullBlock(getLevel(), supportPos)) {
+                    addVelocity(new Vec3(0, (float) (0.04 * (1.0 - i / 15.0)), 0));
                     break;
                 }
                 if (i == 15) {
-                    applyForce(new Vec3(0, 0.04f, 0));
+                    addVelocity(new Vec3(0, 0.04f, 0));
                 }
             }
             Vec3 velocity = getVelocity();
             if (Math.abs(velocity.y) < 0.002) {
                 setVelocity(new Vec3(velocity.x, 0, velocity.z));
             }
-            if (owner != null) {
-                Vec3 ownerPos = owner.position();
-                if (pos.y - ownerPos.y > 64 || Math.sqrt((pos.x - ownerPos.x) * (pos.x - ownerPos.x) + (pos.z - ownerPos.z) * (pos.z - ownerPos.z)) > 128) {
-                    setRemove();
-                }
-            }
         }
-        if (--cooldown <= 0 && isTarget(getTarget())) {
+        if (--cooldown <= 0 && getTarget() != null) {
             cooldown = ATTACK_COOLDOWN;
             LivingEntity target = getTarget();
             Vec3 targetCenter = target.getBoundingBox().getCenter();
             Vec3 direction = targetCenter.subtract(getPos()).normalize();
             PoisonSaliva saliva = new PoisonSaliva();
-            saliva.copyDamageSource(this);
-            saliva.setPos(getPos());
+            saliva.setOwner(owner);
+            saliva.init(new PathNode(getPos(), direction));
+            saliva.copyAttributes(this);
             saliva.setVelocity(direction.scale(2));
-            if (owner != null) {
-                saliva.join(owner);
-            } else {
-                saliva.join(getLevel());
-            }
+            LyraHelper.get(level).add(saliva);
             // 向前喷射绿色唾液粒子（粒子量/速度/阻力均高于激光眼）
             ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
@@ -99,7 +104,6 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
                     .spread(0.25)
                     .emit();
         }
-        super.tick();
     }
 
     @Override
@@ -107,12 +111,4 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
         return new AABB(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25);
     }
 
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        // 顶部接触方块时停止移动（落地同理）
-        if (context.collisionY()) {
-            Vec3 velocity = getVelocity();
-            setVelocity(new Vec3(velocity.x, 0, velocity.z));
-        }
-    }
 }

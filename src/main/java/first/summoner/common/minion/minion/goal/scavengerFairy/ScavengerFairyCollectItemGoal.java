@@ -1,7 +1,8 @@
 package first.summoner.common.minion.minion.goal.scavengerFairy;
 
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.ScavengerFairy;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -14,7 +15,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScavengerFairyCollectItemGoal extends MinionGoal<ScavengerFairy> {
+public class ScavengerFairyCollectItemGoal extends AttachmentEntityGoal<ScavengerFairy> {
 
     public ScavengerFairyCollectItemGoal(ScavengerFairy minion) {
         super(minion);
@@ -25,17 +26,15 @@ public class ScavengerFairyCollectItemGoal extends MinionGoal<ScavengerFairy> {
         Entity targetEntity = minion.getTargetEntity();
         if (targetEntity != null) {
             if (targetEntity instanceof ItemEntity itemEntity) {
-                Player owner = minion.getOwner();
-                if (owner != null) {
-                    Inventory inventory = owner.getInventory();
-                    for (int i = 0; i < inventory.getContainerSize(); i++) {
-                        ItemStack item = inventory.getItem(i);
-                        if (item.isEmpty()) {
-                            return true;
-                        }
-                        if (item.getCount() < item.getMaxStackSize() && itemEntity.getItem().is(item.getItem())) {
-                            return true;
-                        }
+                Player owner = (Player) minion.getOwner();
+                Inventory inventory = owner.getInventory();
+                for (int i = 0; i < inventory.getContainerSize(); i++) {
+                    ItemStack item = inventory.getItem(i);
+                    if (item.isEmpty()) {
+                        return true;
+                    }
+                    if (item.getCount() < item.getMaxStackSize() && itemEntity.getItem().is(item.getItem())) {
+                        return true;
                     }
                 }
             }
@@ -52,11 +51,9 @@ public class ScavengerFairyCollectItemGoal extends MinionGoal<ScavengerFairy> {
                 minion.deliver(entity);
             }
             if (entity instanceof ExperienceOrb experienceOrb) {
-                Player owner = minion.getOwner();
-                if (owner != null) {
-                    owner.takeXpDelay = 0;
-                    experienceOrb.playerTouch(owner);
-                }
+                Player owner = (Player) minion.getOwner();
+                owner.takeXpDelay = 0;
+                experienceOrb.playerTouch(owner);
             }
             minion.setTargetEntity(minion.findNearestNewTargetEntity());
             return;

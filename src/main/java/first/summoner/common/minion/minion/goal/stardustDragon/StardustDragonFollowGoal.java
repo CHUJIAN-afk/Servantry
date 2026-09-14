@@ -1,8 +1,8 @@
 package first.summoner.common.minion.minion.goal.stardustDragon;
 
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.entity.PlannedPath;
-import first.lyra.common.minion.MinionGoal;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.PlannedPath;
 import first.summoner.common.minion.minion.StardustDragon;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -18,7 +18,7 @@ import java.util.Collections;
  * 到达目标位置后朝向前一体节的姿态。
  * </p>
  */
-public class StardustDragonFollowGoal extends MinionGoal<StardustDragon> {
+public class StardustDragonFollowGoal extends AttachmentEntityGoal<StardustDragon> {
 
     public StardustDragonFollowGoal(StardustDragon minion) {
         super(minion);

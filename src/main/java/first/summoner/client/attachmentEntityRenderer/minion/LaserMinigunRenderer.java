@@ -6,7 +6,7 @@ import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.animated.AnimatedModelRenderer;
 import first.lyra.client.render.animated.AnimatedRenderOptions;
 import first.lyra.client.render.trail.ModelConfig;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.Summoner;
 import first.summoner.common.minion.minion.LaserMinigun;
 import net.minecraft.client.renderer.MultiBufferSource;

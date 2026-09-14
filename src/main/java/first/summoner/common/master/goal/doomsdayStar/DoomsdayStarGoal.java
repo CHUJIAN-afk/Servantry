@@ -1,9 +1,9 @@
 package first.summoner.common.master.goal.doomsdayStar;
 
-import first.lyra.common.minion.MinionGoal;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.summoner.common.master.DoomsdayStar;
 
-public abstract class DoomsdayStarGoal extends MinionGoal<DoomsdayStar> {
+public abstract class DoomsdayStarGoal extends AttachmentEntityGoal<DoomsdayStar> {
 
     protected final DoomsdayStar.GoalState goalState;
     protected final DoomsdayStar doomsdayStar;

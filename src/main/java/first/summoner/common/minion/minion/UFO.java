@@ -1,15 +1,17 @@
 package first.summoner.common.minion.minion;
 
+
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.entity.SyncFieldDispatcher;
-import first.lyra.common.minion.MinionGoalSelector;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.minion.minion.goal.MomentumMinionIdleGoal;
 import first.summoner.common.minion.minion.goal.ufo.UFOAttackGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
+import first.summoner.utils.Utils;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,7 +30,6 @@ public class UFO extends MomentumMinion {
         super(SummonerAttachmentEntityRegister.UFO);
         setDrag(0.75f);
         setGravity(0);
-        setRotationSpeed(30f);
     }
 
     @Override
@@ -38,13 +39,14 @@ public class UFO extends MomentumMinion {
     }
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new UFOAttackGoal(this));
         goalSelector.addGoal(2, new MomentumMinionIdleGoal(this, 6, 0.04f, 48, false));
     }
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             if (trailTimer > 0) {
                 trailTimer--;
@@ -55,7 +57,6 @@ public class UFO extends MomentumMinion {
             PathNode current = getCurrentPathNode();
             setDesiredRotation(current.yaw() + 16, 0, 0);
         }
-        super.tick();
     }
 
     @Override
@@ -112,10 +113,9 @@ public class UFO extends MomentumMinion {
         }
     }
 
-    @Override
     public void teleportTo(Vec3 targetPos) {
         setTrailTimer(6);
-        super.teleportTo(targetPos);
+        Utils.teleportTo(this, targetPos);
     }
 
     public int getTrailTimer() {

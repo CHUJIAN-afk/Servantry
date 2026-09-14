@@ -1,6 +1,8 @@
 package first.summoner.common.minion.sentry;
 
-import first.lyra.common.entity.IBlockCollision;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.sound.Playable;
 import first.summoner.common.projectile.DestructionBullet;
@@ -17,8 +19,6 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
 
     public PulseTurret() {
         super(SummonerAttachmentEntityRegister.PULSE_TURRET);
-        setGravity(-0.05f);
-        setRotationSpeed(18f);
     }
 
     @Override
@@ -27,14 +27,17 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && getPos().distanceToSqr(owner.position()) <= 128 * 128;
+    }
+
+    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
-            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
-                setRemove();
-            }
             LivingEntity target = getTarget();
             cooldown--;
-            if (isTarget(target)) {
+            if (target != null) {
                 Vec3 targetPos = target.getBoundingBox().getCenter();
                 lookAtPos(targetPos);
                 if (cooldown < 0) {
@@ -47,30 +50,18 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
                 }
             }
         }
-        super.tick();
-    }
-
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        if (context.bottomSupported()) {
-            Vec3 v = getVelocity();
-            setVelocity(new Vec3(v.x(), 0, v.z()));
-        }
     }
 
     public void fire() {
         Vec3 start = getPos();
         Vec3 direction = start.add(getLookAngle()).offsetRandom(getRandom(), 0.05f).subtract(getPos()).normalize();
         DestructionBullet projectile = new DestructionBullet();
-        projectile.copyDamageSource(this);
-        projectile.setPos(start);
+        projectile.setOwner(owner);
+        projectile.init(new PathNode(start, direction));
+        projectile.copyAttributes(this);
         projectile.setVelocity(direction);
-        projectile.join(getLevel());
-        if (owner != null) {
-            Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), start, owner.getSoundSource());
-        } else {
-            Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), start, net.minecraft.sounds.SoundSource.PLAYERS);
-        }
+        LyraHelper.get(level).add(projectile);
+        Playable.play(SummonerSoundRegister.BallistaShot, level, start, getSoundSource());
     }
 
         public void dimensionChange() {

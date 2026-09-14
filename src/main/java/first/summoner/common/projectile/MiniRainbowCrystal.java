@@ -1,7 +1,9 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -18,7 +20,7 @@ public class MiniRainbowCrystal extends Projectile {
     public MiniRainbowCrystal(){
         super(SummonerAttachmentEntityRegister.MINI_RAINBOW_CRYSTAL);
         setDrag(1);
-        setMaxLife(20);
+        setMaxTickCount(20);
     }
 
     public int getLife() {
@@ -27,6 +29,7 @@ public class MiniRainbowCrystal extends Projectile {
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             if (getTickCount() > 0 && getTickCount() % 9 == 0) {
                 Vec3 pos = getPos();
@@ -52,7 +55,8 @@ public class MiniRainbowCrystal extends Projectile {
                         .emit();
                 DamageSource damageSource = getDamageSource();
                 if (damageSource != null) {
-                    List<LivingEntity> entities = LyraHelper.get(owner).getTargetCache().getEntitiesInRadius(pos, 3.5, this::isTarget);
+                    TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
+                    List<LivingEntity> entities = targetCache.getEntitiesInRadius(pos, 3.5, living -> targetCache.isTarget(owner, living));
                     for (LivingEntity living : entities) {
                         InvincibleData.attack(living)
                                 .attacker(getUuid())
@@ -63,7 +67,6 @@ public class MiniRainbowCrystal extends Projectile {
                 }
             }
         }
-        super.tick();
     }
 
     public int getColor(float partialTick) {
@@ -75,6 +78,6 @@ public class MiniRainbowCrystal extends Projectile {
     }
 
     @Override
-    protected void tickPhysics() {
+    public void tickPhysics() {
     }
 }

@@ -4,6 +4,7 @@ import first.lyra.api.LyraHelper;
 import first.lyra.common.armorSet.ArmorSet;
 import first.lyra.register.LyraAttributeRegister;
 import first.lyra.register.LyraRegistries;
+
 import first.summoner.Summoner;
 import first.summoner.common.minion.minion.ChlorophyteCrystal;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -94,9 +95,10 @@ public class SummonerArmorSetRegister {
                         ChlorophyteCrystal crystal = new ChlorophyteCrystal();
                         crystal.setDamage(10f);
                         crystal.setKnockback(1f);
-                        LyraHelper.get(player).add(crystal);
+                        crystal.setOwner(player);
+                        LyraHelper.get(player.level()).add(crystal);
                     })
-                    .onRemove(player -> LyraHelper.get(player).getEntityData().remove(SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))
+                    .onRemove(player -> LyraHelper.get(player.level()).getEntityData().remove(SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))
                     .tooltip(1, "Summons a powerful leaf crystal to shoot at nearby enemies", "召唤强大的叶状水晶来射击附近的敌人")
                     .build()
             );

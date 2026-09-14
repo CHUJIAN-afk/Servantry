@@ -1,7 +1,7 @@
 package first.summoner.common.minion.minion.goal.enchantedThrowingKnives;
 
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.MinionGoal;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.EnchantedThrowingKnives;
 
 /**
@@ -11,7 +11,7 @@ import first.summoner.common.minion.minion.EnchantedThrowingKnives;
  * 当发现目标时，切换到攻击状态。
  * </p>
  */
-public class EnchantedThrowingKnivesIdleGoal extends MinionGoal<EnchantedThrowingKnives> {
+public class EnchantedThrowingKnivesIdleGoal extends AttachmentEntityGoal<EnchantedThrowingKnives> {
 
     public EnchantedThrowingKnivesIdleGoal(EnchantedThrowingKnives minion) {
         super(minion);

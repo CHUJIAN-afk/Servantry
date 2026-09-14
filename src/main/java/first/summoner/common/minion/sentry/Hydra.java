@@ -1,6 +1,8 @@
 package first.summoner.common.minion.sentry;
 
-import first.lyra.common.entity.IBlockCollision;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.summoner.common.projectile.FrostBolt;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -23,9 +25,6 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
 
     public Hydra() {
         super(SummonerAttachmentEntityRegister.HYDRA);
-        setGravity(-0.05f);
-        setDrag(0.9f);
-        setRotationSpeed(18f);
     }
 
     @Override
@@ -34,14 +33,17 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && getPos().distanceToSqr(owner.position()) <= 128 * 128;
+    }
+
+    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
-            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
-                setRemove();
-            }
             LivingEntity target = getTarget();
             cooldown--;
-            if (isTarget(target)) {
+            if (target != null) {
                 Vec3 targetPos = target.getBoundingBox().getCenter();
                 lookAtPos(targetPos);
                 if (cooldown < 0) {
@@ -54,21 +56,17 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
                 }
             }
         }
-        super.tick();
     }
 
     private void fire(Vec3 targetPos) {
         Vec3 start = getPos();
         Vec3 direction = targetPos.subtract(start).normalize();
         FrostBolt bolt = new FrostBolt();
-        bolt.copyDamageSource(this);
-        bolt.setPos(start);
+        bolt.setOwner(owner);
+        bolt.init(new PathNode(start, direction));
+        bolt.copyAttributes(this);
         bolt.setVelocity(direction);
-        if (owner != null) {
-            bolt.join(owner);
-        } else {
-            bolt.join(getLevel());
-        }
+        LyraHelper.get(level).add(bolt);
     }
 
     private double getAngleDeg(Vec3 a, Vec3 b) {
@@ -76,14 +74,6 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
             return Math.toDegrees(Math.atan2(a.cross(b).length(), a.dot(b)));
         }
         return 0.0;
-    }
-
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        if (context.bottomSupported()) {
-            Vec3 v = getVelocity();
-            setVelocity(new Vec3(v.x(), 0, v.z()));
-        }
     }
 
     @Override

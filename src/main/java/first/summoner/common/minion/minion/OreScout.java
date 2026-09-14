@@ -1,13 +1,12 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,6 +25,7 @@ public class OreScout extends Minion {
 
     @Override
     public void tick() {
+        super.tick();
         Level level = getLevel();
         if (!level.isClientSide()) {
             setPath(Collections.singletonList(getRenderNode(1.0f)));
@@ -38,17 +38,11 @@ public class OreScout extends Minion {
                 target = null;
             }
         }
-        super.tick();
     }
 
     @Override
     public int getSearchDistance() {
         return 0;
-    }
-
-    @Override
-    public boolean isTarget(LivingEntity target) {
-        return false;
     }
 
     @Override

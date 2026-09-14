@@ -1,8 +1,9 @@
 package first.summoner.common.projectile;
 
+
+import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -23,7 +24,8 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
     public ShatteredStellarCore() {
         super(SummonerAttachmentEntityRegister.SHATTERED_STELLAR_CORE);
         setDrag(0.8f);
-        setMaxLife(100);
+        setGravity(0);
+        setMaxTickCount(100);
     }
 
     @Override
@@ -33,7 +35,7 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
 
     @Override
     public boolean isValidCollisionTarget(ShatteredStellarCore entity, LivingEntity target) {
-        if (isTarget(target)) {
+        if (LyraHelper.get(getLevel()).getTargetCache().isTarget(owner, target)) {
             return true;
         }
         return target == chaseTarget;
@@ -44,31 +46,29 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
         HitContext hit = hitContexts.getFirst();
         LivingEntity target = hit.entity();
         DamageSource source = getDamageSource();
-        if (source != null) {
-            UUID uuid = getUuid();
-            InvincibleData.attack(target)
-                    .attacker(uuid)
-                    .damageSource(source)
-                    .damageAmount(getDamage())
-                    .apply();
-        }
-        currentPathNode = new PathNode(hit.hitPoint(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        UUID uuid = getUuid();
+        InvincibleData.attack(target)
+                .attacker(uuid)
+                .damageSource(source)
+                .damageAmount(getDamage())
+                .apply();
+        currentPathNode = currentPathNode.modifyPos(hit.hitPoint());
         setRemove();
     }
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             if (chaseTarget != null && chaseTarget.isAlive()) {
                 if (getTickCount() >= 15) {
                     Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
-                    applyForce(targetCenter.subtract(getPos()).normalize().scale(0.6));
+                    addVelocity(targetCenter.subtract(getPos()).normalize().scale(0.6));
                 }
             } else {
                 setRemove();
             }
         }
-        super.tick();
     }
 
     @Override

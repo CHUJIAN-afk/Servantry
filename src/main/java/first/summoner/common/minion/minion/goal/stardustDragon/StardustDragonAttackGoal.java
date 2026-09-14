@@ -1,6 +1,7 @@
 package first.summoner.common.minion.minion.goal.stardustDragon;
 
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.summoner.common.minion.minion.StardustDragon;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -8,7 +9,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * 星尘龙攻击目标。
  */
-public class StardustDragonAttackGoal extends MinionGoal<StardustDragon> {
+public class StardustDragonAttackGoal extends AttachmentEntityGoal<StardustDragon> {
 
     public StardustDragonAttackGoal(StardustDragon minion) {
         super(minion);
@@ -16,7 +17,7 @@ public class StardustDragonAttackGoal extends MinionGoal<StardustDragon> {
 
     @Override
     public boolean canUse() {
-        return minion.isHead() && minion.isTarget(minion.getTarget());
+        return minion.isHead() && minion.getTarget() != null;
     }
 
     @Override

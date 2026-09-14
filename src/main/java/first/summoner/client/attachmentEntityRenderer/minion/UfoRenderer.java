@@ -7,9 +7,12 @@ import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.animated.AnimatedModelRenderer;
 import first.lyra.client.render.animated.AnimatedRenderOptions;
 import first.lyra.client.render.trail.ModelConfig;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.Summoner;
 import first.summoner.common.minion.minion.UFO;
+import first.summoner.utils.ParticleHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.FastColor;
 
@@ -30,6 +33,21 @@ public class UfoRenderer extends AbstractAttachmentEntityRenderer<UFO> {
 
     @Override
     protected void render(UFO ufo, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<UFO> context, float partialTick, int packedLight, float alpha) {
+        if (ufo.getTrailTimer() > 0 && !Minecraft.getInstance().isPaused()) {
+            ParticleHelper.create(ufo.getLevel())
+                    .generic(GenericParticleBuilder.create()
+                                     .centerColor(0x46f7ff)
+                                     .edgeColor(0x3dd6dd)
+                                     .lifetime(3)
+                                     .lifetimeRandom(2)
+                                     .scale(0.015f)
+                                     .scaleRandom(0.005f)
+                    )
+                    .pos(visualNode.pos())
+                    .offset(0.2)
+                    .count(10)
+                    .emit();
+        }
         AnimatedRenderOptions request = AnimatedModelRenderer.request(Summoner.rl("ufo"))
                 .light(RenderUtil.FULL_LIGHT)
                 .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255));

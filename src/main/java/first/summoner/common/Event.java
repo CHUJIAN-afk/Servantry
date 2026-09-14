@@ -1,8 +1,9 @@
 package first.summoner.common;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.AttachmentEntityData;
-import first.lyra.common.entity.AttachmentEntityDamageSource;
+import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.lyra.common.minion.Minion;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.Summoner;
@@ -55,7 +56,7 @@ public class Event {
         DamageSource source = event.getSource();
         LivingEntity target = event.getEntity();
         if (!target.level().isClientSide() && source instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity() instanceof Minion minion) {
-            Player owner = minion.getOwner();
+            Player owner = minion.getOwner() instanceof Player player ? player : null;
             if (owner != null) {
                 SummonMarkData summonMarkData = owner.getData(SummonerAttachmentRegister.SummonMarkData);
                 if (summonMarkData.isSummonMarkTarget(target)) {
@@ -132,7 +133,7 @@ public class Event {
             if (SummonerArmorSetRegister.Hallowed.get().full(player)) {
                 target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
             }
-            List<VoidEater> voidEaters = LyraHelper.get(player).getEntityData().get(SummonerAttachmentEntityRegister.VOID_EATER.get());
+            List<VoidEater> voidEaters = LyraHelper.get(player.level()).getEntityData().get(SummonerAttachmentEntityRegister.VOID_EATER.get());
             if (!voidEaters.isEmpty()) {
                 target.addEffect(new MobEffectInstance(SummonerMobEffectRegister.GodSlayerInferno, 60));
             }
@@ -151,7 +152,7 @@ public class Event {
             if (!(damageSource instanceof AttachmentEntityDamageSource attachmentDamageSource) || !(attachmentDamageSource.getAttachmentEntity() instanceof StardustCell)) {
                 List<StardustCell> stardustCells = entityData.get(SummonerAttachmentEntityRegister.STARDUST_CELL.get());
                 for (StardustCell cell : stardustCells) {
-                    if (cell.getExtraShootCooldown() <= 0 && player.getRandom().nextFloat() < 0.33f) {
+                    if (cell.getExtraShootCooldown() <= 0 && cell.getRandom().nextFloat() < 0.33f) {
                         cell.setExtraShootCooldown(14);
                         cell.shootExtraAtTarget(target);
                     }

@@ -1,8 +1,9 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -31,8 +32,8 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
     public FrostBolt() {
         super(SummonerAttachmentEntityRegister.FROST_BOLT);
         setDrag(1f);
-        setMaxLife(60);
         setGravity(0);
+        setMaxTickCount(60);
     }
 
     @Override
@@ -64,10 +65,9 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            for (HitContext hit : hitContexts) {
+                for (HitContext hit : hitContexts) {
                 if (hitCount >= 3) {
-                    setCurrentPathNode(getCollisionAfterPathNode(hit.hitPoint(), getCurrentPathNode()));
+                    setCurrentPathNode(getCurrentPathNode().modifyPos(hit.hitPoint()));
                     setRemove();
                     return;
                 }
@@ -104,18 +104,17 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
                     // 每次穿透衰减 15% 伤害
                     setDamage(getDamage() * 0.85f);
                     if (hitCount >= 3) {
-                        setCurrentPathNode(getCollisionAfterPathNode(hit.hitPoint(), getCurrentPathNode()));
+                        setCurrentPathNode(getCurrentPathNode().modifyPos(hit.hitPoint()));
                         setRemove();
                         return;
                     }
                 }
             }
-        }
     }
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        setCurrentPathNode(getCollisionAfterPathNode(context.position(), getCurrentPathNode()));
+        setCurrentPathNode(getCurrentPathNode().modifyPos(context.position()));
         setRemove();
     }
 

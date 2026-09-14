@@ -1,14 +1,11 @@
 package first.summoner.common.minion.minion;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.AttachmentEntityType;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.entity.SyncFieldDispatcher;
+import first.lyra.common.attachmentEntity.*;
 import first.lyra.common.minion.Minion;
-import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.common.minion.minion.goal.terraprism.TerraprismAttackGoal;
 import first.summoner.common.minion.minion.goal.terraprism.TerraprismIdleGoal;
@@ -52,7 +49,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     }
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new TerraprismAttackGoal(this));
         goalSelector.addGoal(1, new TerraprismPrepGoal(this));
         goalSelector.addGoal(2, new TerraprismIdleGoal(this));
@@ -64,7 +61,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
         if (distance > 0) {
             LyraHelper helper = LyraHelper.get(getLevel());
             TargetCache targetCache = helper.getTargetCache();
-            List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), targetCache.getSummonSearchRange(this.getOwner(), (float) distance), (living) -> (attacking || targetCache.isVisibility(this, living)) && this.isTarget(living));
+            List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), (float) distance, (living) -> (attacking || (this.getOwner() != null && targetCache.isVisibility(this.getOwner(), living))) && targetCache.isTarget(this.getOwner(), living));
             if (!targets.isEmpty()) {
                 return targetCache.getNewTarget(this, targets, 8, false);
             }
@@ -84,7 +81,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
 
     @Override
     public boolean canCollideAttack() {
-        return isTarget(getTarget());
+        return getTarget() != null;
     }
 
     @Override
@@ -102,6 +99,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             lastIdleBlend = idleBlend;
             if (attacking) {
@@ -115,11 +113,10 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
                 idleBlend = Math.max(0.0f, idleBlend - 0.25f);
             }
         }
-        super.tick();
     }
 
     public int getColor(float partialTick) {
-        int order = getSameOrder();
+        int order = getOrder();
         int total = Math.max(1, getSameSize());
         int animationTick = owner != null ? owner.tickCount : tickCount;
         float hueShift = ((float) order / total + (animationTick + partialTick) * 0.015f) % 1.0f;
@@ -149,7 +146,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
             float backZ = (float) Math.cos(rad);
             float rightX = (float) Math.cos(rad);
             float rightZ = (float) -Math.sin(rad);
-            int order = getSameOrder();
+            int order = getOrder();
             double localZ = 0.75 + order * 0.12;
             double floatSpeed = 0.08 + order * 0.01;
             double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;

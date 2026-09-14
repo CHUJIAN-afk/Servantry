@@ -6,7 +6,7 @@ import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ModelConfig;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.StardustDragon;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -30,7 +30,7 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
     @Override
     protected RenderContext<StardustDragon> createContext(StardustDragon dragon, float partialTick) {
         int total = Math.max(1, dragon.getSameSize());
-        int index = dragon.getSameOrder();
+        int index = dragon.getOrder();
         boolean isTail = index == total - 1;
         return RenderContext.<StardustDragon>builder()
                 .model(new ModelConfig<StardustDragon>()
@@ -42,7 +42,7 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
     @Override
     protected void render(StardustDragon dragon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<StardustDragon> context, float partialTick, int packedLight, float alpha) {
         int total = Math.max(1, dragon.getSameSize());
-        int index = dragon.getSameOrder();
+        int index = dragon.getOrder();
         ModelResourceLocation model;
         if (index == 0) {
             model = SummonerModelRegister.STARDUST_DRAGON_HEAD;

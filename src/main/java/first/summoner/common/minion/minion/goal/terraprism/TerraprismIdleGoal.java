@@ -1,11 +1,11 @@
 package first.summoner.common.minion.minion.goal.terraprism;
 
-import first.lyra.common.minion.MinionGoal;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.summoner.common.minion.minion.Terraprism;
 
 import java.util.Collections;
 
-public class TerraprismIdleGoal extends MinionGoal<Terraprism> {
+public class TerraprismIdleGoal extends AttachmentEntityGoal<Terraprism> {
 
     public TerraprismIdleGoal(Terraprism minion) {
         super(minion);

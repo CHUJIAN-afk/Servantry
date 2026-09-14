@@ -3,8 +3,8 @@ package first.summoner.common.minion.sentry;
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.SyncFieldDispatcher;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -26,7 +26,6 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
     public LightningAura() {
         super(SummonerAttachmentEntityRegister.LIGHTNING_AURA);
         setGravity(-0.05f);
-        setRotationSpeed(18f);
     }
 
     @Override
@@ -41,11 +40,14 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && getPos().distanceToSqr(owner.position()) <= 128 * 128;
+    }
+
+    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
-            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
-                setRemove();
-            }
             spawnParticles();
             cooldown--;
             if (cooldown < 0) {
@@ -53,7 +55,6 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
                 attack();
             }
         }
-        super.tick();
     }
 
     /**
@@ -94,14 +95,6 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
                     .count(0)
                     .velocity(0, 0, 0)
                     .emit();
-        }
-    }
-
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        if (context.bottomSupported()) {
-            Vec3 v = getVelocity();
-            setVelocity(new Vec3(v.x(), 0, v.z()));
         }
     }
 

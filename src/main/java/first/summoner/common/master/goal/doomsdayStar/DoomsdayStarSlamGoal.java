@@ -1,6 +1,6 @@
 package first.summoner.common.master.goal.doomsdayStar;
 
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.master.DoomsdayStar;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -44,7 +44,7 @@ public class DoomsdayStarSlamGoal extends DoomsdayStarGoal {
         }
 
         if (phase == SLAMMING) {
-            doomsdayStar.applyForce(new Vec3(0.0D, -0.1D, 0.0D));
+            doomsdayStar.addVelocity(new Vec3(0.0D, -0.1D, 0.0D));
             if (doomsdayStar.onGround()) {
                 doomsdayStar.setVelocity(Vec3.ZERO);
                 phase = FINISHED;

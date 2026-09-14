@@ -1,6 +1,7 @@
 package first.summoner.common.minion.minion.goal.stardustCell;
 
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.summoner.common.minion.minion.StardustCell;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -13,7 +14,7 @@ import java.util.Random;
  * 追踪目标并在射击冷却结束时发射星细胞射弹。
  * </p>
  */
-public class StardustCellAttackGoal extends MinionGoal<StardustCell> {
+public class StardustCellAttackGoal extends AttachmentEntityGoal<StardustCell> {
 
     public StardustCellAttackGoal(StardustCell minion) {
         super(minion);
@@ -21,7 +22,7 @@ public class StardustCellAttackGoal extends MinionGoal<StardustCell> {
 
     @Override
     public boolean canUse() {
-        return minion.isTarget(minion.getTarget());
+        return minion.getTarget() != null;
     }
 
     @Override
@@ -33,7 +34,7 @@ public class StardustCellAttackGoal extends MinionGoal<StardustCell> {
         } else {
             Vec3 wanderPos = getHaloAnchorPos(target);
             double distance = minion.getPos().distanceTo(wanderPos);
-            minion.applyForce(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * 0.1, 0.6)));
+            minion.addVelocity(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * 0.1, 0.6)));
             float scale = distance < 1.5 ? 0.55f : 0.95f;
             minion.setVelocity(minion.getVelocity().scale(scale));
             if (!minion.isExecutingPath()) {
@@ -54,7 +55,7 @@ public class StardustCellAttackGoal extends MinionGoal<StardustCell> {
     public Vec3 getHaloAnchorPos(LivingEntity target) {
         int tickCount = minion.getTickCount();
 
-        long seed = target.getId() * 31337L + minion.getSameOrder() * 1021L;
+        long seed = target.getId() * 31337L + minion.getOrder() * 1021L;
         Random rand = new Random(seed);
         double baseTheta = rand.nextDouble() * Math.PI * 2;
         double phi = Math.acos(1.0 - rand.nextDouble() * 1.4);

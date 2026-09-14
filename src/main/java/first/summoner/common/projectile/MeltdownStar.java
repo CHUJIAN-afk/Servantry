@@ -1,10 +1,9 @@
 package first.summoner.common.projectile;
 
+import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.AttachmentEntityDamageSource;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.register.LyraDamageRegister;
 import first.summoner.common.master.DoomsdayStar;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -34,7 +33,7 @@ public class MeltdownStar extends Projectile implements IEntityCollision<Meltdow
         super(SummonerAttachmentEntityRegister.MELTDOWN_STAR);
         setDrag(1.0F);
         setGravity(0.0F);
-        setMaxLife(100);
+        setMaxTickCount(100);
     }
 
     public static void fire(DoomsdayStar doomsdayStar, List<MeltdownStar> stars) {
@@ -61,16 +60,11 @@ public class MeltdownStar extends Projectile implements IEntityCollision<Meltdow
                         .add(tangent.scale(Math.sin(SCATTER_ANGLE)))
                         .normalize();
                 MeltdownStar star = new MeltdownStar();
+                star.setOwner(doomsdayStar.getHurtEntity());
                 star.setDamage(doomsdayStar.getAttackDamage());
-                star.setDamageSourceSupplier((level, player) -> new AttachmentEntityDamageSource(
-                        LyraDamageRegister.getDamageTypeHolder(LyraDamageRegister.Summon, level),
-                        doomsdayStar.getHurtEntity(),
-                        doomsdayStar.getHurtEntity(),
-                        star.getPos(),
-                        star
-                ));
                 star.orbit(doomsdayStar, launchDirection);
-                star.join(doomsdayStar.getLevel());
+                star.init(star.getCurrentPathNode());
+                LyraHelper.get(doomsdayStar.getLevel()).add(star);
                 stars.add(star);
             }
         }
@@ -90,25 +84,26 @@ public class MeltdownStar extends Projectile implements IEntityCollision<Meltdow
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && (source == null || !source.isRemove());
+    }
+
+    @Override
     public void tick() {
-        if (!getLevel().isClientSide() && !launched) {
-            if (source == null || source.isRemove()) {
-                setRemove();
-            } else {
-                orbitAngle += ORBIT_SPEED;
-                Vec3 center = source.getPos();
-                Vec3 offset = launchDirection.scale(ORBIT_RADIUS);
-                double horizontalRadius = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
-                double angle = Math.atan2(offset.z, offset.x) + orbitAngle;
-                setPos(new Vec3(
-                        center.x + Math.cos(angle) * horizontalRadius,
-                        center.y + offset.y,
-                        center.z + Math.sin(angle) * horizontalRadius
-                ));
-                setVelocity(Vec3.ZERO);
-            }
-        }
         super.tick();
+        if (!getLevel().isClientSide() && !launched) {
+            orbitAngle += ORBIT_SPEED;
+            Vec3 center = source.getPos();
+            Vec3 offset = launchDirection.scale(ORBIT_RADIUS);
+            double horizontalRadius = Math.sqrt(offset.x * offset.x + offset.z * offset.z);
+            double angle = Math.atan2(offset.z, offset.x) + orbitAngle;
+            setPos(new Vec3(
+                    center.x + Math.cos(angle) * horizontalRadius,
+                    center.y + offset.y,
+                    center.z + Math.sin(angle) * horizontalRadius
+            ));
+            setVelocity(Vec3.ZERO);
+        }
     }
 
     @Override

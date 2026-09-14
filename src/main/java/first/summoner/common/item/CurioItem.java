@@ -1,7 +1,8 @@
 package first.summoner.common.item;
 
+
 import com.google.common.collect.Multimap;
-import first.lyra.common.entity.AttachmentEntityDamageSource;
+import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.lyra.common.minion.Minion;
 import first.summoner.Summoner;
 import first.summoner.common.builder.CurioItemBuilder;
@@ -42,7 +43,7 @@ public class CurioItem extends Item implements ICurioItem {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onLivingDamageEventPre(LivingDamageEvent.Pre event) {
         if (event.getSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity() instanceof Minion minion) {
-            Player owner = minion.getOwner();
+            Player owner = minion.getOwner() instanceof Player player ? player : null;
             if (owner != null) {
                 if (!owner.level().isClientSide()) {
                     Set<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);
@@ -63,7 +64,7 @@ public class CurioItem extends Item implements ICurioItem {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingDamageEventPost(LivingDamageEvent.Post event) {
         if (event.getSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity() instanceof Minion minion) {
-            Player owner = minion.getOwner();
+            Player owner = minion.getOwner() instanceof Player player ? player : null;
             if (owner != null) {
                 if (!owner.level().isClientSide()) {
                     Set<CurioItem> curiosItemList = CuriosUtil.getCuriosItemList(owner);

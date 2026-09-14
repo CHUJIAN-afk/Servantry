@@ -1,6 +1,6 @@
 package first.summoner.common.summonMark;
 
-import first.lyra.common.entity.AttachmentEntityDamageSource;
+import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.summoner.common.attachment.SummonMarkData;
 import first.summoner.register.SummonerSummonMarkRegister;
 import net.minecraft.ChatFormatting;

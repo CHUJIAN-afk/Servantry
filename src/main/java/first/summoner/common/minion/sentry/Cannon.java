@@ -1,7 +1,9 @@
 package first.summoner.common.minion.sentry;
 
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.SyncFieldDispatcher;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.sound.Playable;
 import first.summoner.common.projectile.Corn;
@@ -34,7 +36,6 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
     public Cannon() {
         super(SummonerAttachmentEntityRegister.CANNON);
         setGravity(-0.05f);
-        setRotationSpeed(18f);
     }
 
     @Override
@@ -50,13 +51,16 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && getPos().distanceToSqr(owner.position()) <= 128 * 128;
+    }
+
+    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
-            if (owner != null && getPos().distanceToSqr(owner.position()) > 128 * 128) {
-                setRemove();
-            }
             LivingEntity target = getTarget();
-            boolean hasTarget = isTarget(target);
+            boolean hasTarget = target != null;
             if (shootingTick == 0) {
                 if (--cooldown <= 0) {
                     hasCorn = true;
@@ -86,15 +90,6 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
                 renderTick = 0;
             }
         }
-        super.tick();
-    }
-
-    @Override
-    public void onBlockCollision(CollisionContext context) {
-        if (context.bottomSupported()) {
-            Vec3 v = getVelocity();
-            setVelocity(new Vec3(v.x(), 0, v.z()));
-        }
     }
 
         public void dimensionChange() {
@@ -106,16 +101,12 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
         Vec3 velocity = Ballistics.solveVelocity(start, targetPos, 85f, 0.99f, -0.05f);
         if (velocity != null) {
             Corn projectile = new Corn();
-            projectile.setPos(start);
-            projectile.copyDamageSource(this);
+            projectile.setOwner(owner);
+            projectile.init(new PathNode(start, velocity));
+            projectile.copyAttributes(this);
             projectile.setVelocity(velocity);
-            if (owner != null) {
-                projectile.join(owner);
-                Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), start, owner.getSoundSource());
-            } else {
-                projectile.join(getLevel());
-                Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), start, net.minecraft.sounds.SoundSource.PLAYERS);
-            }
+            LyraHelper.get(level).add(projectile);
+            Playable.play(SoundEvents.GENERIC_EXPLODE, level, start, getSoundSource());
         }
     }
 

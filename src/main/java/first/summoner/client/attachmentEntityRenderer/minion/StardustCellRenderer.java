@@ -1,5 +1,6 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
@@ -7,7 +8,7 @@ import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ConeTrailConfig;
 import first.lyra.client.render.trail.ModelConfig;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.minion.minion.StardustCell;
 import first.summoner.register.SummonerModelRegister;

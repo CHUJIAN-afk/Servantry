@@ -1,16 +1,17 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.SyncFieldDispatcher;
-import first.lyra.common.minion.MinionGoalSelector;
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.summoner.common.minion.minion.goal.MomentumMinionIdleGoal;
 import first.summoner.common.minion.minion.goal.twins.TwinsCursedFlameAttackGoal;
 import first.summoner.common.minion.minion.goal.twins.TwinsLaserAttackGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,8 +38,8 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
 
     public Twins() {
         super(SummonerAttachmentEntityRegister.TWINS);
-        setDrag(0.75f);
-        setRotationSpeed(20);
+        setDrag(0.7f);
+        setGravity(0);
     }
 
     @Override
@@ -49,7 +50,7 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
     }
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new TwinsLaserAttackGoal(this));
         goalSelector.addGoal(1, new TwinsCursedFlameAttackGoal(this));
         goalSelector.addGoal(2, new MomentumMinionIdleGoal(this, 6, 0.01f, 64, true));
@@ -61,18 +62,13 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
     }
 
     @Override
-    public boolean canCollideWithBlocks() {
-        return !isExecutingPath();
-    }
-
-    @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
     }
 
     @Override
     public boolean canCollideAttack() {
-        return !isLaserEye() && isTarget(getTarget());
+        return isFlameEye() && getTarget() != null;
     }
 
     @Override
@@ -81,28 +77,30 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
     }
 
     @Override
+    public boolean isValidCollisionTarget(Twins entity, LivingEntity target) {
+        return LyraHelper.get(level).getTargetCache().isTarget(owner, target);
+    }
+
+    @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
-            InvincibleData.attack(hit.entity())
-                    .attacker(getUuid())
-                    .damageSource(getDamageSource())
-                    .damageAmount(getDamage())
-                    .invincibleTime(4)
-                    .apply();
+            attack(hit.entity(), getDamage(), 4);
         }
     }
 
     @Override
+    public boolean isAlive() {
+        return super.isAlive() && other != null && !other.isRemove();
+    }
+
+    @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
-            if (other == null || other.isRemove()) {
-                setRemove();
-            }
             if (trailTimer > 0) {
                 trailTimer--;
             }
         }
-        super.tick();
     }
 
     public int getSearchDistance() {

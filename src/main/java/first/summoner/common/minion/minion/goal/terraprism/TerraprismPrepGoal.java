@@ -1,13 +1,14 @@
 package first.summoner.common.minion.minion.goal.terraprism;
 
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.Terraprism;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Collections;
 
-public class TerraprismPrepGoal extends MinionGoal<Terraprism> {
+public class TerraprismPrepGoal extends AttachmentEntityGoal<Terraprism> {
 
     private PathNode prep;
 
@@ -17,12 +18,12 @@ public class TerraprismPrepGoal extends MinionGoal<Terraprism> {
 
     @Override
     public boolean canUse() {
-        return minion.isTarget(minion.getTarget()) && !minion.attacking && minion.getRandom().nextDouble() < 0.1;
+        return minion.getTarget() != null && !minion.attacking && minion.getRandom().nextDouble() < 0.1;
     }
 
     @Override
     public boolean canContinueToUse() {
-        return minion.isTarget(minion.getTarget()) && !minion.attacking;
+        return minion.getTarget() != null && !minion.attacking;
     }
 
     @Override

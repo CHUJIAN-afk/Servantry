@@ -1,9 +1,8 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
@@ -20,14 +19,13 @@ public class DemonFlame extends Projectile implements IEntityCollision<DemonFlam
     public DemonFlame() {
         super(SummonerAttachmentEntityRegister.DEMON_FLAME);
         setDrag(0.92f);
-        setMaxLife(7);
+        setMaxTickCount(7);
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            for (HitContext hitContext : hitContexts) {
+                for (HitContext hitContext : hitContexts) {
                 LivingEntity target = hitContext.entity();
                 InvincibleData.attack(target)
                         .attacker(getUuid())
@@ -37,7 +35,6 @@ public class DemonFlame extends Projectile implements IEntityCollision<DemonFlam
                         .effect(new MobEffectInstance(SummonerMobEffectRegister.CursedFlame, 100, 0))
                         .apply();
             }
-        }
     }
 
     @Override
@@ -52,7 +49,7 @@ public class DemonFlame extends Projectile implements IEntityCollision<DemonFlam
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        currentPathNode = new PathNode(context.position(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        currentPathNode = currentPathNode.modifyPos(context.position());
         setRemove();
     }
 }

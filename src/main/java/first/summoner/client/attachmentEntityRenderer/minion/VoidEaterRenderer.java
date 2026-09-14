@@ -5,7 +5,7 @@ import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.trail.ModelConfig;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.VoidEater;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -30,7 +30,7 @@ public class VoidEaterRenderer extends AbstractAttachmentEntityRenderer<VoidEate
     @Override
     protected void render(VoidEater eater, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<VoidEater> context, float partialTick, int packedLight, float alpha) {
         int total = Math.max(1, eater.getSameSize());
-        int index = eater.getSameOrder();
+        int index = eater.getOrder();
         ModelResourceLocation model = index == 0
                 ? SummonerModelRegister.VOID_EATER_HEAD
                 : index == total - 1 ? SummonerModelRegister.VOID_EATER_TAIL : SummonerModelRegister.VOID_EATER_BODY;

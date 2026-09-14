@@ -1,7 +1,10 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.entity.SyncFieldDispatcher;
+
+
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.ElectricLaser;
@@ -37,13 +40,14 @@ public class LaserMinigun extends Minion {
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             LivingEntity target = getTarget();
             PathNode idleNode = getInterpolatedIdleState(0);
             PathNode currentNode = getCurrentPathNode();
             cooldown--;
             lastAnimationTick = animationTick;
-            if (isTarget(target)) {
+            if (target != null) {
                 Vec3 targetCenter = target.getBoundingBox().getCenter();
                 Vec3 direction = targetCenter.subtract(getPos()).normalize();
                 float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
@@ -60,7 +64,6 @@ public class LaserMinigun extends Minion {
                 setCurrentPathNode(currentNode.lerp(idleNode, 0.5f));
             }
         }
-        super.tick();
     }
 
     /**
@@ -83,12 +86,14 @@ public class LaserMinigun extends Minion {
         for (int i = 0; i < 4; i++) {
             Vec3 laserTargetPos = targetPos.add(direction.scale(5)).offsetRandom(random, 3);
             Vec3 normalize = laserTargetPos.subtract(startPos).normalize();
+            Vec3 spawnPos = startPos.add(normalize.scale(random.nextFloat() * 0.5f));
 
             ElectricLaser laser = new ElectricLaser();
-            laser.copyDamageSource(this);
-            laser.setPos(startPos.add(normalize.scale(random.nextFloat() * 0.5f)));
+            laser.setOwner(owner);
+            laser.init(new PathNode(spawnPos, normalize));
+            laser.copyAttributes(this);
             laser.setVelocity(normalize.scale(1.5));
-            laser.join(getLevel());
+            LyraHelper.get(getLevel()).add(laser);
         }
 
         ParticleHelper.create(getLevel())
@@ -117,7 +122,7 @@ public class LaserMinigun extends Minion {
      * 在玩家左肩偏上，有上下浮动。
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
-        Player owner = getOwner();
+        Player owner = getOwner() instanceof Player player ? player : null;
         PathNode node = getCurrentPathNode();
         if (owner != null) {
             double px = Mth.lerp(partialTick, owner.xo, owner.getX());

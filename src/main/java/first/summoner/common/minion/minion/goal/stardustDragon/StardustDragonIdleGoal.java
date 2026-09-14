@@ -1,14 +1,16 @@
 package first.summoner.common.minion.minion.goal.stardustDragon;
 
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.summoner.common.minion.minion.StardustDragon;
+import first.summoner.utils.Utils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 /**
  * 星尘龙待机目标。
  */
-public class StardustDragonIdleGoal extends MinionGoal<StardustDragon> {
+public class StardustDragonIdleGoal extends AttachmentEntityGoal<StardustDragon> {
 
     private Vec3 wanderPos = Vec3.ZERO;
 
@@ -18,23 +20,19 @@ public class StardustDragonIdleGoal extends MinionGoal<StardustDragon> {
 
     @Override
     public boolean canUse() {
-        return minion.isHead() && !minion.isTarget(minion.getTarget());
+        return minion.isHead() && minion.getTarget() == null;
     }
 
     @Override
     public void tick() {
-        Player owner = minion.getOwner();
-        Vec3 anchor = owner != null ? owner.position() : minion.getPos();
-        if (owner != null) {
-            do {
-                wanderPos = minion.getWanderPos(wanderPos, anchor, 8, 0);
-            } while (wanderPos.distanceToSqr(minion.getPos()) < 2);
-        } else {
-            wanderPos = minion.getWanderPos(wanderPos, anchor, 8, 0);
-        }
+        Player owner = minion.getOwner() instanceof Player player ? player : null;
+        Vec3 anchor = minion.getOwner().position();
+        do {
+            wanderPos = Utils.getWanderPos(minion, wanderPos, anchor, 8, 0);
+        } while (wanderPos.distanceToSqr(minion.getPos()) < 2);
         minion.orbitToward(wanderPos, 120f, 0.05 + minion.getPos().distanceTo(wanderPos) * 0.005);
-        if (owner != null && owner.distanceToSqr(minion.getPos()) > 128 * 128) {
-            minion.teleportTo(owner.getBoundingBox().getCenter());
+        if (owner.distanceToSqr(minion.getPos()) > 128 * 128) {
+            Utils.teleportTo(minion, owner.getBoundingBox().getCenter());
             wanderPos = Vec3.ZERO;
         }
     }

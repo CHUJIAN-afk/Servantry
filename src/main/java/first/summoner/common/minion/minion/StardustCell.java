@@ -1,8 +1,11 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.SyncFieldDispatcher;
-import first.lyra.common.minion.MinionGoalSelector;
+
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.minion.minion.goal.MomentumMinionIdleGoal;
@@ -10,6 +13,7 @@ import first.summoner.common.minion.minion.goal.stardustCell.StardustCellAttackG
 import first.summoner.common.projectile.MiniStardustCell;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
+import first.summoner.utils.Utils;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -53,7 +57,7 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
     }
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new StardustCellAttackGoal(this));
         goalSelector.addGoal(1, new MomentumMinionIdleGoal(this, 6, 0.01f, 64, false));
     }
@@ -65,6 +69,7 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             // 冷却衰减
             if (shootCooldown > 0) {
@@ -78,20 +83,20 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
             }
             setDesiredRotation(currentPathNode.yaw() + 4, currentPathNode.pitch() + 4, currentPathNode.roll() + 4);
         }
-        super.tick();
     }
 
     public void shootExtraAtTarget(LivingEntity target){
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
+        Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
         MiniStardustCell projectile = new MiniStardustCell();
-        projectile.copyDamageSource(this);
-        projectile.setPos(start);
+        projectile.setOwner(owner);
+        projectile.init(new PathNode(start, direction));
+        projectile.copyAttributes(this);
+        projectile.setVelocity(direction);
         projectile.setDamage(getDamage() * 0.67f);
         projectile.setChaseTarget(target);
-        projectile.join(owner);
-        // 后坐力
-        Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
+        LyraHelper.get(level).add(projectile);
         // 喷射粒子 - 星尘调色
         GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                          .centerColor(0x2fb2e1)
@@ -117,14 +122,16 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
     public void shootAtTarget(LivingEntity target) {
         Vec3 start = getPos();
         // 创建并发射星细胞射弹
-        MiniStardustCell projectile = new MiniStardustCell();
-        projectile.copyDamageSource(this);
-        projectile.setPos(start);
-        projectile.setChaseTarget(target);
-        projectile.join(owner);
-        // 后坐力
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
-        applyForce(direction.scale(-0.5));
+        MiniStardustCell projectile = new MiniStardustCell();
+        projectile.setOwner(owner);
+        projectile.init(new PathNode(start, direction));
+        projectile.copyAttributes(this);
+        projectile.setVelocity(direction);
+        projectile.setChaseTarget(target);
+        LyraHelper.get(level).add(projectile);
+        // 后坐力
+        addVelocity(direction.scale(-0.5));
         // 喷射粒子 - 星尘调色
         GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                 .centerColor(0x2fb2e1)
@@ -147,10 +154,9 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
                 .emit();
     }
 
-    @Override
     public void teleportTo(Vec3 targetPos) {
         setTrailTimer(4);
-        super.teleportTo(targetPos);
+        Utils.teleportTo(this, targetPos);
     }
 
     public int getShootCooldown() {
@@ -188,7 +194,7 @@ public class StardustCell extends MomentumMinion implements IBlockCollision<Star
     }
 
     @Override
-    public void onBlockCollision(CollisionContext context) {
-        setVelocity(IBlockCollision.bounceVelocity(getVelocity(), context, 0.25, 0.001));
+    public float getElasticity() {
+        return 0.25f;
     }
 }

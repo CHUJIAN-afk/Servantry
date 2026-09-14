@@ -1,9 +1,11 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
+import first.lyra.common.attachment.TargetCache;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -32,7 +34,7 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
     public ForbiddenOrb() {
         super(SummonerAttachmentEntityRegister.FORBIDDEN_ORB);
         setDrag(1);
-        setMaxLife(60);
+        setMaxTickCount(60);
         setGravity(0);
     }
 
@@ -65,21 +67,17 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            Vec3 hitPoint = hitContexts.getFirst().hitPoint();
+                Vec3 hitPoint = hitContexts.getFirst().hitPoint();
             explode(source, hitPoint);
-            setCurrentPathNode(getCollisionAfterPathNode(hitPoint, getCurrentPathNode()));
+            setCurrentPathNode(getCurrentPathNode().modifyPos(hitPoint));
             setRemove();
-        }
     }
 
     @Override
     public void onBlockCollision(CollisionContext context) {
         DamageSource source = getDamageSource();
-        if (source != null) {
-            explode(source, context.position());
-        }
-        setCurrentPathNode(getCollisionAfterPathNode(context.position(), getCurrentPathNode()));
+                explode(source, context.position());
+        setCurrentPathNode(getCurrentPathNode().modifyPos(context.position()));
         setRemove();
     }
 
@@ -87,7 +85,7 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
     public void onRemove() {
         // 在空气中消失（自然消散）时也会爆炸
         DamageSource source = getDamageSource();
-        if (!getLevel().isClientSide() && source != null) {
+        if (!getLevel().isClientSide()) {
             explode(source, getPos());
         }
     }
@@ -96,8 +94,8 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
      * 爆炸：对命中点半径 3.5 格内所有敌人造成范围伤害，爆出大量金黄色粒子。
      */
     private void explode(DamageSource source, Vec3 hitPoint) {
-        List<LivingEntity> entities = LyraHelper.get(owner).getTargetCache()
-                .getEntitiesInRadius(hitPoint, 3.5, this::isTarget);
+        TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
+        List<LivingEntity> entities = targetCache.getEntitiesInRadius(hitPoint, 3.5, living -> targetCache.isTarget(owner, living));
         for (LivingEntity entity : entities) {
             InvincibleData.attack(entity)
                     .attacker(getUuid())

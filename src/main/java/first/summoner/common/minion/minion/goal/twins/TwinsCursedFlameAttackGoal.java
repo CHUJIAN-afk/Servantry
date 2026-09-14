@@ -1,16 +1,19 @@
 package first.summoner.common.minion.minion.goal.twins;
 
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.minion.minion.Twins;
 import first.summoner.common.projectile.DemonFlame;
 import first.summoner.utils.ParticleHelper;
+import first.summoner.utils.Utils;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-public class TwinsCursedFlameAttackGoal extends MinionGoal<Twins> {
+public class TwinsCursedFlameAttackGoal extends AttachmentEntityGoal<Twins> {
 
     private Vec3 wanderPos = Vec3.ZERO;
     private int cooldown = 0;
@@ -23,15 +26,16 @@ public class TwinsCursedFlameAttackGoal extends MinionGoal<Twins> {
 
     @Override
     public boolean canUse() {
-        return minion.isFlameEye() && minion.isTarget(minion.getTarget());
+        return minion.isFlameEye() && minion.getTarget() != null;
     }
 
     @Override
     public void tick() {
         LivingEntity target = minion.getTarget();
+        assert target != null;
         Vec3 targetPos = target.getBoundingBox().getCenter();
         Vec3 toTarget = targetPos.subtract(minion.getPos());
-        Player owner = minion.getOwner();
+        LivingEntity owner = minion.getOwner();
         Level level = minion.getLevel();
         minion.lookAtPos(targetPos);
         if (!emited) {
@@ -42,24 +46,25 @@ public class TwinsCursedFlameAttackGoal extends MinionGoal<Twins> {
                 } else {
                     cooldown = 12 + level.getRandom().nextInt(-2, 2);
                     Vec3 direction = toTarget.offsetRandom(level.getRandom(), (float) target.getBoundingBox().getSize()).normalize();
-                    minion.applyForce(direction.scale(2));
+                    minion.addVelocity(direction.scale(2));
                     minion.setTrailTimer(10);
                 }
             }
         } else {
-            if (--emit > 0) {
-                wanderPos = minion.getWanderPos(wanderPos, targetPos, 4, 1);
+            if (--emit < 0) {
+                emited = false;
+            }
+            if (emit % 2 == 0) {
+                wanderPos = Utils.getWanderPos(minion, wanderPos, targetPos, 4, 1);
                 double distance = minion.getPos().distanceTo(wanderPos);
-                minion.applyForce(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * 0.04, 0.4)));
+                minion.addVelocity(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * 0.04, 0.4)));
+                Vec3 direction = targetPos.subtract(minion.getPos()).normalize();
                 DemonFlame demonFlame = new DemonFlame();
-                demonFlame.copyDamageSource(minion);
-                demonFlame.setPos(minion.getPos());
-                demonFlame.setVelocity(targetPos.subtract(minion.getPos()).normalize());
-                if (owner != null) {
-                    demonFlame.join(owner);
-                } else {
-                    demonFlame.join(level);
-                }
+                demonFlame.setOwner(owner);
+                demonFlame.init(new PathNode(minion.getPos(), direction));
+                demonFlame.copyAttributes(minion);
+                demonFlame.setVelocity(direction);
+                LyraHelper.get(level).add(demonFlame);
                 GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                         .centerColor(0x24d509)
                         .edgeColor(0x1FF109);
@@ -80,8 +85,6 @@ public class TwinsCursedFlameAttackGoal extends MinionGoal<Twins> {
                         .speed(1.25)
                         .spread(0.15)
                         .emit();
-            } else {
-                emited = false;
             }
         }
     }

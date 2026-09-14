@@ -1,6 +1,6 @@
 package first.summoner.common.summonMark;
 
-import first.lyra.common.entity.AttachmentEntityDamageSource;
+import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;

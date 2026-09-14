@@ -1,11 +1,13 @@
 package first.summoner.common.minion.minion.goal;
 
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.lyra.common.minion.MomentumMinion;
+import first.summoner.utils.Utils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-public class MomentumMinionIdleGoal extends MinionGoal<MomentumMinion> {
+public class MomentumMinionIdleGoal extends AttachmentEntityGoal<MomentumMinion> {
 
     private Vec3 wanderPos = Vec3.ZERO;
     private final float distance;
@@ -23,22 +25,21 @@ public class MomentumMinionIdleGoal extends MinionGoal<MomentumMinion> {
 
     @Override
     public boolean canUse() {
-        return !minion.isTarget(minion.getTarget());
+        return minion.getTarget() == null;
     }
 
     @Override
     public void tick() {
-        Player owner = minion.getOwner();
-        Vec3 ownerPos = owner != null ? owner.position() : minion.getPos();
-        wanderPos = minion.getWanderPos(wanderPos, ownerPos, distance, 0);
+        Player owner = minion.getOwner() instanceof Player player ? player : null;
+        Vec3 ownerPos = minion.getOwner().position();
+        wanderPos = Utils.getWanderPos(minion, wanderPos, ownerPos, distance, 0);
         double distance = minion.getPos().distanceTo(wanderPos);
-        minion.applyForce(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * force, force * 10)));
+        minion.addVelocity(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * force, force * 10)));
         if (lookAtDirection) {
-            minion.lookAtDirection(minion.getVelocity()
-                                            .normalize());
+            minion.lookAtDirection(minion.getVelocity().normalize());
         }
-        if (owner != null && minion.getPos().distanceToSqr(ownerPos) > maxDistance * maxDistance) {
-            minion.teleportTo(ownerPos.add(minion.getVelocity().scale(10)));
+        if (minion.getPos().distanceToSqr(ownerPos) > maxDistance * maxDistance) {
+            Utils.teleportTo(minion, ownerPos.add(minion.getVelocity().scale(10)));
         }
     }
 }

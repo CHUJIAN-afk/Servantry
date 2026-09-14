@@ -1,15 +1,15 @@
 package first.summoner.common.projectile;
 
+
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.entity.SyncFieldDispatcher;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import first.summoner.utils.SummonerStreamCodecs;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.HashSet;
@@ -18,34 +18,19 @@ import java.util.Set;
 
 public class BlitzBall extends Projectile {
 
-    private static final StreamCodec<RegistryFriendlyByteBuf, Set<Integer>> STREAM_CODEC = StreamCodec.of(
-            (buf, ids) -> {
-                buf.writeVarInt(ids.size());
-                for (Integer id : ids) {
-                    buf.writeVarInt(id);
-                }
-            },
-            buf -> {
-                int size = buf.readVarInt();
-                Set<Integer> ids = new HashSet<>(size);
-                for (int i = 0; i < size; i++) {
-                    ids.add(buf.readVarInt());
-                }
-                return ids;
-            }
-    );
-
     private final Set<Integer> idList = new HashSet<>();
 
     public BlitzBall() {
         super(SummonerAttachmentEntityRegister.BLITZ_BALL);
-        setMaxLife(40);
+        setDrag(1);
+        setGravity(0);
+        setMaxTickCount(40);
     }
 
     @Override
     protected void registerSyncFields(SyncFieldDispatcher fields) {
         super.registerSyncFields(fields);
-        fields.field(STREAM_CODEC, this::getIdList, value -> {
+        fields.field(SummonerStreamCodecs.SET_INT, this::getIdList, value -> {
             idList.clear();
             idList.addAll(value);
         });
@@ -53,10 +38,11 @@ public class BlitzBall extends Projectile {
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             idList.clear();
             TargetCache targetCache = getLevel().getData(LyraAttachmentRegister.TargetCache);
-            List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 3, this::isTarget);
+            List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 3, living -> targetCache.isTarget(owner, living));
             for (LivingEntity living : entities) {
                 idList.add(living.getId());
                 InvincibleData.attack(living)
@@ -86,7 +72,6 @@ public class BlitzBall extends Projectile {
                         .emit();
             }
         }
-        super.tick();
     }
 
     @Override

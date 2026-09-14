@@ -2,8 +2,8 @@ package first.summoner.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityDamageSource;
+import first.lyra.common.attachmentEntity.AttachmentEntity;
+import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.lyra.mixinHandler.MixinHandler;
 import first.summoner.common.attachment.SummonMarkData;
 import first.summoner.common.summonMark.SummonMarkType;
@@ -19,9 +19,9 @@ import java.util.Set;
 public class MixinHandlerMixin {
 
     @WrapMethod(method = "getModifyDamage")
-    private static float getModifyDamage(LivingEntity living, Player owner, AttachmentEntity minion, float damage, AttachmentEntityDamageSource source, Operation<Float> original) {
-        if (owner != null) {
-            SummonMarkData data = owner.getData(SummonerAttachmentRegister.SummonMarkData);
+    private static float getModifyDamage(LivingEntity living, LivingEntity summoner, AttachmentEntity minion, float damage, AttachmentEntityDamageSource source, Operation<Float> original) {
+        if (summoner instanceof Player) {
+            SummonMarkData data = summoner.getData(SummonerAttachmentRegister.SummonMarkData);
             if (data.isSummonMarkTarget(living)) {
                 Set<SummonMarkType> summonMarks = data.getMarkTypes();
                 damage += data.getCriticalDamage();
@@ -39,17 +39,17 @@ public class MixinHandlerMixin {
                 }
             }
         }
-        return original.call(living, owner, minion, damage, source);
+        return original.call(living, summoner, minion, damage, source);
     }
 
     @WrapMethod(method = "getModifyArmorPierce")
-    private static float getModifyArmorPierce(LivingEntity living, Player owner, AttachmentEntity minion, float totalArmor, AttachmentEntityDamageSource source, Operation<Float> original) {
-        if (owner != null) {
-            SummonMarkData data = owner.getData(SummonerAttachmentRegister.SummonMarkData);
+    private static float getModifyArmorPierce(LivingEntity living, LivingEntity summoner, AttachmentEntity minion, float totalArmor, AttachmentEntityDamageSource source, Operation<Float> original) {
+        if (summoner instanceof Player) {
+            SummonMarkData data = summoner.getData(SummonerAttachmentRegister.SummonMarkData);
             if (data.isSummonMarkTarget(living)) {
                 totalArmor -= data.getCriticalArmorPierce();
             }
         }
-        return original.call(living, owner, minion, totalArmor, source);
+        return original.call(living, summoner, minion, totalArmor, source);
     }
 }

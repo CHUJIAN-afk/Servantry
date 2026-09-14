@@ -1,9 +1,10 @@
 package first.summoner.common.minion.minion.goal.terraprism;
 
-import first.lyra.common.entity.Ellipse;
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.entity.PlannedPath;
-import first.lyra.common.minion.MinionGoal;
+
+import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
+import first.lyra.common.attachmentEntity.Ellipse;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.PlannedPath;
 import first.lyra.utils.EasingCurve;
 import first.summoner.common.minion.minion.Terraprism;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * 泰拉棱镜仆从的攻击状态机。
  */
-public class TerraprismAttackGoal extends MinionGoal<Terraprism> {
+public class TerraprismAttackGoal extends AttachmentEntityGoal<Terraprism> {
 
     private boolean firstStrike = true;
     private boolean lastEllipse = false;
@@ -28,7 +29,7 @@ public class TerraprismAttackGoal extends MinionGoal<Terraprism> {
 
     @Override
     public boolean canUse() {
-        return minion.isTarget(minion.getTarget()) && minion.attacking;
+        return minion.getTarget() != null && minion.attacking;
     }
 
     @Override

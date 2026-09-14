@@ -1,12 +1,14 @@
 package first.summoner.common.master;
 
-import first.lyra.common.entity.AttachmentEntityDamageSource;
-import first.lyra.common.entity.LivingAttachmentEntity;
-import first.lyra.common.entity.PathNode;
-import first.lyra.common.entity.SyncFieldDispatcher;
-import first.lyra.common.minion.MinionGoalSelector;
+
+
+
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
+import first.lyra.common.attachmentEntity.LivingAttachmentEntity;
+import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.sound.Playable;
-import first.lyra.register.LyraDamageRegister;
 import first.summoner.client.MusicManager;
 import first.summoner.common.master.goal.doomsdayStar.*;
 import first.summoner.common.projectile.DoomsdayStarGel;
@@ -43,6 +45,7 @@ public class DoomsdayStar extends LivingAttachmentEntity {
     private boolean fallLaserIndicatorRender;
     private Vec3 fallLaserIndicatorEnd = Vec3.ZERO;
     private LivingEntity target;
+    private boolean blockCollision = true;
     private float lastScale = 1;
     private float scale = 1;
 
@@ -53,7 +56,7 @@ public class DoomsdayStar extends LivingAttachmentEntity {
     }
 
     @Override
-    public void registerGoals(MinionGoalSelector goalSelector) {
+    public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new DoomsdayStarSummonGoal(GoalState.SUMMON, this));
         goalSelector.addGoal(1, new DoomsdayStarJumpGoal(GoalState.JUMP, this));
         goalSelector.addGoal(2, new DoomsdayStarHoverScatterGoal(GoalState.HOVER_SCATTER, this));
@@ -84,11 +87,11 @@ public class DoomsdayStar extends LivingAttachmentEntity {
             double angle = Math.TAU * i / 36;
             Vec3 direction = new Vec3(Math.cos(angle), 0.0D, Math.sin(angle));
             StarlightShockwave shockwave = new StarlightShockwave();
-            shockwave.setCurrentPathNode(new PathNode(origin, (float) Math.toDegrees(Math.atan2(-direction.x, direction.z)), 0.0F, 0.0F));
+            shockwave.setOwner(getHurtEntity());
+            shockwave.init(new PathNode(origin, (float) Math.toDegrees(Math.atan2(-direction.x, direction.z)), 0.0F, 0.0F));
             shockwave.setVelocity(direction.scale(0.4));
             shockwave.setDamage(damage);
-            shockwave.setDamageSourceSupplier((level, player) -> new AttachmentEntityDamageSource(LyraDamageRegister.getDamageTypeHolder(LyraDamageRegister.Summon, level), getHurtEntity(), getHurtEntity(), shockwave.getPos(), shockwave));
-            shockwave.join(getLevel());
+            LyraHelper.get(getLevel()).add(shockwave);
         }
     }
 
@@ -108,6 +111,7 @@ public class DoomsdayStar extends LivingAttachmentEntity {
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             lastScale = scale;
             if (scale < 1) {
@@ -126,7 +130,6 @@ public class DoomsdayStar extends LivingAttachmentEntity {
             BlockHitResult fallLaserHit = getLevel().clip(new ClipContext(fallLaserStart, fallLaserMinEnd, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, net.minecraft.world.phys.shapes.CollisionContext.empty()));
             setFallLaserIndicatorEnd(fallLaserHit.getType() == HitResult.Type.MISS ? fallLaserMinEnd : fallLaserHit.getLocation());
         }
-        super.tick();
     }
 
     @Override
@@ -138,7 +141,6 @@ public class DoomsdayStar extends LivingAttachmentEntity {
                 Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), getPos(), getHurtEntity().getSoundSource());
                 fireStarlightShockwave();
             }
-            setVelocity(Vec3.ZERO);
         }
     }
 
@@ -146,11 +148,17 @@ public class DoomsdayStar extends LivingAttachmentEntity {
     protected boolean onHurtEntityDeath(@NotNull DamageSource damageSource) {
         if (!getLevel().isClientSide() && phase == 1) {
             phase = 2;
-            setHealth(getMaxHealth());
+            resetHurtEntityHealth();
             return true;
         }
-        setHealth(getMaxHealth());
+        resetHurtEntityHealth();
         return true;
+    }
+
+    private void resetHurtEntityHealth() {
+        if (hurtEntity != null) {
+            hurtEntity.setHealth(hurtEntity.getMaxHealth());
+        }
     }
 
     @Override
@@ -206,9 +214,18 @@ public class DoomsdayStar extends LivingAttachmentEntity {
         this.fallLaserIndicatorEnd = fallLaserIndicatorEnd;
     }
 
+    public void setBlockCollision(boolean blockCollision) {
+        this.blockCollision = blockCollision;
+    }
+
+    @Override
+    public boolean canCollideWithBlocks() {
+        return blockCollision;
+    }
+
     public void jump(Vec3 targetPos) {
         float drag = getDrag();
-        float gravity = getCustomGravity();
+        float gravity = getGravity();
         double targetHeight = targetPos.y - getPos().y;
         if (drag <= 0.0F || gravity >= 0.0F || targetHeight <= 0.0D) {
             setVelocity(Vec3.ZERO);

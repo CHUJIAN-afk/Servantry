@@ -1,7 +1,7 @@
 package first.summoner.register;
 
-import first.lyra.common.entity.AttachmentEntity;
-import first.lyra.common.entity.AttachmentEntityType;
+import first.lyra.common.attachmentEntity.AttachmentEntity;
+import first.lyra.common.attachmentEntity.AttachmentEntityType;
 import first.lyra.register.LyraRegistries;
 import first.summoner.Summoner;
 import first.summoner.common.master.DoomsdayStar;
@@ -27,195 +27,133 @@ public class SummonerAttachmentEntityRegister {
 
     // ===================== Boss =====================
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DoomsdayStar>> DOOMSDAY_STAR =
-            register("doomsday_star", DoomsdayStar::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DoomsdayStar>> DOOMSDAY_STAR = register("doomsday_star", DoomsdayStar::new);
 
     // ===================== 仆从类型 =====================
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<InfiniteShadow>> INFINITE_SHADOW =
-            register("infinite_shadow", InfiniteShadow::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<InfiniteShadow>> INFINITE_SHADOW = register("infinite_shadow", InfiniteShadow::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Terraprism>> TERRA_PRISM =
-            register("terraprism", Terraprism::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Terraprism>> TERRA_PRISM = register("terraprism", Terraprism::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustCell>> STARDUST_CELL =
-            register("stardust_cell", StardustCell::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustCell>> STARDUST_CELL = register("stardust_cell", StardustCell::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EnchantedThrowingKnives>> ENCHANTED_THROWING_KNIVES =
-            register("enchanted_throwing_knives", EnchantedThrowingKnives::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EnchantedThrowingKnives>> ENCHANTED_THROWING_KNIVES = register("enchanted_throwing_knives", EnchantedThrowingKnives::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustDragon>> STARDUST_DRAGON =
-            register("stardust_dragon", StardustDragon::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StardustDragon>> STARDUST_DRAGON = register("stardust_dragon", StardustDragon::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Twins>> TWINS =
-            register("twins", Twins::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Twins>> TWINS = register("twins", Twins::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Sharknado>> SHARKNADO =
-            register("sharknado", Sharknado::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Sharknado>> SHARKNADO = register("sharknado", Sharknado::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DeadlySphere>> DEADLY_SPHERE =
-            register("deadly_sphere", DeadlySphere::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DeadlySphere>> DEADLY_SPHERE = register("deadly_sphere", DeadlySphere::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EtherealStellarCore>> ETHEREAL_STELLAR_CORE =
-            register("ethereal_stellar_core", EtherealStellarCore::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EtherealStellarCore>> ETHEREAL_STELLAR_CORE = register("ethereal_stellar_core", EtherealStellarCore::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<OreScout>> ORE_SCOUT =
-            register("survey_drone", OreScout::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<OreScout>> ORE_SCOUT = register("survey_drone", OreScout::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ScavengerFairy>> SCAVENGER_FAIRY =
-            register("scavenger_fairy", ScavengerFairy::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ScavengerFairy>> SCAVENGER_FAIRY = register("scavenger_fairy", ScavengerFairy::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ChlorophyteCrystal>> CHLOROPHYTE_CRYSTAL =
-            register("chlorophyte_crystal", ChlorophyteCrystal::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ChlorophyteCrystal>> CHLOROPHYTE_CRYSTAL = register("chlorophyte_crystal", ChlorophyteCrystal::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MoonPortal>> MOON_PORTAL =
-            register("moon_portal", MoonPortal::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MoonPortal>> MOON_PORTAL = register("moon_portal", MoonPortal::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<RainbowCrystal>> RAINBOW_CRYSTAL =
-            register("rainbow_crystal", RainbowCrystal::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<RainbowCrystal>> RAINBOW_CRYSTAL = register("rainbow_crystal", RainbowCrystal::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Ballista>> BALLISTA =
-            register("ballista", Ballista::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Ballista>> BALLISTA = register("ballista", Ballista::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SuperPeashooter>> SUPER_PEASHOOTER =
-            register("super_peashooter", SuperPeashooter::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SuperPeashooter>> SUPER_PEASHOOTER = register("super_peashooter", SuperPeashooter::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<VoidEater>> VOID_EATER =
-            register("void_eater", VoidEater::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<VoidEater>> VOID_EATER = register("void_eater", VoidEater::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cloud>> CLOUD =
-            register("cloud", Cloud::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cloud>> CLOUD = register("cloud", Cloud::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<PulseTurret>> PULSE_TURRET =
-            register("pulse_turret", PulseTurret::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<PulseTurret>> PULSE_TURRET = register("pulse_turret", PulseTurret::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Hornet>> HORNET =
-            register("hornet", Hornet::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Hornet>> HORNET = register("hornet", Hornet::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Imp>> IMP =
-            register("imp", Imp::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Imp>> IMP = register("imp", Imp::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<UFO>> UFO =
-            register("ufo", UFO::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<UFO>> UFO = register("ufo", UFO::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cannon>> CANNON =
-            register("cannon", Cannon::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Cannon>> CANNON = register("cannon", Cannon::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<NecroSpirit>> NECRO_SPIRIT =
-            register("necro_spirit", NecroSpirit::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<NecroSpirit>> NECRO_SPIRIT = register("necro_spirit", NecroSpirit::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<LaserMinigun>> LASER_MINIGUN =
-            register("laser_minigun", LaserMinigun::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<LaserMinigun>> LASER_MINIGUN = register("laser_minigun", LaserMinigun::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<LightningAura>> LIGHTNING_AURA =
-            register("lightning_aura", LightningAura::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<LightningAura>> LIGHTNING_AURA = register("lightning_aura", LightningAura::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Barnacle>> BARNACLE =
-            register("barnacle", Barnacle::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Barnacle>> BARNACLE = register("barnacle", Barnacle::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EyeLaserTurret>> EYE_LASER_TURRET =
-            register("eye_laser_turret", EyeLaserTurret::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EyeLaserTurret>> EYE_LASER_TURRET = register("eye_laser_turret", EyeLaserTurret::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Hydra>> HYDRA =
-            register("hydra", Hydra::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Hydra>> HYDRA = register("hydra", Hydra::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Inferno>> INFERNO =
-            register("inferno", Inferno::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Inferno>> INFERNO = register("inferno", Inferno::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<BloodBat>> BLOOD_BAT =
-            register("blood_bat", BloodBat::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<BloodBat>> BLOOD_BAT = register("blood_bat", BloodBat::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<RuinRelic>> RUIN_RELIC =
-            register("ruin_relic", RuinRelic::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<RuinRelic>> RUIN_RELIC = register("ruin_relic", RuinRelic::new);
 
     // ===================== 射弹类型 =====================
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniStardustCell>> MINI_STARDUST_CELL =
-            register("mini_stardust_cell", MiniStardustCell::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniStardustCell>> MINI_STARDUST_CELL = register("mini_stardust_cell", MiniStardustCell::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Laser>> LASER =
-            register("laser", Laser::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Laser>> LASER = register("laser", Laser::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DemonFlame>> DEMON_FLAME =
-            register("demon_flame", DemonFlame::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DemonFlame>> DEMON_FLAME = register("demon_flame", DemonFlame::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SharkDragon>> SHARK_DRAGON =
-            register("shark_dragon", SharkDragon::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SharkDragon>> SHARK_DRAGON = register("shark_dragon", SharkDragon::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ShatteredStellarCore>> SHATTERED_STELLAR_CORE =
-            register("shattered_stellar_core", ShatteredStellarCore::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ShatteredStellarCore>> SHATTERED_STELLAR_CORE = register("shattered_stellar_core", ShatteredStellarCore::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniChlorophyteCrystal>> MINI_CHLOROPHYTE_CRYSTAL =
-            register("mini_chlorophyte_crystal", MiniChlorophyteCrystal::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniChlorophyteCrystal>> MINI_CHLOROPHYTE_CRYSTAL = register("mini_chlorophyte_crystal", MiniChlorophyteCrystal::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Zenith>> ZENITH =
-            register("zenith", Zenith::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Zenith>> ZENITH = register("zenith", Zenith::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CustomLaser>> CUSTOM_LASER =
-            register("custom_laser", CustomLaser::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CustomLaser>> CUSTOM_LASER = register("custom_laser", CustomLaser::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniRainbowCrystal>> MINI_RAINBOW_CRYSTAL =
-            register("mini_rainbow_crystal", MiniRainbowCrystal::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniRainbowCrystal>> MINI_RAINBOW_CRYSTAL = register("mini_rainbow_crystal", MiniRainbowCrystal::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CrossbowBolt>> CROSSBOW_BOLT =
-            register("crossbow_bolt", CrossbowBolt::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CrossbowBolt>> CROSSBOW_BOLT = register("crossbow_bolt", CrossbowBolt::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<GodFlame>> GOD_FLAME =
-            register("god_flame", GodFlame::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<GodFlame>> GOD_FLAME = register("god_flame", GodFlame::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<BlitzBall>> BLITZ_BALL =
-            register("blitz_ball", BlitzBall::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<BlitzBall>> BLITZ_BALL = register("blitz_ball", BlitzBall::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Rain>> RAIN =
-            register("rain", Rain::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Rain>> RAIN = register("rain", Rain::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DestructionBullet>> DESTRUCTION_BULLET =
-            register("destruction_bullet", DestructionBullet::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DestructionBullet>> DESTRUCTION_BULLET = register("destruction_bullet", DestructionBullet::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<HornetStinger>> HORNET_STINGER =
-            register("hornet_stinger", HornetStinger::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<HornetStinger>> HORNET_STINGER = register("hornet_stinger", HornetStinger::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ImpFireball>> IMP_FIREBALL =
-            register("imp_fireball", ImpFireball::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ImpFireball>> IMP_FIREBALL = register("imp_fireball", ImpFireball::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Corn>> CORN =
-            register("corn", Corn::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Corn>> CORN = register("corn", Corn::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniNecroSpirit>> MINI_NECRO_SPIRIT =
-            register("mini_necro_spirit", MiniNecroSpirit::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniNecroSpirit>> MINI_NECRO_SPIRIT = register("mini_necro_spirit", MiniNecroSpirit::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ElectricLaser>> ELECTRIC_LASER =
-            register("electric_laser", ElectricLaser::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ElectricLaser>> ELECTRIC_LASER = register("electric_laser", ElectricLaser::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Meteor>> METEOR =
-            register("meteor", Meteor::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Meteor>> METEOR = register("meteor", Meteor::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Petal>> PETAL =
-            register("petal", Petal::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Petal>> PETAL = register("petal", Petal::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<PoisonSaliva>> POISON_SALIVA =
-            register("poison_saliva", PoisonSaliva::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<PoisonSaliva>> POISON_SALIVA = register("poison_saliva", PoisonSaliva::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<FrostBolt>> FROST_BOLT =
-            register("frost_bolt", FrostBolt::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<FrostBolt>> FROST_BOLT = register("frost_bolt", FrostBolt::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ExplosionFlameBall>> EXPLOSION_FLAME_BALL =
-            register("explosion_flame_ball", ExplosionFlameBall::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ExplosionFlameBall>> EXPLOSION_FLAME_BALL = register("explosion_flame_ball", ExplosionFlameBall::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ForbiddenOrb>> FORBIDDEN_ORB =
-            register("forbidden_orb", ForbiddenOrb::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ForbiddenOrb>> FORBIDDEN_ORB = register("forbidden_orb", ForbiddenOrb::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StarlightShockwave>> STARLIGHT_SHOCKWAVE =
-            register("starlight_shockwave", StarlightShockwave::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StarlightShockwave>> STARLIGHT_SHOCKWAVE = register("starlight_shockwave", StarlightShockwave::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DoomsdayStarGel>> DOOMSDAY_STAR_GEL =
-            register("doomsday_star_gel", DoomsdayStarGel::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<DoomsdayStarGel>> DOOMSDAY_STAR_GEL = register("doomsday_star_gel", DoomsdayStarGel::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MeltdownStar>> MELTDOWN_STAR =
-            register("meltdown_star", MeltdownStar::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MeltdownStar>> MELTDOWN_STAR = register("meltdown_star", MeltdownStar::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StellarDebris>> STELLAR_DEBRIS =
-            register("stellar_debris", StellarDebris::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StellarDebris>> STELLAR_DEBRIS = register("stellar_debris", StellarDebris::new);
 
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, ResourceLocation -> new AttachmentEntityType<>(ResourceLocation, supplier));

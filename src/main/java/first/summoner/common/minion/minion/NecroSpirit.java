@@ -1,6 +1,9 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.common.entity.PathNode;
+
+
+import first.lyra.api.LyraHelper;
+import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.MiniNecroSpirit;
@@ -25,12 +28,13 @@ public class NecroSpirit extends Minion {
 
     @Override
     public void tick() {
+        super.tick();
         if (!getLevel().isClientSide()) {
             LivingEntity target = getTarget();
             PathNode idleNode = getInterpolatedIdleState(0);
             PathNode currentNode = getCurrentPathNode();
             cooldown--;
-            if (isTarget(target)) {
+            if (target != null) {
                 Vec3 targetCenter = target.getBoundingBox().getCenter();
                 Vec3 direction = targetCenter.subtract(getPos()).normalize();
                 float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
@@ -46,7 +50,6 @@ public class NecroSpirit extends Minion {
                 setCurrentPathNode(currentNode.lerp(idleNode, 0.25f));
             }
         }
-        super.tick();
     }
 
     /**
@@ -58,15 +61,12 @@ public class NecroSpirit extends Minion {
         Vec3 direction = targetCenter.subtract(start).normalize();
 
         MiniNecroSpirit projectile = new MiniNecroSpirit();
-        projectile.copyDamageSource(this);
-        projectile.setPos(start);
+        projectile.setOwner(owner);
+        projectile.init(new PathNode(start, direction));
+        projectile.copyAttributes(this);
         projectile.setVelocity(direction);
         projectile.setTrackingTarget(target);
-        if (owner != null) {
-            projectile.join(owner);
-        } else {
-            projectile.join(getLevel());
-        }
+        LyraHelper.get(level).add(projectile);
 
         // 发射粒子效果
         ParticleHelper.create(getLevel())
@@ -92,7 +92,7 @@ public class NecroSpirit extends Minion {
      * 在玩家右肩后方偏上，有上下浮动。
      */
     public PathNode getInterpolatedIdleState(float partialTick) {
-        Player owner = getOwner();
+        Player owner = getOwner() instanceof Player player ? player : null;
         PathNode node = getCurrentPathNode();
         if (owner != null) {
             double px = Mth.lerp(partialTick, owner.xo, owner.getX());

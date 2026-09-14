@@ -1,9 +1,8 @@
 package first.summoner.common.projectile;
 
 import first.lyra.common.attachment.InvincibleData;
-import first.lyra.common.entity.IBlockCollision;
-import first.lyra.common.entity.IEntityCollision;
-import first.lyra.common.entity.PathNode;
+import first.lyra.common.attachmentEntity.IBlockCollision;
+import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.damagesource.DamageSource;
@@ -23,7 +22,7 @@ public class ElectricLaser extends Projectile implements IEntityCollision<Electr
     public ElectricLaser() {
         super(SummonerAttachmentEntityRegister.ELECTRIC_LASER);
         setDrag(1);
-        setMaxLife(34);
+        setMaxTickCount(34);
     }
 
     @Override
@@ -31,15 +30,13 @@ public class ElectricLaser extends Projectile implements IEntityCollision<Electr
         HitContext hit = hitContexts.getFirst();
         LivingEntity target = hit.entity();
         DamageSource source = getDamageSource();
-        if (source != null) {
-            UUID uuid = getUuid();
+                UUID uuid = getUuid();
             InvincibleData.attack(target)
                     .attacker(uuid)
                     .damageSource(source)
                     .damageAmount(getDamage())
                     .apply();
-        }
-        currentPathNode = new PathNode(hit.hitPoint(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
+        currentPathNode = currentPathNode.modifyPos(hit.hitPoint());
         setRemove();
     }
 
