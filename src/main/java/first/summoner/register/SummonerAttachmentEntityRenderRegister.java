@@ -99,9 +99,10 @@ public class SummonerAttachmentEntityRenderRegister {
         register(SummonerAttachmentEntityRegister.FROST_BOLT, FrostBoltRenderer::new);
         register(SummonerAttachmentEntityRegister.EXPLOSION_FLAME_BALL, ExplosionFlameBallRenderer::new);
         register(SummonerAttachmentEntityRegister.FORBIDDEN_ORB, ForbiddenOrbRenderer::new);
-        register(SummonerAttachmentEntityRegister.STARLIGHT_SHOCKWAVE, null);
-        register(SummonerAttachmentEntityRegister.DOOMSDAY_STAR_GEL, null);
-        register(SummonerAttachmentEntityRegister.MELTDOWN_STAR, null);
+        register(SummonerAttachmentEntityRegister.STARLIGHT_SHOCKWAVE, StarlightShockwaveRenderer::new);
+        register(SummonerAttachmentEntityRegister.DOOMSDAY_STAR_GEL, DoomsdayStarGelRenderer::new);
+        register(SummonerAttachmentEntityRegister.MELTDOWN_STAR, MeltdownStarRenderer::new);
+        register(SummonerAttachmentEntityRegister.STELLAR_DEBRIS, StellarDebrisRenderer::new);
     }
 
     private static <T extends AttachmentEntity> void register(DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> type, @Nullable Supplier<IAttachmentEntityRenderer<T>> renderer) {

@@ -12,7 +12,6 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 激光射弹 - 高速直线飞行的红色激光束。
@@ -30,15 +29,12 @@ public class Laser extends Projectile implements IEntityCollision<Laser>, IBlock
         HitContext hit = hitContexts.getFirst();
         LivingEntity target = hit.entity();
         DamageSource source = getDamageSource();
-        if (source != null) {
-            UUID uuid = getUuid();
-            InvincibleData.attack(target)
-                    .attacker(uuid)
-                    .damageSource(source)
-                    .damageAmount(getDamage())
-                    .apply();
-            target.setRemainingFireTicks(Math.min(target.getRemainingFireTicks() + 20, 120));
-        }
+        InvincibleData.attack(target)
+                .attacker(getUuid())
+                .damageSource(source)
+                .damageAmount(getDamage())
+                .apply();
+        target.setRemainingFireTicks(Math.min(target.getRemainingFireTicks() + 20, 120));
         currentPathNode = new PathNode(hit.hitPoint(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll());
         setRemove();
     }

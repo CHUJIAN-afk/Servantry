@@ -8,9 +8,7 @@ import first.lyra.common.minion.MinionGoalSelector;
 import first.lyra.common.sound.Playable;
 import first.lyra.register.LyraDamageRegister;
 import first.summoner.client.MusicManager;
-import first.summoner.common.master.goal.doomsdayStar.DoomsdayStarHoverScatterGoal;
-import first.summoner.common.master.goal.doomsdayStar.DoomsdayStarJumpGoal;
-import first.summoner.common.master.goal.doomsdayStar.DoomsdayStarSummonGoal;
+import first.summoner.common.master.goal.doomsdayStar.*;
 import first.summoner.common.projectile.DoomsdayStarGel;
 import first.summoner.common.projectile.StarlightShockwave;
 import first.summoner.register.SummonerAttachmentEntityRegister;
@@ -34,7 +32,10 @@ public class DoomsdayStar extends LivingAttachmentEntity {
     public enum GoalState {
         SUMMON,
         JUMP,
-        HOVER_SCATTER
+        HOVER_SCATTER,
+        SLAM,
+        SCATTER_SLAM,
+        ORBIT
     }
 
     private int phase = 1;
@@ -56,6 +57,9 @@ public class DoomsdayStar extends LivingAttachmentEntity {
         goalSelector.addGoal(0, new DoomsdayStarSummonGoal(GoalState.SUMMON, this));
         goalSelector.addGoal(1, new DoomsdayStarJumpGoal(GoalState.JUMP, this));
         goalSelector.addGoal(2, new DoomsdayStarHoverScatterGoal(GoalState.HOVER_SCATTER, this));
+        goalSelector.addGoal(3, new DoomsdayStarSlamGoal(GoalState.SLAM, this));
+        goalSelector.addGoal(4, new DoomsdayStarScatterSlamGoal(GoalState.SCATTER_SLAM, this));
+        goalSelector.addGoal(5, new DoomsdayStarOrbitGoal(GoalState.ORBIT, this));
     }
 
     @Override
@@ -130,7 +134,7 @@ public class DoomsdayStar extends LivingAttachmentEntity {
         setOnGround(context.bottomSupported());
         setScale(getScale(1) - (float) Math.abs(getVelocity().y() * 0.1f));
         if (context.bottomSupported()) {
-            if ((goalState == GoalState.JUMP || goalState == GoalState.SUMMON) && getVelocity().y() < -0.2) {
+            if (getVelocity().y() < -0.2) {
                 Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), getPos(), getHurtEntity().getSoundSource());
                 fireStarlightShockwave();
             }
@@ -143,10 +147,10 @@ public class DoomsdayStar extends LivingAttachmentEntity {
         if (!getLevel().isClientSide() && phase == 1) {
             phase = 2;
             setHealth(getMaxHealth());
-            setVelocity(Vec3.ZERO);
             return true;
         }
-        return false;
+        setHealth(getMaxHealth());
+        return true;
     }
 
     @Override

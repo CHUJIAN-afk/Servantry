@@ -214,6 +214,9 @@ public class SummonerAttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MeltdownStar>> MELTDOWN_STAR =
             register("meltdown_star", MeltdownStar::new);
 
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<StellarDebris>> STELLAR_DEBRIS =
+            register("stellar_debris", StellarDebris::new);
+
     private static <T extends AttachmentEntity> DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> register(String name, Supplier<T> supplier) {
         return Register.register(name, ResourceLocation -> new AttachmentEntityType<>(ResourceLocation, supplier));
     }
