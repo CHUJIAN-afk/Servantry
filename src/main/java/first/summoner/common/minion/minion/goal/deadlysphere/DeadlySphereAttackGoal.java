@@ -7,12 +7,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * 致命球冲刺攻击Goal，AI与魔焰眼完全一致。
+ * 致命球直线冲撞攻击Goal。
  */
 public class DeadlySphereAttackGoal extends AttachmentEntityGoal<DeadlySphere> {
 
-    private int cooldown;
-    private int combat = 0;
+    private int cooldown = 0;
+    private int attacks = 0;
 
     public DeadlySphereAttackGoal(DeadlySphere deadlySphere) {
         super(deadlySphere);
@@ -27,18 +27,13 @@ public class DeadlySphereAttackGoal extends AttachmentEntityGoal<DeadlySphere> {
     public void tick() {
         LivingEntity target = minion.getTarget();
         Vec3 targetPos = target.getBoundingBox().getCenter();
-        Vec3 toTarget = targetPos.subtract(minion.getPos());
-        Vec3 direction = toTarget.offsetRandom(minion.getRandom(), (float) target.getBoundingBox().getSize()).normalize();
-        if (--cooldown <= 0) {
-            if (++combat == 3) {
-                combat = 0;
-                cooldown = 20;
-                minion.nextAppearance();
-            } else {
-                cooldown = 8 + minion.getRandom().nextInt(-2, 2);
-            }
-            minion.addVelocity(direction.scale(3));
-            minion.setTrailTimer(10);
+        if (--cooldown < 0) {
+            Vec3 direction = targetPos.subtract(minion.getPos()).normalize();
+            minion.addVelocity(direction.scale(2));
+            attacks++;
+            cooldown = attacks % 3 == 0 ? 20 : 10 + minion.getRandom().nextIntBetweenInclusive(-2, 2);
+        } else {
+            minion.setVelocity(minion.getVelocity().scale(0.8));
         }
     }
 }

@@ -1,45 +1,42 @@
 package first.summoner.common.minion.minion.goal;
 
-
 import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.lyra.common.minion.MomentumMinion;
-import first.summoner.utils.Utils;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 public class MomentumMinionIdleGoal extends AttachmentEntityGoal<MomentumMinion> {
 
-    private Vec3 wanderPos = Vec3.ZERO;
-    private final float distance;
-    private final float force;
-    private final float maxDistance;
-    private final boolean lookAtDirection;
+    private Vec3 offset = Vec3.ZERO;
 
-    public MomentumMinionIdleGoal(MomentumMinion minion, float distance, float force, float maxDistance, boolean lookAtDirection) {
+    public MomentumMinionIdleGoal(MomentumMinion minion) {
         super(minion);
-        this.distance = distance;
-        this.force = force;
-        this.maxDistance = maxDistance;
-        this.lookAtDirection = lookAtDirection;
     }
 
     @Override
     public boolean canUse() {
-        return minion.getTarget() == null;
+        return true;
+    }
+
+    @Override
+    public void start() {
+        LivingEntity owner = minion.getOwner();
+        Vec3 center = owner.getBoundingBox().getCenter().add(0, owner.getBbHeight() + 1, 0).add(Vec3.ZERO.offsetRandom(minion.getRandom(), 0.25f));
+        offset = center.add(center.subtract(minion.getPos()).normalize().scale(1.25f));
+        offset = offset.subtract(owner.getBoundingBox().getCenter());
     }
 
     @Override
     public void tick() {
-        Player owner = minion.getOwner() instanceof Player player ? player : null;
-        Vec3 ownerPos = minion.getOwner().position();
-        wanderPos = Utils.getWanderPos(minion, wanderPos, ownerPos, distance, 0);
-        double distance = minion.getPos().distanceTo(wanderPos);
-        minion.addVelocity(wanderPos.subtract(minion.getPos()).normalize().scale(Math.min(distance * force, force * 10)));
-        if (lookAtDirection) {
-            minion.lookAtDirection(minion.getVelocity().normalize());
-        }
-        if (minion.getPos().distanceToSqr(ownerPos) > maxDistance * maxDistance) {
-            Utils.teleportTo(minion, ownerPos.add(minion.getVelocity().scale(10)));
+        Vec3 targetPos = minion.getOwner().getBoundingBox().getCenter().add(offset);
+        if (minion.getPos().distanceTo(targetPos) > 0.5) {
+            minion.addVelocity(targetPos.subtract(minion.getPos()).normalize().scale(0.02));
+            minion.lookAtPos(targetPos);
+        } else {
+            minion.setVelocity(minion.getVelocity().scale(0.8));
+            if (minion.getVelocity().length() < 0.1) {
+                start();
+            }
         }
     }
 }

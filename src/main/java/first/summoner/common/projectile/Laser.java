@@ -21,7 +21,7 @@ public class Laser extends Projectile implements IEntityCollision<Laser>, IBlock
         super(SummonerAttachmentEntityRegister.LASER);
         setDrag(1);
         setGravity(0);
-        setMaxTickCount(34);
+        setMaxTickCount(100);
     }
 
     @Override
@@ -51,7 +51,6 @@ public class Laser extends Projectile implements IEntityCollision<Laser>, IBlock
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        currentPathNode = currentPathNode.modifyPos(context.position());
         setRemove();
     }
 }

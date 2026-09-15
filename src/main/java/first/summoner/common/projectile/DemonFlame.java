@@ -18,23 +18,22 @@ public class DemonFlame extends Projectile implements IEntityCollision<DemonFlam
 
     public DemonFlame() {
         super(SummonerAttachmentEntityRegister.DEMON_FLAME);
-        setDrag(0.92f);
         setMaxTickCount(7);
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-                for (HitContext hitContext : hitContexts) {
-                LivingEntity target = hitContext.entity();
-                InvincibleData.attack(target)
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .invincibleTime(10)
-                        .effect(new MobEffectInstance(SummonerMobEffectRegister.CursedFlame, 100, 0))
-                        .apply();
-            }
+        for (HitContext hitContext : hitContexts) {
+            LivingEntity target = hitContext.entity();
+            InvincibleData.attack(target)
+                    .attacker(getUuid())
+                    .damageSource(source)
+                    .damageAmount(getDamage())
+                    .invincibleTime(10)
+                    .effect(new MobEffectInstance(SummonerMobEffectRegister.CursedFlame, 100, 0))
+                    .apply();
+        }
     }
 
     @Override
@@ -49,7 +48,6 @@ public class DemonFlame extends Projectile implements IEntityCollision<DemonFlam
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        currentPathNode = currentPathNode.modifyPos(context.position());
         setRemove();
     }
 }

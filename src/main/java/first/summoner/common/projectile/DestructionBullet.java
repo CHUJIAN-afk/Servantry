@@ -23,7 +23,7 @@ public class DestructionBullet extends Projectile implements IEntityCollision<De
         super(SummonerAttachmentEntityRegister.DESTRUCTION_BULLET);
         setDrag(1);
         setGravity(0);
-        setMaxTickCount(40);
+        setMaxTickCount(100);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class DestructionBullet extends Projectile implements IEntityCollision<De
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.05, -0.05, -1, 0.05, 0.05, 0);
+        return new AABB(-0.05, -0.05, -0.5, 0.05, 0.05, 0);
     }
 
     @Override

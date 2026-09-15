@@ -28,7 +28,6 @@ public class DeadlySphereRenderer extends AbstractAttachmentEntityRenderer<Deadl
 
     @Override
     protected void render(DeadlySphere sphere, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DeadlySphere> context, float partialTick, int packedLight, float alpha) {
-        RenderUtil.renderStandalone(SummonerModelRegister.DEADLY_SPHERE, poseStack, bufferSource,
-                FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
+        RenderUtil.renderStandalone(SummonerModelRegister.DEADLY_SPHERE, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
     }
 }

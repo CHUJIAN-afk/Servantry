@@ -1,21 +1,12 @@
 package first.summoner.common.minion.minion;
 
-
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
-import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.minion.MomentumMinion;
-import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
-import first.summoner.common.minion.minion.goal.MomentumMinionIdleGoal;
 import first.summoner.common.minion.minion.goal.ufo.UFOAttackGoal;
+import first.summoner.common.minion.minion.goal.ufo.UFOIdleGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import first.summoner.utils.ParticleHelper;
-import first.summoner.utils.Utils;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -28,7 +19,6 @@ public class UFO extends MomentumMinion {
 
     public UFO() {
         super(SummonerAttachmentEntityRegister.UFO);
-        setDrag(0.75f);
         setGravity(0);
     }
 
@@ -41,7 +31,7 @@ public class UFO extends MomentumMinion {
     @Override
     public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new UFOAttackGoal(this));
-        goalSelector.addGoal(2, new MomentumMinionIdleGoal(this, 6, 0.04f, 48, false));
+        goalSelector.addGoal(1, new UFOIdleGoal(this));
     }
 
     @Override
@@ -54,8 +44,6 @@ public class UFO extends MomentumMinion {
                     setVelocity(getCurrentVelocity().scale(0.25));
                 }
             }
-            PathNode current = getCurrentPathNode();
-            setDesiredRotation(current.yaw() + 16, 0, 0);
         }
     }
 
@@ -73,51 +61,6 @@ public class UFO extends MomentumMinion {
         setDesiredRotation(targetYaw, 0, 0);
     }
 
-    /**
-     * 向目标发射激光（瞬间命中，无射弹实体）。
-     * 直接对目标造成伤害，并用粒子模拟激光线。
-     */
-    public void shootLaserAt(LivingEntity target) {
-        Vec3 startPos = getPos();
-        Vec3 targetPos = target.getBoundingBox().getCenter();
-
-        InvincibleData.attack(target)
-                .attacker(getUuid())
-                .damageSource(getDamageSource())
-                .damageAmount(getDamage())
-                .invincibleTime(4)
-                .apply();
-
-        // 粒子模拟激光线：从UFO到目标之间均匀生成蓝色粒子
-        Level level = getLevel();
-        Vec3 direction = targetPos.subtract(startPos);
-        double distance = direction.length();
-        direction = direction.normalize();
-        int particleCount = Math.max(3, (int) (distance / 0.1));
-        for (int i = 0; i < particleCount; i++) {
-            double t = (double) i / particleCount;
-            Vec3 particlePos = startPos.add(direction.scale(distance * t));
-            ParticleHelper.create(level)
-                    .generic(GenericParticleBuilder.create()
-                            .centerColor(0x46f7ff)
-                            .edgeColor(0x3dd6dd)
-                            .lifetime(3)
-                            .lifetimeRandom(2)
-                            .scale(0.015f)
-                            .scaleRandom(0.005f)
-                    )
-                    .pos(particlePos)
-                    .offset(0.05)
-                    .count(5)
-                    .emit();
-        }
-    }
-
-    public void teleportTo(Vec3 targetPos) {
-        setTrailTimer(6);
-        Utils.teleportTo(this, targetPos);
-    }
-
     public int getTrailTimer() {
         return trailTimer;
     }
@@ -126,11 +69,4 @@ public class UFO extends MomentumMinion {
         this.trailTimer = timer;
     }
 
-    /**
-     * 激光攻击冷却：8 tick（Terraria 0.4秒=24嘀嗒，ceil(24/3)=8）。
-     */
-    public int getLaserCooldown() {
-        RandomSource random = getRandom();
-        return 7 + random.nextIntBetweenInclusive(1, 2);
-    }
 }

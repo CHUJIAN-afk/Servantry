@@ -64,7 +64,7 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
         Playable.play(SummonerSoundRegister.BallistaShot, level, start, getSoundSource());
     }
 
-        public void dimensionChange() {
+    public void dimensionChange() {
         setRemove();
     }
 

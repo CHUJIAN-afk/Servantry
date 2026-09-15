@@ -1,28 +1,19 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
-import first.lyra.common.attachmentEntity.IBlockCollision;
-import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
-import first.lyra.common.sound.Playable;
-import first.summoner.common.minion.minion.goal.MomentumMinionIdleGoal;
 import first.summoner.common.minion.minion.goal.imp.ImpAttackGoal;
-import first.summoner.common.projectile.ImpFireball;
+import first.summoner.common.minion.minion.goal.imp.ImpIdleGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import first.summoner.register.SummonerSoundRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * 小鬼仆从 - 在目标周围盘旋，发射穿透火球。
  */
-public class Imp extends MomentumMinion implements IBlockCollision<Imp> {
+public class Imp extends MomentumMinion {
 
     public Imp() {
         super(SummonerAttachmentEntityRegister.IMP);
@@ -32,7 +23,7 @@ public class Imp extends MomentumMinion implements IBlockCollision<Imp> {
     @Override
     public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new ImpAttackGoal(this));
-        goalSelector.addGoal(1, new MomentumMinionIdleGoal(this, 4, 0.02f, 48, true));
+        goalSelector.addGoal(1, new ImpIdleGoal(this));
     }
 
     @Override
@@ -58,39 +49,13 @@ public class Imp extends MomentumMinion implements IBlockCollision<Imp> {
     }
 
     @Override
-    public @NotNull AABB getBlockCollisionBox() {
-        return new AABB(-0.2, -0.2, -0.2, 0.2, 0.2, 0.2);
-    }
-
-    @Override
     public int getSearchDistance() {
-        return 32;
+        return 16;
     }
 
     @Override
     public void lookAtDirection(Vec3 direction) {
         float targetYaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
         setDesiredRotation(targetYaw, 0, getRoll());
-    }
-
-    /**
-     * 向目标发射火球射弹。
-     */
-    public void shootFireballAt(LivingEntity target) {
-        Vec3 start = getPos();
-        Vec3 targetCenter = target.getBoundingBox().getCenter();
-        Vec3 direction = targetCenter.subtract(start).normalize();
-
-        ImpFireball fireball = new ImpFireball();
-        fireball.setOwner(owner);
-        fireball.init(new PathNode(start, direction));
-        fireball.copyAttributes(this);
-        fireball.setVelocity(direction);
-        LyraHelper.get(level).add(fireball);
-        Playable.play(SummonerSoundRegister.ImpFire, level, start, getSoundSource());
-    }
-
-    public int getFireballCooldown() {
-        return 20 + getRandom().nextIntBetweenInclusive(0, 6);
     }
 }

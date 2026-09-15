@@ -38,7 +38,7 @@ public class MiniStardustCell extends Projectile implements IEntityCollision<Min
 
     public MiniStardustCell() {
         super(SummonerAttachmentEntityRegister.MINI_STARDUST_CELL);
-        setDrag(0.9f);
+        setGravity(0);
         setMaxTickCount(100);
     }
 
@@ -113,6 +113,7 @@ public class MiniStardustCell extends Projectile implements IEntityCollision<Min
         LivingEntity target = hit.entity();
         setAttachedTarget(target);
         attachTo(hit.hitPoint());
+        setCurrentPathNode(getCurrentPathNode().modifyPos(hit.hitPoint()));
         DamageSource source = getDamageSource();
         MobEffectInstance existing = target.getEffect(SummonerMobEffectRegister.CellParasitism);
         int amplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, 9);

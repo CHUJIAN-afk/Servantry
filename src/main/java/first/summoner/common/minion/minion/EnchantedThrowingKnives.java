@@ -44,6 +44,11 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
     }
 
     @Override
+    public int getSearchDistance() {
+        return 16;
+    }
+
+    @Override
     protected void registerSyncFields(SyncFieldDispatcher fields) {
         super.registerSyncFields(fields);
         fields.field(ByteBufCodecs.FLOAT, () -> idleBlendO, value -> idleBlendO = value);
@@ -104,17 +109,12 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
         if (distance > 0) {
             LyraHelper helper = LyraHelper.get(getLevel());
             TargetCache targetCache = helper.getTargetCache();
-            List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), (float) distance, (living) -> (attacking || (targetCache.isVisibility(owner, living))) && targetCache.isTarget(owner, living));
+            List<LivingEntity> targets = targetCache.getEntitiesInRadius(owner.getBoundingBox().getCenter(), distance * 2, (living) -> (attacking || (targetCache.isVisibility(owner, living))) && targetCache.isTarget(owner, living) && targetCache.getDistance(this, living) < distance);
             if (!targets.isEmpty()) {
                 return targetCache.getNewTarget(this, targets, 8, false);
             }
         }
         return null;
-    }
-
-    @Override
-    public int getSearchDistance() {
-        return 32;
     }
 
     // ===================== 网络同步 =====================
@@ -140,7 +140,7 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
         int total = Math.max(1, getSameSize());
         int order = getOrder();
         float angle = (owner.tickCount + partialTick) * 0.015f + (order * Mth.TWO_PI / total);
-        float radius = 1.2f + (total > 4 ? (total - 4) * 0.025f : 0f);
+        float radius = 0.8f + (total > 4 ? (total - 4) * 0.005f : 0f);
 
         double px = Mth.lerp(partialTick, owner.xo, owner.getX());
         double py = Mth.lerp(partialTick, owner.yo, owner.getY());

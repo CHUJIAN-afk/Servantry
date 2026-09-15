@@ -37,12 +37,12 @@ public class HornetStinger extends Projectile implements IEntityCollision<Hornet
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.1, -0.1, -0.1, 0.1, 0.1, 0.1);
+        return new AABB(-0.1, -0.1, -0.5, 0.1, 0.1, 0);
     }
 
     @Override
     public @NotNull AABB getBlockCollisionBox() {
-        return getHitbox();
+        return new AABB(-0.1, -0.1, -0.1, 0.1, 0.1, 0.1);
     }
 
     @Override
