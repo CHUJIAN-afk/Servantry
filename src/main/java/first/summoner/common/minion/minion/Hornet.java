@@ -3,8 +3,8 @@ package first.summoner.common.minion.minion;
 
 import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
 import first.lyra.common.minion.MomentumMinion;
-import first.summoner.common.minion.minion.goal.MomentumMinionIdleGoal;
 import first.summoner.common.minion.minion.goal.hornet.HornetAttackGoal;
+import first.summoner.common.minion.minion.goal.hornet.HornetIdleGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.world.phys.Vec3;
 
@@ -21,7 +21,7 @@ public class Hornet extends MomentumMinion {
     @Override
     public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new HornetAttackGoal(this));
-        goalSelector.addGoal(1, new MomentumMinionIdleGoal(this));
+        goalSelector.addGoal(1, new HornetIdleGoal(this));
     }
 
     @Override

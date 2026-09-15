@@ -166,7 +166,7 @@ public class MoonPortal extends Minion {
         LyraHelper.get(level).add(projectile);
     }
 
-        public void dimensionChange() {
+    public void dimensionChange() {
         setRemove();
     }
 }

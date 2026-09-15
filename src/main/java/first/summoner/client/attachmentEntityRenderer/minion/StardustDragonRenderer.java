@@ -34,8 +34,8 @@ public class StardustDragonRenderer extends AbstractAttachmentEntityRenderer<Sta
         boolean isTail = index == total - 1;
         return RenderContext.<StardustDragon>builder()
                 .model(new ModelConfig<StardustDragon>()
-                        .translateOffset(-0.5f, isTail ? -0.4845f : -0.425f, isTail ? -0.103075f : -0.5f)
-                        .rotationOffset(180, 0, 0))
+                               .translateOffset(-0.5f, isTail ? -0.4845f : -0.425f, isTail ? -0.103075f : -0.5f)
+                               .rotationOffset(180, 0, 0))
                 .build();
     }
 

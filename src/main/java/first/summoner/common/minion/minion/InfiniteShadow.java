@@ -14,17 +14,14 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.UsernameCache;
 import net.neoforged.neoforge.common.util.FakePlayer;
 
 import java.util.List;
-import java.util.UUID;
 
 public class InfiniteShadow extends Terraprism {
 
@@ -57,9 +54,7 @@ public class InfiniteShadow extends Terraprism {
             for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
                 if (this.hitTargets.add(living)) {
-                    UUID attackerId = owner != null ? owner.getUUID() : getUuid();
-                    InvincibleData.get(living)
-                            .recordHit(attackerId, 100);
+                    InvincibleData.get(living).recordHit(owner.getUUID(), 100);
                     int invulnerableTime = living.invulnerableTime;
                     living.invulnerableTime = 0;
                     if (!itemStack.is(Items.TNT)) {
@@ -84,9 +79,7 @@ public class InfiniteShadow extends Terraprism {
     }
 
     public InfiniteShadowFakePlayer getFakePlayer() {
-        Player player = getOwner() instanceof Player owner ? owner : null;
-        Level level = player != null ? player.level() : getLevel();
-        if (!level.isClientSide() && level instanceof ServerLevel serverLevel) {
+        if (getLevel() instanceof ServerLevel serverLevel) {
             if (fakePlayer != null && !fakePlayer.isAlive()) {
                 fakePlayer = null;
             }
@@ -108,32 +101,17 @@ public class InfiniteShadow extends Terraprism {
         private final InfiniteShadow infiniteShadow;
 
         public InfiniteShadowFakePlayer(ServerLevel level, InfiniteShadow infiniteShadow) {
-            super(level, buildProfile(infiniteShadow));
+            super(level, new GameProfile(infiniteShadow.getUuid(), "infinite_shadow_fake_player"));
             this.infiniteShadow = infiniteShadow;
         }
 
         @Override
         public float getAttackStrengthScale(float adjustTicks) {
-            return 0.85F;
+            return 1;
         }
 
         public InfiniteShadow getInfiniteShadow() {
             return infiniteShadow;
-        }
-
-        // 26.2: GameProfile 为 final,无法继承伪装名字,直接按 owner 信息构造
-        private static GameProfile buildProfile(InfiniteShadow infiniteShadow) {
-            UUID id = infiniteShadow.getUuid();
-            String name = "infinite_shadow_fake_player";
-            Player owner = infiniteShadow.getOwner() instanceof Player player ? player : null;
-            if (owner != null) {
-                id = owner.getUUID();
-                String lastKnownUsername = UsernameCache.getLastKnownUsername(owner.getUUID());
-                if (lastKnownUsername != null) {
-                    name = lastKnownUsername;
-                }
-            }
-            return new GameProfile(id, name);
         }
     }
 }

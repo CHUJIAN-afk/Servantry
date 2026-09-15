@@ -32,7 +32,6 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
 
     public Barnacle() {
         super(SummonerAttachmentEntityRegister.BARNACLE);
-        setDrag(0.9f);
         setGravity(0);
     }
 
@@ -110,5 +109,4 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
     public @NotNull AABB getBlockCollisionBox() {
         return new AABB(-0.25, -0.25, -0.25, 0.25, 0.25, 0.25);
     }
-
 }

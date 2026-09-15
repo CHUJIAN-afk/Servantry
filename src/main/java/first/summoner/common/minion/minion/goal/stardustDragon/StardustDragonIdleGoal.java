@@ -4,7 +4,7 @@ package first.summoner.common.minion.minion.goal.stardustDragon;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.summoner.common.minion.minion.StardustDragon;
 import first.summoner.utils.Utils;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -25,7 +25,7 @@ public class StardustDragonIdleGoal extends AttachmentEntityGoal<StardustDragon>
 
     @Override
     public void tick() {
-        Player owner = minion.getOwner() instanceof Player player ? player : null;
+        LivingEntity owner = minion.getOwner();
         Vec3 anchor = minion.getOwner().position();
         do {
             wanderPos = Utils.getWanderPos(minion, wanderPos, anchor, 8, 0);

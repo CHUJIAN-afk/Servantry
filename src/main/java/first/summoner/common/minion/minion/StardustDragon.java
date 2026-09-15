@@ -38,13 +38,11 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
 
     public StardustDragon() {
         super(SummonerAttachmentEntityRegister.STARDUST_DRAGON);
-        setDrag(0.92f);
         setGravity(0);
     }
 
     protected StardustDragon(Holder<AttachmentEntityType<?>> type) {
         super(type);
-        setDrag(0.92f);
         setGravity(0);
     }
 

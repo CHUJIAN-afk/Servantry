@@ -18,11 +18,6 @@ public class VoidEater extends StardustDragon {
     }
 
     @Override
-    public void tick() {
-        super.tick();
-    }
-
-    @Override
     protected void emitParticle() {
 
     }

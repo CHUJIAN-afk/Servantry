@@ -13,7 +13,6 @@ import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -184,12 +183,11 @@ public class RuinRelic extends MomentumMinion {
      * 只有目标一致的遗迹参与总数与次序；只存在一个时占据轴心。
      */
     public PathNode getAttackRingNode(LivingEntity target, float partialTick) {
-        Player player = getOwner() instanceof Player owner ? owner : null;
         PathNode node = getCurrentPathNode();
-        if (player != null) {
+        if (owner != null) {
             int total = getSameTargetCount();
             int order = getSameTargetOrder();
-            Vec3 playerPos = player.getPosition(partialTick).add(0, player.getBbHeight() * 0.5, 0);
+            Vec3 playerPos = owner.getPosition(partialTick).add(0, owner.getBbHeight() * 0.5, 0);
             Vec3 targetPos = target.getPosition(partialTick).add(0, target.getBbHeight() * 0.5, 0);
             double distance = playerPos.distanceTo(targetPos);
             if (distance <= 8) {
@@ -210,7 +208,7 @@ public class RuinRelic extends MomentumMinion {
                 // 圆环中心在连线上，偏玩家侧 20%
                 Vec3 center = playerPos.add(axis.scale(Math.min(4, distance * 0.2)));
                 // 每只遗迹按顺序分配角度并随时间旋转；只存在一个时占据轴心
-                float angle = (player.tickCount + partialTick) * 0.06f + (order * Mth.TWO_PI / total);
+                float angle = (owner.tickCount + partialTick) * 0.06f + (order * Mth.TWO_PI / total);
                 float radius = total > 1 ? 1.6f : 0f;
                 Vec3 pos = center.add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
                 // 看向目标

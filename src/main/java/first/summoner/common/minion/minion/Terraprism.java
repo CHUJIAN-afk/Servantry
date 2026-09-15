@@ -61,7 +61,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
         if (distance > 0) {
             LyraHelper helper = LyraHelper.get(getLevel());
             TargetCache targetCache = helper.getTargetCache();
-            List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.getPos(), (float) distance, (living) -> (attacking || (this.getOwner() != null && targetCache.isVisibility(this.getOwner(), living))) && targetCache.isTarget(this.getOwner(), living));
+            List<LivingEntity> targets = targetCache.getEntitiesInRadius(owner.getBoundingBox().getCenter(), (float) distance, (living) -> (attacking || (this.getOwner() != null && targetCache.isVisibility(this.getOwner(), living))) && targetCache.isTarget(this.getOwner(), living));
             if (!targets.isEmpty()) {
                 return targetCache.getNewTarget(this, targets, 8, false);
             }
@@ -108,7 +108,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
                 trailTimer = 0;
             }
             if (getGoalSelector().getCurrentGoal() instanceof TerraprismIdleGoal) {
-                idleBlend = Math.min(1.0f, idleBlend + 0.1f);
+                idleBlend = Math.min(1.0f, idleBlend + 0.05f);
             } else {
                 idleBlend = Math.max(0.0f, idleBlend - 0.25f);
             }

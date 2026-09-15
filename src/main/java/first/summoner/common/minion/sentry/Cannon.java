@@ -35,7 +35,6 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
 
     public Cannon() {
         super(SummonerAttachmentEntityRegister.CANNON);
-        setGravity(-0.05f);
     }
 
     @Override

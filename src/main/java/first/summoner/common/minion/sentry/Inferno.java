@@ -103,7 +103,7 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
         return 0.0;
     }
 
-        public void dimensionChange() {
+    public void dimensionChange() {
         setRemove();
     }
 
