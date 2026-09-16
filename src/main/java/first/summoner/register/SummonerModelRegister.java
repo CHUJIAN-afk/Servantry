@@ -1,5 +1,6 @@
 package first.summoner.register;
 
+import first.lyra.client.render.model.LyraModelRenderer;
 import first.summoner.Summoner;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.neoforged.api.distmarker.Dist;
@@ -15,6 +16,7 @@ import java.util.List;
  * <p>
  * 注册不与物品/方块关联的独立模型文件，供渲染器直接使用。
  * 1.21.1: ModelEvent.RegisterAdditional + ModelResourceLocation.standalone。
+ * Lyra 路径约定：assets/summoner/lyra_model/json/&lt;folder&gt;/&lt;id&gt;/&lt;id&gt;.json|png。
  * </p>
  */
 @EventBusSubscriber(modid = Summoner.MODID, value = Dist.CLIENT)
@@ -67,7 +69,7 @@ public class SummonerModelRegister {
     }
 
     private static ModelResourceLocation standaloneIn(String folder, String path) {
-        ModelResourceLocation location = ModelResourceLocation.standalone(Summoner.rl(folder + "/" + path));
+        ModelResourceLocation location = LyraModelRenderer.jsonLocation(Summoner.rl(folder + "/" + path));
         MODELS.add(location);
         return location;
     }

@@ -89,12 +89,12 @@ public class SummonerAttachmentEntityRenderRegister {
         register(SummonerAttachmentEntityRegister.RAIN, RainRenderer::new);
         register(SummonerAttachmentEntityRegister.DESTRUCTION_BULLET, DestructionBulletRenderer::new);
         register(SummonerAttachmentEntityRegister.HORNET_STINGER, HornetStingerRenderer::new);
-        register(SummonerAttachmentEntityRegister.IMP_FIREBALL, () -> simpleRenderer(Summoner.rl("textures/item/entity/imp_fireball.png"), 0.25f, 8));
+        register(SummonerAttachmentEntityRegister.IMP_FIREBALL, () -> simpleRenderer(Summoner.rl("lyra_model/textures/imp_fireball.png"), 0.25f, 8));
         register(SummonerAttachmentEntityRegister.CORN, CornRenderer::new);
         register(SummonerAttachmentEntityRegister.MINI_NECRO_SPIRIT, MiniNecroSpiritRenderer::new);
         register(SummonerAttachmentEntityRegister.ELECTRIC_LASER, ElectricLaserRenderer::new);
-        register(SummonerAttachmentEntityRegister.METEOR, () -> simpleRenderer(Summoner.rl("textures/item/entity/meteor.png"), 1, 8));
-        register(SummonerAttachmentEntityRegister.PETAL, () -> simpleRenderer(Summoner.rl("textures/item/entity/petal.png"), 0.5f, 0));
+        register(SummonerAttachmentEntityRegister.METEOR, () -> simpleRenderer(Summoner.rl("lyra_model/textures/meteor.png"), 1, 8));
+        register(SummonerAttachmentEntityRegister.PETAL, () -> simpleRenderer(Summoner.rl("lyra_model/textures/petal.png"), 0.5f, 0));
         register(SummonerAttachmentEntityRegister.POISON_SALIVA, PoisonSalivaRenderer::new);
         register(SummonerAttachmentEntityRegister.FROST_BOLT, FrostBoltRenderer::new);
         register(SummonerAttachmentEntityRegister.EXPLOSION_FLAME_BALL, ExplosionFlameBallRenderer::new);

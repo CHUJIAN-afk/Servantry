@@ -23,6 +23,12 @@ public class RuinSigilIdleGoal extends AttachmentEntityGoal<RuinRelic> {
     public void tick() {
         PathNode currentPathNode = minion.getCurrentPathNode();
         PathNode targetPathNode = minion.getIdleRingNode(1.0f);
-        minion.setCurrentPathNode(currentPathNode.lerp(targetPathNode, 0.3f));
+        minion.setCurrentPathNode(new PathNode(
+                currentPathNode.pos().lerp(targetPathNode.pos(), 0.3f),
+                currentPathNode.yaw(),
+                currentPathNode.pitch(),
+                currentPathNode.roll()
+        ));
+        minion.setDesiredRotation(targetPathNode.yaw(), targetPathNode.pitch(), targetPathNode.roll());
     }
 }

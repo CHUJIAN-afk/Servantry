@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "summoner:lyra_model/json/minion/enchanted_throwing_knives/enchanted_throwing_knives"
+  }
+}

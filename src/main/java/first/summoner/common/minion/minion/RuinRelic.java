@@ -158,6 +158,7 @@ public class RuinRelic extends MomentumMinion {
             int order = getSameTargetOrder();
             // 玩家视线水平方向（圆环法向量）
             float playerYaw = Mth.rotLerp(partialTick, player.yHeadRotO, player.yHeadRot);
+            float playerPitch = Mth.lerp(partialTick, player.xRotO, player.getXRot());
             float rad = (float) Math.toRadians(-playerYaw);
             Vec3 n = new Vec3(Mth.sin(rad), 0, Mth.cos(rad));
             // 竖直圆环面内正交基：v 竖直向上，u = n × v（水平垂直于视线）
@@ -172,7 +173,7 @@ public class RuinRelic extends MomentumMinion {
             float angle = (player.tickCount + partialTick) * 0.06f + (order * Mth.TWO_PI / total);
             float radius = total > 1 ? 1.6f : 0f;
             Vec3 pos = center.add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
-            node = new PathNode(pos, playerYaw, 0, 0);
+            node = new PathNode(pos, playerYaw, playerPitch, 0);
         }
         return node;
     }
@@ -194,16 +195,15 @@ public class RuinRelic extends MomentumMinion {
                 // 目标距离玩家不超过 8 格：在待机位置看向目标
                 PathNode idleNode = getIdleRingNode(partialTick);
                 Vec3 toTarget = target.getBoundingBox().getCenter().subtract(idleNode.pos());
-                float yaw = (float) Math.toDegrees(Math.atan2(-toTarget.x, toTarget.z));
-                float pitch = (float) Math.toDegrees(Math.asin(-toTarget.y));
-                node = new PathNode(idleNode.pos(), yaw, pitch, 0);
+                node = new PathNode(idleNode.pos(), toTarget);
             } else {
                 Vec3 axis = targetPos.subtract(playerPos).normalize();
                 // 圆环面内正交基（垂直于连线）
-                Vec3 v = axis.cross(new Vec3(0, 1, 0)).normalize();
-                if (v.lengthSqr() < 1e-5) {
-                    v = axis.cross(new Vec3(1, 0, 0)).normalize();
+                Vec3 v = axis.cross(new Vec3(0, 1, 0));
+                if (v.lengthSqr() < 1.0E-6) {
+                    v = axis.cross(new Vec3(1, 0, 0));
                 }
+                v = v.normalize();
                 Vec3 u = axis.cross(v).normalize();
                 // 圆环中心在连线上，偏玩家侧 20%
                 Vec3 center = playerPos.add(axis.scale(Math.min(4, distance * 0.2)));
@@ -213,9 +213,7 @@ public class RuinRelic extends MomentumMinion {
                 Vec3 pos = center.add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
                 // 看向目标
                 Vec3 toTarget = target.getBoundingBox().getCenter().subtract(pos);
-                float yaw = (float) Math.toDegrees(Math.atan2(-toTarget.x, toTarget.z));
-                float pitch = (float) Math.toDegrees(Math.asin(-toTarget.y));
-                node = new PathNode(pos, yaw, pitch, 0);
+                node = new PathNode(pos, toTarget);
             }
         }
         return node;

@@ -117,6 +117,22 @@ sourceSets.main.resources {
     exclude 'assets/summoner/compressed (1).zip'
 }
 
+// Minecraft's vanilla model bakery reads standalone JSON models from "models/".
+// Lyra keeps the source convention under "lyra_model/json/"; mirror it at build time.
+tasks.named('processResources', ProcessResources).configure {
+    from("src/main/resources/assets/${mod_id}/lyra_model/json") {
+        include '**/*.json'
+        into "assets/${mod_id}/models/lyra_model/json"
+    }
+    from("src/main/resources/assets/${mod_id}/lyra_model/json") {
+        include '**/*.png'
+        into "assets/${mod_id}/textures/lyra_model/json"
+    }
+    from("src/main/resources/assets/${mod_id}/lyra_model/textures") {
+        into "assets/${mod_id}/textures/lyra_model/textures"
+    }
+}
+
 repositories {
     mavenLocal()
     maven {
