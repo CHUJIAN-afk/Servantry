@@ -3,7 +3,7 @@ package first.summoner.client.attachmentEntityRenderer.minion;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.RenderUtil;
+import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.Sharknado;
@@ -25,6 +25,9 @@ public class SharknadoRenderer extends AbstractAttachmentEntityRenderer<Sharknad
 
     @Override
     protected void render(Sharknado entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Sharknado> context, float partialTick, int packedLight, float alpha) {
-        RenderUtil.renderStandalone(SummonerModelRegister.SHARKNADO, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), packedLight);
+        LyraModelRenderer.json(SummonerModelRegister.SHARKNADO)
+                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
+                .light(packedLight)
+                .render(poseStack, bufferSource);
     }
 }

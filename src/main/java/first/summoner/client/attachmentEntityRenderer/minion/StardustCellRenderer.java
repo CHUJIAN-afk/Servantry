@@ -1,11 +1,11 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
+import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -57,7 +57,10 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
                     .count(10)
                     .emit();
         }
-        RenderUtil.renderStandalone(SummonerModelRegister.STARDUST_CELL, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
+        LyraModelRenderer.json(SummonerModelRegister.STARDUST_CELL)
+                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
+                .light(RenderUtil.FULL_LIGHT)
+                .render(poseStack, bufferSource);
         DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
     }
 }

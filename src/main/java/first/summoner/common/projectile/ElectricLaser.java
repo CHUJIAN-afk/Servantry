@@ -22,6 +22,7 @@ public class ElectricLaser extends Projectile implements IEntityCollision<Electr
     public ElectricLaser() {
         super(SummonerAttachmentEntityRegister.ELECTRIC_LASER);
         setDrag(1);
+        setGravity(0);
         setMaxTickCount(34);
     }
 

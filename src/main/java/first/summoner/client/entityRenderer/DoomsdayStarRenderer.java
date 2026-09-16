@@ -4,10 +4,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
+import first.lyra.client.render.model.LyraModelRenderer;
+import first.lyra.client.render.model.virtual.VirtualEntityPose;
 import first.lyra.client.render.rendererHelper.LaserRendererHelper;
 import first.lyra.client.render.trail.ModelConfig;
-import first.lyra.client.render.virtual.VirtualEntityPose;
-import first.lyra.client.render.virtual.VirtualEntityRenderer;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.master.DoomsdayStar;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -53,11 +53,13 @@ public class DoomsdayStarRenderer extends AbstractAttachmentEntityRenderer<Dooms
         float jumpScale = doomsdayStar.getScale(partialTick);
         float v = (1 - jumpScale) * 0.3f;
         poseStack.scale(1 + v, jumpScale, 1 + v);
-        VirtualEntityRenderer.render(EntityType.SLIME, poseStack, bufferSource, partialTick, VirtualEntityPose.create()
-                .ageTicks(doomsdayStar.getTickCount())
-                .look(0.0F, 0.0F, 0.0F)
-                .packedLight(packedLight)
-                .alpha(alpha));
+        LyraModelRenderer.virtualEntity(EntityType.SLIME, partialTick)
+                .pose(VirtualEntityPose.create()
+                        .ageTicks(doomsdayStar.getTickCount())
+                        .look(0.0F, 0.0F, 0.0F)
+                        .packedLight(packedLight)
+                        .alpha(alpha))
+                .render(poseStack, bufferSource);
         poseStack.popPose();
     }
 }

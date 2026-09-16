@@ -3,7 +3,7 @@ package first.summoner.client.attachmentEntityRenderer.minion;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.RenderUtil;
+import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.BloodBat;
@@ -28,6 +28,9 @@ public class BloodBatRenderer extends AbstractAttachmentEntityRenderer<BloodBat>
 
     @Override
     protected void render(BloodBat minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<BloodBat> context, float partialTick, int packedLight, float alpha) {
-        RenderUtil.renderStandalone(SummonerModelRegister.ENCHANTED_THROWING_KNIVES, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 220, 20, 60), packedLight);
+        LyraModelRenderer.json(SummonerModelRegister.ENCHANTED_THROWING_KNIVES)
+                .color(FastColor.ARGB32.color((int) (alpha * 255), 220, 20, 60))
+                .light(packedLight)
+                .render(poseStack, bufferSource);
     }
 }

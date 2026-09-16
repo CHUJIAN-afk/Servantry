@@ -4,8 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
-import first.lyra.client.render.animated.AnimatedModelRenderer;
-import first.lyra.client.render.animated.AnimatedRenderOptions;
+import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.Summoner;
@@ -30,9 +29,9 @@ public class CannonRenderer extends AbstractAttachmentEntityRenderer<Cannon> {
 
     @Override
     protected void render(Cannon cannon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Cannon> context, float partialTick, int packedLight, float alpha) {
-        AnimatedRenderOptions request = AnimatedModelRenderer.request(Summoner.rl("cannon"))
+        LyraModelRenderer.geo(Summoner.rl("cannon"))
                 .light(RenderUtil.FULL_LIGHT)
-                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255));
-        request.render(poseStack, bufferSource);
+                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
+                .render(poseStack, bufferSource);
     }
 }

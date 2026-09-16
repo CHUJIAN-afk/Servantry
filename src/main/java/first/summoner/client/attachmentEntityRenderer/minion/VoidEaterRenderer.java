@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
+import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.VoidEater;
@@ -34,7 +35,9 @@ public class VoidEaterRenderer extends AbstractAttachmentEntityRenderer<VoidEate
         ModelResourceLocation model = index == 0
                 ? SummonerModelRegister.VOID_EATER_HEAD
                 : index == total - 1 ? SummonerModelRegister.VOID_EATER_TAIL : SummonerModelRegister.VOID_EATER_BODY;
-        RenderUtil.renderStandalone(model, poseStack, bufferSource,
-                FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
+        LyraModelRenderer.json(model)
+                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
+                .light(RenderUtil.FULL_LIGHT)
+                .render(poseStack, bufferSource);
     }
 }

@@ -53,7 +53,7 @@ public class LaserMinigun extends Minion {
                 float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
                 float pitch = (float) Math.toDegrees(Math.asin(-direction.y));
                 PathNode attackNode = new PathNode(idleNode.pos(), yaw, pitch, 0);
-                setCurrentPathNode(currentNode.lerp(attackNode, 0.5f));
+                setCurrentPathNode(currentNode.lerp(attackNode, 0.25f));
                 if (cooldown <= 0) {
                     cooldown = 2;
                     fire(target);
@@ -61,7 +61,7 @@ public class LaserMinigun extends Minion {
                 animationTick += 2;
             } else {
                 animationTick++;
-                setCurrentPathNode(currentNode.lerp(idleNode, 0.5f));
+                setCurrentPathNode(currentNode.lerp(idleNode, 0.25f));
             }
         }
     }

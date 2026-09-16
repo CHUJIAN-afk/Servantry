@@ -3,7 +3,7 @@ package first.summoner.client.attachmentEntityRenderer.minion;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.RenderUtil;
+import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.client.render.rendererHelper.LaserRendererHelper;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.attachmentEntity.PathNode;
@@ -33,7 +33,10 @@ public class SurveyDroneRenderer extends AbstractAttachmentEntityRenderer<OreSco
 
     @Override
     protected void render(OreScout scout, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<OreScout> context, float partialTick, int packedLight, float alpha) {
-        RenderUtil.renderStandalone(SummonerModelRegister.SURVEY_DRONE, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), packedLight);
+        LyraModelRenderer.json(SummonerModelRegister.SURVEY_DRONE)
+                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
+                .light(packedLight)
+                .render(poseStack, bufferSource);
     }
 
     @Override

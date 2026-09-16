@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
+import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.client.render.trail.RibbonTrailConfig;
 import first.lyra.common.attachmentEntity.PathNode;
@@ -32,6 +33,9 @@ public class ZenithRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
 
     @Override
     protected void render(Zenith zenith, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Zenith> context, float partialTick, int packedLight, float alpha) {
-        RenderUtil.renderStandalone(SummonerModelRegister.TERRAPRISM, poseStack, bufferSource, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255), RenderUtil.FULL_LIGHT);
+        LyraModelRenderer.json(SummonerModelRegister.TERRAPRISM)
+                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
+                .light(RenderUtil.FULL_LIGHT)
+                .render(poseStack, bufferSource);
     }
 }
