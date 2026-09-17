@@ -73,19 +73,18 @@ public class StardustCell extends MomentumMinion {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            // 冷却衰减
-            if (shootCooldown > 0) {
-                shootCooldown--;
-            }
-            if (extraShootCooldown > 0) {
-                extraShootCooldown--;
-            }
-            if (trailTimer > 0) {
-                trailTimer--;
-            }
-            //setDesiredRotation(currentPathNode.yaw() + 4, currentPathNode.pitch() + 4, currentPathNode.roll() + 4);
+
+        // 冷却衰减
+        if (shootCooldown > 0) {
+            shootCooldown--;
         }
+        if (extraShootCooldown > 0) {
+            extraShootCooldown--;
+        }
+        if (trailTimer > 0) {
+            trailTimer--;
+        }
+        //setDesiredRotation(currentPathNode.yaw() + 4, currentPathNode.pitch() + 4, currentPathNode.roll() + 4);
     }
 
     public void shootExtraAtTarget(LivingEntity target){
@@ -99,7 +98,7 @@ public class StardustCell extends MomentumMinion {
         projectile.setVelocity(direction);
         projectile.setDamage(getDamage() * 0.67f);
         projectile.setChaseTarget(target);
-        LyraHelper.get(level).add(projectile);
+        LyraHelper.get(owner).add(projectile);
         // 喷射粒子 - 星尘调色
         GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                          .centerColor(0x2fb2e1)
@@ -132,7 +131,7 @@ public class StardustCell extends MomentumMinion {
         projectile.copyAttributes(this);
         projectile.setVelocity(direction);
         projectile.setChaseTarget(target);
-        LyraHelper.get(level).add(projectile);
+        LyraHelper.get(owner).add(projectile);
         // 后坐力
         addVelocity(direction.scale(-recoil));
         // 喷射粒子 - 星尘调色

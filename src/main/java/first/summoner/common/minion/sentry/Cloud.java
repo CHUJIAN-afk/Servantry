@@ -30,18 +30,17 @@ public class Cloud extends MomentumMinion implements IBlockCollision<Cloud> {
     @Override
     public void tick() {
         super.tick();
-        if (!level.isClientSide()) {
-            if (--cooldown <= 0) {
-                RandomSource random = getRandom();
-                cooldown = random.nextInt(2, 4);
-                Vec3 start = getPos().add(0, -0.25, 0).offsetRandom(random, 0.25f);
-                Rain rain = new Rain();
-                rain.setOwner(owner);
-                rain.init(new PathNode(start, 0, 90, 0));
-                rain.copyAttributes(this);
-                rain.setVelocity(new Vec3(0, -0.5, 0));
-                LyraHelper.get(level).add(rain);
-            }
+
+        if (--cooldown <= 0) {
+            RandomSource random = getRandom();
+            cooldown = random.nextInt(2, 4);
+            Vec3 start = getPos().add(0, -0.25, 0).offsetRandom(random, 0.25f);
+            Rain rain = new Rain();
+            rain.setOwner(owner);
+            rain.init(new PathNode(start, 0, 90, 0));
+            rain.copyAttributes(this);
+            rain.setVelocity(new Vec3(0, -0.5, 0));
+            LyraHelper.get(owner).add(rain);
         }
     }
 

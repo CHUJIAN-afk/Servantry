@@ -50,7 +50,7 @@ public class RuinRelic extends MomentumMinion {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide() && cooldown > 0) {
+        if (cooldown > 0) {
             cooldown--;
         }
     }
@@ -73,7 +73,7 @@ public class RuinRelic extends MomentumMinion {
         int extra = Math.max(0, getSameSize() - 1);
         float multiplier = 1.0f + 0.1f * Math.min(extra, 20);
         orb.setDamage(getDamage() * multiplier);
-        LyraHelper.get(level).add(orb);
+        LyraHelper.get(owner).add(orb);
         // 后坐力
         addVelocity(direction.scale(-0.4));
         // 发射粒子
@@ -118,7 +118,7 @@ public class RuinRelic extends MomentumMinion {
      */
     public int getSameTargetCount() {
         LivingEntity myTarget = getTarget();
-        List<RuinRelic> relics = LyraHelper.get(getLevel()).getEntityData().get(SummonerAttachmentEntityRegister.RUIN_RELIC.get());
+        List<RuinRelic> relics = LyraHelper.get(owner).getEntityData().get(SummonerAttachmentEntityRegister.RUIN_RELIC.get());
         int count = 0;
         for (RuinRelic relic : relics) {
             if (relic.getTarget() == myTarget) {
@@ -133,7 +133,7 @@ public class RuinRelic extends MomentumMinion {
      */
     public int getSameTargetOrder() {
         LivingEntity myTarget = getTarget();
-        List<RuinRelic> relics = LyraHelper.get(getLevel()).getEntityData().get(SummonerAttachmentEntityRegister.RUIN_RELIC.get());
+        List<RuinRelic> relics = LyraHelper.get(owner).getEntityData().get(SummonerAttachmentEntityRegister.RUIN_RELIC.get());
         int order = 0;
         for (RuinRelic relic : relics) {
             if (relic == this) {

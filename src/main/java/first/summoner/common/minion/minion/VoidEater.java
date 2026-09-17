@@ -25,7 +25,7 @@ public class VoidEater extends StardustDragon {
     @Override
     public void onRemove() {
         if (isHead()) {
-            List<VoidEater> voidEaters = LyraHelper.get(owner.level()).getEntityData().get(SummonerAttachmentEntityRegister.VOID_EATER.get());
+            List<VoidEater> voidEaters = LyraHelper.get(owner).getEntityData().get(SummonerAttachmentEntityRegister.VOID_EATER.get());
             for (VoidEater voidEater : voidEaters) {
                 voidEater.setRemove();
             }
@@ -41,7 +41,7 @@ public class VoidEater extends StardustDragon {
 
     @Override
     public @Nullable StardustDragon getHead() {
-        List<VoidEater> voidEaters = LyraHelper.get(owner.level())
+        List<VoidEater> voidEaters = LyraHelper.get(owner)
                 .getEntityData()
                 .get(SummonerAttachmentEntityRegister.VOID_EATER.get());
         if (!voidEaters.isEmpty()) {
@@ -53,7 +53,7 @@ public class VoidEater extends StardustDragon {
     @Override
     public @Nullable VoidEater getPrecedingSegment() {
         if (!isHead()) {
-            List<VoidEater> voidEaters = LyraHelper.get(owner.level())
+            List<VoidEater> voidEaters = LyraHelper.get(owner)
                     .getEntityData()
                     .get(SummonerAttachmentEntityRegister.VOID_EATER.get());
             int index = getOrder() - 1;
@@ -67,7 +67,7 @@ public class VoidEater extends StardustDragon {
     @Override
     public @Nullable VoidEater getNextSegment() {
         if (getOrder() < getSameSize() - 1) {
-            List<VoidEater> voidEaters = LyraHelper.get(owner.level())
+            List<VoidEater> voidEaters = LyraHelper.get(owner)
                     .getEntityData()
                     .get(SummonerAttachmentEntityRegister.VOID_EATER.get());
             int index = getOrder() + 1;

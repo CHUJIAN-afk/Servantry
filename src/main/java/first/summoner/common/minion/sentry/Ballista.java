@@ -47,30 +47,29 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTarget();
-            cooldown--;
-            if (isTargetChange()) {
-                aiming = 0;
-            }
-            if (target != null) {
-                lookAtPos(target.getBoundingBox().getCenter());
-                aiming++;
-                if (cooldown < 0 && aiming > 10) {
-                    cooldown = 53;
-                    boolean full = owner instanceof Player player && SummonerArmorSetRegister.ValhallaKnight.value().full(player);
-                    if (full) {
-                        cooldown -= 20;
-                    }
-                    boolean hasEffect = owner.hasEffect(SummonerMobEffectRegister.BallistaPanicked);
-                    if (hasEffect) {
-                        cooldown -= 13;
-                    }
-                    if (full && hasEffect) {
-                        cooldown -= 10;
-                    }
-                    fire();
+
+        LivingEntity target = getTarget();
+        cooldown--;
+        if (isTargetChange()) {
+            aiming = 0;
+        }
+        if (target != null) {
+            lookAtPos(target.getBoundingBox().getCenter());
+            aiming++;
+            if (cooldown < 0 && aiming > 10) {
+                cooldown = 53;
+                boolean full = owner instanceof Player player && SummonerArmorSetRegister.ValhallaKnight.value().full(player);
+                if (full) {
+                    cooldown -= 20;
                 }
+                boolean hasEffect = owner.hasEffect(SummonerMobEffectRegister.BallistaPanicked);
+                if (hasEffect) {
+                    cooldown -= 13;
+                }
+                if (full && hasEffect) {
+                    cooldown -= 10;
+                }
+                fire();
             }
         }
     }
@@ -100,7 +99,7 @@ public class Ballista extends MomentumMinion implements IBlockCollision<Ballista
             direction = direction.scale(1.33f);
         }
         projectile.setVelocity(direction.scale(2));
-        LyraHelper.get(getLevel()).add(projectile);
+        LyraHelper.get(owner).add(projectile);
         Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), start, getSoundSource());
     }
 

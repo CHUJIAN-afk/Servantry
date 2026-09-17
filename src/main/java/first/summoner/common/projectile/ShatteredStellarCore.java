@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -35,7 +34,7 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
 
     @Override
     public boolean isValidCollisionTarget(ShatteredStellarCore entity, LivingEntity target) {
-        if (LyraHelper.get(getLevel()).getTargetCache().isTarget(owner, target)) {
+        if (getTargetCache().isTarget(target)) {
             return true;
         }
         return target == chaseTarget;
@@ -59,15 +58,14 @@ public class ShatteredStellarCore extends Projectile implements IEntityCollision
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (chaseTarget != null && chaseTarget.isAlive()) {
-                if (getTickCount() >= 15) {
-                    Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
-                    addVelocity(targetCenter.subtract(getPos()).normalize().scale(0.6));
-                }
-            } else {
-                setRemove();
+
+        if (chaseTarget != null && chaseTarget.isAlive()) {
+            if (getTickCount() >= 15) {
+                Vec3 targetCenter = chaseTarget.getBoundingBox().getCenter();
+                addVelocity(targetCenter.subtract(getPos()).normalize().scale(0.6));
             }
+        } else {
+            setRemove();
         }
     }
 

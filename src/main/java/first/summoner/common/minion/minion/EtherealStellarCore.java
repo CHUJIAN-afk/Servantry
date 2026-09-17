@@ -26,16 +26,15 @@ public class EtherealStellarCore extends Minion {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (shootCooldown > 0) {
-                shootCooldown--;
-            }
-            LivingEntity target = getTarget();
-            if (getShootCooldown() <= 0 && target != null) {
-                shootTarget(target);
-            }
-            setCurrentPathNode(getInterpolatedIdleState(1f));
+
+        if (shootCooldown > 0) {
+            shootCooldown--;
         }
+        LivingEntity target = getTarget();
+        if (getShootCooldown() <= 0 && target != null) {
+            shootTarget(target);
+        }
+        setCurrentPathNode(getInterpolatedIdleState(1f));
     }
 
     public void shootTarget(LivingEntity target) {
@@ -52,7 +51,7 @@ public class EtherealStellarCore extends Minion {
             projectile.copyAttributes(this);
             projectile.setVelocity(direction.scale(0.5f));
             projectile.setChaseTarget(target);
-            LyraHelper.get(getLevel()).add(projectile);
+            LyraHelper.get(owner).add(projectile);
             GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
                              .centerColor(0x2fb2e1)
                              .edgeColor(0x33ccff);

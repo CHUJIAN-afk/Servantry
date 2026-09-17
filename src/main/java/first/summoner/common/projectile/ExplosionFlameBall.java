@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
@@ -40,24 +39,23 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
     public void tick() {
         super.tick();
         Level level = getLevel();
-        if (!level.isClientSide()) {
-            // 火焰色粒子拖尾（参考小鬼火球）
-            ParticleHelper.create(level)
-                    .generic(GenericParticleBuilder.create()
-                            .centerColor(0xe1c316)
-                            .edgeColor(0xff7506)
-                            .lifetime(4)
-                            .lifetimeRandom(8)
-                            .spin(0.25f)
-                            .spinRandom(0.25F)
-                            .scale(0.015f)
-                            .scaleRandom(0.015f)
-                    )
-                    .pos(getPos())
-                    .count(8)
-                    .offset(0.2)
-                    .emit();
-        }
+
+        // 火焰色粒子拖尾（参考小鬼火球）
+        ParticleHelper.create(level)
+                .generic(GenericParticleBuilder.create()
+                        .centerColor(0xe1c316)
+                        .edgeColor(0xff7506)
+                        .lifetime(4)
+                        .lifetimeRandom(8)
+                        .spin(0.25f)
+                        .spinRandom(0.25F)
+                        .scale(0.015f)
+                        .scaleRandom(0.015f)
+                )
+                .pos(getPos())
+                .count(8)
+                .offset(0.2)
+                .emit();
     }
 
     @Override
@@ -78,36 +76,34 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
 
     @Override
     public void onRemove() {
-        if (!getLevel().isClientSide()) {
-            // 未命中目标消失（自然消散）时爆发少量火焰色粒子
-            ParticleHelper.create(getLevel())
-                    .generic(GenericParticleBuilder.create()
-                            .centerColor(0xe1c316)
-                            .edgeColor(0xff7506)
-                            .lifetime(5)
-                            .lifetimeRandom(5)
-                            .spin(0.25f)
-                            .spinRandom(0.1F)
-                            .friction(0.75F)
-                            .scale(0.04f)
-                            .scaleRandom(0.01f)
-                    )
-                    .pos(getPos())
-                    .offset(0.15)
-                    .velocity(getVelocity())
-                    .count(6)
-                    .speed(0.5)
-                    .spread(2)
-                    .emit();
-        }
+        // 未命中目标消失（自然消散）时爆发少量火焰色粒子
+        ParticleHelper.create(getLevel())
+                .generic(GenericParticleBuilder.create()
+                        .centerColor(0xe1c316)
+                        .edgeColor(0xff7506)
+                        .lifetime(5)
+                        .lifetimeRandom(5)
+                        .spin(0.25f)
+                        .spinRandom(0.1F)
+                        .friction(0.75F)
+                        .scale(0.04f)
+                        .scaleRandom(0.01f)
+                )
+                .pos(getPos())
+                .offset(0.15)
+                .velocity(getVelocity())
+                .count(6)
+                .speed(0.5)
+                .spread(2)
+                .emit();
     }
 
     /**
      * 爆炸：对命中点半径 3 格内所有敌人造成等量伤害并点燃 10 秒，爆发散射粒子。
      */
     private void explode(DamageSource source, Vec3 hitPoint) {
-        TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
-        List<LivingEntity> entities = targetCache.getEntitiesInRadius(hitPoint, 3, living -> targetCache.isTarget(owner, living));
+        TargetCache targetCache = getTargetCache();
+        List<LivingEntity> entities = targetCache.getEntitiesInRadius(hitPoint, 3, living -> targetCache.isTarget(living));
         for (LivingEntity entity : entities) {
             InvincibleData.attack(entity)
                     .attacker(getUuid())

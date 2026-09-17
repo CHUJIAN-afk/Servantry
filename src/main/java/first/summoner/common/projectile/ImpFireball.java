@@ -34,23 +34,22 @@ public class ImpFireball extends Projectile implements IEntityCollision<ImpFireb
     public void tick() {
         super.tick();
         Level level = getLevel();
-        if (!level.isClientSide()) {
-            ParticleHelper.create(level)
-                    .generic(GenericParticleBuilder.create()
-                                     .centerColor(0xe1c316)
-                                     .edgeColor(0xff7506)
-                                     .lifetime(4)
-                                     .lifetimeRandom(8)
-                                     .spin(0.25f)
-                                     .spinRandom(0.25F)
-                                     .scale(0.015f)
-                                     .scaleRandom(0.015f)
-                    )
-                    .pos(getPos())
-                    .count(8)
-                    .offset(0.2)
-                    .emit();
-        }
+
+        ParticleHelper.create(level)
+                .generic(GenericParticleBuilder.create()
+                                 .centerColor(0xe1c316)
+                                 .edgeColor(0xff7506)
+                                 .lifetime(4)
+                                 .lifetimeRandom(8)
+                                 .spin(0.25f)
+                                 .spinRandom(0.25F)
+                                 .scale(0.015f)
+                                 .scaleRandom(0.015f)
+                )
+                .pos(getPos())
+                .count(8)
+                .offset(0.2)
+                .emit();
     }
 
     @Override

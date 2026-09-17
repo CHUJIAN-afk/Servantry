@@ -6,7 +6,6 @@ import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import first.summoner.utils.SummonerStreamCodecs;
@@ -39,38 +38,37 @@ public class BlitzBall extends Projectile {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            idList.clear();
-            TargetCache targetCache = getLevel().getData(LyraAttachmentRegister.TargetCache);
-            List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 3, living -> targetCache.isTarget(owner, living));
-            for (LivingEntity living : entities) {
-                idList.add(living.getId());
-                InvincibleData.attack(living)
-                        .attacker(getUuid())
-                        .damageSource(getDamageSource())
-                        .damageAmount(getDamage())
-                        .invincibleTime(3)
-                        .apply();
-                ParticleHelper.create(getLevel())
-                        .generic(GenericParticleBuilder.create()
-                                         .centerColor(0x38ffec)
-                                         .edgeColor(0x2fc1ae)
-                                         .lifetime(5)
-                                         .lifetimeRandom(5)
-                                         .spin(0.3f)
-                                         .spinRandom(0.05F)
-                                         .friction(0.75F)
-                                         .scale(0.025f)
-                                         .scaleRandom(0.005f)
-                        )
-                        .pos(living.getBoundingBox().getCenter())
-                        .offset(0.15)
-                        .velocity(getVelocity())
-                        .count(1)
-                        .speed(0.25)
-                        .spread(2)
-                        .emit();
-            }
+
+        idList.clear();
+        TargetCache targetCache = getTargetCache();
+        List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 3, living -> targetCache.isTarget(living));
+        for (LivingEntity living : entities) {
+            idList.add(living.getId());
+            InvincibleData.attack(living)
+                    .attacker(getUuid())
+                    .damageSource(getDamageSource())
+                    .damageAmount(getDamage())
+                    .invincibleTime(3)
+                    .apply();
+            ParticleHelper.create(getLevel())
+                    .generic(GenericParticleBuilder.create()
+                                     .centerColor(0x38ffec)
+                                     .edgeColor(0x2fc1ae)
+                                     .lifetime(5)
+                                     .lifetimeRandom(5)
+                                     .spin(0.3f)
+                                     .spinRandom(0.05F)
+                                     .friction(0.75F)
+                                     .scale(0.025f)
+                                     .scaleRandom(0.005f)
+                    )
+                    .pos(living.getBoundingBox().getCenter())
+                    .offset(0.15)
+                    .velocity(getVelocity())
+                    .count(1)
+                    .speed(0.25)
+                    .spread(2)
+                    .emit();
         }
     }
 

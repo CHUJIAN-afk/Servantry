@@ -57,7 +57,7 @@ public class ImpAttackGoal extends AttachmentEntityGoal<Imp> {
             fireball.init(new PathNode(minionPos, direction));
             fireball.copyAttributes(minion);
             fireball.setVelocity(direction);
-            LyraHelper.get(minion.getLevel()).add(fireball);
+            LyraHelper.get(minion.getOwner()).add(fireball);
             Playable.play(SummonerSoundRegister.ImpFire, minion.getLevel(), minionPos, minion.getSoundSource());
         }
     }

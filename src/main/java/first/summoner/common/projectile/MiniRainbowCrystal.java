@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -30,40 +29,39 @@ public class MiniRainbowCrystal extends Projectile {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (getTickCount() > 0 && getTickCount() % 9 == 0) {
-                Vec3 pos = getPos();
-                Vec3 direction = pos.subtract(pos.offsetRandom(getRandom(), 1)).normalize();
-                ParticleHelper.create(getLevel())
-                        .generic(GenericParticleBuilder.create()
-                                         .centerColor(getColor(0))
-                                         .edgeColor(getColor(0))
-                                         .lifetime(5)
-                                         .lifetimeRandom(5)
-                                         .spin(0.1f)
-                                         .spinRandom(0.05F)
-                                         .friction(0.75F)
-                                         .scale(0.06f)
-                                         .scaleRandom(0.006f)
-                        )
-                        .pos(pos)
-                        .offset(0.5)
-                        .velocity(direction)
-                        .count(100)
-                        .speed(0.5)
-                        .spread(2)
-                        .emit();
-                DamageSource damageSource = getDamageSource();
-                if (damageSource != null) {
-                    TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
-                    List<LivingEntity> entities = targetCache.getEntitiesInRadius(pos, 3.5, living -> targetCache.isTarget(owner, living));
-                    for (LivingEntity living : entities) {
-                        InvincibleData.attack(living)
-                                .attacker(getUuid())
-                                .damageSource(damageSource)
-                                .damageAmount(getDamage())
-                                .apply();
-                    }
+
+        if (getTickCount() > 0 && getTickCount() % 9 == 0) {
+            Vec3 pos = getPos();
+            Vec3 direction = pos.subtract(pos.offsetRandom(getRandom(), 1)).normalize();
+            ParticleHelper.create(getLevel())
+                    .generic(GenericParticleBuilder.create()
+                                     .centerColor(getColor(0))
+                                     .edgeColor(getColor(0))
+                                     .lifetime(5)
+                                     .lifetimeRandom(5)
+                                     .spin(0.1f)
+                                     .spinRandom(0.05F)
+                                     .friction(0.75F)
+                                     .scale(0.06f)
+                                     .scaleRandom(0.006f)
+                    )
+                    .pos(pos)
+                    .offset(0.5)
+                    .velocity(direction)
+                    .count(100)
+                    .speed(0.5)
+                    .spread(2)
+                    .emit();
+            DamageSource damageSource = getDamageSource();
+            if (damageSource != null) {
+                TargetCache targetCache = getTargetCache();
+                List<LivingEntity> entities = targetCache.getEntitiesInRadius(pos, 3.5, living -> targetCache.isTarget(living));
+                for (LivingEntity living : entities) {
+                    InvincibleData.attack(living)
+                            .attacker(getUuid())
+                            .damageSource(damageSource)
+                            .damageAmount(getDamage())
+                            .apply();
                 }
             }
         }

@@ -40,19 +40,18 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTarget();
-            cooldown--;
-            if (target != null) {
-                Vec3 targetPos = target.getBoundingBox().getCenter();
-                lookAtPos(targetPos);
-                if (cooldown < 0) {
-                    Vec3 targetDirection = targetPos.subtract(getPos());
-                    Vec3 lookAngle = getLookAngle();
-                    if (getAngleDeg(targetDirection, lookAngle) < 5) {
-                        cooldown = 20;
-                        fire(targetPos);
-                    }
+
+        LivingEntity target = getTarget();
+        cooldown--;
+        if (target != null) {
+            Vec3 targetPos = target.getBoundingBox().getCenter();
+            lookAtPos(targetPos);
+            if (cooldown < 0) {
+                Vec3 targetDirection = targetPos.subtract(getPos());
+                Vec3 lookAngle = getLookAngle();
+                if (getAngleDeg(targetDirection, lookAngle) < 5) {
+                    cooldown = 20;
+                    fire(targetPos);
                 }
             }
         }
@@ -66,7 +65,7 @@ public class Hydra extends MomentumMinion implements IBlockCollision<Hydra> {
         bolt.init(new PathNode(start, direction));
         bolt.copyAttributes(this);
         bolt.setVelocity(direction);
-        LyraHelper.get(level).add(bolt);
+        LyraHelper.get(owner).add(bolt);
     }
 
     private double getAngleDeg(Vec3 a, Vec3 b) {

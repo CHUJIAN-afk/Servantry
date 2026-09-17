@@ -45,33 +45,32 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (isTargetChange()) {
-                aiming = 0;
+
+        if (isTargetChange()) {
+            aiming = 0;
+        }
+        if (task == null) {
+            cooldown--;
+        }
+        if (task != null) {
+            if (task.tick(this)) {
+                Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), getPos(), getSoundSource());
+            } else {
+                task = null;
             }
-            if (task == null) {
-                cooldown--;
-            }
-            if (task != null) {
-                if (task.tick(this)) {
-                    Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), getPos(), getSoundSource());
+        }
+        LivingEntity target = getTarget();
+        if (target != null) {
+            aiming++;
+            AABB box = target.getBoundingBox();
+            lookAtPos(box.getCenter());
+            if (task == null && cooldown < 0 && aiming > 10) {
+                RandomSource random = getRandom();
+                cooldown = 20 + random.nextInt(2);
+                if (random.nextInt(10) == 0) {
+                    task = new ShootTask(225, 60, true);
                 } else {
-                    task = null;
-                }
-            }
-            LivingEntity target = getTarget();
-            if (target != null) {
-                aiming++;
-                AABB box = target.getBoundingBox();
-                lookAtPos(box.getCenter());
-                if (task == null && cooldown < 0 && aiming > 10) {
-                    RandomSource random = getRandom();
-                    cooldown = 20 + random.nextInt(2);
-                    if (random.nextInt(10) == 0) {
-                        task = new ShootTask(225, 60, true);
-                    } else {
-                        task = new ShootTask(7, 7, false);
-                    }
+                    task = new ShootTask(7, 7, false);
                 }
             }
         }
@@ -134,7 +133,7 @@ public class SuperPeashooter extends MomentumMinion implements IBlockCollision<S
                 projectile.init(new PathNode(start, dir));
                 projectile.copyAttributes(shooter);
                 projectile.setVelocity(dir);
-                LyraHelper.get(shooter.getLevel()).add(projectile);
+                LyraHelper.get(shooter.getOwner()).add(projectile);
                 firedShots++;
             }
             elapsedTicks++;

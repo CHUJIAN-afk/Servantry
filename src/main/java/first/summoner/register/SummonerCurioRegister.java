@@ -376,7 +376,7 @@ public class SummonerCurioRegister {
                             projectile.copyAttributes(minion);
                             projectile.setVelocity(direction.scale(0.25f));
                             projectile.setChaseTarget(target);
-                            LyraHelper.get(owner.level()).add(projectile);
+                            LyraHelper.get(owner).add(projectile);
                         }
                     })
                     .properties(properties -> properties.rarity(Rarity.EPIC))

@@ -39,27 +39,26 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            ParticleHelper.create(getLevel())
-                    .generic(GenericParticleBuilder.create()
-                            .centerColor(0x8fe3ff)
-                            .edgeColor(0x4fc1f5)
-                            .lifetime(4)
-                            .lifetimeRandom(8)
-                            .spin(0.3f)
-                            .spinRandom(0.1F)
-                            .friction(0.8F)
-                            .scale(0.03f)
-                            .scaleRandom(0.008f)
-                    )
-                    .pos(getPos())
-                    .offset(0.22)
-                    .velocity(getVelocity().scale(-1))
-                    .count(6)
-                    .speed(0.2)
-                    .spread(1.5)
-                    .emit();
-        }
+
+        ParticleHelper.create(getLevel())
+                .generic(GenericParticleBuilder.create()
+                        .centerColor(0x8fe3ff)
+                        .edgeColor(0x4fc1f5)
+                        .lifetime(4)
+                        .lifetimeRandom(8)
+                        .spin(0.3f)
+                        .spinRandom(0.1F)
+                        .friction(0.8F)
+                        .scale(0.03f)
+                        .scaleRandom(0.008f)
+                )
+                .pos(getPos())
+                .offset(0.22)
+                .velocity(getVelocity().scale(-1))
+                .count(6)
+                .speed(0.2)
+                .spread(1.5)
+                .emit();
     }
 
     @Override
@@ -121,27 +120,25 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
     @Override
     public void onRemove() {
         // 命中方块或在空气中消失时爆出少量淡蓝色粒子
-        if (!getLevel().isClientSide()) {
-            ParticleHelper.create(getLevel())
-                    .generic(GenericParticleBuilder.create()
-                            .centerColor(0x8fe3ff)
-                            .edgeColor(0x4fc1f5)
-                            .lifetime(5)
-                            .lifetimeRandom(5)
-                            .spin(0.3f)
-                            .spinRandom(0.05F)
-                            .friction(0.75F)
-                            .scale(0.025f)
-                            .scaleRandom(0.005f)
-                    )
-                    .pos(getPos())
-                    .offset(0.15)
-                    .velocity(getVelocity())
-                    .count(4)
-                    .speed(0.25)
-                    .spread(2)
-                    .emit();
-        }
+        ParticleHelper.create(getLevel())
+                .generic(GenericParticleBuilder.create()
+                        .centerColor(0x8fe3ff)
+                        .edgeColor(0x4fc1f5)
+                        .lifetime(5)
+                        .lifetimeRandom(5)
+                        .spin(0.3f)
+                        .spinRandom(0.05F)
+                        .friction(0.75F)
+                        .scale(0.025f)
+                        .scaleRandom(0.005f)
+                )
+                .pos(getPos())
+                .offset(0.15)
+                .velocity(getVelocity())
+                .count(4)
+                .speed(0.25)
+                .spread(2)
+                .emit();
     }
 
     @Override

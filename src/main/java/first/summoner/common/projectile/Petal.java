@@ -1,6 +1,5 @@
 package first.summoner.common.projectile;
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -37,16 +36,15 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (chaseDelay > 0) {
-                chaseDelay--;
-            } else if (chaseTarget == null || !chaseTarget.isAlive()) {
-                chaseTarget = findNearestTarget();
-            }
-            if (chaseTarget != null && chaseTarget.isAlive()) {
-                Vec3 dir = chaseTarget.getBoundingBox().getCenter().subtract(getPos()).normalize();
-                addVelocity(dir);
-            }
+
+        if (chaseDelay > 0) {
+            chaseDelay--;
+        } else if (chaseTarget == null || !chaseTarget.isAlive()) {
+            chaseTarget = findNearestTarget();
+        }
+        if (chaseTarget != null && chaseTarget.isAlive()) {
+            Vec3 dir = chaseTarget.getBoundingBox().getCenter().subtract(getPos()).normalize();
+            addVelocity(dir);
         }
     }
 
@@ -54,8 +52,8 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
     private LivingEntity findNearestTarget() {
         LivingEntity nearest = null;
         double nearestDist = Double.MAX_VALUE;
-        TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
-        for (LivingEntity candidate : targetCache.getEntitiesInRadius(getPos(), 8, living -> targetCache.isTarget(owner, living))) {
+        TargetCache targetCache = getTargetCache();
+        for (LivingEntity candidate : targetCache.getEntitiesInRadius(getPos(), 8, living -> targetCache.isTarget(living))) {
             double dist = candidate.position().distanceToSqr(getPos());
             if (dist < nearestDist) {
                 nearestDist = dist;
@@ -77,7 +75,7 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
 
     @Override
     public boolean isValidCollisionTarget(Petal entity, LivingEntity target) {
-        return getTickCount() > 10 && LyraHelper.get(getLevel()).getTargetCache().isTarget(owner, target);
+        return getTickCount() > 10 && getTargetCache().isTarget(target);
     }
 
     @Override

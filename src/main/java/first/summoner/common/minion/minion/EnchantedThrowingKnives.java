@@ -1,7 +1,6 @@
 package first.summoner.common.minion.minion;
 
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
@@ -92,14 +91,13 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            // 空闲混合系数更新
-            idleBlendO = idleBlend;
-            if (!attacking) {
-                idleBlend = Math.min(1.0f, idleBlend + 0.05f);
-            } else {
-                idleBlend = Math.max(0.0f, idleBlend - 0.1f);
-            }
+
+        // 空闲混合系数更新
+        idleBlendO = idleBlend;
+        if (!attacking) {
+            idleBlend = Math.min(1.0f, idleBlend + 0.05f);
+        } else {
+            idleBlend = Math.max(0.0f, idleBlend - 0.1f);
         }
     }
 
@@ -107,9 +105,8 @@ public class EnchantedThrowingKnives extends Minion implements IEntityCollision<
     public LivingEntity searchTarget() {
         int distance = this.getSearchDistance();
         if (distance > 0) {
-            LyraHelper helper = LyraHelper.get(getLevel());
-            TargetCache targetCache = helper.getTargetCache();
-            List<LivingEntity> targets = targetCache.getEntitiesInRadius(owner.getBoundingBox().getCenter(), distance * 2, (living) -> (attacking || (targetCache.isVisibility(owner, living))) && targetCache.isTarget(owner, living) && targetCache.getDistance(this, living) < distance);
+            TargetCache targetCache = getTargetCache();
+            List<LivingEntity> targets = targetCache.getEntitiesInRadius(owner.getBoundingBox().getCenter(), distance * 2, (living) -> (attacking || (targetCache.isVisibility(owner, living))) && targetCache.isTarget(living) && targetCache.getDistance(this, living) < distance);
             if (!targets.isEmpty()) {
                 return targetCache.getNewTarget(this, targets, 8, false);
             }

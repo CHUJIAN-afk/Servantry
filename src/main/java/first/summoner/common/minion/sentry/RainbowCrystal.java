@@ -28,11 +28,10 @@ public class RainbowCrystal extends Minion {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (--cooldown < 0 && getTarget() != null) {
-                cooldown = getRandom().nextInt(6, 8);
-                fire(getTarget());
-            }
+
+        if (--cooldown < 0 && getTarget() != null) {
+            cooldown = getRandom().nextInt(6, 8);
+            fire(getTarget());
         }
     }
 
@@ -60,7 +59,7 @@ public class RainbowCrystal extends Minion {
             projectile.init(startPathNode);
             projectile.copyAttributes(this);
             projectile.setPath(list);
-            LyraHelper.get(level).add(projectile);
+            LyraHelper.get(owner).add(projectile);
         }
     }
 

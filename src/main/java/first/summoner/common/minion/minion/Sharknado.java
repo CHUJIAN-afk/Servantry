@@ -34,27 +34,26 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            // 产生粒子
-            ParticleHelper.create(getLevel())
-                    .generic(GenericParticleBuilder.create()
-                            .centerColor(0x04c7e3)
-                            .edgeColor(0x047a95)
-                            .lifetime(5)
-                            .lifetimeRandom(10)
-                            .spin(0.075f)
-                            .spinRandom(0.3F)
-                            .friction(0.9F)
-                            .scale(0.02f)
-                            .scaleRandom(0.001f)
-                    )
-                    .velocity(Vec3.ZERO)
-                    .pos(getPos())
-                    .offset(0.5)
-                    .count(2)
-                    .spread(1.5)
-                    .emit();
-        }
+
+        // 产生粒子
+        ParticleHelper.create(getLevel())
+                .generic(GenericParticleBuilder.create()
+                        .centerColor(0x04c7e3)
+                        .edgeColor(0x047a95)
+                        .lifetime(5)
+                        .lifetimeRandom(10)
+                        .spin(0.075f)
+                        .spinRandom(0.3F)
+                        .friction(0.9F)
+                        .scale(0.02f)
+                        .scaleRandom(0.001f)
+                )
+                .velocity(Vec3.ZERO)
+                .pos(getPos())
+                .offset(0.5)
+                .count(2)
+                .spread(1.5)
+                .emit();
     }
 
     public int getSearchDistance() {

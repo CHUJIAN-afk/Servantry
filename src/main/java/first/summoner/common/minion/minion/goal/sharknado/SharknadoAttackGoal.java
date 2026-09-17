@@ -54,7 +54,7 @@ public class SharknadoAttackGoal extends AttachmentEntityGoal<Sharknado> {
             projectile.init(new PathNode(minionPos, direction));
             projectile.copyAttributes(minion);
             projectile.setVelocity(direction);
-            LyraHelper.get(minion.getLevel()).add(projectile);
+            LyraHelper.get(minion.getOwner()).add(projectile);
         }
     }
 }

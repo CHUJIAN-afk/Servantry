@@ -60,26 +60,25 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTarget();
-            cooldown--;
-            if (isTargetChange()) {
-                aiming = 0;
-            }
-            if (isValidTarget(target)) {
-                lookAtPos(target.getBoundingBox().getCenter());
-                aiming++;
-                if (cooldown < 0 && aiming > 10) {
-                    cooldown = switch (level) {
-                        case 1 -> 35;
-                        case 2 -> 34;
-                        default -> 31;
-                    };
-                    Vec3 targetDirection = target.getBoundingBox().getCenter().subtract(getPos());
-                    Vec3 lookAngle = getLookAngle();
-                    if (getAngleDeg(targetDirection, lookAngle) < 5) {
-                        fire(target.getBoundingBox().getCenter());
-                    }
+
+        LivingEntity target = getTarget();
+        cooldown--;
+        if (isTargetChange()) {
+            aiming = 0;
+        }
+        if (isValidTarget(target)) {
+            lookAtPos(target.getBoundingBox().getCenter());
+            aiming++;
+            if (cooldown < 0 && aiming > 10) {
+                cooldown = switch (level) {
+                    case 1 -> 35;
+                    case 2 -> 34;
+                    default -> 31;
+                };
+                Vec3 targetDirection = target.getBoundingBox().getCenter().subtract(getPos());
+                Vec3 lookAngle = getLookAngle();
+                if (getAngleDeg(targetDirection, lookAngle) < 5) {
+                    fire(target.getBoundingBox().getCenter());
                 }
             }
         }
@@ -93,7 +92,7 @@ public class Inferno extends MomentumMinion implements IBlockCollision<Inferno> 
         ball.init(new PathNode(start, direction));
         ball.copyAttributes(this);
         ball.setVelocity(direction);
-        LyraHelper.get(getLevel()).add(ball);
+        LyraHelper.get(owner).add(ball);
     }
 
     private double getAngleDeg(Vec3 a, Vec3 b) {

@@ -67,7 +67,7 @@ public class ZenithItem extends SwordItem {
                     PathNode node = projectile.getNode(projectile.progress, 1);
                     projectile.setCurrentPathNode(node);
                     projectile.init(projectile.getCurrentPathNode());
-                    LyraHelper.get(player.level()).add(projectile);
+                    LyraHelper.get(player).add(projectile);
                 }
             }
             return InteractionResultHolder.success(player.getItemInHand(usedHand));

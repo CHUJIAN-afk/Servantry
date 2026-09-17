@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -33,15 +32,14 @@ public class MiniChlorophyteCrystal extends Projectile implements IEntityCollisi
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            currentPathNode = new PathNode(currentPathNode.pos(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll() + 30);
-        }
+
+        currentPathNode = new PathNode(currentPathNode.pos(), currentPathNode.yaw(), currentPathNode.pitch(), currentPathNode.roll() + 30);
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-                TargetCache targetCache = LyraHelper.get(owner.level()).getTargetCache();
+                TargetCache targetCache = getTargetCache();
             HitContext context = hitContexts.getFirst();
             LivingEntity target = context.entity();
             Vec3 pos = target.getBoundingBox().getCenter();

@@ -133,7 +133,7 @@ public class Event {
             if (SummonerArmorSetRegister.Hallowed.get().full(player)) {
                 target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
             }
-            List<VoidEater> voidEaters = LyraHelper.get(player.level()).getEntityData().get(SummonerAttachmentEntityRegister.VOID_EATER.get());
+            List<VoidEater> voidEaters = LyraHelper.get(player).getEntityData().get(SummonerAttachmentEntityRegister.VOID_EATER.get());
             if (!voidEaters.isEmpty()) {
                 target.addEffect(new MobEffectInstance(SummonerMobEffectRegister.GodSlayerInferno, 60));
             }

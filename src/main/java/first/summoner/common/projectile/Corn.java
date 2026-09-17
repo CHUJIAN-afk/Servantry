@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
@@ -54,9 +53,8 @@ public class Corn extends Projectile implements IEntityCollision<Corn>, IBlockCo
      */
     private void explodeAt(Vec3 explosionPos) {
         // 通过TargetCache获取附近实体
-        LyraHelper helper = LyraHelper.get(getLevel());
-        TargetCache targetCache = helper.getTargetCache();
-        List<LivingEntity> nearbyEntities = targetCache.getEntitiesInRadius(explosionPos, AOE_RADIUS, living -> targetCache.isTarget(owner, living));
+        TargetCache targetCache = getTargetCache();
+        List<LivingEntity> nearbyEntities = targetCache.getEntitiesInRadius(explosionPos, AOE_RADIUS, living -> targetCache.isTarget(living));
         for (LivingEntity entity : nearbyEntities) {
             InvincibleData.attack(entity)
                     .attacker(getUuid())

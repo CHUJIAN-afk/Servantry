@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -39,39 +38,37 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTrackingTarget();
-            if (target != null && target.isAlive()) {
-                AABB box = trackingTarget.getBoundingBox();
-                targetPos = box.getCenter();
-            }
-            if (targetPos != null) {
-                addVelocity(targetPos.subtract(getPos()).normalize());
-            }
-            // 粒子拖尾
-            ParticleHelper.create(getLevel())
-                    .generic(GenericParticleBuilder.create()
-                                     .centerColor(0xff1200)
-                                     .edgeColor(0xd40f00)
-                                     .lifetime(4)
-                                     .lifetimeRandom(3)
-                                     .spin(0.2f)
-                                     .spinRandom(0.2f)
-                                     .scale(0.02f)
-                                     .scaleRandom(0.008f)
-                    )
-                    .pos(getPos())
-                    .offset(0.05)
-                    .emit();
+
+        LivingEntity target = getTrackingTarget();
+        if (target != null && target.isAlive()) {
+            AABB box = trackingTarget.getBoundingBox();
+            targetPos = box.getCenter();
         }
+        if (targetPos != null) {
+            addVelocity(targetPos.subtract(getPos()).normalize());
+        }
+        // 粒子拖尾
+        ParticleHelper.create(getLevel())
+                .generic(GenericParticleBuilder.create()
+                                 .centerColor(0xff1200)
+                                 .edgeColor(0xd40f00)
+                                 .lifetime(4)
+                                 .lifetimeRandom(3)
+                                 .spin(0.2f)
+                                 .spinRandom(0.2f)
+                                 .scale(0.02f)
+                                 .scaleRandom(0.008f)
+                )
+                .pos(getPos())
+                .offset(0.05)
+                .emit();
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         DamageSource source = getDamageSource();
-                LyraHelper summonerHelper = LyraHelper.get(getLevel());
-            TargetCache targetCache = summonerHelper.getTargetCache();
-            List<LivingEntity> mainTargets = targetCache.getEntitiesInRadius(getPos(), 3, living -> targetCache.isTarget(owner, living));
+            TargetCache targetCache = getTargetCache();
+            List<LivingEntity> mainTargets = targetCache.getEntitiesInRadius(getPos(), 3, living -> targetCache.isTarget(living));
             for (LivingEntity living : mainTargets) {
                 float amount = getDamage();
                 if (living == trackingTarget) {
@@ -93,7 +90,7 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
                         .damageAmount(amount * 0.5f)
                         .apply();
                 List<LivingEntity> splashTargets = targetCache.getEntitiesInRadius(living.position(), 2,
-                        entity -> entity == living || targetCache.isTarget(owner, entity));
+                        entity -> entity == living || targetCache.isTarget(entity));
                 for (LivingEntity entity : splashTargets) {
                     InvincibleData.attack(living)
                             .attacker(getUuid())

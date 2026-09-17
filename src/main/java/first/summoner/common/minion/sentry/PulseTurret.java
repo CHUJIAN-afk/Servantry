@@ -34,19 +34,18 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTarget();
-            cooldown--;
-            if (target != null) {
-                Vec3 targetPos = target.getBoundingBox().getCenter();
-                lookAtPos(targetPos);
-                if (cooldown < 0) {
-                    Vec3 targetDirection = targetPos.subtract(getPos());
-                    Vec3 lookAngle = getLookAngle();
-                    if (getAngleDeg(targetDirection, lookAngle) < 5) {
-                        cooldown = 10 + getRandom().nextInt(-1, 1);
-                        fire();
-                    }
+
+        LivingEntity target = getTarget();
+        cooldown--;
+        if (target != null) {
+            Vec3 targetPos = target.getBoundingBox().getCenter();
+            lookAtPos(targetPos);
+            if (cooldown < 0) {
+                Vec3 targetDirection = targetPos.subtract(getPos());
+                Vec3 lookAngle = getLookAngle();
+                if (getAngleDeg(targetDirection, lookAngle) < 5) {
+                    cooldown = 10 + getRandom().nextInt(-1, 1);
+                    fire();
                 }
             }
         }
@@ -60,8 +59,8 @@ public class PulseTurret extends MomentumMinion implements IBlockCollision<Pulse
         projectile.init(new PathNode(start, direction));
         projectile.copyAttributes(this);
         projectile.setVelocity(direction);
-        LyraHelper.get(level).add(projectile);
-        Playable.play(SummonerSoundRegister.BallistaShot, level, start, getSoundSource());
+        LyraHelper.get(owner).add(projectile);
+        Playable.play(SummonerSoundRegister.BallistaShot, getLevel(), start, getSoundSource());
     }
 
     public void dimensionChange() {

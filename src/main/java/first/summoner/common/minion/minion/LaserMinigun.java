@@ -41,28 +41,27 @@ public class LaserMinigun extends Minion {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTarget();
-            PathNode idleNode = getInterpolatedIdleState(0);
-            PathNode currentNode = getCurrentPathNode();
-            cooldown--;
-            lastAnimationTick = animationTick;
-            if (target != null) {
-                Vec3 targetCenter = target.getBoundingBox().getCenter();
-                Vec3 direction = targetCenter.subtract(getPos()).normalize();
-                float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
-                float pitch = (float) Math.toDegrees(Math.asin(-direction.y));
-                PathNode attackNode = new PathNode(idleNode.pos(), yaw, pitch, 0);
-                setCurrentPathNode(currentNode.lerp(attackNode, 0.25f));
-                if (cooldown <= 0) {
-                    cooldown = 2;
-                    fire(target);
-                }
-                animationTick += 2;
-            } else {
-                animationTick++;
-                setCurrentPathNode(currentNode.lerp(idleNode, 0.25f));
+
+        LivingEntity target = getTarget();
+        PathNode idleNode = getInterpolatedIdleState(0);
+        PathNode currentNode = getCurrentPathNode();
+        cooldown--;
+        lastAnimationTick = animationTick;
+        if (target != null) {
+            Vec3 targetCenter = target.getBoundingBox().getCenter();
+            Vec3 direction = targetCenter.subtract(getPos()).normalize();
+            float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
+            float pitch = (float) Math.toDegrees(Math.asin(-direction.y));
+            PathNode attackNode = new PathNode(idleNode.pos(), yaw, pitch, 0);
+            setCurrentPathNode(currentNode.lerp(attackNode, 0.25f));
+            if (cooldown <= 0) {
+                cooldown = 2;
+                fire(target);
             }
+            animationTick += 2;
+        } else {
+            animationTick++;
+            setCurrentPathNode(currentNode.lerp(idleNode, 0.25f));
         }
     }
 
@@ -93,7 +92,7 @@ public class LaserMinigun extends Minion {
             laser.init(new PathNode(spawnPos, normalize));
             laser.copyAttributes(this);
             laser.setVelocity(normalize.scale(1.5));
-            LyraHelper.get(getLevel()).add(laser);
+            LyraHelper.get(owner).add(laser);
         }
 
         ParticleHelper.create(getLevel())

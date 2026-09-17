@@ -10,6 +10,7 @@ import first.summoner.register.SummonerCurioRegister;
 import first.summoner.utils.CuriosUtil;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 public class HornetAttackGoal extends AttachmentEntityGoal<Hornet> {
@@ -51,7 +52,7 @@ public class HornetAttackGoal extends AttachmentEntityGoal<Hornet> {
         minion.lookAtPos(targetPos);
 
         if (--cooldown <= 0) {
-            LivingEntity owner = minion.getOwner();
+            Player owner = minion.getOwner();
             RandomSource random = minion.getRandom();
             cooldown = 13 + random.nextIntBetweenInclusive(0, 4);
             Vec3 direction = targetPos.subtract(minionPos).normalize();
@@ -60,7 +61,7 @@ public class HornetAttackGoal extends AttachmentEntityGoal<Hornet> {
             stinger.init(new PathNode(minionPos, direction));
             stinger.copyAttributes(minion);
             stinger.setVelocity(direction);
-            LyraHelper.get(minion.getLevel()).add(stinger);
+            LyraHelper.get(minion.getOwner()).add(stinger);
             if (CuriosUtil.isEquipped(owner, SummonerCurioRegister.HivePack.get())) {
                 stinger.setDamage(stinger.getDamage() * 1.15f);
                 cooldown = (int) (cooldown * 0.67);

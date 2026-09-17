@@ -1,6 +1,5 @@
 package first.summoner.common.projectile;
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -40,7 +39,7 @@ public class SharkDragon extends Projectile implements IEntityCollision<SharkDra
 
     @Override
     public boolean isValidCollisionTarget(SharkDragon entity, LivingEntity target) {
-        return LyraHelper.get(level).getTargetCache().isTarget(owner, target);
+        return getTargetCache().isTarget(target);
     }
 
     @Override

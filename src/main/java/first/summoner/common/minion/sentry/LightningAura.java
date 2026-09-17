@@ -1,6 +1,5 @@
 package first.summoner.common.minion.sentry;
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
@@ -47,13 +46,12 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            spawnParticles();
-            cooldown--;
-            if (cooldown < 0) {
-                cooldown = 10;
-                attack();
-            }
+
+        spawnParticles();
+        cooldown--;
+        if (cooldown < 0) {
+            cooldown = 10;
+            attack();
         }
     }
 
@@ -62,7 +60,7 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
      * 击退/护甲穿透由 MinionDamageSource 统一应用（击退 0.25、穿透 1000）。
      */
     private void attack() {
-        TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
+        TargetCache targetCache = getTargetCache();
         List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 6, null);
         for (LivingEntity entity : entities) {
             InvincibleData.attack(entity)

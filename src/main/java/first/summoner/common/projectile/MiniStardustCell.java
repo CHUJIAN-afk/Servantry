@@ -14,7 +14,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -129,7 +128,7 @@ public class MiniStardustCell extends Projectile implements IEntityCollision<Min
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide() && !isAttached()) {
+        if (!isAttached()) {
             tickFlying();
         }
         if (trailTimer > 0) {
@@ -168,52 +167,49 @@ public class MiniStardustCell extends Projectile implements IEntityCollision<Min
 
     @Override
     public void onRemove() {
-        Level level = getLevel();
-        if (!level.isClientSide()) {
-            Vec3 pos = getPos();
-            RandomSource random = getRandom();
-            int count = random.nextInt(2, 3);
-            double baseSpeed = 0.2;
-            if (isAttached()) {
-                DamageSource source = getDamageSource();
-                LivingEntity target = getAttachedTarget();
-                if (target != null && target.isAlive()) {
-                    InvincibleData.attack(target)
-                            .attacker(getUuid())
-                            .damageSource(source)
-                            .damageAmount(getDamage() * 0.5f)
-                            .apply();
-                }
-                count *= 4;
-                baseSpeed *= 4;
+        Vec3 pos = getPos();
+        RandomSource random = getRandom();
+        int count = random.nextInt(2, 3);
+        double baseSpeed = 0.2;
+        if (isAttached()) {
+            DamageSource source = getDamageSource();
+            LivingEntity target = getAttachedTarget();
+            if (target != null && target.isAlive()) {
+                InvincibleData.attack(target)
+                        .attacker(getUuid())
+                        .damageSource(source)
+                        .damageAmount(getDamage() * 0.5f)
+                        .apply();
             }
-            Vec3 velocity;
-            if (attachedTarget != null) {
-                velocity = pos.subtract(attachedTarget.getBoundingBox().getCenter());
-            } else {
-                velocity = pos.subtract(pos.offsetRandom(random, 1f)).scale(0.5);
-            }
-            GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
-                    .centerColor(0x2fb2e1)
-                    .edgeColor(0x33ccff);
-            ParticleHelper.create(getLevel())
-                    .generic(genericParticleBuilder
-                            .lifetime(5)
-                            .lifetimeRandom(25)
-                            .spin(0.1f)
-                            .spinRandom(0.5F)
-                            .friction(0.75F)
-                            .scale(0.035f)
-                            .scaleRandom(0.005f)
-                    )
-                    .pos(pos)
-                    .velocity(velocity.normalize())
-                    .spread(0.02)
-                    .count(count)
-                    .speed(baseSpeed)
-                    .spread(1)
-                    .emit();
+            count *= 4;
+            baseSpeed *= 4;
         }
+        Vec3 velocity;
+        if (attachedTarget != null) {
+            velocity = pos.subtract(attachedTarget.getBoundingBox().getCenter());
+        } else {
+            velocity = pos.subtract(pos.offsetRandom(random, 1f)).scale(0.5);
+        }
+        GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
+                .centerColor(0x2fb2e1)
+                .edgeColor(0x33ccff);
+        ParticleHelper.create(getLevel())
+                .generic(genericParticleBuilder
+                        .lifetime(5)
+                        .lifetimeRandom(25)
+                        .spin(0.1f)
+                        .spinRandom(0.5F)
+                        .friction(0.75F)
+                        .scale(0.035f)
+                        .scaleRandom(0.005f)
+                )
+                .pos(pos)
+                .velocity(velocity.normalize())
+                .spread(0.02)
+                .count(count)
+                .speed(baseSpeed)
+                .spread(1)
+                .emit();
     }
 
     public void setChaseTarget(LivingEntity chaseTarget) {

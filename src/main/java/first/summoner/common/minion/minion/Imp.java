@@ -30,22 +30,21 @@ public class Imp extends MomentumMinion {
     public void tick() {
         super.tick();
         Level level = getLevel();
-        if (!level.isClientSide()){
-            ParticleHelper.create(level)
-                    .generic(GenericParticleBuilder.create()
-                                     .centerColor(0xe1c316)
-                                     .edgeColor(0xff7506)
-                                     .lifetime(6)
-                                     .lifetimeRandom(4)
-                                     .spin(0.25f)
-                                     .spinRandom(0.25F)
-                                     .scale(0.015f)
-                                     .scaleRandom(0.015f)
-                    )
-                    .pos(getPos())
-                    .offset(0.2)
-                    .emit();
-        }
+
+        ParticleHelper.create(level)
+                .generic(GenericParticleBuilder.create()
+                                 .centerColor(0xe1c316)
+                                 .edgeColor(0xff7506)
+                                 .lifetime(6)
+                                 .lifetimeRandom(4)
+                                 .spin(0.25f)
+                                 .spinRandom(0.25F)
+                                 .scale(0.015f)
+                                 .scaleRandom(0.015f)
+                )
+                .pos(getPos())
+                .offset(0.2)
+                .emit();
     }
 
     @Override

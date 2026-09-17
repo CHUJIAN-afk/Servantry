@@ -96,9 +96,9 @@ public class SummonerArmorSetRegister {
                         crystal.setDamage(10f);
                         crystal.setKnockback(1f);
                         crystal.setOwner(player);
-                        LyraHelper.get(player.level()).add(crystal);
+                        LyraHelper.get(player).add(crystal);
                     })
-                    .onRemove(player -> LyraHelper.get(player.level()).getEntityData().remove(SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))
+                    .onRemove(player -> LyraHelper.get(player).getEntityData().remove(SummonerAttachmentEntityRegister.CHLOROPHYTE_CRYSTAL.get()))
                     .tooltip(1, "Summons a powerful leaf crystal to shoot at nearby enemies", "召唤强大的叶状水晶来射击附近的敌人")
                     .build()
             );

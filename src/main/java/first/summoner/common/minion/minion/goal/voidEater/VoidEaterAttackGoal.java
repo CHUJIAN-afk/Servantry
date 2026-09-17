@@ -103,7 +103,7 @@ public class VoidEaterAttackGoal extends AttachmentEntityGoal<VoidEater> {
                         projectile.copyAttributes(minion);
                         projectile.setVelocity(direction.scale(3));
                         projectile.setDamage(minion.getDamage() * 0.5f);
-                        LyraHelper.get(level).add(projectile);
+                        LyraHelper.get(owner).add(projectile);
                     }
                     Playable.play(SummonerSoundRegister.Laser, level, start, minion.getSoundSource());
                 }
@@ -140,7 +140,7 @@ public class VoidEaterAttackGoal extends AttachmentEntityGoal<VoidEater> {
                 laser.setColor(0x6f19d4);
                 laser.setDamage(minion.getDamage() * 2);
                 Level level = minion.getLevel();
-                LyraHelper.get(level).add(laser);
+                LyraHelper.get(minion.getOwner()).add(laser);
                 laser.setTickConsumer(laserProjectile -> {
                     if (laserProjectile.getDamageSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity().isRemove()) {
                         laserProjectile.setRemove();

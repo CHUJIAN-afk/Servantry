@@ -52,10 +52,9 @@ public class CustomLaser extends Projectile implements IEntityCollision<CustomLa
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (tickConsumer != null) {
-                tickConsumer.accept(this);
-            }
+
+        if (tickConsumer != null) {
+            tickConsumer.accept(this);
         }
     }
 

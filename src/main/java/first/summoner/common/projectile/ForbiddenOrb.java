@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
@@ -12,7 +11,6 @@ import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -41,27 +39,24 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
     @Override
     public void tick() {
         super.tick();
-        Level level = getLevel();
-        if (!level.isClientSide()) {
-            // 金黄色粒子轨迹
-            ParticleHelper.create(level)
-                    .generic(GenericParticleBuilder.create()
-                            .centerColor(0xffd700)
-                            .edgeColor(0xffa500)
-                            .lifetime(4)
-                            .lifetimeRandom(6)
-                            .spin(0.25f)
-                            .spinRandom(0.2F)
-                            .friction(0.75F)
-                            .scale(0.025f)
-                            .scaleRandom(0.01f)
-                    )
-                    .pos(getPos())
-                    .count(6)
-                    .offset(0.15)
-                    .velocity(getVelocity().scale(-0.1))
-                    .emit();
-        }
+        // 金黄色粒子轨迹
+        ParticleHelper.create(getLevel())
+                .generic(GenericParticleBuilder.create()
+                        .centerColor(0xffd700)
+                        .edgeColor(0xffa500)
+                        .lifetime(4)
+                        .lifetimeRandom(6)
+                        .spin(0.25f)
+                        .spinRandom(0.2F)
+                        .friction(0.75F)
+                        .scale(0.025f)
+                        .scaleRandom(0.01f)
+                )
+                .pos(getPos())
+                .count(6)
+                .offset(0.15)
+                .velocity(getVelocity().scale(-0.1))
+                .emit();
     }
 
     @Override
@@ -85,17 +80,15 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
     public void onRemove() {
         // 在空气中消失（自然消散）时也会爆炸
         DamageSource source = getDamageSource();
-        if (!getLevel().isClientSide()) {
-            explode(source, getPos());
-        }
+        explode(source, getPos());
     }
 
     /**
      * 爆炸：对命中点半径 3.5 格内所有敌人造成范围伤害，爆出大量金黄色粒子。
      */
     private void explode(DamageSource source, Vec3 hitPoint) {
-        TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
-        List<LivingEntity> entities = targetCache.getEntitiesInRadius(hitPoint, 3.5, living -> targetCache.isTarget(owner, living));
+        TargetCache targetCache = getTargetCache();
+        List<LivingEntity> entities = targetCache.getEntitiesInRadius(hitPoint, 3.5, targetCache::isTarget);
         for (LivingEntity entity : entities) {
             InvincibleData.attack(entity)
                     .attacker(getUuid())

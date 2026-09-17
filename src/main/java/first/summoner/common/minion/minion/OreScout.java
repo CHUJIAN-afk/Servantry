@@ -41,34 +41,33 @@ public class OreScout extends Minion {
     public void tick() {
         super.tick();
         Level level = getLevel();
-        if (!level.isClientSide()) {
-            setPath(Collections.singletonList(getRenderNode(1.0f)));
-            if (oreTarget == null) {
-                oreTarget = getNearestOrePos(searchRadius);
-                searchRadius = searchRadius >= 16 ? 1 : searchRadius + 1;
-            }
-            if (oreTarget != null) {
-                BlockState state = level.getBlockState(oreTarget);
-                float destroySpeed = state.getDestroySpeed(level, oreTarget);
-                if (destroySpeed < 0 || !isOre(state)) {
+
+        setPath(Collections.singletonList(getRenderNode(1.0f)));
+        if (oreTarget == null) {
+            oreTarget = getNearestOrePos(searchRadius);
+            searchRadius = searchRadius >= 16 ? 1 : searchRadius + 1;
+        }
+        if (oreTarget != null) {
+            BlockState state = level.getBlockState(oreTarget);
+            float destroySpeed = state.getDestroySpeed(level, oreTarget);
+            if (destroySpeed < 0 || !isOre(state)) {
+                oreTarget = null;
+                miningProgress = 0;
+            } else {
+                miningProgress += 1f / Math.max(1f, destroySpeed * 20f);
+                ParticleHelper.create(level)
+                        .type(new DustParticleOptions(new Vector3f(1f, 0f, 0f), 1f))
+                        .pos(Vec3.atCenterOf(oreTarget))
+                        .velocity(0, 0.2, 0)
+                        .count(4)
+                        .speed(0.15)
+                        .offset(0.5)
+                        .count(10)
+                        .emit();
+                if (miningProgress >= 1f) {
+                    level.destroyBlock(oreTarget, true, owner);
                     oreTarget = null;
                     miningProgress = 0;
-                } else {
-                    miningProgress += 1f / Math.max(1f, destroySpeed * 20f);
-                    ParticleHelper.create(level)
-                            .type(new DustParticleOptions(new Vector3f(1f, 0f, 0f), 1f))
-                            .pos(Vec3.atCenterOf(oreTarget))
-                            .velocity(0, 0.2, 0)
-                            .count(4)
-                            .speed(0.15)
-                            .offset(0.5)
-                            .count(10)
-                            .emit();
-                    if (miningProgress >= 1f) {
-                        level.destroyBlock(oreTarget, true, owner);
-                        oreTarget = null;
-                        miningProgress = 0;
-                    }
                 }
             }
         }

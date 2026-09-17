@@ -48,22 +48,18 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTarget();
-            if (target != null) {
-                lookAtPos(target.getBoundingBox().getCenter());
-            } else if (owner.getBoundingBox().getCenter().distanceTo(getPos()) < 2) {
-                lookAtPos(owner.getEyePosition());
-            }
+        LivingEntity target = getTarget();
+        if (target != null) {
+            lookAtPos(target.getBoundingBox().getCenter());
+        } else if (owner.getBoundingBox().getCenter().distanceTo(getPos()) < 2) {
+            lookAtPos(owner.getEyePosition());
         }
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTarget();
-            if (target != null) {
-                updateLaser();
-            } else if (laser != null) {
-                laser.setRemove();
-                laser = null;
-            }
+
+        if (target != null) {
+            updateLaser();
+        } else if (laser != null) {
+            laser.setRemove();
+            laser = null;
         }
     }
 
@@ -105,7 +101,7 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
                                 .apply();
                     }
             });
-            LyraHelper.get(level).add(laser);
+            LyraHelper.get(owner).add(laser);
         } else {
             chargeTicks = Math.min(chargeTicks + 1, 60);
         }

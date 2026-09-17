@@ -42,6 +42,8 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
         super.registerSyncFields(fields);
         fields.field(ByteBufCodecs.BOOL, () -> shooting, value -> shooting = value);
         fields.field(ByteBufCodecs.BOOL, this::isHasCorn, value -> hasCorn = value);
+        fields.field(ByteBufCodecs.INT, () -> lastRenderTick, value -> lastRenderTick = value);
+        fields.field(ByteBufCodecs.INT, () -> renderTick, value -> renderTick = value);
     }
 
     @Override
@@ -57,37 +59,34 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTarget();
-            boolean hasTarget = target != null;
-            if (shootingTick == 0) {
-                if (--cooldown <= 0) {
-                    hasCorn = true;
-                    if (hasTarget) {
-                        shootingTick++;
-                        targetPos = target.getBoundingBox().getCenter();
-                    }
-                }
-            } else {
-                shootingTick++;
-                if (shootingTick == 30) {
-                    hasCorn = false;
-                    fire();
-                }
-                if (shootingTick == 50) {
-                    cooldown = 100;
-                    shootingTick = 0;
+        LivingEntity target = getTarget();
+        boolean hasTarget = target != null;
+        if (shootingTick == 0) {
+            if (--cooldown <= 0) {
+                hasCorn = true;
+                if (hasTarget) {
+                    shootingTick++;
+                    targetPos = target.getBoundingBox().getCenter();
                 }
             }
-            shooting = shootingTick != 0;
         } else {
-            if (shooting) {
-                lastRenderTick = renderTick;
-                renderTick++;
-            } else {
-                lastRenderTick = 0;
-                renderTick = 0;
+            shootingTick++;
+            if (shootingTick == 30) {
+                hasCorn = false;
+                fire();
             }
+            if (shootingTick == 50) {
+                cooldown = 100;
+                shootingTick = 0;
+            }
+        }
+        shooting = shootingTick != 0;
+        if (shooting) {
+            lastRenderTick = renderTick;
+            renderTick++;
+        } else {
+            lastRenderTick = 0;
+            renderTick = 0;
         }
     }
 
@@ -104,8 +103,8 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
             projectile.init(new PathNode(start, velocity));
             projectile.copyAttributes(this);
             projectile.setVelocity(velocity);
-            LyraHelper.get(level).add(projectile);
-            Playable.play(SoundEvents.GENERIC_EXPLODE, level, start, getSoundSource());
+            LyraHelper.get(owner).add(projectile);
+            Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), start, getSoundSource());
         }
     }
 

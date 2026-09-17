@@ -1,7 +1,6 @@
 package first.summoner.common.minion.minion;
 
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.*;
@@ -59,9 +58,8 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     public LivingEntity searchTarget() {
         int distance = this.getSearchDistance();
         if (distance > 0) {
-            LyraHelper helper = LyraHelper.get(getLevel());
-            TargetCache targetCache = helper.getTargetCache();
-            List<LivingEntity> targets = targetCache.getEntitiesInRadius(owner.getBoundingBox().getCenter(), (float) distance, (living) -> (attacking || (this.getOwner() != null && targetCache.isVisibility(this.getOwner(), living))) && targetCache.isTarget(this.getOwner(), living));
+            TargetCache targetCache = getTargetCache();
+            List<LivingEntity> targets = targetCache.getEntitiesInRadius(owner.getBoundingBox().getCenter(), (float) distance, (living) -> (attacking || (targetCache.isVisibility(owner, living))) && targetCache.isTarget(living));
             if (!targets.isEmpty()) {
                 return targetCache.getNewTarget(this, targets, 8, false);
             }
@@ -100,18 +98,17 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            lastIdleBlend = idleBlend;
-            if (attacking) {
-                trailTimer = Math.min(trailTimer + 1, 12);
-            } else {
-                trailTimer = 0;
-            }
-            if (getGoalSelector().getCurrentGoal() instanceof TerraprismIdleGoal) {
-                idleBlend = Math.min(1.0f, idleBlend + 0.05f);
-            } else {
-                idleBlend = Math.max(0.0f, idleBlend - 0.25f);
-            }
+
+        lastIdleBlend = idleBlend;
+        if (attacking) {
+            trailTimer = Math.min(trailTimer + 1, 12);
+        } else {
+            trailTimer = 0;
+        }
+        if (getGoalSelector().getCurrentGoal() instanceof TerraprismIdleGoal) {
+            idleBlend = Math.min(1.0f, idleBlend + 0.05f);
+        } else {
+            idleBlend = Math.max(0.0f, idleBlend - 0.25f);
         }
     }
 

@@ -25,25 +25,24 @@ public class ChlorophyteCrystal extends Minion {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTarget();
-            if (shootCooldown > 0) {
-                shootCooldown--;
-            }
-            if (extraShootCooldown > 0) {
-                extraShootCooldown--;
-            }
-            if (shootCooldown <= 0 && target != null) {
-                shootCooldown = 13;
-                shootTarget(target);
-            }
-            float bob = Mth.sin((tickCount) * 0.12f) * 0.15f;
-            Vec3 targetPos = owner.getBoundingBox().getCenter().add(0, owner.getBbHeight() + bob, 0);
-            Vec3 lerpXZ = currentPathNode.pos().lerp(targetPos, 0.8f);
-            Vec3 lerpY = currentPathNode.pos().lerp(targetPos, 0.15f);
-            int yaw = getTarget() != null ? 30 : 15;
-            currentPathNode = new PathNode(new Vec3(lerpXZ.x(), lerpY.y(), lerpXZ.z()), currentPathNode.yaw() + yaw, currentPathNode.pitch(), currentPathNode.roll());
+
+        LivingEntity target = getTarget();
+        if (shootCooldown > 0) {
+            shootCooldown--;
         }
+        if (extraShootCooldown > 0) {
+            extraShootCooldown--;
+        }
+        if (shootCooldown <= 0 && target != null) {
+            shootCooldown = 13;
+            shootTarget(target);
+        }
+        float bob = Mth.sin((tickCount) * 0.12f) * 0.15f;
+        Vec3 targetPos = owner.getBoundingBox().getCenter().add(0, owner.getBbHeight() + bob, 0);
+        Vec3 lerpXZ = currentPathNode.pos().lerp(targetPos, 0.8f);
+        Vec3 lerpY = currentPathNode.pos().lerp(targetPos, 0.15f);
+        int yaw = getTarget() != null ? 30 : 15;
+        currentPathNode = new PathNode(new Vec3(lerpXZ.x(), lerpY.y(), lerpXZ.z()), currentPathNode.yaw() + yaw, currentPathNode.pitch(), currentPathNode.roll());
     }
 
     public int getExtraShootCooldown() {
@@ -63,7 +62,7 @@ public class ChlorophyteCrystal extends Minion {
         projectile.init(new PathNode(startPos, direction));
         projectile.copyAttributes(this);
         projectile.setVelocity(direction.scale(1.5));
-        LyraHelper.get(level).add(projectile);
+        LyraHelper.get(owner).add(projectile);
         ParticleHelper.create(level)
                 .generic(GenericParticleBuilder.create()
                         .centerColor(0x1bff10)

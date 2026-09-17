@@ -12,6 +12,7 @@ import first.summoner.register.SummonerSoundRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -41,7 +42,7 @@ public class TwinsLaserAttackGoal extends AttachmentEntityGoal<Twins> {
     @Override
     public void tick() {
         LivingEntity target = minion.getTarget();
-        LivingEntity owner = minion.getOwner();
+        Player owner = minion.getOwner();
         Level level = minion.getLevel();
         Vec3 targetPos = target.getBoundingBox().getCenter();
         Vec3 minionPos = minion.getPos();
@@ -62,7 +63,7 @@ public class TwinsLaserAttackGoal extends AttachmentEntityGoal<Twins> {
         }
     }
 
-    private void shootAtTarget(LivingEntity owner, LivingEntity target, Level level) {
+    private void shootAtTarget(Player owner, LivingEntity target, Level level) {
         Vec3 start = minion.getPos();
         RandomSource random = level.getRandom();
         Vec3 direction = target.getBoundingBox().getCenter().subtract(start).normalize();
@@ -72,7 +73,7 @@ public class TwinsLaserAttackGoal extends AttachmentEntityGoal<Twins> {
         projectile.copyAttributes(minion);
         projectile.setVelocity(direction);
         projectile.setDamage(minion.getDamage() * 1.1f);
-        LyraHelper.get(level).add(projectile);
+        LyraHelper.get(owner).add(projectile);
         Playable.play(SummonerSoundRegister.Laser, level, start, minion.getSoundSource());
         ParticleHelper.create(level)
                 .generic(GenericParticleBuilder.create()

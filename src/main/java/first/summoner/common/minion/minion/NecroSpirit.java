@@ -29,26 +29,25 @@ public class NecroSpirit extends Minion {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            LivingEntity target = getTarget();
-            PathNode idleNode = getInterpolatedIdleState(0);
-            PathNode currentNode = getCurrentPathNode();
-            cooldown--;
-            if (target != null) {
-                Vec3 targetCenter = target.getBoundingBox().getCenter();
-                Vec3 direction = targetCenter.subtract(getPos()).normalize();
-                float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
-                float pitch = (float) Math.toDegrees(Math.asin(-direction.y));
-                PathNode attackNode = new PathNode(idleNode.pos(), yaw, pitch, 0);
 
-                setCurrentPathNode(currentNode.lerp(attackNode, 0.25f));
-                if (cooldown <= 0) {
-                    cooldown = 200;
-                    fire(target);
-                }
-            } else {
-                setCurrentPathNode(currentNode.lerp(idleNode, 0.25f));
+        LivingEntity target = getTarget();
+        PathNode idleNode = getInterpolatedIdleState(0);
+        PathNode currentNode = getCurrentPathNode();
+        cooldown--;
+        if (target != null) {
+            Vec3 targetCenter = target.getBoundingBox().getCenter();
+            Vec3 direction = targetCenter.subtract(getPos()).normalize();
+            float yaw = (float) Math.toDegrees(Math.atan2(-direction.x, direction.z));
+            float pitch = (float) Math.toDegrees(Math.asin(-direction.y));
+            PathNode attackNode = new PathNode(idleNode.pos(), yaw, pitch, 0);
+
+            setCurrentPathNode(currentNode.lerp(attackNode, 0.25f));
+            if (cooldown <= 0) {
+                cooldown = 200;
+                fire(target);
             }
+        } else {
+            setCurrentPathNode(currentNode.lerp(idleNode, 0.25f));
         }
     }
 
@@ -66,7 +65,7 @@ public class NecroSpirit extends Minion {
         projectile.copyAttributes(this);
         projectile.setVelocity(direction);
         projectile.setTrackingTarget(target);
-        LyraHelper.get(level).add(projectile);
+        LyraHelper.get(owner).add(projectile);
 
         // 发射粒子效果
         ParticleHelper.create(getLevel())

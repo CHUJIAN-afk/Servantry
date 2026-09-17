@@ -30,7 +30,7 @@ public class GildedWandItem extends Item {
             return InteractionResultHolder.consume(itemStack);
         } else {
             if (!level.isClientSide()) {
-                AttachmentEntityData entityData = LyraHelper.get(player.level()).getEntityData();
+                AttachmentEntityData entityData = LyraHelper.get(player).getEntityData();
                 entityData.get(AttachmentEntity.class).forEach(AttachmentEntity::setRemove);
                 entityData.get(AttachmentEntity.class).forEach(AttachmentEntity::setRemove);
                 Playable.play(SummonerSoundRegister.UseMinionWeapon, level, player.position(), player.getSoundSource());

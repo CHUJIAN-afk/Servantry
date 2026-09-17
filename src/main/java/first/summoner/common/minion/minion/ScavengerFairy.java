@@ -34,13 +34,12 @@ public class ScavengerFairy extends Minion {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (targetEntity == null) {
-                setTargetEntity(findNearestTargetEntity());
-            }
+
+        if (targetEntity == null) {
+            setTargetEntity(findNearestTargetEntity());
         }
     }
-    
+
     @Override
     public int getSearchDistance() {
         return 0;

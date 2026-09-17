@@ -8,7 +8,6 @@ import first.lyra.common.attachmentEntity.AttachmentEntityType;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
-import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.common.minion.minion.goal.stardustDragon.StardustDragonAttackGoal;
 import first.summoner.common.minion.minion.goal.stardustDragon.StardustDragonFollowGoal;
 import first.summoner.common.minion.minion.goal.stardustDragon.StardustDragonIdleGoal;
@@ -58,8 +57,8 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
         if (isHead()) {
             int distance = this.getSearchDistance();
             if (distance > 0) {
-                TargetCache targetCache = this.level.getData(LyraAttachmentRegister.TargetCache);
-                List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.owner.getBoundingBox().getCenter(), distance, living -> targetCache.isTarget(this.owner, living));
+                TargetCache targetCache = getTargetCache();
+                List<LivingEntity> targets = targetCache.getEntitiesInRadius(this.owner.getBoundingBox().getCenter(), distance, living -> targetCache.isTarget(living));
                 if (!targets.isEmpty()) {
                     return targetCache.getNewTarget(this, targets, 0.0F, true);
                 }
@@ -81,33 +80,31 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
     }
 
     protected void emitParticle() {
-        if (!getLevel().isClientSide()) {
-            if (getRandom().nextFloat() < 0.2) {
-                ParticleHelper.create(getLevel())
-                        .generic(GenericParticleBuilder.create()
-                                .centerColor(0x2fb2e1)
-                                .edgeColor(0x33ccff)
-                                .lifetime(5)
-                                .lifetimeRandom(25)
-                                .spin(0.1f)
-                                .spinRandom(0.5F)
-                                .friction(0.75F)
-                                .scale(0.035f)
-                                .scaleRandom(0.005f)
-                        )
-                        .pos(getPos().offsetRandom(getRandom(), 0.2f))
-                        .velocity(getVelocity().scale(-1))
-                        .spread(0)
-                        .speed(0)
-                        .emit();
-            }
+        if (getRandom().nextFloat() < 0.2) {
+            ParticleHelper.create(getLevel())
+                    .generic(GenericParticleBuilder.create()
+                                     .centerColor(0x2fb2e1)
+                                     .edgeColor(0x33ccff)
+                                     .lifetime(5)
+                                     .lifetimeRandom(25)
+                                     .spin(0.1f)
+                                     .spinRandom(0.5F)
+                                     .friction(0.75F)
+                                     .scale(0.035f)
+                                     .scaleRandom(0.005f)
+                    )
+                    .pos(getPos().offsetRandom(getRandom(), 0.2f))
+                    .velocity(getVelocity().scale(-1))
+                    .spread(0)
+                    .speed(0)
+                    .emit();
         }
     }
 
     @Override
     public void onRemove() {
         if (isHead()) {
-            List<StardustDragon> dragons = LyraHelper.get(owner.level())
+            List<StardustDragon> dragons = LyraHelper.get(owner)
                     .getEntityData()
                     .get(SummonerAttachmentEntityRegister.STARDUST_DRAGON.get());
             for (StardustDragon dragon : dragons) {
@@ -118,7 +115,7 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
 
     @Nullable
     public StardustDragon getHead() {
-        List<StardustDragon> dragons = LyraHelper.get(owner.level())
+        List<StardustDragon> dragons = LyraHelper.get(owner)
                 .getEntityData()
                 .get(SummonerAttachmentEntityRegister.STARDUST_DRAGON.get());
         if (!dragons.isEmpty()) {
@@ -146,7 +143,7 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
     @Nullable
     public StardustDragon getPrecedingSegment() {
         if (!isHead()) {
-            List<StardustDragon> dragons = LyraHelper.get(owner.level())
+            List<StardustDragon> dragons = LyraHelper.get(owner)
                     .getEntityData()
                     .get(SummonerAttachmentEntityRegister.STARDUST_DRAGON.get());
             int index = getOrder() - 1;
@@ -160,7 +157,7 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
     @Nullable
     public StardustDragon getNextSegment() {
         if (getOrder() < getSameSize() - 1) {
-            List<StardustDragon> dragons = LyraHelper.get(owner.level())
+            List<StardustDragon> dragons = LyraHelper.get(owner)
                     .getEntityData()
                     .get(SummonerAttachmentEntityRegister.STARDUST_DRAGON.get());
             int index = getOrder() + 1;

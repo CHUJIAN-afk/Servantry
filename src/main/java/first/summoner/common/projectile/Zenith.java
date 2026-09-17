@@ -42,38 +42,37 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
         fields.field(LyraStreamCodecs.VEC_3, () -> normal, value -> normal = value);
         fields.field(ByteBufCodecs.FLOAT, () -> curvature, value -> curvature = value);
         fields.field(ByteBufCodecs.INT, () -> chaseTarget != null ? chaseTarget.getId() : -1, (level, id) -> chaseTarget = id != -1 && level.getEntity(id) instanceof LivingEntity living ? living : null);
+        fields.field(ByteBufCodecs.FLOAT, () -> lastProgress, value -> lastProgress = value);
+        fields.field(ByteBufCodecs.FLOAT, () -> progress, value -> progress = value);
     }
 
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            updateDirection(chaseTarget, 1);
-            setCurrentPathNode(getNode(progress, 1));
-            if (progress >= 1) {
-                setRemove();
-            }
-        } else if (getHistoryNodes().size() > 2) {
-            ParticleHelper.create(getLevel())
-                    .generic(GenericParticleBuilder.create()
-                                     .centerColor(0xffffff)
-                                     .edgeColor(0xb7b7b7)
-                                     .lifetime(30)
-                                     .lifetimeRandom(5)
-                                     .spin(3)
-                                     .spinRandom(0.1F)
-                                     .friction(0.7F)
-                                     .scale(0.04f)
-                                     .scaleRandom(0.004f)
-                    )
-                    .pos(getPos())
-                    .offset(0.15)
-                    .velocity(getCurrentVelocity().normalize())
-                    .count(1)
-                    .speed(2)
-                    .spread(0.05)
-                    .emit();
+        updateDirection(chaseTarget, 1);
+        setCurrentPathNode(getNode(progress, 1));
+        if (progress >= 1) {
+            setRemove();
         }
+        ParticleHelper.create(getLevel())
+                .generic(GenericParticleBuilder.create()
+                                 .centerColor(0xffffff)
+                                 .edgeColor(0xb7b7b7)
+                                 .lifetime(30)
+                                 .lifetimeRandom(5)
+                                 .spin(3)
+                                 .spinRandom(0.1F)
+                                 .friction(0.7F)
+                                 .scale(0.04f)
+                                 .scaleRandom(0.004f)
+                )
+                .pos(getPos())
+                .offset(0.15)
+                .velocity(getCurrentVelocity().normalize())
+                .count(1)
+                .speed(2)
+                .spread(0.05)
+                .emit();
         lastProgress = progress;
         progress = Math.min(progress + (float) 1 / 14, 1);
     }

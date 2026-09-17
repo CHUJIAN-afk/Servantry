@@ -37,12 +37,11 @@ public class UFO extends MomentumMinion {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (trailTimer > 0) {
-                trailTimer--;
-                if (trailTimer == 0) {
-                    setVelocity(getCurrentVelocity().scale(0.25));
-                }
+
+        if (trailTimer > 0) {
+            trailTimer--;
+            if (trailTimer == 0) {
+                setVelocity(getCurrentVelocity().scale(0.25));
             }
         }
     }

@@ -10,6 +10,7 @@ import first.summoner.common.projectile.DemonFlame;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -43,7 +44,7 @@ public class TwinsCursedFlameAttackGoal extends AttachmentEntityGoal<Twins> {
         Vec3 targetPos = target.getBoundingBox().getCenter();
         Vec3 minionPos = minion.getPos();
         Vec3 toTarget = targetPos.subtract(minion.getPos());
-        LivingEntity owner = minion.getOwner();
+        Player owner = minion.getOwner();
         Level level = minion.getLevel();
         minion.lookAtPos(targetPos);
         RandomSource random = minion.getRandom();
@@ -81,7 +82,7 @@ public class TwinsCursedFlameAttackGoal extends AttachmentEntityGoal<Twins> {
                 demonFlame.init(new PathNode(minionPos, direction));
                 demonFlame.copyAttributes(minion);
                 demonFlame.setVelocity(direction);
-                LyraHelper.get(level).add(demonFlame);
+                LyraHelper.get(owner).add(demonFlame);
                 ParticleHelper.create(level)
                         .generic(GenericParticleBuilder.create()
                                 .centerColor(0x24d509)

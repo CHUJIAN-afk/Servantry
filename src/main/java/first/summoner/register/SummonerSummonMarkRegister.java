@@ -18,6 +18,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -53,7 +54,7 @@ public class SummonerSummonMarkRegister {
             .damage(0.4f)
             .onKill((target, source) -> {
                 AttachmentEntity minion = source.getAttachmentEntity();
-                List<LivingEntity> entities = LyraHelper.get(minion.getLevel()).getTargetCache()
+                List<LivingEntity> entities = minion.getTargetCache()
                         .getEntitiesInRadius(target.position(), 3, livingEntity -> target != livingEntity);
                 entities.stream()
                         .findAny()
@@ -75,7 +76,7 @@ public class SummonerSummonMarkRegister {
             .onDamage((data, target, source, damage) -> {
                 if (data.usePower(30)) {
                     AttachmentEntity minion = source.getAttachmentEntity();
-                    LivingEntity owner = source.getAttachmentEntity() instanceof Minion minionOwner ? minionOwner.getOwner() : null;
+                    Player owner = source.getAttachmentEntity() instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                     RandomSource random = minion.getRandom();
                     Vec3 pos = target.position().add(0, 8, 0).offsetRandom(random, 3);
                     Vec3 dir = target.position().add(0, 0.5f, 0).subtract(pos).normalize();
@@ -85,7 +86,7 @@ public class SummonerSummonMarkRegister {
                     meteor.copyAttributes(minion);
                     meteor.setVelocity(dir);
                     meteor.setDamage(damage * 1.33f);
-                    LyraHelper.get(minion.getLevel()).add(meteor);
+                    LyraHelper.get(minion.getOwner()).add(meteor);
                 }
             })
             .build());
@@ -136,7 +137,7 @@ public class SummonerSummonMarkRegister {
                             .apply();
                     target.igniteForSeconds(5);
                     // 半径 3 格内其他目标：175% + 点燃（TargetCache 目标选择）
-                    List<LivingEntity> entities = LyraHelper.get(minion.getLevel()).getTargetCache()
+                    List<LivingEntity> entities = minion.getTargetCache()
                             .getEntitiesInRadius(pos, 3, other -> other != target);
                     for (LivingEntity other : entities) {
                         InvincibleData.attack(other)
@@ -180,7 +181,7 @@ public class SummonerSummonMarkRegister {
             .damage(0.9f)
             .onKill((target, source) -> {
                 AttachmentEntity minion = source.getAttachmentEntity();
-                List<LivingEntity> entities = LyraHelper.get(minion.getLevel()).getTargetCache()
+                List<LivingEntity> entities = minion.getTargetCache()
                         .getEntitiesInRadius(target.position(), 3, livingEntity -> target != livingEntity);
                 entities.stream()
                         .findAny()
@@ -197,7 +198,7 @@ public class SummonerSummonMarkRegister {
             .onDamage((mark, target, source, damage) -> {
                 if (mark.usePower(30)) {
                     AttachmentEntity minion = source.getAttachmentEntity();
-                    LivingEntity owner = minion instanceof Minion minionOwner ? minionOwner.getOwner() : null;
+                    Player owner = minion instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                     Vec3 pos = target.getBoundingBox().getCenter();
                     RandomSource random = minion.getRandom();
                     int count = 3 + random.nextInt(4);
@@ -212,7 +213,7 @@ public class SummonerSummonMarkRegister {
                         petal.setArmorPierce(50);
                         petal.setKnockback(0);
                         petal.setChaseDelay(7 + random.nextInt(7));
-                        LyraHelper.get(minion.getLevel()).add(petal);
+                        LyraHelper.get(minion.getOwner()).add(petal);
                     }
                 }
             })
@@ -225,7 +226,7 @@ public class SummonerSummonMarkRegister {
             .onDamage((mark, target, source, damage) -> {
                 if (mark.usePower(10)) {
                     AttachmentEntity minion = source.getAttachmentEntity();
-                    LivingEntity owner = minion instanceof Minion minionOwner ? minionOwner.getOwner() : null;
+                    Player owner = minion instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                     RandomSource random = minion.getRandom();
                     for (int i = 0; i < 9; i++) {
                         Vec3 pos = target.getBoundingBox().getCenter().offsetRandom(random, 10);
@@ -239,7 +240,7 @@ public class SummonerSummonMarkRegister {
                         core.setDamage(damage * 0.2f);
                         core.setArmorPierce(50);
                         core.setChaseTarget(target);
-                        LyraHelper.get(minion.getLevel()).add(core);
+                        LyraHelper.get(minion.getOwner()).add(core);
                     }
                 }
             })
@@ -249,7 +250,7 @@ public class SummonerSummonMarkRegister {
     public static final DeferredHolder<SummonMarkType, SummonMarkType> DarkHarvest = Register.register("dark_harvest", ResourceLocation -> new SummonMarkTypeBuild(ResourceLocation)
             .onDamage((mark, target, source, damage) -> {
                 AttachmentEntity minion = source.getAttachmentEntity();
-                List<LivingEntity> entities = LyraHelper.get(minion.getLevel()).getTargetCache()
+                List<LivingEntity> entities = minion.getTargetCache()
                         .getEntitiesInRadius(target.position(), 6, other -> other != target);
                 int count = 0;
                 for (LivingEntity other : entities) {
@@ -272,7 +273,7 @@ public class SummonerSummonMarkRegister {
             .onDamage((mark, target, source, damage) -> {
                 if (mark.usePower(30)) {
                     AttachmentEntity minion = source.getAttachmentEntity();
-                    LivingEntity owner = minion instanceof Minion minionOwner ? minionOwner.getOwner() : null;
+                    Player owner = minion instanceof Minion minionOwner ? minionOwner.getOwner() : null;
                     RandomSource random = minion.getRandom();
                     for (int i = 0; i < 6; i++) {
                         Vec3 pos = target.getBoundingBox().getCenter().offsetRandom(random, 5);
@@ -286,7 +287,7 @@ public class SummonerSummonMarkRegister {
                         core.setArmorPierce(minion.getArmorPierce());
                         core.setKnockback(minion.getKnockback());
                         core.setChaseTarget(target);
-                        LyraHelper.get(minion.getLevel()).add(core);
+                        LyraHelper.get(minion.getOwner()).add(core);
                     }
                 }
             })
@@ -300,7 +301,7 @@ public class SummonerSummonMarkRegister {
                 if (mark.usePower(30)) {
                     // 6 格内其他目标（TargetCache 目标选择），伤害系数 100%+每目标10%，最高 200%
                     AttachmentEntity minion = source.getAttachmentEntity();
-                    List<LivingEntity> others = LyraHelper.get(minion.getLevel()).getTargetCache()
+                    List<LivingEntity> others = minion.getTargetCache()
                             .getEntitiesInRadius(target.position(), 6, other -> other != target);
                     float multiplier = Math.min(1f + 0.1f * others.size(), 2f);
                     Vec3 center = target.getBoundingBox().getCenter();
@@ -408,7 +409,7 @@ public class SummonerSummonMarkRegister {
             .onDamage((mark, target, source, damage) -> target.addEffect(new MobEffectInstance(SummonerMobEffectRegister.MoonBite, 60, 0)))
             .onKill((target, source) -> {
                 AttachmentEntity minion = source.getAttachmentEntity();
-                List<LivingEntity> entities = LyraHelper.get(minion.getLevel()).getTargetCache()
+                List<LivingEntity> entities = minion.getTargetCache()
                         .getEntitiesInRadius(target.position(), 3, other -> other != target);
                 for (LivingEntity other : entities) {
                     other.addEffect(new MobEffectInstance(SummonerMobEffectRegister.MoonBite, 200, 0));

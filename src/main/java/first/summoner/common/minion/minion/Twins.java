@@ -1,6 +1,5 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -77,7 +76,7 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
 
     @Override
     public boolean isValidCollisionTarget(Twins entity, LivingEntity target) {
-        return LyraHelper.get(level).getTargetCache().isTarget(owner, target);
+        return getTargetCache().isTarget(target);
     }
 
     @Override
@@ -95,10 +94,9 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (trailTimer > 0) {
-                trailTimer--;
-            }
+
+        if (trailTimer > 0) {
+            trailTimer--;
         }
     }
 

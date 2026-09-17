@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
@@ -53,8 +52,8 @@ public class Meteor extends Projectile implements IEntityCollision<Meteor>, IBlo
     private void explode(LivingEntity primary) {
         Vec3 pos = getPos();
         DamageSource source = getDamageSource();
-        TargetCache targetCache = LyraHelper.get(getLevel()).getTargetCache();
-        List<LivingEntity> targets = targetCache.getEntitiesInRadius(pos, 2, living -> targetCache.isTarget(owner, living));
+        TargetCache targetCache = getTargetCache();
+        List<LivingEntity> targets = targetCache.getEntitiesInRadius(pos, 2, living -> targetCache.isTarget(living));
         for (LivingEntity target : targets) {
             InvincibleData.attack(target)
                     .attacker(getUuid())

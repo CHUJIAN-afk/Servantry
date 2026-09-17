@@ -54,22 +54,21 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            Vec3 pos = getPos();
-            for (int i = 1; i <= 15; i++) {
-                BlockPos supportPos = BlockPos.containing(pos.add(0, -i, 0));
-                if (getLevel().getBlockState(supportPos).isCollisionShapeFullBlock(getLevel(), supportPos)) {
-                    addVelocity(new Vec3(0, (float) (0.04 * (1.0 - i / 15.0)), 0));
-                    break;
-                }
-                if (i == 15) {
-                    addVelocity(new Vec3(0, 0.04f, 0));
-                }
+
+        Vec3 pos = getPos();
+        for (int i = 1; i <= 15; i++) {
+            BlockPos supportPos = BlockPos.containing(pos.add(0, -i, 0));
+            if (getLevel().getBlockState(supportPos).isCollisionShapeFullBlock(getLevel(), supportPos)) {
+                addVelocity(new Vec3(0, (float) (0.04 * (1.0 - i / 15.0)), 0));
+                break;
             }
-            Vec3 velocity = getVelocity();
-            if (Math.abs(velocity.y) < 0.002) {
-                setVelocity(new Vec3(velocity.x, 0, velocity.z));
+            if (i == 15) {
+                addVelocity(new Vec3(0, 0.04f, 0));
             }
+        }
+        Vec3 velocity = getVelocity();
+        if (Math.abs(velocity.y) < 0.002) {
+            setVelocity(new Vec3(velocity.x, 0, velocity.z));
         }
         if (--cooldown <= 0 && getTarget() != null) {
             cooldown = ATTACK_COOLDOWN;
@@ -81,7 +80,7 @@ public class Barnacle extends MomentumMinion implements IBlockCollision<Barnacle
             saliva.init(new PathNode(getPos(), direction));
             saliva.copyAttributes(this);
             saliva.setVelocity(direction.scale(2));
-            LyraHelper.get(level).add(saliva);
+            LyraHelper.get(owner).add(saliva);
             // 向前喷射绿色唾液粒子（粒子量/速度/阻力均高于激光眼）
             ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()

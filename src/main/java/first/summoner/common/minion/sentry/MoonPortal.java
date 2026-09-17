@@ -37,11 +37,10 @@ public class MoonPortal extends Minion {
     @Override
     public void tick() {
         super.tick();
-        if (!getLevel().isClientSide()) {
-            if (--cooldown < 0 && getTarget() != null) {
-                cooldown = getRandom().nextInt(9, 11);
-                fireLaser(getTarget());
-            }
+
+        if (--cooldown < 0 && getTarget() != null) {
+            cooldown = getRandom().nextInt(9, 11);
+            fireLaser(getTarget());
         }
     }
 
@@ -163,7 +162,7 @@ public class MoonPortal extends Minion {
                         .emit();
             }
         });
-        LyraHelper.get(level).add(projectile);
+        LyraHelper.get(owner).add(projectile);
     }
 
     public void dimensionChange() {
