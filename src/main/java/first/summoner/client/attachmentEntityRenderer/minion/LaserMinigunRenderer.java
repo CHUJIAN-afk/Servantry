@@ -28,10 +28,10 @@ public class LaserMinigunRenderer extends AbstractAttachmentEntityRenderer<Laser
 
     @Override
     protected void render(LaserMinigun minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<LaserMinigun> context, float partialTick, int packedLight, float alpha) {
-        LyraModelRenderer.bbmodel(Summoner.rl("bear"))
+        LyraModelRenderer.geo(Summoner.rl("laser_minigun"))
                 .light(packedLight)
                 .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
-                .animation("run", minion.getRenderTick(partialTick))
+                .animation("shooting", minion.getRenderTick(partialTick))
                 .render(poseStack, bufferSource);
     }
 }
