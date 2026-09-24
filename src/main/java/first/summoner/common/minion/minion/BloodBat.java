@@ -47,10 +47,7 @@ public class BloodBat extends Minion implements IEntityCollision<BloodBat> {
         if (!prep) {
             return null;
         }
-        if (getTarget() != null) {
-            return getTarget();
-        }
-        return super.searchTarget();
+        return getTarget() != null ? getTarget() : super.searchTarget();
     }
 
     @Override

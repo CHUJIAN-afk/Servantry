@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -66,13 +65,8 @@ public class DestructionBullet extends Projectile implements IEntityCollision<De
     public void onCollisionAttack(List<HitContext> hitContexts) {
         HitContext hitContext = hitContexts.getFirst();
         LivingEntity living = hitContext.entity();
-        ImmunityData immunityData = ImmunityData.get(living);
-        if (!immunityData.isActive(getUuid())) {
-            attack(living, getDamage(), 20);
-            // attack 命中成功才写入无敌记录，据此判断本次是否真的打中
-            if (immunityData.isActive(getUuid())) {
-                living.addEffect(new MobEffectInstance(SummonerMobEffectRegister.ArmorCrunch, 100));
-            }
+        if (attack(living, getDamage(), 20)) {
+            living.addEffect(new MobEffectInstance(SummonerMobEffectRegister.ArmorCrunch, 100));
         }
         ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()

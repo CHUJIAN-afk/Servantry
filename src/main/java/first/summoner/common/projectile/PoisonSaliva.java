@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
@@ -30,13 +29,8 @@ public class PoisonSaliva extends Projectile implements IEntityCollision<PoisonS
         HitContext hit = hitContexts.getFirst();
                 // 中毒持续 5~10 秒（100~200 tick）
             int duration = 100 + getRandom().nextInt(101);
-            ImmunityData immunityData = ImmunityData.get(hit.entity());
-            if (!immunityData.isActive(getUuid())) {
-                attack(hit.entity(), getDamage(), 0);
-                // attack 命中成功才写入无敌记录，据此判断本次是否真的打中
-                if (immunityData.isActive(getUuid())) {
-                    hit.entity().addEffect(new MobEffectInstance(MobEffects.POISON, duration, 0));
-                }
+            if (attack(hit.entity(), getDamage(), 0)) {
+                hit.entity().addEffect(new MobEffectInstance(MobEffects.POISON, duration, 0));
             }
         setCurrentPathNode(getCurrentPathNode().modifyPos(hit.hitPoint()));
         setRemove();

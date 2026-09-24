@@ -1,12 +1,11 @@
 package first.summoner.common.minion.sentry;
 
 import first.lyra.api.LyraHelper;
-import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
-import first.summoner.common.projectile.CustomLaser;
+import first.summoner.common.projectile.EyeLaser;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<EyeLaserTurret> {
 
-    private CustomLaser laser = null;
+    private EyeLaser laser = null;
     private int chargeTicks = 0;
 
     public EyeLaserTurret() {
@@ -78,21 +77,11 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
 
         if (laser == null || laser.isRemove()) {
             chargeTicks = Math.max(chargeTicks - 1, 0);
-            laser = new CustomLaser();
+            laser = new EyeLaser();
             laser.setOwner(owner);
             laser.init(new PathNode(pos, getYaw(), getPitch(), 0));
             laser.copyAttributes(this);
-            laser.setColor(0xFF6B6B);
-            laser.setTickConsumer(l -> {
-                if (l.getDamageSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity().isRemove()) {
-                    l.setRemove();
-                }
-            });
-            laser.setHitConsumer((l, hitContexts) -> {
-                                for (var hitContext : hitContexts) {
-                        l.attack(hitContext.entity(), l.getDamage(), 5);
-                    }
-            });
+            laser.follow(this);
             LyraHelper.get(owner).add(laser);
         } else {
             chargeTicks = Math.min(chargeTicks + 1, 60);

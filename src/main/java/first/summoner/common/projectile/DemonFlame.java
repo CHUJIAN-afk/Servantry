@@ -1,6 +1,5 @@
 package first.summoner.common.projectile;
 
-import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
@@ -18,19 +17,15 @@ public class DemonFlame extends Projectile implements IEntityCollision<DemonFlam
     public DemonFlame() {
         super(SummonerAttachmentEntityRegister.DEMON_FLAME);
         setMaxTickCount(7);
+        setGravity(0);
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hitContext : hitContexts) {
             LivingEntity target = hitContext.entity();
-            ImmunityData immunityData = ImmunityData.get(target);
-            if (!immunityData.isActive(getUuid())) {
-                attack(target, getDamage(), 10);
-                // attack 命中成功才写入无敌记录，据此判断本次是否真的打中
-                if (immunityData.isActive(getUuid())) {
-                    target.addEffect(new MobEffectInstance(SummonerMobEffectRegister.CursedFlame, 100, 0));
-                }
+            if (attack(target, getDamage(), 10)) {
+                target.addEffect(new MobEffectInstance(SummonerMobEffectRegister.CursedFlame, 100, 0));
             }
         }
     }

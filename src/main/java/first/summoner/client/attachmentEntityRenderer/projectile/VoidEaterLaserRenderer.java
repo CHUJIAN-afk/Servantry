@@ -7,31 +7,28 @@ import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.rendererHelper.LaserRendererHelper;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.attachmentEntity.PathNode;
-import first.summoner.common.projectile.CustomLaser;
+import first.summoner.common.projectile.VoidEaterLaser;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.phys.AABB;
 
 /**
- * 自定义激光投射物渲染器。
- * <p>
- * 使用 {@link LaserRendererHelper} 多层同心壳 + 自定义着色器实现发光、流动、体积雾效果。
- * 替代旧的四叉面伪圆柱实现。
- * </p>
+ * 虚空吞噬者激光渲染器 - 紫色激光束。
  */
-public class CustomLaserRenderer extends AbstractAttachmentEntityRenderer<CustomLaser> {
+public class VoidEaterLaserRenderer extends AbstractAttachmentEntityRenderer<VoidEaterLaser> {
+
+    private static final int COLOR = 0x6f19d4;
 
     @Override
-    protected RenderContext<CustomLaser> createContext(CustomLaser laser, float partialTick) {
-        return RenderContext.<CustomLaser>builder()
-                .model(new ModelConfig<CustomLaser>()
+    protected RenderContext<VoidEaterLaser> createContext(VoidEaterLaser laser, float partialTick) {
+        return RenderContext.<VoidEaterLaser>builder()
+                .model(new ModelConfig<VoidEaterLaser>()
                                .alphaDistanceFactor(0)
                                .rotationOffset(180, 0, 0))
                 .build();
     }
 
     @Override
-    protected void render(CustomLaser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<CustomLaser> context, float partialTick, int packedLight, float alpha) {
-        int color = entity.getColor();
+    protected void render(VoidEaterLaser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<VoidEaterLaser> context, float partialTick, int packedLight, float alpha) {
         AABB hitbox = entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;
@@ -40,8 +37,8 @@ public class CustomLaserRenderer extends AbstractAttachmentEntityRenderer<Custom
                 .radius(width * 0.25F, width)
                 .layers(4)
                 .segments(16)
-                .color(color)
-                .alpha(entity.getAlpha())
+                .color(COLOR)
+                .alpha(0.95f)
                 .innerRatio(0.35f)
                 .render(poseStack, bufferSource);
         DynamicLightDispatcher.addLightSources(visualNode, hitbox, 8);

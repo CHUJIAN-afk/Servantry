@@ -1,20 +1,17 @@
 package first.summoner.common.minion.minion.goal.voidEater;
 
 import first.lyra.api.LyraHelper;
-import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
-import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.sound.Playable;
 import first.summoner.common.minion.minion.VoidEater;
-import first.summoner.common.projectile.CustomLaser;
 import first.summoner.common.projectile.GodFlame;
+import first.summoner.common.projectile.VoidEaterLaser;
 import first.summoner.register.SummonerSoundRegister;
 import first.summoner.utils.ParticleHelper;
 import first.summoner.utils.Utils;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -25,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public class VoidEaterAttackGoal extends AttachmentEntityGoal<VoidEater> {
 
-    private CustomLaser laser = null;
+    private VoidEaterLaser laser = null;
     private AttackMode mode = AttackMode.GOD_DASH;
     private int combat = 0;
     private Vec3 prepPos = Vec3.ZERO;
@@ -131,61 +128,18 @@ public class VoidEaterAttackGoal extends AttachmentEntityGoal<VoidEater> {
             }
         } else {
             if (laser == null || laser.isRemove()) {
-                laser = new CustomLaser();
+                laser = new VoidEaterLaser();
                 laser.setOwner(minion.getOwner());
                 laser.init(minion.getCurrentPathNode());
                 laser.copyAttributes(minion);
-                laser.setColor(0x6f19d4);
                 laser.setDamage(minion.getDamage() * 2);
-                Level level = minion.getLevel();
+                laser.follow(minion);
                 LyraHelper.get(minion.getOwner()).add(laser);
-                laser.setTickConsumer(laserProjectile -> {
-                    if (laserProjectile.getDamageSource() instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity().isRemove()) {
-                        laserProjectile.setRemove();
-                        return;
-                    }
-                    if (!(minion.getGoalSelector().getCurrentGoal() instanceof VoidEaterAttackGoal voidEaterAttackGoal) || voidEaterAttackGoal.mode != AttackMode.COSMIC_MAELSTROM) {
-                        laserProjectile.setRemove();
-                        return;
-                    }
-                    laserProjectile.setCurrentPathNode(minion.getCurrentPathNode());
-                    // 沿当前朝向射线追踪方块，计算碰撞箱
-                    float pYaw = laserProjectile.getCurrentPathNode().yaw();
-                    float pPitch = laserProjectile.getCurrentPathNode().pitch();
-                    Vec3 dir = Vec3.directionFromRotation(pPitch, pYaw);
-                    Vec3 hitPos = pos.add(dir.scale(48));
-                    laserProjectile.setHitbox(pos, hitPos, 0.4f);
-                });
-                laser.setHitConsumer((laserProjectile, hitContexts) -> {
-                    DamageSource source = laserProjectile.getDamageSource();
-                                        for (IEntityCollision.HitContext hitContext : hitContexts) {
-                            LivingEntity living = hitContext.entity();
-                            laserProjectile.attack(living, laserProjectile.getDamage(), 0);
-                            Vec3 hitPoint = living.getBoundingBox().getCenter();
-                            Vec3 direction = hitPoint.offsetRandom(level.getRandom(), 2).subtract(hitPoint).normalize();
-                            GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()
-                                             .centerColor(0x841af3)
-                                             .edgeColor(0x6f19d4);
-                            ParticleHelper.create(level)
-                                    .generic(genericParticleBuilder
-                                                     .lifetime(5)
-                                                     .lifetimeRandom(5)
-                                                     .spin(0.1f)
-                                                     .spinRandom(0.05F)
-                                                     .friction(0.75F)
-                                                     .scale(0.045f)
-                                                     .scaleRandom(0.005f)
-                                    )
-                                    .pos(hitPoint)
-                                    .offset(0.35)
-                                    .velocity(direction)
-                                    .count(2)
-                                    .speed(0.65)
-                                    .spread(2)
-                                    .emit();
-                        }
-                });
             }
+            // 每 tick 跟随本体：同步朝向，并沿当前朝向延伸 48 格作为碰撞箱
+            laser.setCurrentPathNode(minion.getCurrentPathNode());
+            Vec3 dir = Vec3.directionFromRotation(minion.getCurrentPathNode().pitch(), minion.getCurrentPathNode().yaw());
+            laser.setHitbox(pos, pos.add(dir.scale(48)), 0.4f);
             ParticleHelper.create(minion.getLevel())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0x841af3)
@@ -213,11 +167,28 @@ public class VoidEaterAttackGoal extends AttachmentEntityGoal<VoidEater> {
         }
     }
 
+    /** 目标丢失或切换到其它 Goal 时收起激光 */
+    @Override
+    public void stop() {
+        removeLaser();
+    }
+
     public void nextMode() {
+        // 离开宇宙漩涡形态时收起激光
+        if (mode == AttackMode.COSMIC_MAELSTROM) {
+            removeLaser();
+        }
         combat = 0;
         approaching = true;
         prepPos = Vec3.ZERO;
         mode = mode.next();
+    }
+
+    private void removeLaser() {
+        if (laser != null) {
+            laser.setRemove();
+            laser = null;
+        }
     }
 
     public enum AttackMode {

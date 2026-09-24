@@ -1,12 +1,12 @@
 package first.summoner.network;
 
-import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachment.SummonMarkTracker;
-import first.lyra.common.summonMark.SummonMarkInstance;
 import first.lyra.common.summonMark.SummonMarkType;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.Summoner;
+import first.summoner.common.attachment.GildedWandData;
 import first.summoner.common.item.GildedWandItem;
+import first.summoner.register.SummonerAttachmentRegister;
 import first.summoner.register.SummonerEnchantmentSummonMarkTypeRegister;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -46,29 +46,23 @@ public record GildedWandPacket(int id, InteractionHand hand) implements CustomPa
     public static void handleServer(GildedWandPacket payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
-            // 客户端引导时每 tick 都会发包，只取 tick 值整除 20 的那一次落标记
-            if (player.tickCount % MARK_INTERVAL != 0) {
-                return;
-            }
             Level level = player.level();
             Entity entity = level.getEntity(payload.id());
             ItemStack itemStack = player.getItemInHand(payload.hand());
-            if (!(itemStack.getItem() instanceof GildedWandItem) || !(entity instanceof LivingEntity living)) {
-                return;
-            }
-            // 标记附魔互斥，鎏金法杖上至多命中一个标记类型
-            Set<SummonMarkType> markTypes = SummonerEnchantmentSummonMarkTypeRegister.resolveActiveMarkType(itemStack);
-            if (markTypes.isEmpty()) {
-                return;
-            }
-            SummonMarkType markType = markTypes.iterator().next();
-            // 标记实例由标记类型创建（持续时间由上游 createInstance 决定），再交给玩家的标记追踪器登记
-            SummonMarkInstance instance = markType.createInstance(player, living);
-            SummonMarkTracker tracker = player.getData(LyraAttachmentRegister.SummonMarkData);
-            tracker.tracker(living, instance);
-            ImmunityData.get(living).record(player.getUUID(), instance.getDuration());
-            if (!player.isCreative()) {
-                itemStack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
+            if (itemStack.getItem() instanceof GildedWandItem && entity instanceof LivingEntity living) {
+                if (!player.isCreative()) {
+                    itemStack.hurtAndBreak(1, player, player.getUsedItemHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+                }
+                player.getData(LyraAttachmentRegister.TargetCache).record(living, 200);
+                GildedWandData data = player.getData(SummonerAttachmentRegister.GildedWandData);
+                if (++data.power > 20) {
+                    Set<SummonMarkType> markTypes = SummonerEnchantmentSummonMarkTypeRegister.resolveActiveMarkType(itemStack);
+                    if (!markTypes.isEmpty()) {
+                        SummonMarkType markType = markTypes.iterator().next();
+                        SummonMarkTracker tracker = player.getData(LyraAttachmentRegister.SummonMarkData);
+                        tracker.tracker(living, markType.createInstance(player, living));
+                    }
+                }
             }
         });
     }

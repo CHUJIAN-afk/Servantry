@@ -106,7 +106,11 @@ public class SummonerAttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Zenith>> ZENITH = register("zenith", Zenith::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<CustomLaser>> CUSTOM_LASER = register("custom_laser", CustomLaser::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MoonPortalLaser>> MOON_PORTAL_LASER = register("moon_portal_laser", MoonPortalLaser::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EyeLaser>> EYE_LASER = register("eye_laser", EyeLaser::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<VoidEaterLaser>> VOID_EATER_LASER = register("void_eater_laser", VoidEaterLaser::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniRainbowCrystal>> MINI_RAINBOW_CRYSTAL = register("mini_rainbow_crystal", MiniRainbowCrystal::new);
 

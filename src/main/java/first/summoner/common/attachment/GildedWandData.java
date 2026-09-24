@@ -24,9 +24,10 @@ import net.neoforged.neoforge.network.PacketDistributor;
 @EventBusSubscriber(modid = Summoner.MODID, value = Dist.CLIENT)
 public class GildedWandData {
 
-    private LivingEntity target = null;
-    private final int BenchmarkFps = 165;
-    private int fps = 165;
+    public LivingEntity target = null;
+    public final int BenchmarkFps = 165;
+    public int fps = 165;
+    public int power = 0;
 
     @SubscribeEvent
     public static void tick(PlayerTickEvent.Post event) {

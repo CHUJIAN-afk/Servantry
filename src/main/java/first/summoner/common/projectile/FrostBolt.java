@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -69,16 +68,9 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
                     return;
                 }
                 LivingEntity living = hit.entity();
-                ImmunityData immunityData = ImmunityData.get(living);
-                boolean applied = false;
-                if (!immunityData.isActive(getUuid())) {
-                    attack(living, getDamage(), 3);
-                    applied = immunityData.isActive(getUuid());
-                }
+                boolean applied = attack(living, getDamage(), 3);
                 if (applied) {
                     living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 0));
-                }
-                if (applied) {
                     hitCount++;
                     // 命中时目标爆出淡蓝色粒子（参考雷电球）
                     ParticleHelper.create(getLevel())
