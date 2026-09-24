@@ -4,7 +4,7 @@ package first.summoner.common.minion.minion;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.authlib.GameProfile;
-import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.core.Holder;
@@ -54,7 +54,7 @@ public class InfiniteShadow extends Terraprism {
             for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
                 if (this.hitTargets.add(living)) {
-                    InvincibleData.get(living).recordHit(owner.getUUID(), 100);
+                    ImmunityData.get(living).record(owner.getUUID(), 100);
                     int invulnerableTime = living.invulnerableTime;
                     living.invulnerableTime = 0;
                     if (!itemStack.is(Items.TNT)) {

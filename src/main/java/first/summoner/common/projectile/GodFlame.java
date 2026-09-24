@@ -1,13 +1,10 @@
 package first.summoner.common.projectile;
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 /**
@@ -23,14 +20,8 @@ public class GodFlame extends Projectile implements IEntityCollision<GodFlame> {
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
                 for (HitContext hitContext : hitContexts) {
-                InvincibleData.attack(hitContext.entity())
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .invincibleTime(20)
-                        .apply();
+                attack(hitContext.entity(), getDamage(), 20);
             }
     }
 

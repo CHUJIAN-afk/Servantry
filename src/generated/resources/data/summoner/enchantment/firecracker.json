@@ -3,6 +3,32 @@
   "description": {
     "translate": "enchantment.summoner.firecracker"
   },
+  "exclusive_set": [
+    "summoner:food_chain",
+    "summoner:jungle_hunter",
+    "summoner:death_magister",
+    "summoner:soul_flail",
+    "summoner:starfall",
+    "summoner:bramble",
+    "summoner:vein",
+    "summoner:spine",
+    "summoner:firecracker",
+    "summoner:frost_snow",
+    "summoner:divine_judgment",
+    "summoner:rough_display_of_flowers",
+    "summoner:dominance_omen",
+    "summoner:dark_harvest",
+    "summoner:constellation",
+    "summoner:current_surge",
+    "summoner:morning_star",
+    "summoner:kaleidoscope",
+    "summoner:requiem",
+    "summoner:galaxy",
+    "summoner:silent_end",
+    "summoner:moon_bite",
+    "summoner:angel",
+    "summoner:god_slayer"
+  ],
   "max_cost": {
     "base": 8,
     "per_level_above_first": 0

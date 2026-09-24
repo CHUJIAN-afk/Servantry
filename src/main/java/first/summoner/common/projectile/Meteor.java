@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -9,12 +8,10 @@ import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 /**
@@ -51,15 +48,10 @@ public class Meteor extends Projectile implements IEntityCollision<Meteor>, IBlo
 
     private void explode(LivingEntity primary) {
         Vec3 pos = getPos();
-        DamageSource source = getDamageSource();
         TargetCache targetCache = getTargetCache();
         List<LivingEntity> targets = targetCache.getEntitiesInRadius(pos, 2, living -> targetCache.isTarget(living));
         for (LivingEntity target : targets) {
-            InvincibleData.attack(target)
-                    .attacker(getUuid())
-                    .damageSource(source)
-                    .damageAmount(getDamage())
-                    .apply();
+            attack(target, getDamage(), 0);
         }
         ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()

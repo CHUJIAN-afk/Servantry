@@ -1,15 +1,12 @@
 package first.summoner.common.projectile;
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,16 +45,10 @@ public class CrossbowBolt extends Projectile implements IBlockCollision<Crossbow
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
                 for (HitContext hitContext : hitContexts) {
                 LivingEntity living = hitContext.entity();
                 if (hitTargets.add(living)) {
-                    InvincibleData.attack(living)
-                            .attacker(getUuid())
-                            .damageSource(source)
-                            .damageAmount(getDamage())
-                            .invincibleTime(20)
-                            .apply();
+                    attack(living, getDamage(), 20);
                 }
                 if (hitTargets.size() >= maxPierceCount) {
                     setRemove();

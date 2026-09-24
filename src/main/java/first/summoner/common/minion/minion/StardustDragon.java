@@ -1,7 +1,6 @@
 package first.summoner.common.minion.minion;
 
 import first.lyra.api.LyraHelper;
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
 import first.lyra.common.attachmentEntity.AttachmentEntityType;
@@ -20,7 +19,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
 /**
@@ -193,12 +191,7 @@ public class StardustDragon extends MomentumMinion implements IEntityCollision<S
         StardustDragon head = getHead();
         if (head != null) {
             for (HitContext hit : hitContexts) {
-                InvincibleData.attack(hit.entity())
-                        .attacker(head.getUuid())
-                        .damageSource(getDamageSource())
-                        .damageAmount(getDamage())
-                        .invincibleTime(2)
-                        .apply();
+                head.attack(hit.entity(), getDamage(), 2);
             }
         }
     }

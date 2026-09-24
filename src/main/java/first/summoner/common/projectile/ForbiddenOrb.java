@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -14,7 +13,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 /**
@@ -90,11 +88,7 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
         TargetCache targetCache = getTargetCache();
         List<LivingEntity> entities = targetCache.getEntitiesInRadius(hitPoint, 3.5, targetCache::isTarget);
         for (LivingEntity entity : entities) {
-            InvincibleData.attack(entity)
-                    .attacker(getUuid())
-                    .damageSource(source)
-                    .damageAmount(getDamage())
-                    .apply();
+            attack(entity, getDamage(), 0);
         }
         // 命中时爆出大量金黄色粒子
         ParticleHelper.create(getLevel())

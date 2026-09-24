@@ -86,7 +86,7 @@ public class SummonerWeaponRegister {
                                     .build())
                     ))
                     .itemLanguage("Gilded Wand", "镀金魔杖")
-                    .itemLanguageTooltip(1, "", "持续引导标记目标以积累标记能量，使你的召唤物集中攻击标记目标")
+                    .itemLanguageTooltip(1, "", "持续引导标记目标，使你的召唤物集中攻击标记目标")
                     .itemLanguageTooltip(2, "", "可通过附魔获得额外标记效果")
                     .itemLanguageTooltip(3, "", "潜行右键遣散所有仆从与哨兵")
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeaponTool)

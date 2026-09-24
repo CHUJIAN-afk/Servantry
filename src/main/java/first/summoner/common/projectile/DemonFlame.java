@@ -1,12 +1,11 @@
 package first.summoner.common.projectile;
 
-import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -23,16 +22,16 @@ public class DemonFlame extends Projectile implements IEntityCollision<DemonFlam
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
         for (HitContext hitContext : hitContexts) {
             LivingEntity target = hitContext.entity();
-            InvincibleData.attack(target)
-                    .attacker(getUuid())
-                    .damageSource(source)
-                    .damageAmount(getDamage())
-                    .invincibleTime(10)
-                    .effect(new MobEffectInstance(SummonerMobEffectRegister.CursedFlame, 100, 0))
-                    .apply();
+            ImmunityData immunityData = ImmunityData.get(target);
+            if (!immunityData.isActive(getUuid())) {
+                attack(target, getDamage(), 10);
+                // attack 命中成功才写入无敌记录，据此判断本次是否真的打中
+                if (immunityData.isActive(getUuid())) {
+                    target.addEffect(new MobEffectInstance(SummonerMobEffectRegister.CursedFlame, 100, 0));
+                }
+            }
         }
     }
 

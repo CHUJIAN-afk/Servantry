@@ -1,6 +1,5 @@
 package first.summoner.common.minion.minion;
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.minion.MomentumMinion;
@@ -12,7 +11,6 @@ import first.summoner.utils.ParticleHelper;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 /**
@@ -75,12 +73,7 @@ public class Sharknado extends MomentumMinion implements IEntityCollision<Sharkn
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
-            InvincibleData.attack(hit.entity())
-                    .attacker(getUuid())
-                    .damageSource(getDamageSource())
-                    .damageAmount(getDamage())
-                    .invincibleTime(2)
-                    .apply();
+            attack(hit.entity(), getDamage(), 2);
         }
     }
 }

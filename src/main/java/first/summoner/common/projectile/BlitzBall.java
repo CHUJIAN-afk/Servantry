@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -10,7 +9,6 @@ import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import first.summoner.utils.SummonerStreamCodecs;
 import net.minecraft.world.entity.LivingEntity;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,12 +42,7 @@ public class BlitzBall extends Projectile {
         List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 3, living -> targetCache.isTarget(living));
         for (LivingEntity living : entities) {
             idList.add(living.getId());
-            InvincibleData.attack(living)
-                    .attacker(getUuid())
-                    .damageSource(getDamageSource())
-                    .damageAmount(getDamage())
-                    .invincibleTime(3)
-                    .apply();
+            attack(living, getDamage(), 3);
             ParticleHelper.create(getLevel())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0x38ffec)

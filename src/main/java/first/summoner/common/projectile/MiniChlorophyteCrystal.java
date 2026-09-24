@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.attachmentEntity.PathNode;
@@ -9,12 +8,10 @@ import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 public class MiniChlorophyteCrystal extends Projectile implements IEntityCollision<MiniChlorophyteCrystal> {
@@ -38,17 +35,13 @@ public class MiniChlorophyteCrystal extends Projectile implements IEntityCollisi
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
                 TargetCache targetCache = getTargetCache();
             HitContext context = hitContexts.getFirst();
             LivingEntity target = context.entity();
             Vec3 pos = target.getBoundingBox().getCenter();
             List<LivingEntity> list = targetCache.getEntitiesInRadius(pos, 2.5, living -> isValidCollisionTarget(this, living));
             for (LivingEntity living : list) {
-                InvincibleData.attack(living)
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .apply();
+                attack(living, getDamage(), 0);
             }
             setCurrentPathNode(getCurrentPathNode().modifyPos(context.hitPoint()));
             setRemove();

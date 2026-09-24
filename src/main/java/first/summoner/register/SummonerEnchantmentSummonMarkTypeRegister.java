@@ -47,8 +47,6 @@ public class SummonerEnchantmentSummonMarkTypeRegister {
         register(SummonerEnchantmentRegister.MoonBite, SummonerSummonMarkRegister.MoonBite);
         register(SummonerEnchantmentRegister.Angel, SummonerSummonMarkRegister.Angel);
         register(SummonerEnchantmentRegister.GodSlayer, SummonerSummonMarkRegister.GodSlayer);
-        register(SummonerEnchantmentRegister.CeruleanDawn, SummonerSummonMarkRegister.CeruleanDawn);
-        register(SummonerEnchantmentRegister.ArcaneRite, SummonerSummonMarkRegister.ArcaneRite);
     }
 
     public static void register(Holder<Enchantment> enchantmentHolder, Holder<SummonMarkType> summonMarkTypeHolder) {

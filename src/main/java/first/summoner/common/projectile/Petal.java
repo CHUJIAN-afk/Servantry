@@ -1,18 +1,14 @@
 package first.summoner.common.projectile;
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 花瓣射弹（花儿的粗暴展示）：从目标位置向周围释放，不穿透实体（命中即伤），
@@ -80,15 +76,8 @@ public class Petal extends Projectile implements IEntityCollision<Petal> {
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
-                UUID uuid = getUuid();
             for (HitContext hitContext : hitContexts) {
-                InvincibleData.attack(hitContext.entity())
-                        .attacker(uuid)
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .invincibleTime(3)
-                        .apply();
+                attack(hitContext.entity(), getDamage(), 3);
             }
         setRemove();
     }

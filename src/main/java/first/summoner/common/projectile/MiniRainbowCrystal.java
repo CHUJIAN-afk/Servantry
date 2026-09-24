@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
@@ -11,7 +10,6 @@ import net.minecraft.util.FastColor;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-
 import java.util.List;
 
 public class MiniRainbowCrystal extends Projectile {
@@ -57,11 +55,7 @@ public class MiniRainbowCrystal extends Projectile {
                 TargetCache targetCache = getTargetCache();
                 List<LivingEntity> entities = targetCache.getEntitiesInRadius(pos, 3.5, living -> targetCache.isTarget(living));
                 for (LivingEntity living : entities) {
-                    InvincibleData.attack(living)
-                            .attacker(getUuid())
-                            .damageSource(damageSource)
-                            .damageAmount(getDamage())
-                            .apply();
+                    attack(living, getDamage(), 0);
                 }
             }
         }

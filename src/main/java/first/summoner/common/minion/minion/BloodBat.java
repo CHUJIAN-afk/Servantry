@@ -1,7 +1,6 @@
 package first.summoner.common.minion.minion;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
 import first.lyra.common.attachmentEntity.Ellipse;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -69,11 +68,7 @@ public class BloodBat extends Minion implements IEntityCollision<BloodBat> {
         for (HitContext hit : hitContexts) {
             LivingEntity living = hit.entity();
             if (hitTargets.add(living)) {
-                InvincibleData.attack(living)
-                        .attacker(getUuid())
-                        .damageSource(getDamageSource())
-                        .damageAmount(getDamage())
-                        .apply();
+                attack(living, getDamage(), 0);
                 if (living == getTarget()) {
                     hasDamaged = true;
                 }

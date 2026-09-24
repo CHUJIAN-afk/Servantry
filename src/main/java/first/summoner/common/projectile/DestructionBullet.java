@@ -1,7 +1,7 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -9,7 +9,6 @@ import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -65,16 +64,16 @@ public class DestructionBullet extends Projectile implements IEntityCollision<De
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
         HitContext hitContext = hitContexts.getFirst();
         LivingEntity living = hitContext.entity();
-        InvincibleData.attack(living)
-                .attacker(getUuid())
-                .damageSource(source)
-                .damageAmount(getDamage())
-                .invincibleTime(20)
-                .effect(new MobEffectInstance(SummonerMobEffectRegister.ArmorCrunch, 100))
-                .apply();
+        ImmunityData immunityData = ImmunityData.get(living);
+        if (!immunityData.isActive(getUuid())) {
+            attack(living, getDamage(), 20);
+            // attack 命中成功才写入无敌记录，据此判断本次是否真的打中
+            if (immunityData.isActive(getUuid())) {
+                living.addEffect(new MobEffectInstance(SummonerMobEffectRegister.ArmorCrunch, 100));
+            }
+        }
         ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
                                  .centerColor(0xff3d00)

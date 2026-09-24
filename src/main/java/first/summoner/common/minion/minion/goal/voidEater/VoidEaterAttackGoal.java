@@ -1,8 +1,6 @@
 package first.summoner.common.minion.minion.goal.voidEater;
 
-
 import first.lyra.api.LyraHelper;
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -162,11 +160,7 @@ public class VoidEaterAttackGoal extends AttachmentEntityGoal<VoidEater> {
                     DamageSource source = laserProjectile.getDamageSource();
                                         for (IEntityCollision.HitContext hitContext : hitContexts) {
                             LivingEntity living = hitContext.entity();
-                            InvincibleData.attack(living)
-                                    .attacker(laserProjectile.getUuid())
-                                    .damageSource(source)
-                                    .damageAmount(laserProjectile.getDamage())
-                                    .apply();
+                            laserProjectile.attack(living, laserProjectile.getDamage(), 0);
                             Vec3 hitPoint = living.getBoundingBox().getCenter();
                             Vec3 direction = hitPoint.offsetRandom(level.getRandom(), 2).subtract(hitPoint).normalize();
                             GenericParticleBuilder genericParticleBuilder = GenericParticleBuilder.create()

@@ -1,7 +1,7 @@
 package first.summoner.common.minion.sentry;
 
 import first.lyra.api.LyraHelper;
-import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.attachmentEntity.PathNode;
@@ -11,7 +11,6 @@ import first.summoner.common.projectile.CustomLaser;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
@@ -127,16 +126,16 @@ public class MoonPortal extends Minion {
         });
 
         projectile.setHitConsumer((laser, hitContexts) -> {
-            DamageSource source = getDamageSource();
             for (IEntityCollision.HitContext hitContext : hitContexts) {
                 LivingEntity living = hitContext.entity();
-                InvincibleData.attack(living)
-                        .attacker(laser.getUuid())
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .invincibleTime(3)
-                        .effect(new MobEffectInstance(SummonerMobEffectRegister.MoonBite, 60))
-                        .apply();
+                ImmunityData immunityData = ImmunityData.get(living);
+                if (!immunityData.isActive(laser.getUuid())) {
+                    laser.attack(living, getDamage(), 3);
+                    // attack 命中成功才写入无敌记录，据此判断本次是否真的打中
+                    if (immunityData.isActive(laser.getUuid())) {
+                        living.addEffect(new MobEffectInstance(SummonerMobEffectRegister.MoonBite, 60));
+                    }
+                }
                 Vec3 hitPoint = living.getBoundingBox()
                         .getCenter();
                 Vec3 direction = hitPoint.offsetRandom(getRandom(), 2).subtract(hitPoint).normalize();

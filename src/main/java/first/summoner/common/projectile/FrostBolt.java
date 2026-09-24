@@ -1,14 +1,13 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -63,7 +62,6 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
                 for (HitContext hit : hitContexts) {
                 if (hitCount >= 3) {
                     setCurrentPathNode(getCurrentPathNode().modifyPos(hit.hitPoint()));
@@ -71,13 +69,15 @@ public class FrostBolt extends Projectile implements IEntityCollision<FrostBolt>
                     return;
                 }
                 LivingEntity living = hit.entity();
-                boolean applied = InvincibleData.attack(living)
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .invincibleTime(3)
-                        .effect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 0))
-                        .apply();
+                ImmunityData immunityData = ImmunityData.get(living);
+                boolean applied = false;
+                if (!immunityData.isActive(getUuid())) {
+                    attack(living, getDamage(), 3);
+                    applied = immunityData.isActive(getUuid());
+                }
+                if (applied) {
+                    living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 0));
+                }
                 if (applied) {
                     hitCount++;
                     // 命中时目标爆出淡蓝色粒子（参考雷电球）

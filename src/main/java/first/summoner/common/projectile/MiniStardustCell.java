@@ -1,6 +1,6 @@
 package first.summoner.common.projectile;
 
-import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.attachment.ImmunityData;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
@@ -117,12 +117,14 @@ public class MiniStardustCell extends Projectile implements IEntityCollision<Min
         MobEffectInstance existing = target.getEffect(SummonerMobEffectRegister.CellParasitism);
         int amplifier = existing == null ? 0 : Math.min(existing.getAmplifier() + 1, 9);
         MobEffectInstance effectInstance = new MobEffectInstance(SummonerMobEffectRegister.CellParasitism, 100, amplifier);
-        InvincibleData.attack(target)
-                .attacker(getUuid())
-                .damageSource(source)
-                .damageAmount(getDamage())
-                .effect(effectInstance)
-                .apply();
+        ImmunityData immunityData = ImmunityData.get(target);
+        if (!immunityData.isActive(getUuid())) {
+            attack(target, getDamage(), 0);
+            // attack 命中成功才写入无敌记录，据此判断本次是否真的打中
+            if (immunityData.isActive(getUuid())) {
+                target.addEffect(effectInstance);
+            }
+        }
     }
 
     @Override
@@ -175,11 +177,7 @@ public class MiniStardustCell extends Projectile implements IEntityCollision<Min
             DamageSource source = getDamageSource();
             LivingEntity target = getAttachedTarget();
             if (target != null && target.isAlive()) {
-                InvincibleData.attack(target)
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(getDamage() * 0.5f)
-                        .apply();
+                attack(target, getDamage() * 0.5f, 0);
             }
             count *= 4;
             baseSpeed *= 4;

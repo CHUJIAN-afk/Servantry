@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -15,7 +14,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 /**
@@ -105,11 +103,7 @@ public class ExplosionFlameBall extends Projectile implements IEntityCollision<E
         TargetCache targetCache = getTargetCache();
         List<LivingEntity> entities = targetCache.getEntitiesInRadius(hitPoint, 3, living -> targetCache.isTarget(living));
         for (LivingEntity entity : entities) {
-            InvincibleData.attack(entity)
-                    .attacker(getUuid())
-                    .damageSource(source)
-                    .damageAmount(getDamage())
-                    .apply();
+            attack(entity, getDamage(), 0);
             entity.igniteForTicks(200);
         }
         // 命中时爆发散射粒子

@@ -1,6 +1,5 @@
 package first.summoner.common.minion.sentry;
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
@@ -14,7 +13,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 public class LightningAura extends MomentumMinion implements IBlockCollision<LightningAura> {
@@ -63,10 +61,7 @@ public class LightningAura extends MomentumMinion implements IBlockCollision<Lig
         TargetCache targetCache = getTargetCache();
         List<LivingEntity> entities = targetCache.getEntitiesInRadius(getPos(), 6, null);
         for (LivingEntity entity : entities) {
-            InvincibleData.attack(entity)
-                    .damageSource(getDamageSource())
-                    .damageAmount(getDamage())
-                    .apply();
+            attack(entity, getDamage(), 0);
         }
     }
 

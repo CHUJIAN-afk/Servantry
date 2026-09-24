@@ -19,11 +19,6 @@ public class SummonerAttachmentRegister {
             Register.register("curio_data", () -> AttachmentType.builder(() -> new CurioData(new HashSet<>()))
                     .build());
 
-    public static final DeferredHolder<AttachmentType<?>, AttachmentType<SummonMarkData>> SummonMarkData =
-            Register.register("summon_mark_data", () -> AttachmentType.builder(SummonMarkData::new)
-                    .sync(new SummonMarkData())
-                    .build());
-
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<GildedWandData>> GildedWandData =
             Register.register("gilded_wand_data", () -> AttachmentType.builder(GildedWandData::new)
                     .build());

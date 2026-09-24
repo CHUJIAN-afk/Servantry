@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
@@ -10,12 +9,10 @@ import first.lyra.common.sound.Playable;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 /**
@@ -66,7 +63,6 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
             TargetCache targetCache = getTargetCache();
             List<LivingEntity> mainTargets = targetCache.getEntitiesInRadius(getPos(), 3, living -> targetCache.isTarget(living));
             for (LivingEntity living : mainTargets) {
@@ -74,29 +70,13 @@ public class MiniNecroSpirit extends Projectile implements IEntityCollision<Mini
                 if (living == trackingTarget) {
                     amount *= 1.25f;
                 }
-                InvincibleData.attack(living)
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(amount)
-                        .apply();
-                InvincibleData.attack(living)
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(amount * 0.5f)
-                        .apply();
-                InvincibleData.attack(living)
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(amount * 0.5f)
-                        .apply();
+                attack(living, amount, 0);
+                attack(living, amount * 0.5f, 0);
+                attack(living, amount * 0.5f, 0);
                 List<LivingEntity> splashTargets = targetCache.getEntitiesInRadius(living.position(), 2,
                         entity -> entity == living || targetCache.isTarget(entity));
                 for (LivingEntity entity : splashTargets) {
-                    InvincibleData.attack(living)
-                            .attacker(getUuid())
-                            .damageSource(source)
-                            .damageAmount(amount * 1.75f)
-                            .apply();
+                    attack(living, amount * 1.75f, 0);
                 }
             }
             // 命中粒子效果

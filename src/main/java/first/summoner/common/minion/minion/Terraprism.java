@@ -1,7 +1,6 @@
 package first.summoner.common.minion.minion;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.*;
 import first.lyra.common.minion.Minion;
@@ -16,7 +15,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -86,11 +84,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
             if (this.hitTargets.add(hit.entity())) {
-                InvincibleData.attack(hit.entity())
-                        .attacker(getUuid())
-                        .damageSource(getDamageSource())
-                        .damageAmount(getDamage())
-                        .apply();
+                attack(hit.entity(), getDamage(), 0);
             }
         }
     }

@@ -1,7 +1,6 @@
 package first.summoner.common.minion.sentry;
 
 import first.lyra.api.LyraHelper;
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.PathNode;
@@ -10,7 +9,6 @@ import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.projectile.CustomLaser;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
@@ -91,14 +89,8 @@ public class EyeLaserTurret extends MomentumMinion implements IBlockCollision<Ey
                 }
             });
             laser.setHitConsumer((l, hitContexts) -> {
-                DamageSource source = getDamageSource();
                                 for (var hitContext : hitContexts) {
-                        InvincibleData.attack(hitContext.entity())
-                                .attacker(l.getUuid())
-                                .damageSource(source)
-                                .damageAmount(l.getDamage())
-                                .invincibleTime(5)
-                                .apply();
+                        l.attack(hitContext.entity(), l.getDamage(), 5);
                     }
             });
             LyraHelper.get(owner).add(laser);

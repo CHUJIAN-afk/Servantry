@@ -56,7 +56,7 @@ public class EnchantmentUtils {
         if (enchantmentHolder != null) {
             Holder<SummonMarkType> markType = SummonerEnchantmentSummonMarkTypeRegister.getSummonMarkType(enchantmentHolder);
             if (markType != null) {
-                ResourceLocation identifier = markType.value().identifier();
+                ResourceLocation identifier = markType.value().location();
                 String base = "enchantment." + identifier.getNamespace() + "." + identifier.getPath() + ".desc.";
                 int i = 1;
                 while (Language.getInstance().has(base + i)) {

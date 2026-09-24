@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.Ellipse;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.attachmentEntity.PathNode;
@@ -13,12 +12,10 @@ import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 public class Zenith extends Projectile implements IEntityCollision<Zenith> {
@@ -125,15 +122,9 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
                 for (HitContext hit : hitContexts) {
                 LivingEntity living = hit.entity();
-                InvincibleData.attack(living)
-                        .attacker(getUuid())
-                        .damageSource(source)
-                        .damageAmount(getDamage())
-                        .invincibleTime(2)
-                        .apply();
+                attack(living, getDamage(), 2);
             }
     }
 }

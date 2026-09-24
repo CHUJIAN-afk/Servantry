@@ -1,7 +1,6 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
@@ -15,7 +14,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 /**
@@ -56,12 +54,7 @@ public class Corn extends Projectile implements IEntityCollision<Corn>, IBlockCo
         TargetCache targetCache = getTargetCache();
         List<LivingEntity> nearbyEntities = targetCache.getEntitiesInRadius(explosionPos, AOE_RADIUS, living -> targetCache.isTarget(living));
         for (LivingEntity entity : nearbyEntities) {
-            InvincibleData.attack(entity)
-                    .attacker(getUuid())
-                    .damageSource(getDamageSource())
-                    .damageAmount(getDamage())
-                    .invincibleTime(10)
-                    .apply();
+            attack(entity, getDamage(), 10);
         }
         Vec3 pos = getPos();
         ParticleHelper.create(getLevel())

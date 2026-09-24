@@ -1,7 +1,6 @@
 package first.summoner.common.minion.minion.goal.ufo;
 
 
-import first.lyra.common.attachment.InvincibleData;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.attachmentEntity.PlannedPath;
@@ -11,7 +10,6 @@ import first.summoner.utils.ParticleHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,12 +73,7 @@ public class UFOAttackGoal extends AttachmentEntityGoal<UFO> {
         // 激光攻击
         if (--cooldown <= 0 && distance < 8) {
             cooldown = 7 + minion.getRandom().nextIntBetweenInclusive(1, 2);
-            InvincibleData.attack(target)
-                    .attacker(minion.getUuid())
-                    .damageSource(minion.getDamageSource())
-                    .damageAmount(minion.getDamage())
-                    .invincibleTime(4)
-                    .apply();
+            minion.attack(target, minion.getDamage(), 4);
 
             Level level = minion.getLevel();
             Vec3 direction = targetPos.subtract(minionPos);

@@ -1,6 +1,8 @@
 package first.summoner.common.attachment;
 
 import first.lyra.client.render.RenderUtil;
+import first.lyra.common.attachment.SummonMarkTracker;
+import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.Summoner;
 import first.summoner.common.item.GildedWandItem;
 import first.summoner.network.GildedWandPacket;
@@ -101,8 +103,8 @@ public class GildedWandData {
                 player.setYRot(Mth.rotLerp(aimSpeed, player.getYRot(), yaw));
                 player.setXRot(Mth.rotLerp(aimSpeed, player.getXRot(), pitch));
             }
-            SummonMarkData markData = player.getData(SummonerAttachmentRegister.SummonMarkData);
-            LivingEntity markTarget = markData.getMarkTarget();
+            SummonMarkTracker markData = player.getData(LyraAttachmentRegister.SummonMarkData);
+            LivingEntity markTarget = markData.getTarget();
             if (markTarget != null) {
                 Vec3 targetPos = markTarget.getPosition(partialTick).add(0, markTarget.getBoundingBox().getYsize(), 0);
                 MultiBufferSource bufferSource = minecraft.renderBuffers().bufferSource();

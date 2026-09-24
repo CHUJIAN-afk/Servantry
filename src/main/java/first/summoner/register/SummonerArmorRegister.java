@@ -88,7 +88,7 @@ public class SummonerArmorRegister {
                     .itemModel(ItemModelProvider::basicItem)
                     .build();
     /**
-     * 蜜蜂靴 - 套装奖励部分
+     * 蜜蜂靴
      */
     public static final DeferredItem<ArmorItem> BeeBoots =
             REGISTRIES.build("bee_boots", () -> AttributeArmorItemBuilder.builder(SummonerArmorMaterialRegister.BeeArmorMaterial, ArmorItem.Type.BOOTS)
