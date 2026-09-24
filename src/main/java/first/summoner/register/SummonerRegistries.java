@@ -1,7 +1,7 @@
 package first.summoner.register;
 
+import first.lyra.common.summonMark.SummonMarkType;
 import first.summoner.Summoner;
-import first.summoner.common.summonMark.SummonMarkType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.SubscribeEvent;

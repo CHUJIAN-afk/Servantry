@@ -1,6 +1,6 @@
 package first.summoner.utils;
 
-import first.summoner.common.summonMark.SummonMarkType;
+import first.lyra.common.summonMark.SummonMarkType;
 import first.summoner.register.SummonerEnchantmentSummonMarkTypeRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;

@@ -1,10 +1,9 @@
 package first.summoner.network;
 
 import first.lyra.common.attachment.InvincibleData;
+import first.lyra.common.summonMark.SummonMarkType;
 import first.summoner.Summoner;
-import first.summoner.common.attachment.SummonMarkData;
 import first.summoner.common.item.GildedWandItem;
-import first.summoner.common.summonMark.SummonMarkType;
 import first.summoner.register.SummonerAttachmentRegister;
 import first.summoner.register.SummonerEnchantmentSummonMarkTypeRegister;
 import first.summoner.register.SummonerSummonMarkRegister;

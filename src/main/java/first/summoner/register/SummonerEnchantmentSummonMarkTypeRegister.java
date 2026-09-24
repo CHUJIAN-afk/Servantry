@@ -1,7 +1,7 @@
 package first.summoner.register;
 
+import first.lyra.common.summonMark.SummonMarkType;
 import first.summoner.Summoner;
-import first.summoner.common.summonMark.SummonMarkType;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;

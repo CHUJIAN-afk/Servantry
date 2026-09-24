@@ -4,23 +4,18 @@ package first.summoner.common;
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.AttachmentEntityData;
 import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
-import first.lyra.common.minion.Minion;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.Summoner;
-import first.summoner.common.attachment.SummonMarkData;
 import first.summoner.common.dataComponent.ScabbardContainer;
 import first.summoner.common.minion.minion.ChlorophyteCrystal;
 import first.summoner.common.minion.minion.StardustCell;
 import first.summoner.common.minion.minion.VoidEater;
-import first.summoner.common.summonMark.SummonMarkType;
 import first.summoner.register.*;
 import first.summoner.utils.CuriosUtil;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -36,38 +31,12 @@ import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 
 import java.util.List;
-import java.util.Set;
 
 @EventBusSubscriber(modid = Summoner.MODID)
 public class Event {
-
-    @SubscribeEvent
-    public static void tickHandler(PlayerTickEvent.Post event) {
-        Player player = event.getEntity();
-        player.getData(SummonerAttachmentRegister.SummonMarkData).tick(player);
-    }
-
-    @SubscribeEvent
-    public static void damageHandler(LivingDamageEvent.Post event) {
-        DamageSource source = event.getSource();
-        LivingEntity target = event.getEntity();
-        if (!target.level().isClientSide() && source instanceof AttachmentEntityDamageSource attachmentDamageSource && attachmentDamageSource.getAttachmentEntity() instanceof Minion minion) {
-            Player owner = minion.getOwner() instanceof Player player ? player : null;
-            if (owner != null) {
-                SummonMarkData summonMarkData = owner.getData(SummonerAttachmentRegister.SummonMarkData);
-                if (summonMarkData.isSummonMarkTarget(target)) {
-                    Set<SummonMarkType> summonMarks = summonMarkData.getMarkTypes();
-                    for (SummonMarkType summonMark : summonMarks) {
-                        summonMark.damage(summonMarkData, target, attachmentDamageSource, event.getNewDamage());
-                    }
-                }
-            }
-        }
-    }
 
     @SubscribeEvent
     public static void onItemStackedOnOther(ItemStackedOnOtherEvent event) {
@@ -121,18 +90,7 @@ public class Event {
     public static void onLivingDamageEventPostFromMinion(LivingDamageEvent.Post event) {
         DamageSource damageSource = event.getSource();
         LivingEntity target = event.getEntity();
-        if (!target.level().isClientSide() && target.getType() == EntityType.WARDEN) {
-            target.heal(target.getMaxHealth());
-        }
-        if (!target.level().isClientSide() && target instanceof Player player) {
-            if (SummonerArmorSetRegister.ValhallaKnight.get().full(player)) {
-                player.addEffect(new MobEffectInstance(SummonerMobEffectRegister.BallistaPanicked, 100));
-            }
-        }
         if (!target.level().isClientSide() && damageSource.getEntity() instanceof Player player) {
-            if (SummonerArmorSetRegister.Hallowed.get().full(player)) {
-                target.addEffect(new MobEffectInstance(MobEffects.GLOWING, 60));
-            }
             List<VoidEater> voidEaters = LyraHelper.get(player).getEntityData().get(SummonerAttachmentEntityRegister.VOID_EATER.get());
             if (!voidEaters.isEmpty()) {
                 target.addEffect(new MobEffectInstance(SummonerMobEffectRegister.GodSlayerInferno, 60));
