@@ -38,10 +38,10 @@ public class Spider extends GroundMinion {
 
     @Override
     public void tick() {
-        if (variant < 0 && !getLevel().isClientSide()) {
+        super.tick();
+        if (variant < 0) {
             variant = Math.floorMod(getOrder(), 3);
         }
-        super.tick();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class Spider extends GroundMinion {
 
     @Override
     public int getSearchDistance() {
-        return (int) (50 + getOrder() * 2.5);
+        return 32;
     }
 
     @Override

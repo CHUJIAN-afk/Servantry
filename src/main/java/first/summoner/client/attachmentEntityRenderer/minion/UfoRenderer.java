@@ -1,39 +1,41 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.RenderUtil;
-import first.lyra.client.render.model.LyraModelRenderer;
-import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.client.render.geo.AbstractAttachmentEntityGeoRenderer;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.Summoner;
 import first.summoner.common.minion.minion.UFO;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.FastColor;
 
 /**
- * UFO 渲染器：渲染 geo/ufo 静态模型。
+ * UFO 渲染器：geo 模型 {@code entity/summon/ufo}，常亮渲染。
  */
-public class UfoRenderer extends AbstractAttachmentEntityRenderer<UFO> {
+public class UfoRenderer extends AbstractAttachmentEntityGeoRenderer<UFO> {
 
-    @Override
-    protected RenderContext<UFO> createContext(UFO ufo, float partialTick) {
-        return RenderContext.<UFO>builder()
-                .model(new ModelConfig<UFO>()
-                               .scale(0.8f)
-                               .translateOffset(0, -0.125f, 0)
-                               .alphaDistanceFactor(1.5f))
-                .build();
+    public UfoRenderer() {
+        super(Summoner.rl("entity/summon/ufo"));
     }
 
     @Override
-    protected void render(UFO ufo, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<UFO> context, float partialTick, int packedLight, float alpha) {
-        if (ufo.getTrailTimer() > 0 && !Minecraft.getInstance().isPaused()) {
-            ParticleHelper.create(ufo.getLevel())
+    protected RenderContext<UFO> createContext(UFO ufo, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(ufo, visualNode, partialTick, packedLight)
+                .packedLight(LightTexture.FULL_BRIGHT)
+                .model(new ModelContext()
+                               .scale(0.8f)
+                               .translateOffset(0, -0.125f, 0)
+                               .alphaDistanceFactor(1.5f));
+    }
+
+    @Override
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
+        if (context.entity.getTrailTimer() > 0 && !Minecraft.getInstance().isPaused()) {
+            ParticleHelper.create(context.entity.getLevel())
                     .generic(GenericParticleBuilder.create()
                                      .centerColor(0x46f7ff)
                                      .edgeColor(0x3dd6dd)
@@ -42,14 +44,10 @@ public class UfoRenderer extends AbstractAttachmentEntityRenderer<UFO> {
                                      .scale(0.015f)
                                      .scaleRandom(0.005f)
                     )
-                    .pos(visualNode.pos())
+                    .pos(context.visualNode.pos())
                     .offset(0.2)
                     .count(10)
                     .emit();
         }
-        LyraModelRenderer.geo(Summoner.rl("ufo"))
-                .light(RenderUtil.FULL_LIGHT)
-                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
-                .render(poseStack, bufferSource);
     }
 }

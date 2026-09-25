@@ -1,0 +1,37 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.laser_minigun.idle": {
+			"loop": true,
+			"animation_length": 2,
+			"bones": {
+				"枪管": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"2.0": {
+							"vector": [0, 0, 360]
+						}
+					}
+				}
+			}
+		},
+		"animation.laser_minigun.shooting": {
+			"loop": true,
+			"animation_length": 2,
+			"bones": {
+				"枪管": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"2.0": {
+							"vector": [0, 0, 1440]
+						}
+					}
+				}
+			}
+		}
+	}
+}

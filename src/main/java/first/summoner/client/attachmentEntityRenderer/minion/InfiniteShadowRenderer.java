@@ -1,13 +1,12 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.trail.ModelConfig;
-import first.lyra.client.render.trail.RibbonTrailConfig;
-import first.lyra.client.render.trail.TrailConfig;
+import first.lyra.client.render.trail.RibbonTrailContext;
+import first.lyra.client.render.trail.TrailContext;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.InfiniteShadow;
 import net.minecraft.client.Minecraft;
@@ -24,31 +23,30 @@ import static first.summoner.utils.RenderUtil.getDominantColor;
 public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<InfiniteShadow> {
 
     @Override
-    protected RenderContext<InfiniteShadow> createContext(InfiniteShadow infiniteShadow, float partialTick) {
+    protected RenderContext<InfiniteShadow> createContext(InfiniteShadow infiniteShadow, PathNode visualNode, float partialTick, int packedLight) {
         ItemStack itemStack = infiniteShadow.getItemStack();
         if (!itemStack.isEmpty()) {
             int dominantColor = getDominantColor(itemStack);
-            TrailConfig<InfiniteShadow, ?> trailConfig = null;
+            TrailContext<InfiniteShadow> trail = null;
             if (!(itemStack.getItem() instanceof BlockItem)) {
-                trailConfig = new RibbonTrailConfig<InfiniteShadow>()
+                trail = new RibbonTrailContext<InfiniteShadow>()
+                        .upOffset(1.015f)
                         .timer(infiniteShadow.trailTimer)
                         .colorRGB(dominantColor)
-                        .historyLength(4)
-                        .upOffset(1.015f);
+                        .historyLength(4);
             }
-            return RenderContext.<InfiniteShadow>builder()
-                    .trail(trailConfig)
-                    .model(new ModelConfig<InfiniteShadow>()
+            return super.createContext(infiniteShadow, visualNode, partialTick, packedLight)
+                    .trail(trail)
+                    .model(new ModelContext()
                                    .scale(1.5f)
-                                   .rotationOffset(0, 90, -45))
-                    .build();
+                                   .rotationOffset(0, 90, -45));
         }
         return null;
     }
 
     @Override
-    protected void render(InfiniteShadow infiniteShadow, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<InfiniteShadow> context, float partialTick, int packedLight, float alpha) {
-        ItemStack itemStack = infiniteShadow.getItemStack();
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
+        ItemStack itemStack = context.entity.getItemStack();
         if (!itemStack.isEmpty()) {
             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
             itemRenderer.renderStatic(
@@ -58,10 +56,10 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
                     OverlayTexture.NO_OVERLAY,
                     poseStack,
                     bufferSource,
-                    infiniteShadow.getLevel(),
+                    context.entity.getLevel(),
                     0
             );
-            DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
+            DynamicLightDispatcher.addLightSources(context.visualNode.pos(), 8);
         }
     }
 }

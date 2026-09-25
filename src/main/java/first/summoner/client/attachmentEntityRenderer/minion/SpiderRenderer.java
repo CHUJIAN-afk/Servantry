@@ -1,15 +1,12 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.client.render.AbstractAttachmentEntityGeoRenderer;
+import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.client.render.geo.AbstractAttachmentEntityGeoRenderer;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.Summoner;
 import first.summoner.common.minion.minion.Spider;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.util.Color;
 
 /**
  * 蜘蛛渲染器 - geo 模型 {@code entity/summon/spider}，按 {@code spider.variant} 切换三套贴图。
@@ -31,12 +28,8 @@ public class SpiderRenderer extends AbstractAttachmentEntityGeoRenderer<Spider> 
     }
 
     @Override
-    protected GeoRenderContext createContext(Spider spider, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode visualNode) {
-        RenderContext<Spider> renderContext = RenderContext.<Spider>builder()
-                .model(new ModelConfig<Spider>()
-                               .rotationOffset(180, 0, 0)
-                               .alphaDistanceFactor(1.5F))
-                .build();
-        return new GeoRenderContext(spider, visualNode, Color.WHITE, partialTick, packedLight, renderContext);
+    protected RenderContext<Spider> createContext(Spider spider, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(spider, visualNode, partialTick, packedLight)
+                .model(new ModelContext().rotationOffset(180, 0, 0));
     }
 }

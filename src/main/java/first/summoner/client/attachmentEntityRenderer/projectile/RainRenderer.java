@@ -12,14 +12,13 @@ import net.minecraft.world.phys.AABB;
 public class RainRenderer extends AbstractAttachmentEntityRenderer<Rain> {
 
     @Override
-    protected RenderContext<Rain> createContext(Rain laser, float partialTick) {
-        return RenderContext.<Rain>builder()
-                .build();
+    protected RenderContext<Rain> createContext(Rain laser, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(laser, visualNode, partialTick, packedLight);
     }
 
     @Override
-    protected void render(Rain entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Rain> context, float partialTick, int packedLight, float alpha) {
-        AABB hitbox = entity.getHitbox();
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
+        AABB hitbox = context.entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.25f;
         LaserRendererHelper.builder()

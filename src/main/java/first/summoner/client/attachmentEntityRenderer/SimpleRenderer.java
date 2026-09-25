@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
 import first.lyra.common.attachmentEntity.AttachmentEntity;
-import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.register.LyraRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -16,13 +15,16 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
+/**
+ * 简易渲染器：交给函数式渲染器自行绘制，未提供时退回实体名称标签。
+ */
 public class SimpleRenderer<T extends AttachmentEntity> extends AbstractAttachmentEntityRenderer<T> {
 
     private final Render<T> renderer;
 
     @FunctionalInterface
     public interface Render<T extends AttachmentEntity> {
-        void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context, float partialTick, float alpha);
+        void render(PoseStack poseStack, MultiBufferSource bufferSource, RenderContext<T> context);
     }
 
     public SimpleRenderer(@Nullable Render<T> renderer) {
@@ -30,18 +32,12 @@ public class SimpleRenderer<T extends AttachmentEntity> extends AbstractAttachme
     }
 
     @Override
-    protected RenderContext<T> createContext(T entity, float partialTick) {
-        return RenderContext.<T>builder()
-                .build();
-    }
-
-    @Override
-    protected void modelModify(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context, float partialTick, int packedLight, float alpha) {
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
         if (renderer != null) {
-            renderer.render(entity, poseStack, bufferSource, visualNode, context, partialTick, alpha);
+            renderer.render(poseStack, bufferSource, context);
         } else {
             // 26.2 submitNameTag 在 1.21.1 无等价 API；1.21.1 通用文本标签写法（见 1.21.1 TextOnlyRenderer）。
-            ResourceLocation location = LyraRegistries.ATTACHMENT_ENTITY_TYPES.getKey(entity.getType());
+            ResourceLocation location = LyraRegistries.ATTACHMENT_ENTITY_TYPES.getKey(context.entity.getType());
             if (location != null) {
                 String key = "summon." + location.getNamespace() + "." + location.getPath();
                 Component component = Component.translatable(key).withStyle(ChatFormatting.DARK_AQUA);
@@ -59,9 +55,5 @@ public class SimpleRenderer<T extends AttachmentEntity> extends AbstractAttachme
                 poseStack.popPose();
             }
         }
-    }
-
-    @Override
-    protected void render(T entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<T> context, float partialTick, int packedLight, float alpha) {
     }
 }

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.trail.ConeTrailConfig;
+import first.lyra.client.render.trail.ConeTrailContext;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.projectile.MiniRainbowCrystal;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -12,20 +12,19 @@ import net.minecraft.client.renderer.MultiBufferSource;
 public class RainbowCrystalRenderer extends AbstractAttachmentEntityRenderer<MiniRainbowCrystal> {
 
     @Override
-    protected RenderContext<MiniRainbowCrystal> createContext(MiniRainbowCrystal crystal, float partialTick) {
-        return RenderContext.<MiniRainbowCrystal>builder()
-                .trail(new ConeTrailConfig<MiniRainbowCrystal>()
+    protected RenderContext<MiniRainbowCrystal> createContext(MiniRainbowCrystal crystal, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(crystal, visualNode, partialTick, packedLight)
+                .trail(new ConeTrailContext<MiniRainbowCrystal>()
+                               .maxRadius((crystal.getLife() + partialTick) * 0.025f)
+                               .resolution(4)
                                .timer(15)
                                .colorRGB(crystal.getColor(partialTick))
                                .historyLength(16)
-                               .segmentsPerNode(2)
-                               .maxRadius((crystal.getLife() + partialTick) * 0.025f)
-                               .resolution(4))
-                .build();
+                               .segmentsPerNode(2));
     }
 
     @Override
-    protected void render(MiniRainbowCrystal entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<MiniRainbowCrystal> context, float partialTick, int packedLight, float alpha) {
-        DynamicLightDispatcher.addLightSources(visualNode.pos(), 8);
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
+        DynamicLightDispatcher.addLightSources(context.visualNode.pos(), 8);
     }
 }

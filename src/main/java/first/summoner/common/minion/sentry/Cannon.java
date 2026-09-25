@@ -16,6 +16,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
 
 /**
  * 玉米加农炮哨兵 - 不移动，有重力，35秒冷却，发射抛物线玉米炮精准命中目标。
@@ -44,6 +48,13 @@ public class Cannon extends MomentumMinion implements IBlockCollision<Cannon> {
         fields.field(ByteBufCodecs.BOOL, this::isHasCorn, value -> hasCorn = value);
         fields.field(ByteBufCodecs.INT, () -> lastRenderTick, value -> lastRenderTick = value);
         fields.field(ByteBufCodecs.INT, () -> renderTick, value -> renderTick = value);
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "cannon", 2, state -> shooting
+                ? state.setAndContinue(RawAnimation.begin().thenLoop("shooting"))
+                : PlayState.STOP));
     }
 
     @Override

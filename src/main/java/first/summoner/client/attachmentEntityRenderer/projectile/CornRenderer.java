@@ -1,37 +1,29 @@
 package first.summoner.client.attachmentEntityRenderer.projectile;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.RenderUtil;
-import first.lyra.client.render.model.LyraModelRenderer;
-import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.client.render.geo.AbstractAttachmentEntityGeoRenderer;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.Summoner;
 import first.summoner.common.projectile.Corn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.FastColor;
+import net.minecraft.client.renderer.LightTexture;
 
 /**
- * 玉米炮射弹渲染器：渲染 geo/corn 静态模型。
+ * 玉米炮射弹渲染器：geo 模型 {@code entity/summon/corn}，常亮渲染。
  */
-public class CornRenderer extends AbstractAttachmentEntityRenderer<Corn> {
+public class CornRenderer extends AbstractAttachmentEntityGeoRenderer<Corn> {
 
-    @Override
-    protected RenderContext<Corn> createContext(Corn corn, float partialTick) {
-        return RenderContext.<Corn>builder()
-                .model(new ModelConfig<Corn>()
-                               .scale(0.45f)
-                               .translateOffset(0, -0.8125f, -0.3125f)
-                               .alphaDistanceFactor(1.5f))
-                .build();
+    public CornRenderer() {
+        super(Summoner.rl("entity/summon/corn"));
     }
 
     @Override
-    protected void render(Corn corn, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Corn> context, float partialTick, int packedLight, float alpha) {
-        LyraModelRenderer.geo(Summoner.rl("corn"))
-                .light(RenderUtil.FULL_LIGHT)
-                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
-                .render(poseStack, bufferSource);
+    protected RenderContext<Corn> createContext(Corn corn, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(corn, visualNode, partialTick, packedLight)
+                .packedLight(LightTexture.FULL_BRIGHT)
+                .model(new ModelContext()
+                               .scale(0.45f)
+                               .translateOffset(0, -0.8125f, -0.3125f)
+                               .alphaDistanceFactor(1.5f));
     }
 }

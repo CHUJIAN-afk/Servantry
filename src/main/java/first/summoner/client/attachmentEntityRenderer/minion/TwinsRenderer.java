@@ -2,46 +2,42 @@ package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.model.LyraModelRenderer;
-import first.lyra.client.render.trail.ConeTrailConfig;
-import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.client.render.trail.ConeTrailContext;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.Twins;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.util.FastColor;
 
 public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
 
     @Override
-    protected RenderContext<Twins> createContext(Twins twins, float partialTick) {
+    protected RenderContext<Twins> createContext(Twins twins, PathNode visualNode, float partialTick, int packedLight) {
         int trailTimer = twins.getTrailTimer();
-        return RenderContext.<Twins>builder()
-                .trail(new ConeTrailConfig<Twins>()
-                        .timer(trailTimer)
-                        .colorRGB(0xce4949)
-                        .historyLength(trailTimer / 2)
-                        .maxRadius(0.2f)
-                        .minRadiusRatio(0.75f)
-                        .resolution(4)
-                        .fadeOut(progress -> (1 - progress) * (1 - progress))
-                )
-                .model(new ModelConfig<Twins>()
-                        .scale(0.5f)
-                        .translateOffset(-0.5f, -0.25f, -0.5f)
-                        .rotationOffset(180, 0, 0)
-                )
-                .build();
+        return super.createContext(twins, visualNode, partialTick, packedLight)
+                .trail(new ConeTrailContext<Twins>()
+                               .maxRadius(0.2f)
+                               .minRadiusRatio(0.75f)
+                               .resolution(4)
+                               .timer(trailTimer)
+                               .colorRGB(0xce4949)
+                               .historyLength(trailTimer / 2)
+                               .fadeOut(progress -> (1 - progress) * (1 - progress)))
+                .model(new ModelContext()
+                               .scale(0.5f)
+                               .translateOffset(-0.5f, -0.25f, -0.5f)
+                               .rotationOffset(180, 0, 0));
     }
 
     @Override
-    protected void render(Twins minion, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Twins> context, float partialTick, int packedLight, float alpha) {
-        ModelResourceLocation modelKey = minion.isLaserEye() ? SummonerModelRegister.TWINS_LASER : SummonerModelRegister.TWINS_CURSED_FLAME;
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
+        ModelResourceLocation modelKey = context.entity.isLaserEye() ? SummonerModelRegister.TWINS_LASER : SummonerModelRegister.TWINS_CURSED_FLAME;
         LyraModelRenderer.json(modelKey)
-                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
-                .light(packedLight)
+                .color(context.color.argbInt())
+                .light(context.packedLight)
                 .render(poseStack, bufferSource);
     }
 }

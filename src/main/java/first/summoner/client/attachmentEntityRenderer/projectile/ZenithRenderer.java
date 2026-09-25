@@ -2,39 +2,36 @@ package first.summoner.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.model.LyraModelRenderer;
-import first.lyra.client.render.trail.ModelConfig;
-import first.lyra.client.render.trail.RibbonTrailConfig;
+import first.lyra.client.render.trail.RibbonTrailContext;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.projectile.Zenith;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.FastColor;
 
 public class ZenithRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
 
     @Override
-    protected RenderContext<Zenith> createContext(Zenith zenith, float partialTick) {
-        return RenderContext.<Zenith>builder()
-                .trail(new RibbonTrailConfig<Zenith>()
+    protected RenderContext<Zenith> createContext(Zenith zenith, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(zenith, visualNode, partialTick, packedLight)
+                .trail(new RibbonTrailContext<Zenith>()
+                               .upOffset(1.32575f)
                                .timer(0)
                                .colorRGB(0xffffff)
-                               .historyLength(2)
-                               .upOffset(1.32575f)
-                )
-                .model(new ModelConfig<Zenith>()
+                               .historyLength(2))
+                .model(new ModelContext()
                                .scale(2)
                                .translateOffset(-0.5f, -0.5f, -0.5f)
-                               .rotationOffset(0, 90, 45))
-                .build();
+                               .rotationOffset(0, 90, 45));
     }
 
     @Override
-    protected void render(Zenith zenith, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Zenith> context, float partialTick, int packedLight, float alpha) {
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
         LyraModelRenderer.json(SummonerModelRegister.TERRAPRISM)
-                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
+                .color(context.color.argbInt())
                 .light(RenderUtil.FULL_LIGHT)
                 .render(poseStack, bufferSource);
     }

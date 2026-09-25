@@ -3,7 +3,7 @@ package first.summoner.client.attachmentEntityRenderer.projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.trail.ConeTrailConfig;
+import first.lyra.client.render.trail.ConeTrailContext;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.projectile.PoisonSaliva;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -14,19 +14,18 @@ import net.minecraft.client.renderer.MultiBufferSource;
 public class PoisonSalivaRenderer extends AbstractAttachmentEntityRenderer<PoisonSaliva> {
 
     @Override
-    protected RenderContext<PoisonSaliva> createContext(PoisonSaliva projectile, float partialTick) {
-        return RenderContext.<PoisonSaliva>builder()
-                .trail(new ConeTrailConfig<PoisonSaliva>()
-                        .timer(5)
-                        .colorRGB(0x59ff3a)
+    protected RenderContext<PoisonSaliva> createContext(PoisonSaliva projectile, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(projectile, visualNode, partialTick, packedLight)
+                .trail(new ConeTrailContext<PoisonSaliva>()
                         .maxRadius(0.18f)
                         .minRadiusRatio(0.45f)
                         .resolution(4)
-                        .fadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 0.5)))
-                .build();
+                        .timer(5)
+                        .colorRGB(0x59ff3a)
+                        .fadeOut(progress -> (float) Math.pow(Math.max(0.0f, 1.0f - progress), 0.5)));
     }
 
     @Override
-    protected void render(PoisonSaliva projectile, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<PoisonSaliva> context, float partialTick, int packedLight, float alpha) {
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
     }
 }

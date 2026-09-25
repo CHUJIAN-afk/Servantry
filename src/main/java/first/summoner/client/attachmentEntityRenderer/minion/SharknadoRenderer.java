@@ -2,32 +2,30 @@ package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.model.LyraModelRenderer;
-import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.Sharknado;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.FastColor;
 
 public class SharknadoRenderer extends AbstractAttachmentEntityRenderer<Sharknado> {
 
     @Override
-    protected RenderContext<Sharknado> createContext(Sharknado entity, float partialTick) {
-        return RenderContext.<Sharknado>builder()
-                .model(new ModelConfig<Sharknado>()
+    protected RenderContext<Sharknado> createContext(Sharknado entity, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(entity, visualNode, partialTick, packedLight)
+                .model(new ModelContext()
                         .translateOffset(-0.5f, -0.5f, -0.5f)
                         .alphaDistanceFactor(1.5f)
-                )
-                .build();
+                );
     }
 
     @Override
-    protected void render(Sharknado entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Sharknado> context, float partialTick, int packedLight, float alpha) {
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
         LyraModelRenderer.json(SummonerModelRegister.SHARKNADO)
-                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
-                .light(packedLight)
+                .color(context.color.argbInt())
+                .light(context.packedLight)
                 .render(poseStack, bufferSource);
     }
 }

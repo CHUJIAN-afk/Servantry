@@ -1,15 +1,14 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.client.render.AbstractAttachmentEntityGeoRenderer;
 import first.lyra.client.render.IAttachmentEntityRenderer;
+import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.client.render.geo.AbstractAttachmentEntityGeoRenderer;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.Summoner;
 import first.summoner.common.minion.sentry.EyeLaserTurret;
 import net.minecraft.client.renderer.MultiBufferSource;
-import software.bernie.geckolib.util.Color;
 
 public class EyeLaserTurretRenderer implements IAttachmentEntityRenderer<EyeLaserTurret> {
 
@@ -30,12 +29,9 @@ public class EyeLaserTurretRenderer implements IAttachmentEntityRenderer<EyeLase
         }
 
         @Override
-        protected GeoRenderContext createContext(EyeLaserTurret turret, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode visualNode) {
-            RenderContext<EyeLaserTurret> renderContext = RenderContext.<EyeLaserTurret>builder()
-                    .model(new ModelConfig<EyeLaserTurret>()
-                                   .translateOffset(0.0F, -1.699F, 0.0F))
-                    .build();
-            return new GeoRenderContext(turret, visualNode, Color.WHITE, partialTick, packedLight, renderContext);
+        protected RenderContext<EyeLaserTurret> createContext(EyeLaserTurret turret, PathNode visualNode, float partialTick, int packedLight) {
+            return super.createContext(turret, visualNode, partialTick, packedLight)
+                    .model(new ModelContext().translateOffset(0.0F, -1.699F, 0.0F));
         }
     }
 
@@ -47,13 +43,9 @@ public class EyeLaserTurretRenderer implements IAttachmentEntityRenderer<EyeLase
         }
 
         @Override
-        protected GeoRenderContext createContext(EyeLaserTurret turret, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode visualNode) {
-            RenderContext<EyeLaserTurret> context = RenderContext.<EyeLaserTurret>builder()
-                    .model(new ModelConfig<EyeLaserTurret>()
-                                   .translateOffset(0.0F, -1.81F, 0.0F)
-                                   .rotationOffset(180, 0, 0))
-                    .build();
-            return new GeoRenderContext(turret, visualNode, Color.WHITE, partialTick, packedLight, context);
+        protected RenderContext<EyeLaserTurret> createContext(EyeLaserTurret turret, PathNode visualNode, float partialTick, int packedLight) {
+            return super.createContext(turret, visualNode, partialTick, packedLight)
+                    .model(new ModelContext().translateOffset(0.0F, -1.81F, 0.0F).rotationOffset(180, 0, 0));
         }
     }
 }

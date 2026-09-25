@@ -16,14 +16,13 @@ import net.minecraft.world.phys.AABB;
 public class ElectricLaserRenderer extends AbstractAttachmentEntityRenderer<ElectricLaser> {
 
     @Override
-    protected RenderContext<ElectricLaser> createContext(ElectricLaser laser, float partialTick) {
-        return RenderContext.<ElectricLaser>builder()
-                .build();
+    protected RenderContext<ElectricLaser> createContext(ElectricLaser laser, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(laser, visualNode, partialTick, packedLight);
     }
 
     @Override
-    protected void render(ElectricLaser entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<ElectricLaser> context, float partialTick, int packedLight, float alpha) {
-        AABB hitbox = entity.getHitbox();
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
+        AABB hitbox = context.entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;
         LaserRendererHelper.builder()
@@ -35,6 +34,6 @@ public class ElectricLaserRenderer extends AbstractAttachmentEntityRenderer<Elec
                 .alpha(0.95f)
                 .innerRatio(0.15f)
                 .render(poseStack, bufferSource);
-        DynamicLightDispatcher.addLightSources(visualNode, hitbox, 8);
+        DynamicLightDispatcher.addLightSources(context.visualNode, hitbox, 8);
     }
 }

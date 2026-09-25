@@ -1,37 +1,29 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.RenderUtil;
-import first.lyra.client.render.model.LyraModelRenderer;
-import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.client.render.geo.AbstractAttachmentEntityGeoRenderer;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.Summoner;
 import first.summoner.common.minion.sentry.Cannon;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.FastColor;
+import net.minecraft.client.renderer.LightTexture;
 
 /**
- * 玉米炮哨兵渲染器：渲染 geo/cannon 静态模型。
+ * 玉米炮哨兵渲染器：geo 模型 {@code entity/summon/cannon}，常亮渲染，开火动画由 geo 动画控制器驱动。
  */
-public class CannonRenderer extends AbstractAttachmentEntityRenderer<Cannon> {
+public class CannonRenderer extends AbstractAttachmentEntityGeoRenderer<Cannon> {
 
-    @Override
-    protected RenderContext<Cannon> createContext(Cannon cannon, float partialTick) {
-        return RenderContext.<Cannon>builder()
-                .model(new ModelConfig<Cannon>()
-                               .scale(0.6f)
-                               .translateOffset(0, -0.625f, -0.375f)
-                               .alphaDistanceFactor(1.5f))
-                .build();
+    public CannonRenderer() {
+        super(Summoner.rl("entity/summon/cannon"));
     }
 
     @Override
-    protected void render(Cannon cannon, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Cannon> context, float partialTick, int packedLight, float alpha) {
-        LyraModelRenderer.geo(Summoner.rl("cannon"))
-                .light(RenderUtil.FULL_LIGHT)
-                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
-                .render(poseStack, bufferSource);
+    protected RenderContext<Cannon> createContext(Cannon cannon, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(cannon, visualNode, partialTick, packedLight)
+                .packedLight(LightTexture.FULL_BRIGHT)
+                .model(new ModelContext()
+                               .scale(0.6f)
+                               .translateOffset(0, -0.625f, -0.375f)
+                               .alphaDistanceFactor(1.5f));
     }
 }

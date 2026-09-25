@@ -2,16 +2,15 @@ package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.client.render.rendererHelper.LaserRendererHelper;
-import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.OreScout;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -22,20 +21,19 @@ import org.joml.Vector3f;
 public class SurveyDroneRenderer extends AbstractAttachmentEntityRenderer<OreScout> {
 
     @Override
-    protected RenderContext<OreScout> createContext(OreScout scout, float partialTick) {
-        return RenderContext.<OreScout>builder()
-                .model(new ModelConfig<OreScout>()
+    protected RenderContext<OreScout> createContext(OreScout scout, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(scout, visualNode, partialTick, packedLight)
+                .model(new ModelContext()
                                .scale(0.7f)
                                .translateOffset(-0.5f, -0.19f, -0.44f)
-                               .alphaDistanceFactor(1.5f))
-                .build();
+                               .alphaDistanceFactor(1.5f));
     }
 
     @Override
-    protected void render(OreScout scout, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<OreScout> context, float partialTick, int packedLight, float alpha) {
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
         LyraModelRenderer.json(SummonerModelRegister.SURVEY_DRONE)
-                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
-                .light(packedLight)
+                .color(context.color.argbInt())
+                .light(context.packedLight)
                 .render(poseStack, bufferSource);
     }
 

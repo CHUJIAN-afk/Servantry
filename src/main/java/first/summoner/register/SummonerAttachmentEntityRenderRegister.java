@@ -11,7 +11,6 @@ import first.summoner.client.attachmentEntityRenderer.SimpleRenderer;
 import first.summoner.client.attachmentEntityRenderer.minion.*;
 import first.summoner.client.attachmentEntityRenderer.projectile.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -111,12 +110,12 @@ public class SummonerAttachmentEntityRenderRegister {
     }
 
     private static <T extends AttachmentEntity> SimpleRenderer<T> simpleRenderer(@Nullable ResourceLocation texture, float size, int light) {
-        return new SimpleRenderer<>((entity, poseStack, bufferSource, visualNode, context, partialTick, alpha) -> {
+        return new SimpleRenderer<>((poseStack, bufferSource, context) -> {
             if (texture != null && size > 0) {
-                RenderUtil.renderImage(texture, visualNode.pos(), size, size, bufferSource, false, FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255));
+                RenderUtil.renderImage(texture, context.visualNode.pos(), size, size, bufferSource, false, context.color.argbInt());
             }
             if (light > 0) {
-                DynamicLightDispatcher.addLightSources(visualNode.pos(), light);
+                DynamicLightDispatcher.addLightSources(context.visualNode.pos(), light);
             }
         });
     }

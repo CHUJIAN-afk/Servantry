@@ -13,14 +13,13 @@ import net.minecraft.world.phys.AABB;
 public class DestructionBulletRenderer extends AbstractAttachmentEntityRenderer<DestructionBullet> {
 
     @Override
-    protected RenderContext<DestructionBullet> createContext(DestructionBullet laser, float partialTick) {
-        return RenderContext.<DestructionBullet>builder()
-                .build();
+    protected RenderContext<DestructionBullet> createContext(DestructionBullet laser, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(laser, visualNode, partialTick, packedLight);
     }
 
     @Override
-    protected void render(DestructionBullet entity, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<DestructionBullet> context, float partialTick, int packedLight, float alpha) {
-        AABB hitbox = entity.getHitbox();
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
+        AABB hitbox = context.entity.getHitbox();
         float length = (float) hitbox.getZsize();
         float width = (float) hitbox.getXsize() * 0.5f;
         LaserRendererHelper.builder()
@@ -32,6 +31,6 @@ public class DestructionBulletRenderer extends AbstractAttachmentEntityRenderer<
                 .alpha(0.5f)
                 .innerRatio(0.4f)
                 .render(poseStack, bufferSource);
-        DynamicLightDispatcher.addLightSources(visualNode, hitbox, 8);
+        DynamicLightDispatcher.addLightSources(context.visualNode, hitbox, 8);
     }
 }

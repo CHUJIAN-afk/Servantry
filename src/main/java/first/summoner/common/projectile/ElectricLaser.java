@@ -26,14 +26,14 @@ public class ElectricLaser extends Projectile implements IEntityCollision<Electr
     public void onCollisionAttack(List<HitContext> hitContexts) {
         HitContext hit = hitContexts.getFirst();
         LivingEntity target = hit.entity();
-            attack(target, getDamage(), 0);
+        attack(target, getDamage(), 0);
         currentPathNode = currentPathNode.modifyPos(hit.hitPoint());
         setRemove();
     }
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.03, -0.03, -1, 0.03, 0.03, 0);
+        return new AABB(-0.03, -0.03, -0.5f, 0.03, 0.03, 0);
     }
 
     @Override

@@ -2,18 +2,13 @@ package first.summoner.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import first.lyra.client.render.AbstractAttachmentEntityRenderer;
-import first.lyra.client.render.LyraRenderTypes;
-import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.RenderUtil;
-import first.lyra.client.render.trail.ModelConfig;
+import first.lyra.client.render.*;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.Summoner;
 import first.summoner.common.projectile.HornetStinger;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
 import org.joml.Matrix4f;
 
 /**
@@ -58,21 +53,20 @@ public class HornetStingerRenderer extends AbstractAttachmentEntityRenderer<Horn
     };
 
     @Override
-    protected RenderContext<HornetStinger> createContext(HornetStinger stinger, float partialTick) {
-        return RenderContext.<HornetStinger>builder()
-                .model(new ModelConfig<HornetStinger>()
+    protected RenderContext<HornetStinger> createContext(HornetStinger stinger, PathNode visualNode, float partialTick, int packedLight) {
+        return super.createContext(stinger, visualNode, partialTick, packedLight)
+                .model(new ModelContext()
                                .scale(0.6F)
                                .translateOffset(0, -0.45F, 0.3F)
                                .rotationOffset(180, 0, 0)
-                               .alphaDistanceFactor(1.5F))
-                .build();
+                               .alphaDistanceFactor(1.5F));
     }
 
     @Override
-    protected void render(HornetStinger stinger, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<HornetStinger> context, float partialTick, int packedLight, float alpha) {
+    protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
         VertexConsumer consumer = bufferSource.getBuffer(LyraRenderTypes.texture(TEXTURE, false));
         Matrix4f pose = poseStack.last().pose();
-        int color = FastColor.ARGB32.color(Math.clamp(Math.round(alpha * 255.0F), 0, 255), 255, 255, 255);
+        int color = context.color.argbInt();
         // 竖直薄片（法线 ±X）
         emitDoubleSidedQuad(consumer, pose, VERTICAL_SHEET, color, 1.0F, 0.0F, 0.0F);
         // 水平薄片（法线 ±Y）
