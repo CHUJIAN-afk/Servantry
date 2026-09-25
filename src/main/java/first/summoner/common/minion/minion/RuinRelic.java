@@ -24,7 +24,6 @@ import java.util.List;
  * - 待机：圆环垂直于地面，位于玩家背后，看向玩家视线方向
  * - 攻击：目标距离玩家超过 8 格时移动到玩家与目标之间，否则在待机位置看向目标
  * - 每 1.75~1.92 秒发射一枚禁戒弹，发射时产生后坐力
- * - 玩家召唤数量越多，开火越慢、禁戒弹伤害越高
  * </p>
  */
 public class RuinRelic extends MomentumMinion {
@@ -56,10 +55,7 @@ public class RuinRelic extends MomentumMinion {
     }
 
     /**
-     * 向目标发射禁戒弹，产生后坐力（参考星尘细胞）。
-     * <p>
-     * 每多一个同类仆从，禁戒弹伤害提升 10%，至多提升 200%。
-     * </p>
+     * 向目标发射禁戒弹，并按同类数量提高伤害和返还后坐力。
      */
     public void shootForbiddenOrb(LivingEntity target) {
         Vec3 start = getPos();
@@ -69,10 +65,6 @@ public class RuinRelic extends MomentumMinion {
         orb.init(new PathNode(start, direction));
         orb.copyAttributes(this);
         orb.setVelocity(direction.scale(4));
-        // 数量越多伤害越高：每多一个 +10%，至多 +200%
-        int extra = Math.max(0, getSameSize() - 1);
-        float multiplier = 1.0f + 0.1f * Math.min(extra, 20);
-        orb.setDamage(getDamage() * multiplier);
         LyraHelper.get(owner).add(orb);
         // 后坐力
         addVelocity(direction.scale(-0.4));
@@ -98,11 +90,10 @@ public class RuinRelic extends MomentumMinion {
     }
 
     /**
-     * 获取攻击冷却：基础 1.75~1.92 秒（35~38 tick），每多一个同类仆从随机上限 +1 tick，最多额外 +20 tick。
+     * 获取攻击冷却：基础 1.75~1.92 秒（35~38 tick）。
      */
     public int getAttackCooldown() {
-        int extra = Math.max(0, getSameSize() - 1);
-        return 35 + getRandom().nextInt(Math.min(extra, 20) + 4);
+        return 35 + getRandom().nextInt(4);
     }
 
     public int getCooldown() {
@@ -168,10 +159,10 @@ public class RuinRelic extends MomentumMinion {
             double px = Mth.lerp(partialTick, player.xo, player.getX());
             double py = Mth.lerp(partialTick, player.yo, player.getY());
             double pz = Mth.lerp(partialTick, player.zo, player.getZ());
-            Vec3 center = new Vec3(px, py + player.getBbHeight() * 0.5, pz).add(n.scale(-0.8));
+            Vec3 center = new Vec3(px, py + player.getEyeHeight(), pz).add(n.scale(-0.8));
             // 每只遗迹按顺序分配角度并随时间旋转；只存在一个时占据轴心
             float angle = (player.tickCount + partialTick) * 0.06f + (order * Mth.TWO_PI / total);
-            float radius = total > 1 ? 1.6f : 0f;
+            float radius = total > 1 ? 0.8f : 0f;
             Vec3 pos = center.add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
             node = new PathNode(pos, playerYaw, playerPitch, 0);
         }

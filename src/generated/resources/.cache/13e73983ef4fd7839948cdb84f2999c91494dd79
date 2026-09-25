@@ -1,4 +1,4 @@
-// 1.21.1	2026-09-17T11:43:40.022387	Tags for minecraft:item mod id summoner
+// 1.21.1	2026-09-24T23:49:16.426174	Tags for minecraft:item mod id summoner
 bbf535210e74720506a7333a3d9e501cdd8d64ae data/curios/tags/item/curio.json
 30104be9acedcfe08262f47378d0f1767c5fd4eb data/c/tags/item/armors.json
 30104be9acedcfe08262f47378d0f1767c5fd4eb data/c/tags/item/enchantables.json
@@ -12,8 +12,8 @@ c6ad28e6720e77d3033b2c7c52c327bf5d34da22 data/minecraft/tags/item/enchantable/he
 30e85585f2e427e4083208319a18c1bfc97e910c data/minecraft/tags/item/foot_armor.json
 c6ad28e6720e77d3033b2c7c52c327bf5d34da22 data/minecraft/tags/item/head_armor.json
 8e66a5d0c1845e8ee9c808f473528dc17818ad8b data/minecraft/tags/item/leg_armor.json
-572b676aad92a4ce69d1be33913405b5ce69bced data/summoner/tags/item/minion_weapon.json
+491a91a4c0c0cb7413388409eed2e44f7f0816c4 data/summoner/tags/item/minion_weapon.json
 bbf535210e74720506a7333a3d9e501cdd8d64ae data/summoner/tags/item/sections/accessory.json
 30104be9acedcfe08262f47378d0f1767c5fd4eb data/summoner/tags/item/sections/armor.json
-572b676aad92a4ce69d1be33913405b5ce69bced data/summoner/tags/item/sections/minion_weapon.json
+491a91a4c0c0cb7413388409eed2e44f7f0816c4 data/summoner/tags/item/sections/minion_weapon.json
 1e549d47c64c2b869e372035ea2dd4b13ebe70d1 data/summoner/tags/item/sections/minion_weapon_tool.json

@@ -53,6 +53,15 @@ public class SummonerMobEffectRegister {
             );
 
     /**
+     * 酸性毒液 - 每秒损失 1 点生命（经 Lyra 生命恢复属性结算，与其它伤害性效果一致）
+     */
+    public static final DeferredHolder<MobEffect, MobEffect> AcidVenom =
+            Register.register("acid_venom", () -> new SimpleMobEffectBuilder(MobEffectCategory.HARMFUL, 0x228B22)
+                    .addAttributeModifier(LyraAttributeRegister.HealthRegen, Summoner.rl("acid_venom"), amplifier -> -(amplifier + 1) * 1, AttributeModifier.Operation.ADD_VALUE)
+                    .build()
+            );
+
+    /**
      * 月噬
      */
     public static final DeferredHolder<MobEffect, MobEffect> MoonBite =

@@ -36,6 +36,12 @@
     "summoner:inferno_cane",
     "summoner:inferno_staff",
     "summoner:sanguine_staff",
-    "summoner:ruin_staff"
+    "summoner:ruin_staff",
+    "summoner:finch_staff",
+    "summoner:iron_golem_staff",
+    "summoner:slime_staff",
+    "summoner:snow_flinx_staff",
+    "summoner:vampire_frog_staff",
+    "summoner:spider_staff"
   ]
 }

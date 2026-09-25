@@ -1226,13 +1226,13 @@ public class SummonerWeaponRegister {
     /**
      * 血红法杖 - 召唤血蝙蝠仆从
      */
-    public static final DeferredItem<SummonerWeaponItem<BloodBat>> SanguineStaff =
-            REGISTRIES.build("sanguine_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.BLOOD_BAT)
+    public static final DeferredItem<SummonerWeaponItem<SanguineBat>> SanguineStaff =
+            REGISTRIES.build("sanguine_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SANGUINE_BAT)
                             .damage(3.5f)
                             .knockback(0.3f)
                             .sound(SummonerSoundRegister.UseMinionWeapon)
                             .summon((weapon, player, itemStack) -> {
-                                BloodBat minion = weapon.createMinion(player, itemStack);
+                                SanguineBat minion = weapon.createMinion(player, itemStack);
                                 LyraHelper summonerHelper = LyraHelper.get(player);
                                 MinionSlotType slotType = weapon.getSlotType(itemStack);
                                 if (summonerHelper.canSummon(slotType, minion.getSlotCost())) {
@@ -1245,7 +1245,7 @@ public class SummonerWeaponRegister {
                             .build())
                     .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
                     .itemLanguage("Sanguine Staff", "血红法杖")
-                    .summonLanguage(SummonerAttachmentEntityRegister.BLOOD_BAT, "Blood Bat", "血蝙蝠")
+                    .summonLanguage(SummonerAttachmentEntityRegister.SANGUINE_BAT, "Sanguine Bat", "血蝙蝠")
                     .lootTable(ResourceLocation.withDefaultNamespace("entities/bat"), LootTable -> LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1f))
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.SanguineStaff.get())
@@ -1282,6 +1282,108 @@ public class SummonerWeaponRegister {
                             .add(LootItem.lootTableItem(SummonerWeaponRegister.RuinStaff.get())
                                          .when(LootItemRandomChanceCondition.randomChance(0.05f)))
                             .build())
+                    .itemModel(ItemModelProvider::handheldItem)
+                    .itemTag(SummonerItemTagsRegister.MinionWeapon)
+                    .build();
+
+    // ===================== confluence 迁移新增法杖 =====================
+    // 数值取自 confluence 的 SummonItems；注意 Summoner 现有法杖伤害量级约为 confluence 的 1/10，
+    // 这六把的数值待确认是否需要同步缩放。
+
+    /**
+     * 小鸟法杖 - 召唤小鸟仆从
+     */
+    public static final DeferredItem<SummonerWeaponItem<Finch>> FinchStaff =
+            REGISTRIES.build("finch_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.FINCH)
+                            .damage(0.3f)
+                            .sound(SummonerSoundRegister.UseMinionWeapon)
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x4A9EFF)))
+                            .build())
+                    .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
+                    .itemLanguage("Finch Staff", "小鸟法杖")
+                    .summonLanguage(SummonerAttachmentEntityRegister.FINCH, "Finch", "小鸟")
+                    .itemModel(ItemModelProvider::handheldItem)
+                    .itemTag(SummonerItemTagsRegister.MinionWeapon)
+                    .build();
+
+    /**
+     * 铁傀儡法杖 - 召唤铁傀儡仆从
+     */
+    public static final DeferredItem<SummonerWeaponItem<IronGolem>> IronGolemStaff =
+            REGISTRIES.build("iron_golem_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.IRON_GOLEM)
+                            .damage(1.2f)
+                            .knockback(1.0f)
+                            .sound(SummonerSoundRegister.UseMinionWeapon)
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0x4A9EFF)))
+                            .build())
+                    .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
+                    .itemLanguage("Iron Golem Staff", "铁傀儡法杖")
+                    .summonLanguage(SummonerAttachmentEntityRegister.IRON_GOLEM, "Iron Golem", "铁傀儡")
+                    .itemModel(ItemModelProvider::handheldItem)
+                    .itemTag(SummonerItemTagsRegister.MinionWeapon)
+                    .build();
+
+    /**
+     * 史莱姆法杖 - 召唤史莱姆仆从
+     */
+    public static final DeferredItem<SummonerWeaponItem<Slime>> SlimeStaff =
+            REGISTRIES.build("slime_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SLIME)
+                            .damage(0.5f)
+                            .sound(SummonerSoundRegister.UseMinionWeapon)
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFF7A7A)))
+                            .build())
+                    .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
+                    .itemLanguage("Slime Staff", "史莱姆法杖")
+                    .summonLanguage(SummonerAttachmentEntityRegister.SLIME, "Slime", "史莱姆")
+                    .itemModel(ItemModelProvider::handheldItem)
+                    .itemTag(SummonerItemTagsRegister.MinionWeapon)
+                    .build();
+
+    /**
+     * 小雪怪法杖 - 召唤小雪怪仆从
+     */
+    public static final DeferredItem<SummonerWeaponItem<SnowFlinx>> SnowFlinxStaff =
+            REGISTRIES.build("snow_flinx_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SNOW_FLINX)
+                            .damage(0.7f)
+                            .sound(SummonerSoundRegister.UseMinionWeapon)
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFE7902)))
+                            .build())
+                    .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
+                    .itemLanguage("Snow Flinx Staff", "小雪怪法杖")
+                    .summonLanguage(SummonerAttachmentEntityRegister.SNOW_FLINX, "Snow Flinx", "小雪怪")
+                    .itemModel(ItemModelProvider::handheldItem)
+                    .itemTag(SummonerItemTagsRegister.MinionWeapon)
+                    .build();
+
+    /**
+     * 吸血鬼青蛙法杖 - 召唤吸血鬼青蛙仆从
+     */
+    public static final DeferredItem<SummonerWeaponItem<VampireFrog>> VampireFrogStaff =
+            REGISTRIES.build("vampire_frog_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.VAMPIRE_FROG)
+                            .damage(1.1f)
+                            .sound(SummonerSoundRegister.UseMinionWeapon)
+                            .properties(properties -> properties.rarity(Rarity.RARE).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFE7902)))
+                            .build())
+                    .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
+                    .itemLanguage("Vampire Frog Staff", "吸血鬼青蛙法杖")
+                    .summonLanguage(SummonerAttachmentEntityRegister.VAMPIRE_FROG, "Vampire Frog", "吸血鬼青蛙")
+                    .itemModel(ItemModelProvider::handheldItem)
+                    .itemTag(SummonerItemTagsRegister.MinionWeapon)
+                    .build();
+
+    /**
+     * 蜘蛛法杖 - 召唤蜘蛛仆从
+     */
+    public static final DeferredItem<SummonerWeaponItem<Spider>> SpiderStaff =
+            REGISTRIES.build("spider_staff", ResourceLocation -> new MinionWeaponItemBuilder<>(ResourceLocation, SummonerAttachmentEntityRegister.SPIDER)
+                            .damage(2.0f)
+                            .knockback(1.0f)
+                            .sound(SummonerSoundRegister.UseMinionWeapon)
+                            .properties(properties -> properties.rarity(Rarity.UNCOMMON).component(LyraDataComponentRegister.RARITY, new LyraRarity(0xFF7A7A)))
+                            .build())
+                    .itemTag(SummonerItemTagsRegister.SectionMinionWeapon)
+                    .itemLanguage("Spider Staff", "蜘蛛法杖")
+                    .summonLanguage(SummonerAttachmentEntityRegister.SPIDER, "Spider", "蜘蛛")
                     .itemModel(ItemModelProvider::handheldItem)
                     .itemTag(SummonerItemTagsRegister.MinionWeapon)
                     .build();

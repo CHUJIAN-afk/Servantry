@@ -86,7 +86,19 @@ public class SummonerAttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Inferno>> INFERNO = register("inferno", Inferno::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<BloodBat>> BLOOD_BAT = register("blood_bat", BloodBat::new);
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SanguineBat>> SANGUINE_BAT = register("sanguine_bat", SanguineBat::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Finch>> FINCH = register("finch", Finch::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<IronGolem>> IRON_GOLEM = register("iron_golem", IronGolem::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Slime>> SLIME = register("slime", Slime::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<SnowFlinx>> SNOW_FLINX = register("snow_flinx", SnowFlinx::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Spider>> SPIDER = register("spider", Spider::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<VampireFrog>> VAMPIRE_FROG = register("vampire_frog", VampireFrog::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<RuinRelic>> RUIN_RELIC = register("ruin_relic", RuinRelic::new);
 
@@ -108,7 +120,6 @@ public class SummonerAttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MoonPortalLaser>> MOON_PORTAL_LASER = register("moon_portal_laser", MoonPortalLaser::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EyeLaser>> EYE_LASER = register("eye_laser", EyeLaser::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<VoidEaterLaser>> VOID_EATER_LASER = register("void_eater_laser", VoidEaterLaser::new);
 
@@ -127,6 +138,8 @@ public class SummonerAttachmentEntityRegister {
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<HornetStinger>> HORNET_STINGER = register("hornet_stinger", HornetStinger::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<ImpFireball>> IMP_FIREBALL = register("imp_fireball", ImpFireball::new);
+
+    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<EyeFireball>> EYE_FIREBALL = register("eye_fireball", EyeFireball::new);
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Corn>> CORN = register("corn", Corn::new);
 

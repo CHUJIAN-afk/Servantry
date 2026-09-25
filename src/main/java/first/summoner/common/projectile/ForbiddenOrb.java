@@ -1,37 +1,39 @@
 package first.summoner.common.projectile;
 
-
-import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.IBlockCollision;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 /**
- * 禁戒弹射弹 - 命中时对半径 3.5 格内所有敌人造成范围伤害。
+ * 禁戒弹：命中时对半径 3.5 格内所有有效目标造成范围伤害。
  * <p>
  * 行为：
  * - 金黄色粒子轨迹
  * - 命中时范围伤害并爆出大量金黄色粒子
  * - 命中方块或在空气中消失时也会爆炸
- * - 只能存在 0.62 秒（12 tick）
+ * - 只能存在 3 秒（60 tick）
+ * - 单次存在期间只结算一次爆炸
  * </p>
  */
 public class ForbiddenOrb extends Projectile implements IEntityCollision<ForbiddenOrb>, IBlockCollision<ForbiddenOrb> {
 
+    private boolean exploded;
+
     public ForbiddenOrb() {
         super(SummonerAttachmentEntityRegister.FORBIDDEN_ORB);
-        setDrag(1);
+        setDrag(1.0F);
+        setGravity(0.0F);
         setMaxTickCount(60);
-        setGravity(0);
     }
 
     @Override
@@ -40,36 +42,36 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
         // 金黄色粒子轨迹
         ParticleHelper.create(getLevel())
                 .generic(GenericParticleBuilder.create()
-                        .centerColor(0xffd700)
-                        .edgeColor(0xffa500)
-                        .lifetime(4)
-                        .lifetimeRandom(6)
-                        .spin(0.25f)
+                        .centerColor(0xFFD700)
+                        .edgeColor(0xFFA500)
+                        .lifetime(5)
+                        .lifetimeRandom(20)
+                        .spin(0.25F)
                         .spinRandom(0.2F)
                         .friction(0.75F)
-                        .scale(0.025f)
-                        .scaleRandom(0.01f)
+                        .scale(0.025F)
+                        .scaleRandom(0.01F)
                 )
                 .pos(getPos())
-                .count(6)
-                .offset(0.15)
-                .velocity(getVelocity().scale(-0.1))
+                .count(12)
+                .offset(0.05)
+                .velocity(getVelocity().normalize().scale(0.1))
                 .emit();
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-        DamageSource source = getDamageSource();
-                Vec3 hitPoint = hitContexts.getFirst().hitPoint();
-            explode(source, hitPoint);
+        if (!hitContexts.isEmpty()) {
+            Vec3 hitPoint = hitContexts.getFirst().hitPoint();
+            explode(hitPoint);
             setCurrentPathNode(getCurrentPathNode().modifyPos(hitPoint));
             setRemove();
+        }
     }
 
     @Override
     public void onBlockCollision(CollisionContext context) {
-        DamageSource source = getDamageSource();
-                explode(source, context.position());
+        explode(context.position());
         setCurrentPathNode(getCurrentPathNode().modifyPos(context.position()));
         setRemove();
     }
@@ -77,39 +79,40 @@ public class ForbiddenOrb extends Projectile implements IEntityCollision<Forbidd
     @Override
     public void onRemove() {
         // 在空气中消失（自然消散）时也会爆炸
-        DamageSource source = getDamageSource();
-        explode(source, getPos());
+        explode(getPos());
     }
 
     /**
-     * 爆炸：对命中点半径 3.5 格内所有敌人造成范围伤害，爆出大量金黄色粒子。
+     * 在指定位置结算一次范围伤害并生成金色与白色粒子，同一次存在只结算一次。
      */
-    private void explode(DamageSource source, Vec3 hitPoint) {
-        TargetCache targetCache = getTargetCache();
-        List<LivingEntity> entities = targetCache.getEntitiesInRadius(hitPoint, 3.5, targetCache::isTarget);
-        for (LivingEntity entity : entities) {
-            attack(entity, getDamage(), 0);
+    private void explode(Vec3 hitPoint) {
+        if (!exploded) {
+            exploded = true;
+            List<LivingEntity> entities = getTargetCache().getEntitiesInRadius(hitPoint, 3.5, target -> getTargetCache().isTarget(target));
+            for (LivingEntity entity : entities) {
+                attack(entity, getDamage(), 0);
+            }
+            // 命中时爆出大量金黄色粒子
+            ParticleHelper.create(getLevel())
+                    .generic(GenericParticleBuilder.create()
+                            .centerColor(0xFFD700)
+                            .edgeColor(0xFFA500)
+                            .lifetime(5)
+                            .lifetimeRandom(5)
+                            .spin(0.25F)
+                            .spinRandom(0.1F)
+                            .friction(0.75F)
+                            .scale(0.04F)
+                            .scaleRandom(0.01F)
+                    )
+                    .pos(hitPoint)
+                    .offset(0.3)
+                    .velocity(getVelocity())
+                    .count(16)
+                    .speed(0.7)
+                    .spread(Mth.TWO_PI)
+                    .emit();
         }
-        // 命中时爆出大量金黄色粒子
-        ParticleHelper.create(getLevel())
-                .generic(GenericParticleBuilder.create()
-                        .centerColor(0xffd700)
-                        .edgeColor(0xffa500)
-                        .lifetime(5)
-                        .lifetimeRandom(5)
-                        .spin(0.25f)
-                        .spinRandom(0.1F)
-                        .friction(0.75F)
-                        .scale(0.04f)
-                        .scaleRandom(0.01f)
-                )
-                .pos(hitPoint)
-                .offset(0.3)
-                .velocity(getVelocity())
-                .count(16)
-                .speed(0.7)
-                .spread(2)
-                .emit();
     }
 
     @Override

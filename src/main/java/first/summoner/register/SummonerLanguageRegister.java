@@ -22,6 +22,7 @@ public class SummonerLanguageRegister implements LyraItemRegistries.LanguageInit
         registries.language(SummonerMobEffectRegister.PhantasmalBulwark.get().getDescriptionId(), "Phantasmal Bulwark", "幻魂坚盾");
         registries.language(SummonerMobEffectRegister.PhantasmalRebirth.get().getDescriptionId(), "Phantasmal Rebirth", "幻魂还生");
         registries.language(SummonerMobEffectRegister.Shadowflame.get().getDescriptionId(), "Shadowflame", "暗影焰");
+        registries.language(SummonerMobEffectRegister.AcidVenom.get().getDescriptionId(), "Acid Venom", "酸性毒液");
         registries.language(SummonerMobEffectRegister.MoonBite.get().getDescriptionId(), "Moon Bite", "月噬");
         registries.language(SummonerMobEffectRegister.GodSlayerInferno.get().getDescriptionId(), "God Slayer Inferno", "噬神怒焰");
         registries.language(SummonerMobEffectRegister.ArmorCrunch.get().getDescriptionId(), "Armor Crunch", "碎甲");

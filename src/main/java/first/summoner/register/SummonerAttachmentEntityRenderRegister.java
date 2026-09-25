@@ -67,7 +67,13 @@ public class SummonerAttachmentEntityRenderRegister {
         register(SummonerAttachmentEntityRegister.EYE_LASER_TURRET, EyeLaserTurretRenderer::new);
         register(SummonerAttachmentEntityRegister.HYDRA, HydraRenderer::new);
         register(SummonerAttachmentEntityRegister.INFERNO, InfernoRenderer::new);
-        register(SummonerAttachmentEntityRegister.BLOOD_BAT, BloodBatRenderer::new);
+        register(SummonerAttachmentEntityRegister.SANGUINE_BAT, SanguineBatRenderer::new);
+        register(SummonerAttachmentEntityRegister.FINCH, FinchRenderer::new);
+        register(SummonerAttachmentEntityRegister.IRON_GOLEM, IronGolemRenderer::new);
+        register(SummonerAttachmentEntityRegister.SLIME, SlimeRenderer::new);
+        register(SummonerAttachmentEntityRegister.SNOW_FLINX, SnowFlinxRenderer::new);
+        register(SummonerAttachmentEntityRegister.SPIDER, SpiderRenderer::new);
+        register(SummonerAttachmentEntityRegister.VAMPIRE_FROG, VampireFrogRenderer::new);
         register(SummonerAttachmentEntityRegister.RUIN_RELIC, RuinRelicRenderer::new);
 
         // ===================== 射弹 =====================
@@ -79,7 +85,6 @@ public class SummonerAttachmentEntityRenderRegister {
         register(SummonerAttachmentEntityRegister.MINI_CHLOROPHYTE_CRYSTAL, MiniChlorophyteCrystalRenderer::new);
         register(SummonerAttachmentEntityRegister.ZENITH, ZenithRenderer::new);
         register(SummonerAttachmentEntityRegister.MOON_PORTAL_LASER, MoonPortalLaserRenderer::new);
-        register(SummonerAttachmentEntityRegister.EYE_LASER, EyeLaserRenderer::new);
         register(SummonerAttachmentEntityRegister.VOID_EATER_LASER, VoidEaterLaserRenderer::new);
         register(SummonerAttachmentEntityRegister.MINI_RAINBOW_CRYSTAL, RainbowCrystalRenderer::new);
         register(SummonerAttachmentEntityRegister.CROSSBOW_BOLT, CrossbowBoltRenderer::new);
@@ -88,7 +93,8 @@ public class SummonerAttachmentEntityRenderRegister {
         register(SummonerAttachmentEntityRegister.RAIN, RainRenderer::new);
         register(SummonerAttachmentEntityRegister.DESTRUCTION_BULLET, DestructionBulletRenderer::new);
         register(SummonerAttachmentEntityRegister.HORNET_STINGER, HornetStingerRenderer::new);
-        register(SummonerAttachmentEntityRegister.IMP_FIREBALL, () -> simpleRenderer(Summoner.rl("lyra_model/textures/imp_fireball.png"), 0.25f, 8));
+        register(SummonerAttachmentEntityRegister.IMP_FIREBALL, ImpFireballRenderer::new);
+        register(SummonerAttachmentEntityRegister.EYE_FIREBALL, EyeFireballRenderer::new);
         register(SummonerAttachmentEntityRegister.CORN, CornRenderer::new);
         register(SummonerAttachmentEntityRegister.MINI_NECRO_SPIRIT, MiniNecroSpiritRenderer::new);
         register(SummonerAttachmentEntityRegister.ELECTRIC_LASER, ElectricLaserRenderer::new);
@@ -97,7 +103,7 @@ public class SummonerAttachmentEntityRenderRegister {
         register(SummonerAttachmentEntityRegister.POISON_SALIVA, PoisonSalivaRenderer::new);
         register(SummonerAttachmentEntityRegister.FROST_BOLT, FrostBoltRenderer::new);
         register(SummonerAttachmentEntityRegister.EXPLOSION_FLAME_BALL, ExplosionFlameBallRenderer::new);
-        register(SummonerAttachmentEntityRegister.FORBIDDEN_ORB, ForbiddenOrbRenderer::new);
+        register(SummonerAttachmentEntityRegister.FORBIDDEN_ORB, null);
     }
 
     private static <T extends AttachmentEntity> void register(DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<T>> type, @Nullable Supplier<IAttachmentEntityRenderer<T>> renderer) {

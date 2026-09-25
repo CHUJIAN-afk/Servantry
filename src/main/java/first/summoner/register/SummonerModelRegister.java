@@ -38,7 +38,6 @@ public class SummonerModelRegister {
     public static final ModelResourceLocation SHARK_CLOSE = standalone("shark_close");
     public static final ModelResourceLocation CHLOROPHYTE_CRYSTAL = standalone("chlorophyte_crystal");
     public static final ModelResourceLocation BALLISTA = standalone("ballista");
-    public static final ModelResourceLocation DEADLY_SPHERE = standalone("deadly_sphere");
     public static final ModelResourceLocation MOON_PORTAL = standalone("moon_portal");
     public static final ModelResourceLocation RAINBOW_CRYSTAL = standalone("rainbow_crystal");
     public static final ModelResourceLocation SCAVENGER_FAIRY = standalone("scavenger_fairy");
@@ -46,13 +45,10 @@ public class SummonerModelRegister {
     public static final ModelResourceLocation SUPER_PEASHOOTER = standalone("super_peashooter");
     public static final ModelResourceLocation CLOUD = standalone("cloud");
     public static final ModelResourceLocation PULSE_TURRET = standalone("pulse_turret");
-    public static final ModelResourceLocation IMP = standalone("imp");
     public static final ModelResourceLocation NECRO_SPIRIT = standalone("necro_spirit");
     public static final ModelResourceLocation BARNACLE = standalone("barnacle");
     public static final ModelResourceLocation HYDRA = standalone("hydra");
     public static final ModelResourceLocation INFERNO = standalone("inferno");
-    public static final ModelResourceLocation RUIN_RELIC = standalone("ruin_relic");
-    public static final ModelResourceLocation EYE_LASER_TURRET = standalone("eye_laser_turret");
     public static final ModelResourceLocation VOID_EATER_HEAD = standalone("void_eater_head");
     public static final ModelResourceLocation VOID_EATER_BODY = standalone("void_eater_body");
     public static final ModelResourceLocation VOID_EATER_TAIL = standalone("void_eater_tail");
@@ -61,8 +57,6 @@ public class SummonerModelRegister {
     public static final ModelResourceLocation MINI_NECRO_SPIRIT = standaloneIn("projectile", "mini_necro_spirit");
     public static final ModelResourceLocation FROST_BOLT = standaloneIn("projectile", "frost_bolt");
     public static final ModelResourceLocation EXPLOSION_FLAME_BALL = standaloneIn("projectile", "explosion_flame_ball");
-    public static final ModelResourceLocation FORBIDDEN_ORB = standaloneIn("projectile", "forbidden_orb");
-    public static final ModelResourceLocation HORNET_STINGER = standaloneIn("projectile", "hornet_stinger");
 
     private static ModelResourceLocation standalone(String path) {
         return standaloneIn("minion", path);

@@ -1,37 +1,34 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.client.render.AbstractAttachmentEntityRenderer;
+import first.lyra.client.render.AbstractAttachmentEntityGeoRenderer;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.RenderUtil;
-import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.client.render.trail.ModelConfig;
 import first.lyra.common.attachmentEntity.PathNode;
+import first.summoner.Summoner;
 import first.summoner.common.minion.minion.Imp;
-import first.summoner.register.SummonerModelRegister;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.util.FastColor;
+import software.bernie.geckolib.util.Color;
 
 /**
- * 小鬼仆从渲染器。
+ * 小鬼仆从渲染器 - geo 模型 {@code entity/summon/summon_imp}，常亮渲染。
  */
-public class ImpRenderer extends AbstractAttachmentEntityRenderer<Imp> {
+public class ImpRenderer extends AbstractAttachmentEntityGeoRenderer<Imp> {
 
-    @Override
-    protected RenderContext<Imp> createContext(Imp imp, float partialTick) {
-        return RenderContext.<Imp>builder()
-                .model(new ModelConfig<Imp>()
-                               .scale(0.5f)
-                               .translateOffset(-0.5f, -0.5f, -0.5f)
-                               .alphaDistanceFactor(1.5f))
-                .build();
+    public ImpRenderer() {
+        super(Summoner.rl("entity/summon/summon_imp"));
     }
 
     @Override
-    protected void render(Imp imp, PoseStack poseStack, MultiBufferSource bufferSource, PathNode visualNode, RenderContext<Imp> context, float partialTick, int packedLight, float alpha) {
-        LyraModelRenderer.json(SummonerModelRegister.IMP)
-                .color(FastColor.ARGB32.color((int) (alpha * 255), 255, 255, 255))
-                .light(RenderUtil.FULL_LIGHT)
-                .render(poseStack, bufferSource);
+    protected GeoRenderContext createContext(Imp imp, PoseStack poseStack, MultiBufferSource bufferSource, float partialTick, int packedLight, PathNode visualNode) {
+        RenderContext<Imp> renderContext = RenderContext.<Imp>builder()
+                .model(new ModelConfig<Imp>()
+                               .scale(0.8F)
+                               .translateOffset(0, -1.15F, 0)
+                               .rotationOffset(180, 0, 0)
+                               .alphaDistanceFactor(1.5F))
+                .build();
+        return new GeoRenderContext(imp, visualNode, Color.WHITE, partialTick, LightTexture.FULL_BRIGHT, renderContext);
     }
 }

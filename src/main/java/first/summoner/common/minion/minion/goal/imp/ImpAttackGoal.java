@@ -13,7 +13,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class ImpAttackGoal extends AttachmentEntityGoal<Imp> {
 
-    private int cooldown = 0;
+    private int cooldown;
     private Vec3 offset = Vec3.ZERO;
 
     public ImpAttackGoal(Imp minion) {
@@ -27,38 +27,33 @@ public class ImpAttackGoal extends AttachmentEntityGoal<Imp> {
 
     @Override
     public void start() {
-        LivingEntity target = minion.getTarget();
-        Vec3 minionPos = minion.getPos().offsetRandom(minion.getRandom(), 1f);
-        Vec3 targetPos = target.getBoundingBox().getCenter();
-        offset = minionPos.subtract(targetPos).normalize().scale(4);
+        Vec3 targetPos = minion.getTarget().getBoundingBox().getCenter();
+        Vec3 direction = minion.getPos().offsetRandom(minion.getRandom(), 1.0F).subtract(targetPos);
+        offset = direction.lengthSqr() < 1.0E-6 ? Vec3.ZERO : direction.normalize().scale(4);
     }
 
     @Override
     public void tick() {
         LivingEntity target = minion.getTarget();
-        Vec3 minionPos = minion.getPos();
         Vec3 targetPos = target.getBoundingBox().getCenter();
-        Vec3 wanderPos = targetPos.add(offset);
-        if (minionPos.distanceTo(wanderPos) > 0.5) {
-            minion.addVelocity(wanderPos.subtract(minionPos).normalize().scale(0.04));
-        } else {
-            if (minion.getVelocity().length() < 0.1) {
-                start();
-            }
+        Vec3 toHover = targetPos.add(offset).subtract(minion.getPos());
+        if (toHover.lengthSqr() > 0.25) {
+            minion.addVelocity(toHover.normalize().scale(0.04));
+        } else if (minion.getVelocity().lengthSqr() < 0.01) {
+            start();
         }
         minion.lookAtPos(targetPos);
-
         if (--cooldown <= 0) {
             cooldown = 20 + minion.getRandom().nextIntBetweenInclusive(0, 6);
-
-            Vec3 direction = targetPos.subtract(minionPos).normalize();
+            Vec3 direction = targetPos.subtract(minion.getPos()).normalize();
             ImpFireball fireball = new ImpFireball();
             fireball.setOwner(minion.getOwner());
-            fireball.init(new PathNode(minionPos, direction));
+            fireball.init(new PathNode(minion.getPos(), direction));
             fireball.copyAttributes(minion);
             fireball.setVelocity(direction);
             LyraHelper.get(minion.getOwner()).add(fireball);
-            Playable.play(SummonerSoundRegister.ImpFire, minion.getLevel(), minionPos, minion.getSoundSource());
+            minion.attackTime = minion.getTickCount();
+            Playable.play(SummonerSoundRegister.ImpFire, minion.getLevel(), minion.getPos(), minion.getSoundSource());
         }
     }
 }

@@ -1,4 +1,4 @@
-// 1.21.1	2026-09-17T11:43:40.0243816	Item Models: summoner
+// 1.21.1	2026-09-24T23:49:16.432654	Item Models: summoner
 dfd235cedf5a4c6ed82a229e3aea00f38c65a735 assets/summoner/models/item/apprentices_scarf.json
 eaa95ce6bcf921e88836c38085395aa77d00a18a assets/summoner/models/item/ballista_cane.json
 7f4b58794f5d75080a2787052e62b231324f4f2b assets/summoner/models/item/ballista_rod.json
@@ -19,6 +19,7 @@ b03ffffbe0fd9a1f29364991145dec2129f59d74 assets/summoner/models/item/corn_cannon
 a8b09b8c98b95311ae24c2f486852599cfbc6f75 assets/summoner/models/item/ethereal_stellar_core_staff.json
 39230db8b05f68adab9c2d2fe79bffa5f370c825 assets/summoner/models/item/eye_laser_turret_staff.json
 d675fe959a8f39acffc79219b97fdb4285154bdf assets/summoner/models/item/fairy_bell.json
+50e558c39f4edf8e783cf1b7670fa7e437ec81d3 assets/summoner/models/item/finch_staff.json
 80481fd79b71e366bc92bceb2480aefdc21eb975 assets/summoner/models/item/flinx_fur_coat.json
 d82f2280b3bdc1f0d4d8d1f7f7c0a77de77691ee assets/summoner/models/item/forbidden_boots.json
 76950db7cbb719da2ccf5d754eb171470ff6722b assets/summoner/models/item/forbidden_leggings.json
@@ -41,6 +42,7 @@ c8a10e2567cec93246c8da6438673f834568990c assets/summoner/models/item/inferno_can
 f9c1129724dc2927c2a65deded914925e407fcbc assets/summoner/models/item/inferno_rod.json
 4630170e094b64c883dd0059e3ae2c9b9f797995 assets/summoner/models/item/inferno_staff.json
 9a132380f1ee50ca041458a1dc8ceb97809e153a assets/summoner/models/item/infinite_scabbard.json
+457d988a954a1775e867321ac229373de6dfcb9b assets/summoner/models/item/iron_golem_staff.json
 25af28c98645609fb7fdbc59451d2761b0abea34 assets/summoner/models/item/laser_minigun.json
 381381130412d020e66757ffe34c4e34b43261cc assets/summoner/models/item/lightning_aura_cane.json
 faa37b9d8ba525aa10a20ff9f811ce0e95672841 assets/summoner/models/item/lightning_aura_rod.json
@@ -63,11 +65,14 @@ aacf56d476b22ee96d276c168375f0aec3d2bcb5 assets/summoner/models/item/pygmy_neckl
 31ce9262f8213cff510c5446f1946766e63d98c7 assets/summoner/models/item/rain_cloud_staff.json
 dc531cdce1e0a24c4f2486c6159fe0e80d4cbd1e assets/summoner/models/item/ruin_staff.json
 16fe0e37ade4456f77449e5abf64074c409eff5d assets/summoner/models/item/sanguine_staff.json
+e7b216030b279a0e3005e9aed2a92954277b1d86 assets/summoner/models/item/slime_staff.json
+da3b0ff8ab771ed08489e09b9800b53123645d5e assets/summoner/models/item/snow_flinx_staff.json
 b67c6c0cf276c97f6d4d153761330184f539862d assets/summoner/models/item/soul_relief.json
 b92ad37de7cc532e7c17dc29907cea6c1604485e assets/summoner/models/item/spider_boots.json
 bd3b96a54a92db072c6dd6b47a7fe8f8eda1769d assets/summoner/models/item/spider_chestplate.json
 84c1d261e68695b9607a80286b31b002d18d0723 assets/summoner/models/item/spider_leggings.json
 d0381340dc36918d60d63cc836d59711813a44c9 assets/summoner/models/item/spider_mask.json
+0b87a48c76a8e4e3b87efbf06057c8e77d8f65b8 assets/summoner/models/item/spider_staff.json
 e6f82b727355339501dee8d39c6ea3b4f5c954e0 assets/summoner/models/item/spooky_boots.json
 7ae029d8038fded2f88f00ba39f8ab7facf4c9a7 assets/summoner/models/item/spooky_chestplate.json
 fb704e6bcc6c8a6a23a93dc0fda78b91f7a1d8c9 assets/summoner/models/item/spooky_helmet.json
@@ -94,6 +99,7 @@ cc66b8141ec9b001e1101c6e66aa67d91480337a assets/summoner/models/item/tiki_chestp
 988398aee0412e83e29eaaff544ed900a0456208 assets/summoner/models/item/valhalla_knight_chestplate.json
 4b403ebdfba15b030865c668bd89ba204ae6b439 assets/summoner/models/item/valhalla_knight_helmet.json
 ee88a56d7a49bac46052125dd186bd0d2d5a2eea assets/summoner/models/item/valhalla_knight_leggings.json
+5ce87149a1c5a157f40a8111df0216faf4e3d2a7 assets/summoner/models/item/vampire_frog_staff.json
 240537c38f1bec5b3ee47a4dfc3423b63c1c227f assets/summoner/models/item/void_eater_marionette.json
 be5e34a5df907a9e288dbd2aa4f60573bd14e191 assets/summoner/models/item/xeno_staff.json
 b1ca2f61fe53372d5a3f9b86666300565db5299d assets/summoner/models/item/zenith.json
