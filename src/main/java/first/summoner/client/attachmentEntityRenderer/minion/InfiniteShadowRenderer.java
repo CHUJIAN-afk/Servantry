@@ -1,7 +1,6 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
@@ -9,6 +8,7 @@ import first.lyra.client.render.trail.RibbonTrailContext;
 import first.lyra.client.render.trail.TrailContext;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.InfiniteShadow;
+import first.summoner.utils.DynamicLightUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -59,7 +59,7 @@ public class InfiniteShadowRenderer extends AbstractAttachmentEntityRenderer<Inf
                     context.entity.getLevel(),
                     0
             );
-            DynamicLightDispatcher.addLightSources(context.visualNode.pos(), 8);
+            DynamicLightUtil.addLight(context.visualNode.pos(), 8);
         }
     }
 }

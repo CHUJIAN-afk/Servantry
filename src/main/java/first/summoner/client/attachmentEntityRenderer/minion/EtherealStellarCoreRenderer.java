@@ -1,7 +1,6 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
@@ -10,6 +9,7 @@ import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.EtherealStellarCore;
 import first.summoner.register.SummonerModelRegister;
+import first.summoner.utils.DynamicLightUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 public class EtherealStellarCoreRenderer extends AbstractAttachmentEntityRenderer<EtherealStellarCore> {
@@ -30,6 +30,6 @@ public class EtherealStellarCoreRenderer extends AbstractAttachmentEntityRendere
                 .color(context.color.argbInt())
                 .light(RenderUtil.FULL_LIGHT)
                 .render(poseStack, bufferSource);
-        DynamicLightDispatcher.addLightSources(context.visualNode.pos(), 8);
+        DynamicLightUtil.addLight(context.visualNode.pos(), 8);
     }
 }

@@ -1,6 +1,5 @@
 package first.summoner.register;
 
-import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AttachmentEntityRenderDispatcher;
 import first.lyra.client.render.IAttachmentEntityRenderer;
 import first.lyra.client.render.RenderUtil;
@@ -10,6 +9,7 @@ import first.summoner.Summoner;
 import first.summoner.client.attachmentEntityRenderer.SimpleRenderer;
 import first.summoner.client.attachmentEntityRenderer.minion.*;
 import first.summoner.client.attachmentEntityRenderer.projectile.*;
+import first.summoner.utils.DynamicLightUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -85,7 +85,7 @@ public class SummonerAttachmentEntityRenderRegister {
         register(SummonerAttachmentEntityRegister.ZENITH, ZenithRenderer::new);
         register(SummonerAttachmentEntityRegister.MOON_PORTAL_LASER, MoonPortalLaserRenderer::new);
         register(SummonerAttachmentEntityRegister.VOID_EATER_LASER, VoidEaterLaserRenderer::new);
-        register(SummonerAttachmentEntityRegister.MINI_RAINBOW_CRYSTAL, RainbowCrystalRenderer::new);
+        //register(SummonerAttachmentEntityRegister.MINI_RAINBOW_CRYSTAL, RainbowCrystalRenderer::new);
         register(SummonerAttachmentEntityRegister.CROSSBOW_BOLT, CrossbowBoltRenderer::new);
         register(SummonerAttachmentEntityRegister.GOD_FLAME, GodFlameRenderer::new);
         register(SummonerAttachmentEntityRegister.BLITZ_BALL, BlitzBallRenderer::new);
@@ -115,7 +115,7 @@ public class SummonerAttachmentEntityRenderRegister {
                 RenderUtil.renderImage(texture, context.visualNode.pos(), size, size, bufferSource, false, context.color.argbInt());
             }
             if (light > 0) {
-                DynamicLightDispatcher.addLightSources(context.visualNode.pos(), light);
+                DynamicLightUtil.addLight(context.visualNode.pos(), light);
             }
         });
     }

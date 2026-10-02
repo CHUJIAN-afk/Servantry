@@ -1,11 +1,11 @@
 package first.summoner.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.client.dynamicLight.DynamicLightDispatcher;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.rendererHelper.LightningRendererHelper;
 import first.lyra.client.render.rendererHelper.SphereRendererHelper;
 import first.summoner.common.projectile.BlitzBall;
+import first.summoner.utils.DynamicLightUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -56,6 +56,6 @@ public class BlitzBallRenderer extends AbstractAttachmentEntityRenderer<BlitzBal
                 .alpha(0.75f)
                 .innerRatio(0.5f)
                 .render(poseStack, bufferSource);
-        DynamicLightDispatcher.addLightSources(context.visualNode.pos(), 8);
+        DynamicLightUtil.addLight(context.visualNode.pos(), 8);
     }
 }

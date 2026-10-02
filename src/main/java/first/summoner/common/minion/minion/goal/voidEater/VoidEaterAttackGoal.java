@@ -97,7 +97,7 @@ public class VoidEaterAttackGoal extends AttachmentEntityGoal<VoidEater> {
                         projectile.init(new PathNode(start, direction));
                         projectile.copyAttributes(minion);
                         projectile.setVelocity(direction.scale(3));
-                        projectile.setDamage(minion.getDamage() * 0.5f);
+                        projectile.setDamage(minion.getDamage());
                         LyraHelper.get(owner).add(projectile);
                     }
                     Playable.play(SummonerSoundRegister.Laser, level, start, minion.getSoundSource());
