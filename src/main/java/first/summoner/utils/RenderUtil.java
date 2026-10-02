@@ -8,12 +8,20 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.fml.loading.FMLLoader;
 
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 public class RenderUtil {
+
+    public static float getPartialTick() {
+        if (FMLLoader.getDist().isClient()) {
+            return Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+        }
+        return 1;
+    }
 
     private static final Map<Object, Integer> COLOR_CACHE = new WeakHashMap<>();
 

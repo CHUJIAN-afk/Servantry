@@ -1,6 +1,7 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.lyra.api.LyraAPI;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
@@ -8,7 +9,6 @@ import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.minion.minion.EnchantedThrowingKnives;
 import first.summoner.register.SummonerModelRegister;
-import first.summoner.utils.DynamicLightUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 
 /**
@@ -34,6 +34,6 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
                 .color(context.color.argbInt())
                 .light(context.packedLight)
                 .render(poseStack, bufferSource);
-        DynamicLightUtil.addLight(context.visualNode.pos(), 4);
+        LyraAPI.light(context.visualNode.pos(), 4);
     }
 }

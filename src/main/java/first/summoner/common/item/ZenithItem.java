@@ -1,17 +1,18 @@
 package first.summoner.common.item;
 
 
-
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.Ellipse;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.common.projectile.Zenith;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
@@ -25,14 +26,9 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 天顶剑。
- * <p>
- * 1.21.1: SwordItem + Tier（26.2 的 ToolMaterial/Weapon 组件在 1.21.1 无对应物）。
- * </p>
- */
 public class ZenithItem extends SwordItem {
 
     public ZenithItem(Tier tier, Properties properties) {
@@ -45,29 +41,42 @@ public class ZenithItem extends SwordItem {
             if (!level.isClientSide()) {
                 Vec3 lookAngle = player.getLookAngle();
                 Vec3 center = player.getPosition(1).add(0, player.getBbHeight() / 2, 0);
-                Vec3 startPos = center.add(lookAngle.scale(-1));
-                for (int i = 0; i < 3; i++) {
-                    Zenith projectile = new Zenith();
-                    projectile.setDamage(19);
-                    projectile.setKnockback(0.65f);
+                RandomSource random = player.getRandom();
+                for (int i = 1; i < 4; i++) {
+                    Zenith zenith = new Zenith();
+                    zenith.setDamage((float) player.getAttributeValue(Attributes.ATTACK_DAMAGE));
+                    zenith.setKnockback(0.65f);
                     Vec3 endPos = computeEndPos(player);
-                    if (i != 0) {
+                    if (i != 1) {
                         LivingEntity living = collectTargets(player).stream().findAny().orElse(null);
                         if (living != null) {
                             endPos = living.getBoundingBox().getCenter();
-                            projectile.chaseTarget = living;
                         }
                     }
-                    RandomSource random = player.getRandom();
-                    projectile.setOwner(player);
-                    projectile.direction = endPos.subtract(center).scale(0.95 + random.nextFloat() * 0.05);
-                    projectile.normal = Ellipse.randomPlaneNormal(random, endPos, startPos);
-                    projectile.curvature = (float) Math.min(0.3, 10 / endPos.distanceTo(startPos)) + random.nextFloat() * 0.2f + 0.15f;
-                    projectile.progress += random.nextFloat() * 0.05f;
-                    PathNode node = projectile.getNode(projectile.progress, 1);
-                    projectile.setCurrentPathNode(node);
-                    projectile.init(projectile.getCurrentPathNode());
-                    LyraHelper.get(player).add(projectile);
+                    endPos = endPos.add(Vec3.ZERO.subtract(Vec3.ZERO.offsetRandom(random, 2)));
+                    Vec3 startPos = center.add(center.subtract(endPos).normalize().scale(1.5f));
+                    Vec3 normal = Ellipse.randomPlaneNormal(random, endPos, startPos);
+                    float curvature = random.nextFloat() * 0.6f + 0.2f;
+                    Ellipse ellipse = new Ellipse(endPos, startPos, normal, curvature);
+                    ArrayList<PathNode> list = new ArrayList<>();
+                    for (int j = i; j < 10 + i; j++) {
+                        float progress = (float) j / (9 + i);
+                        Vec3 point = ellipse.getPoint(progress);
+                        Vec3 tipPoint;
+                        if (progress < 0.5) {
+                            tipPoint = startPos.lerp(endPos, Mth.clamp(progress, 0.05, 0.95));
+                        } else {
+                            tipPoint = endPos.lerp(startPos, Mth.clamp(progress, 0.05, 0.95));
+                        }
+                        Vec3 tipDir = point.subtract(tipPoint).normalize();
+                        list.add(zenith.getEulerNode(point, tipDir, normal));
+                    }
+                    list.add(list.getLast());
+                    list.add(list.getLast());
+                    zenith.init(list.getFirst());
+                    zenith.setPath(list);
+                    zenith.initialPosition = player.getPosition(1);
+                    LyraHelper.get(player).add(zenith);
                 }
             }
             return InteractionResultHolder.success(player.getItemInHand(usedHand));
@@ -116,7 +125,7 @@ public class ZenithItem extends SwordItem {
     private Vec3 computeEndPos(Player player) {
         Vec3 eyePos = player.getEyePosition();
         Vec3 lookDir = player.getLookAngle();
-        double reach = 20;
+        double reach = 32;
 
         // 优先检测视线命中的实体
         EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(player, eyePos, eyePos.add(lookDir.scale(reach)), player.getBoundingBox().inflate(reach), e -> e instanceof LivingEntity && e.isAlive() && e != player, reach * reach);

@@ -1,6 +1,7 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.lyra.api.LyraAPI;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
@@ -10,7 +11,6 @@ import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.summoner.common.minion.minion.StardustCell;
 import first.summoner.register.SummonerModelRegister;
-import first.summoner.utils.DynamicLightUtil;
 import first.summoner.utils.ParticleHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -59,6 +59,6 @@ public class StardustCellRenderer extends AbstractAttachmentEntityRenderer<Stard
                 .color(context.color.argbInt())
                 .light(RenderUtil.FULL_LIGHT)
                 .render(poseStack, bufferSource);
-        DynamicLightUtil.addLight(context.visualNode.pos(), 8);
+        LyraAPI.light(context.visualNode.pos(), 8);
     }
 }

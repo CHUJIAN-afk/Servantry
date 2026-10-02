@@ -1,130 +1,156 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachmentEntity.Ellipse;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
-import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
-import first.lyra.utils.LyraStreamCodecs;
+import first.summoner.Summoner;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import first.summoner.utils.ParticleHelper;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
+import first.summoner.utils.RenderUtil;
+import first.summoner.utils.SummonerStreamCodecs;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Zenith extends Projectile implements IEntityCollision<Zenith> {
 
-    public LivingEntity chaseTarget = null;
-    public Vec3 direction = Vec3.ZERO;
-    public Vec3 normal = Vec3.ZERO;
-    public float curvature = 1;
-    public float lastProgress = 0;
-    public float progress = 0;
+    public Vec3 initialPosition = Vec3.ZERO;
+    public RenderType renderType;
+    public float alpha;
 
     public Zenith() {
         super(SummonerAttachmentEntityRegister.ZENITH);
-        setMaxTickCount(-1);
+        setMaxTickCount(30);
+        setPhysics(false);
+        Random random = new Random();
+        this.renderType = RenderType.values()[random.nextInt(RenderType.values().length)];
+        this.alpha = random.nextFloat(2, 10) * 0.1f;
     }
 
     @Override
     protected void registerSyncFields(SyncFieldDispatcher fields) {
         super.registerSyncFields(fields);
-        fields.field(LyraStreamCodecs.VEC_3, () -> direction, value -> direction = value);
-        fields.field(LyraStreamCodecs.VEC_3, () -> normal, value -> normal = value);
-        fields.field(ByteBufCodecs.FLOAT, () -> curvature, value -> curvature = value);
-        fields.field(ByteBufCodecs.INT, () -> chaseTarget != null ? chaseTarget.getId() : -1, (level, id) -> chaseTarget = id != -1 && level.getEntity(id) instanceof LivingEntity living ? living : null);
-        fields.field(ByteBufCodecs.FLOAT, () -> lastProgress, value -> lastProgress = value);
-        fields.field(ByteBufCodecs.FLOAT, () -> progress, value -> progress = value);
+        fields.field(SummonerStreamCodecs.VEC_3, () -> initialPosition, value -> initialPosition = value);
+        fields.field(SummonerStreamCodecs.ZENITH_RENDER_TYPE, () -> renderType, value -> renderType = value);
     }
 
     @Override
     public void tick() {
         super.tick();
-        updateDirection(chaseTarget, 1);
-        setCurrentPathNode(getNode(progress, 1));
-        if (progress >= 1) {
-            setRemove();
-        }
-        ParticleHelper.create(getLevel())
-                .generic(GenericParticleBuilder.create()
-                                 .centerColor(0xffffff)
-                                 .edgeColor(0xb7b7b7)
-                                 .lifetime(30)
-                                 .lifetimeRandom(5)
-                                 .spin(3)
-                                 .spinRandom(0.1F)
-                                 .friction(0.7F)
-                                 .scale(0.04f)
-                                 .scaleRandom(0.004f)
-                )
-                .pos(getPos())
-                .offset(0.15)
-                .velocity(getCurrentVelocity().normalize())
-                .count(1)
-                .speed(2)
-                .spread(0.05)
-                .emit();
-        lastProgress = progress;
-        progress = Math.min(progress + (float) 1 / 14, 1);
-    }
-
-    public void updateDirection(LivingEntity chaseTarget, float partialTick) {
-        if (chaseTarget != null && chaseTarget.isAlive()) {
-            Vec3 center = getPos();
-            if (owner != null) {
-                center = owner.getPosition(partialTick).add(0, owner.getBbHeight() / 2, 0);
-            }
-            Vec3 endPos = chaseTarget.getPosition(partialTick).add(0, chaseTarget.getBbHeight() / 2, 0);
-            direction = endPos.subtract(center);
-        }
-    }
-
-    public PathNode getNode(float progress, float partialTick) {
-        Vec3 center = getPos();
-        if (owner != null) {
-            center = owner.getPosition(partialTick).add(0, owner.getBbHeight() / 2, 0);
-        }
-        Vec3 endPos = center.add(direction);
-        Vec3 startPos = center.add(direction.normalize().scale(-1));
-        Ellipse ellipse = new Ellipse(endPos, startPos, normal, curvature);
-        Vec3 point = ellipse.getPoint(progress);
-        Vec3 ellipseCenter = ellipse.getCenter();
-        Vec3 tipDir = point.subtract(ellipseCenter).normalize();
-        return getEulerNode(point, tipDir, normal);
+        ArrayList<PathNode> pathNodes = getHistoryNodes();
+        historyNodes.clear();
+        historyNodes.addAll(pathNodes);
     }
 
     @Override
-    public void tickPhysics() {
+    public boolean isAlive() {
+        return isExecutingPath();
     }
 
     @Override
     public PathNode getRenderNode(float partialTick) {
         PathNode renderNode = super.getRenderNode(partialTick);
-        if (chaseTarget != null && chaseTarget.isAlive()) {
-            updateDirection(chaseTarget, partialTick);
+        Vec3 currentPos = owner.getPosition(partialTick);
+        return renderNode.modifyPos(renderNode.pos().add(currentPos.subtract(initialPosition)));
+    }
+
+    @Override
+    public ArrayList<PathNode> getHistoryNodes() {
+        ArrayList<PathNode> pathNodes = super.getHistoryNodes();
+        ArrayList<PathNode> list = new ArrayList<>();
+        float partialTick = RenderUtil.getPartialTick();
+        Vec3 currentPos = owner.getPosition(partialTick);
+        for (PathNode pathNode : pathNodes) {
+            if (!pathNode.pos().equals(Vec3.ZERO)) {
+                list.add(pathNode.modifyPos(pathNode.pos().add(currentPos.subtract(initialPosition))));
+            }
         }
-        if (!direction.equals(Vec3.ZERO)) {
-            return getNode(Mth.lerp(partialTick, lastProgress, progress), partialTick);
-        }
-        return renderNode;
+        return list;
     }
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.6, -0.1, -1, 0.6, 0.1, 1.5);
+        return new AABB(-1, -0.5, -1.5, 1, 0.5, 2);
     }
 
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
-                for (HitContext hit : hitContexts) {
-                LivingEntity living = hit.entity();
-                attack(living, getDamage(), 2);
-            }
+        for (HitContext hit : hitContexts) {
+            attack(hit.entity(), getDamage(), 2);
+        }
+    }
+
+    /**
+     * 天顶剑轨迹所使用的剑类型，颜色为各自轨迹的渲染颜色。
+     */
+    public enum RenderType {
+        // 铜短剑 - 浅橙色 (#EBA687)
+        COPPER_SHORT_SWORD("copper_short_sword", 0xEBA687),
+        // 魔光剑 - 紫色 (#7A42BF)
+        LIGHTS_BANE("lights_bane", 0x7A42BF),
+        // 村正 - 海军蓝 (#384ED2)
+        MURAMASA("muramasa", 0x384ED2),
+        // 泰拉魔刃 - 亮薄荷绿 (#B2FFB4)
+        TERRA_BLADE("terra_blade", 0xB2FFB4),
+        // 血腥屠刀 - 红色 (#ED1C24)
+        BLOOD_BUTCHERER("blood_butcherer", 0xED1C24),
+        // 星怒 - 粉色 (#EC3EC0)
+        STARFURY("starfury", 0xEC3EC0),
+        // 附魔剑 - 浅蓝色 (#5B9EE8)
+        ENCHANTED_SWORD("enchanted_sword", 0x5B9EE8),
+        // 养蜂人 - 黄色 (#FFE745)
+        BEE_KEEPER("bee_keeper", 0xFFE745),
+        // 草剑 - 绿色 (#6BCB00)
+        BLADE_OF_GRASS("blade_of_grass", 0x6BCB00),
+        // 火山 - 橙色 (#FE9E23)
+        FIERY_GREATSWORD("fiery_greatsword", 0xFE9E23),
+        // 永夜刃 - 紫色 (#B336C9)
+        NIGHTS_EDGE("nights_edge", 0xB336C9),
+        // 真永夜刃 - 紫色 (#B336C9)
+        TRUE_NIGHTS_EDGE("true_nights_edge", 0xB336C9),
+        // 断钢剑 - 黄色 (#ECC813)
+        EXCALIBUR("excalibur", 0xECC813),
+        // 真断钢剑 - 黄色 (#ECC813)
+        TRUE_EXCALIBUR("true_excalibur", 0xECC813),
+        // 无头骑士剑 - 橙色 (#FC5F04)
+        THE_HORSEMANS_BLADE("the_horsemans_blade", 0xFC5F04),
+        // 种子弯刀 - 绿色 (#8FD71D)
+        SEEDLER("seedler", 0x8FD71D),
+        // 泰拉刃 - 浅绿色 (#50DE7A)
+        TRUE_TERRA_BLADE("true_terra_blade", 0x50DE7A),
+        // 波涌之刃 - 青色 (#54EAF5)
+        INFLUX_WAVER("influx_waver", 0x54EAF5),
+        // 狂星之怒 - 粉色 (#ED3F85)
+        STAR_WRATH("star_wrath", 0xED3F85),
+        // 彩虹猫之刃 - 浅粉色 (#FEC2FA)
+        MEOWMERE("meowmere", 0xFEC2FA),
+        // 天顶剑 - 亮薄荷绿 (#B2FFB4)
+        ZENITH("zenith", 0xB2FFB4);
+
+        private final ResourceLocation texture;
+        private final int color;
+
+        RenderType(String textureName, int color) {
+            this.texture = Summoner.rl("textures/projectile/zenith/" + textureName + ".png");
+            this.color = color;
+        }
+
+        public ResourceLocation getTexture() {
+            return texture;
+        }
+
+        public int getColor() {
+            return color;
+        }
+
+        public int getColorRBG(float alpha) {
+            return ((int) (alpha * 255) << 24) | (this.color & 0xFFFFFF);
+        }
     }
 }
