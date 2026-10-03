@@ -10,6 +10,8 @@ import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.RenderUtil;
 import first.summoner.utils.SummonerStreamCodecs;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +33,9 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
         Random random = new Random();
         this.renderType = RenderType.values()[random.nextInt(RenderType.values().length)];
         this.alpha = random.nextFloat(0.105f, 1);
+        if (alpha > 0.8) {
+            alpha = 1;
+        }
     }
 
     @Override
@@ -78,6 +83,11 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
     @Override
     public @NotNull AABB getHitbox() {
         return new AABB(-1, -0.5, -1.5, 1, 0.5, 2);
+    }
+
+    @Override
+    public boolean isValidCollisionTarget(Zenith entity, LivingEntity target) {
+        return owner != target;
     }
 
     @Override
@@ -151,8 +161,8 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
             return color;
         }
 
-        public int getColorRBG(float alpha) {
-            return ((int) (alpha * 255) << 24) | (this.color & 0xFFFFFF);
+        public int getColorARBG(float alpha) {
+            return FastColor.ARGB32.color((int) (alpha * 255), color);
         }
     }
 }

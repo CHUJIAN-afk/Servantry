@@ -9,10 +9,12 @@ import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.model.LyraModelRenderer;
 import first.lyra.client.render.trail.RibbonTrailContext;
 import first.lyra.common.attachmentEntity.PathNode;
+import first.summoner.Summoner;
 import first.summoner.common.projectile.Zenith;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.world.phys.Vec3;
 
 public class ZenithRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
 
@@ -30,17 +32,23 @@ public class ZenithRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
             }
         }
         context = super.createContext(zenith, visualNode, partialTick, packedLight);
-        return context
-                .trail(new RibbonTrailContext<Zenith>()
-                               .upOffset(1.32575f)
-                               .timer(12)
-                               .colorRGB(zenith.renderType.getColorRBG(getAlphaModify()))
-                               .segmentsPerNode(6)
-                               .historyLength(historyLength))
-                .model(new ModelContext()
-                               .scale(2)
-                               .translateOffset(-0.5f, -0.5f, -0.5f)
-                               .rotationOffset(0, 90, 45));
+        if (zenith.alpha > 0.5) {
+            context = context.trail(new RibbonTrailContext<Zenith>()
+                                            .upOffset(1.32575f)
+                                            .timer(12)
+                                            .colorRGB(zenith.renderType.getColorARBG(getAlphaModify()))
+                                            .segmentsPerNode(6)
+                                            .historyLength(historyLength));
+        }
+        return context.model(new ModelContext()
+                                     .scale(2)
+                                     .translateOffset(-0.5f, -0.5f, -0.5f)
+                                     .rotationOffset(0, 90, 45));
+    }
+
+    @Override
+    protected void renderModel(PoseStack poseStack, MultiBufferSource bufferSource) {
+        super.renderModel(poseStack, bufferSource);
     }
 
     @Override
@@ -50,6 +58,22 @@ public class ZenithRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
                 .light(RenderUtil.FULL_LIGHT)
                 .render(poseStack, bufferSource);
         LyraAPI.light(context.visualNode.pos(), 8);
+        if (context.trail != null) {
+            float tick = context.entity.getTickCount() + context.partialTick;
+            float alpha = 0;
+            if (tick >= 4 && tick <= 6) {
+                alpha = tick - 4;
+            }
+            if (tick >= 6 && tick <= 8) {
+                alpha = 8 - tick;
+            }
+            alpha *= 0.5f;
+            if (alpha > 0) {
+                PathNode renderNode = context.entity.getRenderNode(context.partialTick);
+                Vec3 pos = renderNode.pos().add(context.entity.getLookAngle().scale(1.15));
+                RenderUtil.renderImage(Summoner.rl("textures/zenith.png"), pos, 6 * alpha, alpha, bufferSource, false, context.trail.colorRGB);
+            }
+        }
     }
 
     @Override
