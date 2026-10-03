@@ -63,15 +63,16 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
     @Override
     public ArrayList<PathNode> getHistoryNodes() {
         ArrayList<PathNode> pathNodes = super.getHistoryNodes();
-        ArrayList<PathNode> list = new ArrayList<>();
-        float partialTick = RenderUtil.getPartialTick();
-        Vec3 currentPos = owner.getPosition(partialTick);
-        for (PathNode pathNode : pathNodes) {
-            if (!pathNode.pos().equals(Vec3.ZERO)) {
+        if (tickCount > 0) {
+            ArrayList<PathNode> list = new ArrayList<>();
+            float partialTick = RenderUtil.getPartialTick();
+            Vec3 currentPos = owner.getPosition(partialTick);
+            for (PathNode pathNode : pathNodes) {
                 list.add(pathNode.modifyPos(pathNode.pos().add(currentPos.subtract(initialPosition))));
             }
+            return list;
         }
-        return list;
+        return pathNodes;
     }
 
     @Override
@@ -82,7 +83,7 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
     @Override
     public void onCollisionAttack(List<HitContext> hitContexts) {
         for (HitContext hit : hitContexts) {
-            attack(hit.entity(), getDamage(), 2);
+            attack(hit.entity(), getDamage(), 1);
         }
     }
 
@@ -137,7 +138,8 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
         private final int color;
 
         RenderType(String textureName, int color) {
-            this.texture = Summoner.rl("textures/projectile/zenith/" + textureName + ".png");
+            // 与 assets/summoner/lyra_model/json/projectile/zenith/<name>/<name>.png 一一对应
+            this.texture = Summoner.rl("lyra_model/json/projectile/zenith/" + textureName + "/" + textureName);
             this.color = color;
         }
 

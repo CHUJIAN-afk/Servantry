@@ -18,11 +18,8 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +41,7 @@ public class ZenithItem extends SwordItem {
                 RandomSource random = player.getRandom();
                 for (int i = 1; i < 4; i++) {
                     Zenith zenith = new Zenith();
-                    zenith.setDamage((float) player.getAttributeValue(Attributes.ATTACK_DAMAGE));
+                    zenith.setDamage((float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) + 19);
                     zenith.setKnockback(0.65f);
                     Vec3 endPos = computeEndPos(player);
                     if (i != 1) {
@@ -52,11 +49,16 @@ public class ZenithItem extends SwordItem {
                         if (living != null) {
                             endPos = living.getBoundingBox().getCenter();
                         }
+                    } else {
+                        zenith.renderType = Zenith.RenderType.ZENITH;
                     }
                     endPos = endPos.add(Vec3.ZERO.subtract(Vec3.ZERO.offsetRandom(random, 2)));
                     Vec3 startPos = center.add(center.subtract(endPos).normalize().scale(1.5f));
                     Vec3 normal = Ellipse.randomPlaneNormal(random, endPos, startPos);
                     float curvature = random.nextFloat() * 0.6f + 0.2f;
+                    if (endPos.distanceTo(startPos) < 4) {
+                        curvature *= 1.5f;
+                    }
                     Ellipse ellipse = new Ellipse(endPos, startPos, normal, curvature);
                     ArrayList<PathNode> list = new ArrayList<>();
                     for (int j = i; j < 10 + i; j++) {
@@ -64,9 +66,9 @@ public class ZenithItem extends SwordItem {
                         Vec3 point = ellipse.getPoint(progress);
                         Vec3 tipPoint;
                         if (progress < 0.5) {
-                            tipPoint = startPos.lerp(endPos, Mth.clamp(progress, 0.05, 0.95));
+                            tipPoint = startPos.lerp(endPos, Mth.clamp(progress, 0.01, 0.99));
                         } else {
-                            tipPoint = endPos.lerp(startPos, Mth.clamp(progress, 0.05, 0.95));
+                            tipPoint = endPos.lerp(startPos, Mth.clamp(progress, 0.01, 0.99));
                         }
                         Vec3 tipDir = point.subtract(tipPoint).normalize();
                         list.add(zenith.getEulerNode(point, tipDir, normal));
@@ -131,12 +133,6 @@ public class ZenithItem extends SwordItem {
         EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(player, eyePos, eyePos.add(lookDir.scale(reach)), player.getBoundingBox().inflate(reach), e -> e instanceof LivingEntity && e.isAlive() && e != player, reach * reach);
         if (entityHit != null && entityHit.getEntity() instanceof LivingEntity living) {
             return living.getBoundingBox().getCenter();
-        }
-
-        // 其次检测视线命中的方块
-        BlockHitResult blockHit = player.level().clip(new ClipContext(eyePos, eyePos.add(lookDir.scale(reach)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
-        if (blockHit.getType() == HitResult.Type.BLOCK) {
-            return blockHit.getLocation();
         }
 
         // 最后回退到视线方向20格
