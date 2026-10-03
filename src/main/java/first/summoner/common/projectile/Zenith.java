@@ -30,7 +30,7 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
         setPhysics(false);
         Random random = new Random();
         this.renderType = RenderType.values()[random.nextInt(RenderType.values().length)];
-        this.alpha = random.nextFloat(2, 10) * 0.1f;
+        this.alpha = random.nextFloat(0.105f, 1);
     }
 
     @Override

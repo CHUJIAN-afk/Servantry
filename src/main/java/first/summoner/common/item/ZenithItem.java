@@ -6,6 +6,7 @@ import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.Ellipse;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.register.LyraAttachmentRegister;
+import first.lyra.utils.EasingCurve;
 import first.summoner.common.projectile.Zenith;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.ItemCooldowns;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
@@ -35,107 +37,113 @@ public class ZenithItem extends SwordItem {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
         if (usedHand == InteractionHand.MAIN_HAND) {
-            if (!level.isClientSide()) {
-                Vec3 lookAngle = player.getLookAngle();
-                Vec3 center = player.getPosition(1).add(0, player.getBbHeight() / 2, 0);
-                RandomSource random = player.getRandom();
-                for (int i = 1; i < 4; i++) {
-                    Zenith zenith = new Zenith();
-                    zenith.setDamage((float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) + 19);
-                    zenith.setKnockback(0.65f);
-                    Vec3 endPos = computeEndPos(player);
-                    if (i != 1) {
-                        LivingEntity living = collectTargets(player).stream().findAny().orElse(null);
-                        if (living != null) {
-                            endPos = living.getBoundingBox().getCenter();
+            ItemCooldowns cooldowns = player.getCooldowns();
+            if (!cooldowns.isOnCooldown(this)) {
+                cooldowns.addCooldown(this, 2);
+                if (!level.isClientSide()) {
+                    Vec3 lookAngle = player.getLookAngle();
+                    Vec3 center = player.getBoundingBox().getCenter();
+                    RandomSource random = player.getRandom();
+                    Vec3 eyePos = player.getEyePosition();
+                    int reach = 32;
+                    Vec3 endEndPos = eyePos.add(lookAngle.scale(reach));
+                    EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(player, eyePos, endEndPos, player.getBoundingBox().inflate(reach), entity -> entity instanceof LivingEntity living && living.isAlive() && living != player, reach * reach);
+                    if (entityHit != null && entityHit.getEntity() instanceof LivingEntity) {
+                        endEndPos = entityHit.getLocation();
+                    }
+                    TargetCache targetCache = player.getData(LyraAttachmentRegister.TargetCache);
+                    List<LivingEntity> targetList = targetCache.getEntitiesInRadius(endEndPos, 32, null);
+                    LivingEntity best = null;
+                    if (!targetList.isEmpty()) {
+                        int searchRange = 32;
+                        double fovAngle = 30;
+                        double distanceWeight = 0.2;
+                        double bestScore = Double.MAX_VALUE;
+                        for (LivingEntity living : targetList) {
+                            Vec3 targetPoint = living.getBoundingBox().getCenter();
+                            Vec3 toEntity = targetPoint.subtract(center);
+                            double angle = Math.toDegrees(Math.acos(toEntity.dot(lookAngle) / toEntity.length()));
+                            if (angle <= fovAngle) {
+                                // 角度、距离分别归一化到 [0,1]
+                                double normalizedAngle = angle / fovAngle;
+                                double normalizedDistance = toEntity.length() / searchRange;
+                                // 综合分数：按权重合成角度与距离，越小越优先
+                                double score = (1.0 - distanceWeight) * normalizedAngle + distanceWeight * normalizedDistance;
+                                if (score < bestScore) {
+                                    bestScore = score;
+                                    best = living;
+                                }
+                            }
                         }
-                    } else {
-                        zenith.renderType = Zenith.RenderType.ZENITH;
                     }
-                    endPos = endPos.add(Vec3.ZERO.subtract(Vec3.ZERO.offsetRandom(random, 2)));
-                    Vec3 startPos = center.add(center.subtract(endPos).normalize().scale(1.5f));
-                    Vec3 normal = Ellipse.randomPlaneNormal(random, endPos, startPos);
-                    float curvature = random.nextFloat() * 0.6f + 0.2f;
-                    if (endPos.distanceTo(startPos) < 4) {
-                        curvature *= 1.5f;
-                    }
-                    Ellipse ellipse = new Ellipse(endPos, startPos, normal, curvature);
-                    ArrayList<PathNode> list = new ArrayList<>();
-                    for (int j = i; j < 10 + i; j++) {
-                        float progress = (float) j / (9 + i);
-                        Vec3 point = ellipse.getPoint(progress);
-                        Vec3 tipPoint;
-                        if (progress < 0.5) {
-                            tipPoint = startPos.lerp(endPos, Mth.clamp(progress, 0.01, 0.99));
-                        } else {
-                            tipPoint = endPos.lerp(startPos, Mth.clamp(progress, 0.01, 0.99));
+                    float distance = (float) eyePos.distanceTo(endEndPos);
+                    for (int i = 1; i < 4; i++) {
+                        Zenith zenith = new Zenith();
+                        zenith.setOwner(player);
+                        zenith.setDamage((float) player.getAttributeValue(Attributes.ATTACK_DAMAGE) + 1.9f);
+                        zenith.setKnockback(1);
+                        Vec3 endPos = endEndPos.add(Vec3.ZERO.subtract(Vec3.ZERO.offsetRandom(random, distance * 0.2f)));
+                        if (i == 1) {
+                            zenith.renderType = Zenith.RenderType.ZENITH;
                         }
-                        Vec3 tipDir = point.subtract(tipPoint).normalize();
-                        list.add(zenith.getEulerNode(point, tipDir, normal));
+                        if (zenith.renderType != Zenith.RenderType.ZENITH) {
+                            List<LivingEntity> radius = zenith.getTargetCache().getEntitiesInRadius(endPos, 10, null);
+                            if (!radius.isEmpty()) {
+                                endPos = radius.get(player.getRandom().nextInt(radius.size())).getBoundingBox().getCenter();
+                            } else {
+                                if (best != null) {
+                                    endPos = best.getBoundingBox().getCenter();
+                                }
+                            }
+                        }
+                        Vec3 startPos = center.add(center.subtract(endPos).normalize().scale(1.5f));
+                        Vec3 normal = Ellipse.randomPlaneNormal(random, endPos, startPos);
+                        float distanceTo = (float) (startPos.distanceTo(endPos));
+                        float curvature = 0.3f + random.nextFloat() * 0.6f - Math.min(0.1f, distanceTo * 0.05f);
+                        if (distanceTo < 4) {
+                            curvature *= 1 + ((4 - distanceTo) / 4);
+                        }
+                        Ellipse ellipse = new Ellipse(endPos, startPos, normal, curvature);
+                        ArrayList<PathNode> list = new ArrayList<>();
+                        for (int j = i; j < 10 + i; j++) {
+                            float progress = (float) j / (9 + i);
+                            progress = EasingCurve.bezier()
+                                    .control(0.1f)
+                                    .control(0.2f)
+                                    .control(0.3f)
+                                    .control(0.4f)
+                                    .control(0.45f)
+                                    .control(0.475f)
+                                    .control(0.5f)
+                                    .control(0.525f)
+                                    .control(0.55f)
+                                    .control(0.6f)
+                                    .control(0.7f)
+                                    .control(0.8f)
+                                    .control(0.9f)
+                                    .control(1f)
+                                    .build()
+                                    .apply(progress);
+                            Vec3 point = ellipse.getPoint(progress);
+                            Vec3 tipPoint;
+                            if (progress < 0.5) {
+                                tipPoint = startPos.lerp(endPos, Mth.clamp(progress * 2, 0.01, 0.99));
+                            } else {
+                                tipPoint = endPos.lerp(startPos, Mth.clamp(progress * 2 - 1, 0.01, 0.99));
+                            }
+                            Vec3 tipDir = point.subtract(tipPoint).normalize();
+                            list.add(zenith.getEulerNode(point, tipDir, normal));
+                        }
+                        list.add(list.getLast());
+                        list.add(list.getLast());
+                        zenith.init(list.getFirst());
+                        zenith.setPath(list);
+                        zenith.initialPosition = player.getPosition(1);
+                        LyraHelper.get(player).add(zenith);
                     }
-                    list.add(list.getLast());
-                    list.add(list.getLast());
-                    zenith.init(list.getFirst());
-                    zenith.setPath(list);
-                    zenith.initialPosition = player.getPosition(1);
-                    LyraHelper.get(player).add(zenith);
                 }
             }
-            return InteractionResultHolder.success(player.getItemInHand(usedHand));
         }
-        return super.use(level, player, usedHand);
-    }
-
-    /**
-     * 收集玩家周围/视线内的敌人（走 TargetCache 空间分组）。
-     */
-    private List<LivingEntity> collectTargets(Player player) {
-        TargetCache cache = player.getData(LyraAttachmentRegister.TargetCache);
-
-        Vec3 eyePos = player.getEyePosition();
-        Vec3 lookDir = player.getLookAngle().normalize();
-        Vec3 lookEnd = eyePos.add(lookDir.scale(8));
-
-        // 以视线终点为中心，半径 16 的球覆盖“玩家周围8格”和“视线8格内偏离≤8”的所有候选，再用断言精确过滤
-        return cache.getEntitiesInRadius(lookEnd, 16, entity -> {
-            if (cache.getDistance(player, entity) <= 4) {
-                return true;
-            }
-            Vec3 entityPos = entity.getBoundingBox().getCenter();
-            // 视线前方：到视线向量的距离不足8格，且在视线前方
-            double distToLine = distanceToLineSegment(eyePos, lookEnd, entityPos);
-            return distToLine <= 8 && entityPos.subtract(eyePos).dot(lookDir) > 0;
-        });
-    }
-
-    /**
-     * 点到线段的最短距离
-     */
-    private double distanceToLineSegment(Vec3 lineStart, Vec3 lineEnd, Vec3 point) {
-        Vec3 line = lineEnd.subtract(lineStart);
-        double lineLenSq = line.lengthSqr();
-        if (lineLenSq < 1e-5) return point.distanceTo(lineStart);
-
-        double t = Math.clamp(point.subtract(lineStart).dot(line) / lineLenSq, 0, 1);
-        Vec3 projection = lineStart.add(line.scale(t));
-        return point.distanceTo(projection);
-    }
-
-    /**
-     * 计算终点位置：视线命中实体 > 视线命中方块 > 视线方向20格
-     */
-    private Vec3 computeEndPos(Player player) {
-        Vec3 eyePos = player.getEyePosition();
-        Vec3 lookDir = player.getLookAngle();
-        double reach = 32;
-
-        // 优先检测视线命中的实体
-        EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(player, eyePos, eyePos.add(lookDir.scale(reach)), player.getBoundingBox().inflate(reach), e -> e instanceof LivingEntity && e.isAlive() && e != player, reach * reach);
-        if (entityHit != null && entityHit.getEntity() instanceof LivingEntity living) {
-            return living.getBoundingBox().getCenter();
-        }
-
-        // 最后回退到视线方向20格
-        return eyePos.add(lookDir.scale(reach));
+        return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }
 }
