@@ -6,12 +6,15 @@ import first.lyra.common.attachment.AttachmentEntityData;
 import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.Summoner;
+import first.summoner.common.attachment.ZenithData;
 import first.summoner.common.dataComponent.ScabbardContainer;
 import first.summoner.common.minion.minion.ChlorophyteCrystal;
 import first.summoner.common.minion.minion.StardustCell;
 import first.summoner.common.minion.minion.VoidEater;
+import first.summoner.network.ZenithPacket;
 import first.summoner.register.*;
 import first.summoner.utils.CuriosUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -31,12 +34,27 @@ import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
 
 import java.util.List;
 
 @EventBusSubscriber(modid = Summoner.MODID)
 public class Event {
+
+    @SubscribeEvent
+    public static void tick(PlayerTickEvent.Post event) {
+        Player player = event.getEntity();
+        ZenithData data = player.getData(SummonerAttachmentRegister.ZenithData);
+        if (!player.level().isClientSide()) {
+            data.tick();
+        } else {
+            if (Minecraft.getInstance().options.keyUse.isDown() && data.swing()) {
+                PacketDistributor.sendToServer(new ZenithPacket());
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void onItemStackedOnOther(ItemStackedOnOtherEvent event) {

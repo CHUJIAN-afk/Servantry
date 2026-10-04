@@ -56,21 +56,25 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
         historyNodes.clear();
         historyNodes.addAll(pathNodes);
         RandomSource random = getRandom();
-        if (tickCount > 2 && tickCount < 9 && random.nextFloat() < 0.4f) {
+        if (tickCount > 2 && tickCount < 9 && random.nextFloat() < 0.5f) {
             PathNode last = historyNodes.getFirst();
-            Vec3 pos = getCurrentPathNode().pos().add(getLookAngle().scale(-2 * random.nextFloat()));
-            Vec3 direction = pos.subtract(last.pos());
-            // 天顶剑粒子：颜色跟随剑型，大小/速度/阻力按范围随机，寿命固定 10 tick 自然消退
-            float scale = Mth.nextFloat(random, 0.008F, 0.01F);
-            float speed = Mth.nextFloat(random, 0.25F, 0.5F);
-            float friction = Mth.nextFloat(random, 0.8F, 0.9F);
-            int life = random.nextIntBetweenInclusive(5, 50);
-            ParticleHelper.create(owner.level())
-                    .type(new ZenithParticleOptions(renderType.getColor(), life, friction, scale))
-                    .pos(pos.add(owner.getPosition(1).subtract(initialPosition)))
-                    .velocity(direction.normalize().scale(speed))
-                    .count(0)
-                    .emit();
+            int count = random.nextIntBetweenInclusive(1, 5);
+            for (int i = 0; i < count; i++) {
+                Vec3 pos = getCurrentPathNode().pos();
+                Vec3 direction = pos.subtract(last.pos());
+                pos = pos.add(direction.scale(random.nextFloat() * 2)).offsetRandom(random, 0.5f);
+                // 天顶剑粒子：颜色跟随剑型，大小/速度/阻力按范围随机，寿命固定 10 tick 自然消退
+                float scale = Mth.nextFloat(random, 0.02F, 0.04F);
+                float speed = Mth.nextFloat(random, 0.6F, 1.2F);
+                float friction = Mth.nextFloat(random, 0.35F, 0.7F);
+                int life = random.nextIntBetweenInclusive(5, 40);
+                ParticleHelper.create(owner.level())
+                        .type(new ZenithParticleOptions(renderType.getColor(), life, friction, scale))
+                        .pos(pos.add(owner.getPosition(1).subtract(initialPosition)))
+                        .velocity(direction.normalize().scale(speed))
+                        .count(0)
+                        .emit();
+            }
         }
     }
 

@@ -61,17 +61,16 @@ public class ZenithRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
         if (context.trail != null) {
             float tick = context.entity.getTickCount() + context.partialTick;
             float alpha = 0;
-            if (tick >= 4 && tick <= 6) {
-                alpha = tick - 4;
+            if (tick >= 4 && tick <= 5) {
+                alpha = tick - 4f;
             }
-            if (tick >= 6 && tick <= 8) {
-                alpha = 8 - tick;
+            if (tick >= 5 && tick <= 6) {
+                alpha = 6 - tick;
             }
-            alpha *= 0.5f;
             if (alpha > 0) {
                 PathNode renderNode = context.entity.getRenderNode(context.partialTick);
                 Vec3 pos = renderNode.pos().add(context.entity.getLookAngle().scale(1.15));
-                RenderUtil.renderImage(Summoner.rl("textures/zenith.png"), pos, 6 * alpha, alpha, bufferSource, false, context.trail.colorRGB);
+                RenderUtil.renderImage(Summoner.rl("textures/zenith.png"), pos, 3 * alpha, 0.75f * alpha, bufferSource, false, context.trail.colorRGB);
             }
         }
     }
