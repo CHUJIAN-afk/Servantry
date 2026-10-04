@@ -81,7 +81,7 @@ public class ZenithData {
                     float distance = (float) eyePos.distanceTo(endEndPos);
                     Zenith zenith = new Zenith();
                     zenith.setOwner(owner);
-                    zenith.setDamage((float) owner.getAttributeValue(Attributes.ATTACK_DAMAGE) + 1.9f);
+                    zenith.setDamage((float) owner.getAttributeValue(Attributes.ATTACK_DAMAGE));
                     zenith.setKnockback(1);
                     Vec3 endPos = endEndPos.add(Vec3.ZERO.subtract(Vec3.ZERO.offsetRandom(random, distance * 0.2f)));
                     if (random.nextFloat() < 0.33) {
