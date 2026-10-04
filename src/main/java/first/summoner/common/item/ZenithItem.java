@@ -5,9 +5,11 @@ import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.Ellipse;
 import first.lyra.common.attachmentEntity.PathNode;
+import first.lyra.common.sound.Playable;
 import first.lyra.register.LyraAttachmentRegister;
 import first.lyra.utils.EasingCurve;
 import first.summoner.common.projectile.Zenith;
+import first.summoner.register.SummonerSoundRegister;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -41,6 +43,7 @@ public class ZenithItem extends SwordItem {
             if (!cooldowns.isOnCooldown(this)) {
                 cooldowns.addCooldown(this, 2);
                 if (!level.isClientSide()) {
+                    Playable.play(SummonerSoundRegister.Zenith, level, player.position(), player.getSoundSource());
                     Vec3 lookAngle = player.getLookAngle();
                     Vec3 center = player.getBoundingBox().getCenter();
                     RandomSource random = player.getRandom();

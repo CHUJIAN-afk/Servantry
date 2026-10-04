@@ -30,6 +30,7 @@ public class Summoner {
         SummonerSoundRegister.register(eventBus);
         SummonerAttachmentRegister.register(eventBus);
         SummonerSummonMarkRegister.register(eventBus);
+        SummonerParticleRegister.register(eventBus);
     }
 
     public static ResourceLocation rl(String path) {

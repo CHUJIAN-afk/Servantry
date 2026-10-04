@@ -6,11 +6,15 @@ import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.Summoner;
+import first.summoner.common.particle.zenithParticle.ZenithParticleOptions;
 import first.summoner.register.SummonerAttachmentEntityRegister;
+import first.summoner.utils.ParticleHelper;
 import first.summoner.utils.RenderUtil;
 import first.summoner.utils.SummonerStreamCodecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -51,6 +55,23 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
         ArrayList<PathNode> pathNodes = getHistoryNodes();
         historyNodes.clear();
         historyNodes.addAll(pathNodes);
+        RandomSource random = getRandom();
+        if (tickCount > 2 && tickCount < 9 && random.nextFloat() < 0.4f) {
+            PathNode last = historyNodes.getFirst();
+            Vec3 pos = getCurrentPathNode().pos().add(getLookAngle().scale(-2 * random.nextFloat()));
+            Vec3 direction = pos.subtract(last.pos());
+            // 天顶剑粒子：颜色跟随剑型，大小/速度/阻力按范围随机，寿命固定 10 tick 自然消退
+            float scale = Mth.nextFloat(random, 0.008F, 0.01F);
+            float speed = Mth.nextFloat(random, 0.25F, 0.5F);
+            float friction = Mth.nextFloat(random, 0.8F, 0.9F);
+            int life = random.nextIntBetweenInclusive(5, 50);
+            ParticleHelper.create(owner.level())
+                    .type(new ZenithParticleOptions(renderType.getColor(), life, friction, scale))
+                    .pos(pos.add(owner.getPosition(1).subtract(initialPosition)))
+                    .velocity(direction.normalize().scale(speed))
+                    .count(0)
+                    .emit();
+        }
     }
 
     @Override
