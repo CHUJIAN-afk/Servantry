@@ -17,6 +17,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -26,6 +27,7 @@ public class Zenith extends AttachmentEntity implements IEntityCollision<Zenith>
     public LivingEntity target;
     public RenderType renderType;
     public float alpha;
+    public static final EasingCurve ZENITH_EASING_CURVE = EasingCurve.bezier().control(0.1f).control(0.2f).control(0.3f).control(0.4f).control(0.45f).control(0.475f).control(0.5f).control(0.5f).control(0.525f).control(0.575f).control(0.6f).control(0.7f).control(0.8f).control(0.9f).control(1f).build();
 
     public Zenith() {
         super(SummonerAttachmentEntityRegister.ZENITH);
@@ -98,24 +100,7 @@ public class Zenith extends AttachmentEntity implements IEntityCollision<Zenith>
     public PathNode getRenderNode(float partialTick) {
         Ellipse renderEllipse = getRenderEllipse(partialTick);
         float progress = (tickCount + partialTick) / 9;
-        progress = EasingCurve.bezier()
-                .control(0.1f)
-                .control(0.2f)
-                .control(0.3f)
-                .control(0.4f)
-                .control(0.45f)
-                .control(0.475f)
-                .control(0.5f)
-                .control(0.5f)
-                .control(0.525f)
-                .control(0.575f)
-                .control(0.6f)
-                .control(0.7f)
-                .control(0.8f)
-                .control(0.9f)
-                .control(1f)
-                .build()
-                .apply(progress);
+        progress = ZENITH_EASING_CURVE.apply(progress);
         Vec3 point = renderEllipse.getPoint(progress);
         Vec3 endPos = renderEllipse.getPointA();
         Vec3 startPos = renderEllipse.getPointB();
@@ -149,7 +134,22 @@ public class Zenith extends AttachmentEntity implements IEntityCollision<Zenith>
 
     @Override
     public void entityCollision() {
-        IEntityCollision.super.entityCollision();
+        if (canCollideAttack()) {
+            tickCount--;
+            List<PathNode> list = new ArrayList<>();
+            int samples = 16;
+            PathNode last = getRenderNode(0);
+            for (int i = 1; i <= samples; i++) {
+                float progress = (float) i / samples;
+                PathNode current = getRenderNode(progress);
+                setCurrentPathNode(last);
+                historyNodes.set(0, current);
+                IEntityCollision.super.entityCollision();
+                last = current;
+            }
+            setCurrentPathNode(last);
+            tickCount++;
+        }
     }
 
     /**
