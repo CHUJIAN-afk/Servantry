@@ -1,15 +1,12 @@
 package first.summoner.common.projectile;
 
 
-import first.lyra.common.attachmentEntity.IEntityCollision;
-import first.lyra.common.attachmentEntity.PathNode;
-import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
-import first.lyra.common.projectile.Projectile;
+import first.lyra.common.attachmentEntity.*;
+import first.lyra.utils.EasingCurve;
 import first.summoner.Summoner;
 import first.summoner.common.particle.zenithParticle.ZenithParticleOptions;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
-import first.summoner.utils.RenderUtil;
 import first.summoner.utils.SummonerStreamCodecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
@@ -20,20 +17,18 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Zenith extends Projectile implements IEntityCollision<Zenith> {
+public class Zenith extends AttachmentEntity implements IEntityCollision<Zenith> {
 
-    public Vec3 initialPosition = Vec3.ZERO;
+    public Vec3 offest;
+    public LivingEntity target;
     public RenderType renderType;
     public float alpha;
 
     public Zenith() {
         super(SummonerAttachmentEntityRegister.ZENITH);
-        setMaxTickCount(30);
-        setPhysics(false);
         Random random = new Random();
         this.renderType = RenderType.values()[random.nextInt(RenderType.values().length)];
         this.alpha = random.nextFloat(0.105f, 1);
@@ -45,16 +40,21 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
     @Override
     protected void registerSyncFields(SyncFieldDispatcher fields) {
         super.registerSyncFields(fields);
-        fields.field(SummonerStreamCodecs.VEC_3, () -> initialPosition, value -> initialPosition = value);
+        fields.field(SummonerStreamCodecs.VEC_3, () -> offest, value -> offest = value);
         fields.field(SummonerStreamCodecs.ZENITH_RENDER_TYPE, () -> renderType, value -> renderType = value);
+        fields.field(SummonerStreamCodecs.INT, () -> target != null ? target.getId() : -1, (level, value) -> {
+            if (value != -1 && level.getEntity(value) instanceof LivingEntity living) {
+                target = living;
+            } else {
+                target = null;
+            }
+        });
     }
 
     @Override
     public void tick() {
         super.tick();
-        ArrayList<PathNode> pathNodes = getHistoryNodes();
-        historyNodes.clear();
-        historyNodes.addAll(pathNodes);
+        setCurrentPathNode(getRenderNode(1));
         RandomSource random = getRandom();
         if (tickCount > 2 && tickCount < 9 && random.nextFloat() < 0.5f) {
             PathNode last = historyNodes.getFirst();
@@ -70,7 +70,7 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
                 int life = random.nextIntBetweenInclusive(5, 40);
                 ParticleHelper.create(owner.level())
                         .type(new ZenithParticleOptions(renderType.getColor(), life, friction, scale))
-                        .pos(pos.add(owner.getPosition(1).subtract(initialPosition)))
+                        .pos(pos)
                         .velocity(direction.normalize().scale(speed))
                         .count(0)
                         .emit();
@@ -80,34 +80,59 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
 
     @Override
     public boolean isAlive() {
-        return isExecutingPath();
+        return tickCount <= 11;
+    }
+
+    public Ellipse getRenderEllipse(float partialTick) {
+        Vec3 currentPos = owner.getPosition(partialTick).add(0, owner.getBbHeight() / 2, 0);
+        Vec3 pointA = target != null ? target.getPosition(partialTick).add(0, target.getBbHeight() / 2, 0) : currentPos.add(offest);
+        Vec3 pointB = currentPos.add(currentPos.subtract(pointA).normalize().scale(2));
+        RandomSource random = getRandom();
+        random.setSeed(getUuid().hashCode());
+        Vec3 normal = Ellipse.randomPlaneNormal(random, pointA, pointB);
+        float curvature = 0.2f + random.nextFloat() * 0.6f;
+        return new Ellipse(pointA, pointB, normal, curvature);
     }
 
     @Override
     public PathNode getRenderNode(float partialTick) {
-        PathNode renderNode = super.getRenderNode(partialTick);
-        Vec3 currentPos = owner.getPosition(partialTick);
-        return renderNode.modifyPos(renderNode.pos().add(currentPos.subtract(initialPosition)));
-    }
-
-    @Override
-    public ArrayList<PathNode> getHistoryNodes() {
-        ArrayList<PathNode> pathNodes = super.getHistoryNodes();
-        if (tickCount > 0) {
-            ArrayList<PathNode> list = new ArrayList<>();
-            float partialTick = RenderUtil.getPartialTick();
-            Vec3 currentPos = owner.getPosition(partialTick);
-            for (PathNode pathNode : pathNodes) {
-                list.add(pathNode.modifyPos(pathNode.pos().add(currentPos.subtract(initialPosition))));
-            }
-            return list;
+        Ellipse renderEllipse = getRenderEllipse(partialTick);
+        float progress = (tickCount + partialTick) / 9;
+        progress = EasingCurve.bezier()
+                .control(0.1f)
+                .control(0.2f)
+                .control(0.3f)
+                .control(0.4f)
+                .control(0.45f)
+                .control(0.475f)
+                .control(0.5f)
+                .control(0.5f)
+                .control(0.525f)
+                .control(0.575f)
+                .control(0.6f)
+                .control(0.7f)
+                .control(0.8f)
+                .control(0.9f)
+                .control(1f)
+                .build()
+                .apply(progress);
+        Vec3 point = renderEllipse.getPoint(progress);
+        Vec3 endPos = renderEllipse.getPointA();
+        Vec3 startPos = renderEllipse.getPointB();
+        Vec3 normal = renderEllipse.getPlaneNormal();
+        Vec3 tipPoint;
+        if (progress < 0.5) {
+            tipPoint = startPos.lerp(endPos, Mth.clamp(progress * 2, 0.05, 0.95));
+        } else {
+            tipPoint = endPos.lerp(startPos, Mth.clamp(progress * 2 - 1, 0.05, 0.95));
         }
-        return pathNodes;
+        Vec3 tipDir = point.subtract(tipPoint).normalize();
+        return getEulerNode(point, tipDir, normal);
     }
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-1, -0.5, -1.5, 1, 0.5, 2);
+        return new AABB(-0.35, -0.1, -1.5, 0.35, 0.1, 1.5);
     }
 
     @Override
@@ -120,6 +145,11 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
         for (HitContext hit : hitContexts) {
             attack(hit.entity(), getDamage(), 1);
         }
+    }
+
+    @Override
+    public void entityCollision() {
+        IEntityCollision.super.entityCollision();
     }
 
     /**
@@ -173,7 +203,6 @@ public class Zenith extends Projectile implements IEntityCollision<Zenith> {
         private final int color;
 
         RenderType(String textureName, int color) {
-            // 与 assets/summoner/lyra_model/json/projectile/zenith/<name>/<name>.png 一一对应
             this.texture = Summoner.rl("lyra_model/json/projectile/zenith/" + textureName + "/" + textureName);
             this.color = color;
         }

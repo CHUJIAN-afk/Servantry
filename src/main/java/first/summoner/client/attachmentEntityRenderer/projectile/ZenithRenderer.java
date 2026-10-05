@@ -7,7 +7,6 @@ import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
 import first.lyra.client.render.RenderUtil;
 import first.lyra.client.render.model.LyraModelRenderer;
-import first.lyra.client.render.trail.RibbonTrailContext;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.Summoner;
 import first.summoner.common.projectile.Zenith;
@@ -33,12 +32,14 @@ public class ZenithRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
         }
         context = super.createContext(zenith, visualNode, partialTick, packedLight);
         if (zenith.alpha > 0.5) {
+            /*
             context = context.trail(new RibbonTrailContext<Zenith>()
                                             .upOffset(1.32575f)
                                             .timer(12)
                                             .colorRGB(zenith.renderType.getColorARBG(getAlphaModify()))
                                             .segmentsPerNode(6)
                                             .historyLength(historyLength));
+            */
         }
         return context.model(new ModelContext()
                                      .scale(2)

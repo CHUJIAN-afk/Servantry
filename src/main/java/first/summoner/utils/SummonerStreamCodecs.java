@@ -1,5 +1,6 @@
 package first.summoner.utils;
 
+import first.lyra.common.attachmentEntity.Ellipse;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.common.projectile.Zenith;
@@ -14,6 +15,7 @@ import java.util.Set;
 
 public interface SummonerStreamCodecs extends LyraStreamCodecs {
     StreamCodec<RegistryFriendlyByteBuf, Zenith.RenderType> ZENITH_RENDER_TYPE = StreamCodec.composite(LyraStreamCodecs.STRING_UTF8, Enum::name, Zenith.RenderType::valueOf);
+    StreamCodec<RegistryFriendlyByteBuf, Ellipse> ELLIPSE = StreamCodec.composite(LyraStreamCodecs.VEC_3, Ellipse::getPointA, LyraStreamCodecs.VEC_3, Ellipse::getPointB, LyraStreamCodecs.VEC_3, Ellipse::getPlaneNormal, LyraStreamCodecs.FLOAT, Ellipse::getCurvature, Ellipse::new);
 
     StreamCodec<RegistryFriendlyByteBuf, List<PathNode>> PATH_NODE_LIST = StreamCodec.of((buf, list) -> {
         buf.writeVarInt(list.size());

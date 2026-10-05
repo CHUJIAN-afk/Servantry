@@ -2,15 +2,11 @@ package first.summoner.common.attachment;
 
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.attachmentEntity.Ellipse;
-import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.sound.Playable;
 import first.lyra.register.LyraAttachmentRegister;
-import first.lyra.utils.EasingCurve;
 import first.summoner.common.projectile.Zenith;
 import first.summoner.register.SummonerItemRegister;
 import first.summoner.register.SummonerSoundRegister;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,7 +17,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ZenithData {
@@ -84,7 +79,7 @@ public class ZenithData {
                     zenith.setDamage((float) owner.getAttributeValue(Attributes.ATTACK_DAMAGE));
                     zenith.setKnockback(1);
                     Vec3 endPos = endEndPos.add(Vec3.ZERO.subtract(Vec3.ZERO.offsetRandom(random, distance * 0.2f)));
-                    if (random.nextFloat() < 0.33) {
+                    if ( random.nextFloat() < 0.33) {
                         zenith.renderType = Zenith.RenderType.ZENITH;
                     }
                     if (zenith.renderType != Zenith.RenderType.ZENITH) {
@@ -97,49 +92,9 @@ public class ZenithData {
                             }
                         }
                     }
-                    Vec3 startPos = center.add(center.subtract(endPos).normalize().scale(1.5f));
-                    Vec3 normal = Ellipse.randomPlaneNormal(random, endPos, startPos);
-                    float distanceTo = (float) (startPos.distanceTo(endPos));
-                    float curvature = 0.3f + random.nextFloat() * 0.6f - Math.min(0.1f, distanceTo * 0.05f);
-                    if (distanceTo < 4) {
-                        curvature *= 1 + ((4 - distanceTo) / 4);
-                    }
-                    Ellipse ellipse = new Ellipse(endPos, startPos, normal, curvature);
-                    ArrayList<PathNode> list = new ArrayList<>();
-                    for (int j = 1; j < 11; j++) {
-                        float progress = (float) j / 10;
-                        progress = EasingCurve.bezier()
-                                .control(0.1f)
-                                .control(0.2f)
-                                .control(0.3f)
-                                .control(0.4f)
-                                .control(0.45f)
-                                .control(0.475f)
-                                .control(0.5f)
-                                .control(0.525f)
-                                .control(0.55f)
-                                .control(0.6f)
-                                .control(0.7f)
-                                .control(0.8f)
-                                .control(0.9f)
-                                .control(1f)
-                                .build()
-                                .apply(progress);
-                        Vec3 point = ellipse.getPoint(progress);
-                        Vec3 tipPoint;
-                        if (progress < 0.5) {
-                            tipPoint = startPos.lerp(endPos, Mth.clamp(progress * 2, 0.01, 0.99));
-                        } else {
-                            tipPoint = endPos.lerp(startPos, Mth.clamp(progress * 2 - 1, 0.01, 0.99));
-                        }
-                        Vec3 tipDir = point.subtract(tipPoint).normalize();
-                        list.add(zenith.getEulerNode(point, tipDir, normal));
-                    }
-                    list.add(list.getLast());
-                    list.add(list.getLast());
-                    zenith.init(list.getFirst());
-                    zenith.setPath(list);
-                    zenith.initialPosition = owner.getPosition(1);
+                    zenith.offest = endPos.subtract(center);
+                    zenith.target = best;
+                    zenith.init(zenith.getRenderNode(1));
                     LyraHelper.get(owner).add(zenith);
                 } while (power > 3.33f);
             }
