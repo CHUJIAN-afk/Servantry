@@ -10,6 +10,7 @@ import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,8 +38,11 @@ public class ZenithParticle extends TextureSheetParticle {
     private final Vec3[] trail = new Vec3[TRAIL_LENGTH];
     /** 头部方块中截面四角相对头部的偏移，顺序首尾相邻，所在平面垂直于运动方向 */
     private final Vec3[] corners = new Vec3[4];
-    /** 单位运动方向，头部方块的中轴 */
+    /**
+     * 单位运动方向，头部方块的中轴
+     */
     private final Vec3 axis;
+    private final float rollSpeed;
 
     public ZenithParticle(ClientLevel level, double x, double y, double z, double vx, double vy, double vz, SpriteSet spriteSet, ZenithParticleOptions options) {
         super(level, x, y, z, vx, vy, vz);
@@ -71,6 +75,7 @@ public class ZenithParticle extends TextureSheetParticle {
         this.corners[1] = up.subtract(right);
         this.corners[2] = this.corners[0].scale(-1.0);
         this.corners[3] = this.corners[1].scale(-1.0);
+        this.rollSpeed = RandomSource.create().nextIntBetweenInclusive(9, 18);
     }
 
     @Override
@@ -80,14 +85,28 @@ public class ZenithParticle extends TextureSheetParticle {
         // 右移一位后写入移动前的位置，队尾即头部 6 个 tick 前所在的位置
         System.arraycopy(this.trail, 0, this.trail, 1, TRAIL_LENGTH - 1);
         this.trail[0] = new Vec3(this.xo, this.yo, this.zo);
+        this.oRoll = this.roll;
+        this.roll += this.rollSpeed;
     }
 
     @Override
     public void render(@NotNull VertexConsumer buffer, @NotNull Camera camera, float partialTick) {
-        if (this.age == 0) {
-            return;
-        }
         Vec3 cameraPos = camera.getPosition();
+
+        float currantRoll = Mth.lerp(partialTick, this.oRoll, this.roll);
+        // 横截面四角绕运动轴自转：罗德里格斯公式把 corners 按翻滚角旋到当帧姿态
+        float cosRoll = Mth.cos(currantRoll);
+        float sinRoll = Mth.sin(currantRoll);
+        float axisX = (float) this.axis.x, axisY = (float) this.axis.y, axisZ = (float) this.axis.z;
+        float[] rolled = new float[12];
+        for (int i = 0; i < 4; i++) {
+            Vec3 corner = this.corners[i];
+            float ox = (float) corner.x, oy = (float) corner.y, oz = (float) corner.z;
+            float projection = axisX * ox + axisY * oy + axisZ * oz;
+            rolled[i * 3] = ox * cosRoll + (axisY * oz - axisZ * oy) * sinRoll + axisX * projection * (1.0F - cosRoll);
+            rolled[i * 3 + 1] = oy * cosRoll + (axisZ * ox - axisX * oz) * sinRoll + axisY * projection * (1.0F - cosRoll);
+            rolled[i * 3 + 2] = oz * cosRoll + (axisX * oy - axisY * ox) * sinRoll + axisZ * projection * (1.0F - cosRoll);
+        }
         // 头部：与通用粒子一致的分刻插值
         double x = Mth.lerp(partialTick, this.xo, this.x);
         double y = Mth.lerp(partialTick, this.yo, this.y);
@@ -131,10 +150,9 @@ public class ZenithParticle extends TextureSheetParticle {
         float[] front = new float[12];
         float[] back = new float[12];
         for (int i = 0; i < 4; i++) {
-            Vec3 corner = this.corners[i];
-            float cx = hx + (float) corner.x * size;
-            float cy = hy + (float) corner.y * size;
-            float cz = hz + (float) corner.z * size;
+            float cx = hx + rolled[i * 3] * size;
+            float cy = hy + rolled[i * 3 + 1] * size;
+            float cz = hz + rolled[i * 3 + 2] * size;
             front[i * 3] = cx + dx;
             front[i * 3 + 1] = cy + dy;
             front[i * 3 + 2] = cz + dz;

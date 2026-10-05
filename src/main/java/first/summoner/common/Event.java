@@ -50,7 +50,8 @@ public class Event {
         if (!player.level().isClientSide()) {
             data.tick();
         } else {
-            if (Minecraft.getInstance().options.keyUse.isDown() && data.swing()) {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.isLocalPlayer(player.getUUID()) && minecraft.options.keyUse.isDown() && data.swing()) {
                 PacketDistributor.sendToServer(new ZenithPacket());
             }
         }
