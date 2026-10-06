@@ -18,6 +18,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public class ZenithData {
 
@@ -36,64 +37,67 @@ public class ZenithData {
         if (owner.getMainHandItem().is(SummonerItemRegister.Zenith)) {
             if (power > 3.33f) {
                 Playable.play(SummonerSoundRegister.Zenith, owner.level(), owner.position(), owner.getSoundSource());
-                do {
-                    power -= 3.33f;
-                    Vec3 lookAngle = owner.getLookAngle();
-                    Vec3 center = owner.getBoundingBox().getCenter();
-                    RandomSource random = owner.getRandom();
-                    Vec3 eyePos = owner.getEyePosition();
-                    int reach = 32;
-                    Vec3 endEndPos = eyePos.add(lookAngle.scale(reach));
-                    EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(owner, eyePos, endEndPos, owner.getBoundingBox().inflate(reach), entity -> entity instanceof LivingEntity living && living.isAlive() && living != owner, reach * reach);
-                    if (entityHit != null && entityHit.getEntity() instanceof LivingEntity) {
-                        endEndPos = entityHit.getLocation();
-                    }
-                    TargetCache targetCache = owner.getData(LyraAttachmentRegister.TargetCache);
-                    List<LivingEntity> targetList = targetCache.getEntitiesInRadius(endEndPos, 32, null);
-                    LivingEntity best = null;
-                    if (!targetList.isEmpty()) {
-                        int searchRange = 32;
-                        double fovAngle = 30;
-                        double distanceWeight = 0.2;
-                        double bestScore = Double.MAX_VALUE;
-                        for (LivingEntity living : targetList) {
-                            Vec3 targetPoint = living.getBoundingBox().getCenter();
-                            Vec3 toEntity = targetPoint.subtract(center);
-                            double angle = Math.toDegrees(Math.acos(toEntity.dot(lookAngle) / toEntity.length()));
-                            if (angle <= fovAngle) {
-                                // 角度、距离分别归一化到 [0,1]
-                                double normalizedAngle = angle / fovAngle;
-                                double normalizedDistance = toEntity.length() / searchRange;
-                                // 综合分数：按权重合成角度与距离，越小越优先
-                                double score = (1.0 - distanceWeight) * normalizedAngle + distanceWeight * normalizedDistance;
-                                if (score < bestScore) {
-                                    bestScore = score;
-                                    best = living;
-                                }
+                Vec3 lookAngle = owner.getLookAngle();
+                Vec3 center = owner.getBoundingBox().getCenter();
+                Vec3 eyePos = owner.getEyePosition();
+                int reach = 32;
+                Vec3 endEndPos = eyePos.add(lookAngle.scale(reach));
+                EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(owner, eyePos, endEndPos, owner.getBoundingBox().inflate(reach), entity -> entity instanceof LivingEntity living && living.isAlive() && living != owner, reach * reach);
+                if (entityHit != null && entityHit.getEntity() instanceof LivingEntity) {
+                    endEndPos = entityHit.getLocation();
+                }
+                TargetCache targetCache = owner.getData(LyraAttachmentRegister.TargetCache);
+                Predicate<LivingEntity> predicate = target -> owner != target && !(target instanceof Player player && (player.isSpectator() || player.isCreative()));
+                List<LivingEntity> targetList = targetCache.getEntitiesInRadius(endEndPos, 32, predicate);
+                LivingEntity best = null;
+                if (!targetList.isEmpty()) {
+                    int searchRange = 32;
+                    double fovAngle = 30;
+                    double distanceWeight = 0.2;
+                    double bestScore = Double.MAX_VALUE;
+                    for (LivingEntity living : targetList) {
+                        Vec3 targetPoint = living.getBoundingBox().getCenter();
+                        Vec3 toEntity = targetPoint.subtract(center);
+                        double angle = Math.toDegrees(Math.acos(toEntity.dot(lookAngle) / toEntity.length()));
+                        if (angle <= fovAngle) {
+                            // 角度、距离分别归一化到 [0,1]
+                            double normalizedAngle = angle / fovAngle;
+                            double normalizedDistance = toEntity.length() / searchRange;
+                            // 综合分数：按权重合成角度与距离，越小越优先
+                            double score = (1.0 - distanceWeight) * normalizedAngle + distanceWeight * normalizedDistance;
+                            if (score < bestScore) {
+                                bestScore = score;
+                                best = living;
                             }
                         }
                     }
-                    float distance = (float) eyePos.distanceTo(endEndPos);
+                }
+                do {
+                    power -= 3.33f;
                     Zenith zenith = new Zenith();
                     zenith.setOwner(owner);
                     zenith.setDamage((float) owner.getAttributeValue(Attributes.ATTACK_DAMAGE));
                     zenith.setKnockback(1);
-                    Vec3 endPos = endEndPos.add(Vec3.ZERO.subtract(Vec3.ZERO.offsetRandom(random, distance * 0.2f)));
-                    if ( random.nextFloat() < 0.33) {
+                    RandomSource random = owner.getRandom();
+                    if (random.nextFloat() < 0.33) {
                         zenith.renderType = Zenith.RenderType.ZENITH;
                     }
+                    float distance = (float) eyePos.distanceTo(endEndPos);
+                    Vec3 endPos = endEndPos.offsetRandom(random, distance * 0.1f);
                     if (zenith.renderType != Zenith.RenderType.ZENITH) {
-                        List<LivingEntity> radius = zenith.getTargetCache().getEntitiesInRadius(endPos, 10, null);
+                        List<LivingEntity> radius = zenith.getTargetCache().getEntitiesInRadius(endPos, 10, predicate);
                         if (!radius.isEmpty()) {
-                            endPos = radius.get(owner.getRandom().nextInt(radius.size())).getBoundingBox().getCenter();
+                            LivingEntity living = radius.get(random.nextInt(radius.size()));
+                            endPos = living.getBoundingBox().getCenter();
+                            zenith.target = living;
                         } else {
                             if (best != null) {
                                 endPos = best.getBoundingBox().getCenter();
+                                zenith.target = best;
                             }
                         }
                     }
                     zenith.offest = endPos.subtract(center);
-                    zenith.target = best;
                     zenith.init(zenith.getRenderNode(1));
                     LyraHelper.get(owner).add(zenith);
                 } while (power > 3.33f);

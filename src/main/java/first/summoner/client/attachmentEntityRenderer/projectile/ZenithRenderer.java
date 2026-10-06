@@ -23,10 +23,16 @@ public class ZenithRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
     protected RenderContext<Zenith> createContext(Zenith zenith, PathNode visualNode, float partialTick, int packedLight) {
         if (zenith.getTickCount() >= 1) {
             context = super.createContext(zenith, visualNode, partialTick, packedLight);
-            if (zenith.alpha > 0.2) {
-                context = context.trail(new ZenithTrailContext().upOffset(1.32575f).tipAlphaBoost((entity, progress) -> (1.0F - progress) * 20.0F * zenith.alpha).timer(1).colorRGB(zenith.renderType.getColor()));
+            if (zenith.alpha > 0.3) {
+                context = context.trail(new ZenithTrailContext()
+                                                .downOffset(-1.32575f)
+                                                .tipAlphaBoost((entity, progress) -> (1.0F - progress) * 20.0F * zenith.alpha).timer(1)
+                                                .colorRGB(zenith.renderType.getColor()));
             }
-            return context.model(new ModelContext().scale(2).translateOffset(-0.5f, -0.5f, -0.5f).rotationOffset(0, 90, 45));
+            return context.model(new ModelContext()
+                                         .scale(2)
+                                         .translateOffset(-1f, -1f, -0.5f)
+                                         .rotationOffset(0, 90, 45));
         } else {
             return null;
         }
@@ -56,9 +62,9 @@ public class ZenithRenderer extends AbstractAttachmentEntityRenderer<Zenith> {
             }
             alpha = EasingCurve.EASE_IN_OUT_QUAD.apply(alpha);
             if (alpha > 0) {
-                Vec3 pos = visualNode.pos().add(Vec3.directionFromRotation(visualNode.pitch(), visualNode.yaw()).normalize().scale(1.15));
+                Vec3 pos = visualNode.pos();
                 int color = FastColor.ARGB32.color((int) (alpha * 255), context.trail.colorRGB);
-                RenderUtil.renderImage(Summoner.rl("textures/zenith.png"), pos, 6 * alpha, 1.5f * alpha, bufferSource, false, color);
+                RenderUtil.renderImage(Summoner.rl("textures/zenith.png"), pos, 4 * alpha, alpha, bufferSource, false, color);
             }
         }
     }

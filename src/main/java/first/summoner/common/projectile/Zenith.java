@@ -14,6 +14,7 @@ import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -63,25 +64,27 @@ public class Zenith extends AttachmentEntity implements IEntityCollision<Zenith>
     public void tick() {
         super.tick();
         setCurrentPathNode(getRenderNode(1));
-        if (tickCount > 2 && tickCount < 8) {
-            int length = Math.clamp((int) (offest.length() * 0.5f), 2, 8);
+        if (tickCount < 8) {
+            int length = Math.clamp((int) (offest.length()), 2, 16);
             for (int i = 1; i < length; i++) {
-                float partialTick = (float) (i / length);
-                int count = random.nextInt(-4, 2);
+                float partialTick = (float) i / length;
+                int count = random.nextInt(-6, 2);
                 for (int j = 0; j < count; j++) {
-                    Vec3 scaled = getLookAngle().scale(1.15 * random.nextFloat());
-                    Vec3 pos = getRenderNode(partialTick).pos().add(scaled);
-                    Vec3 next = getRenderNode(partialTick + 0.125f).pos().add(scaled);
-                    Vec3 subtract = next.subtract(pos);
-                    float range = 0.25f;
-                    Vec3 velocity = next.add(subtract.normalize()).add(random.nextFloat(-range, range), random.nextFloat(-range, range), random.nextFloat(-range, range)).subtract(pos).normalize();
-                    float scale = random.nextFloat(0.01f, 0.06f);
-                    float speed = random.nextFloat(0.2F, 0.4F);
-                    float friction = random.nextFloat(0.6F, 0.8F);
+                    PathNode currentNode = getRenderNode(partialTick);
+                    double factor = 1.15 * random.nextFloat(-2, 0);
+                    Vec3 currentPos = currentNode.pos().add(Vec3.directionFromRotation(currentNode.pitch(), currentNode.yaw()).normalize().scale(factor));
+                    PathNode nextNode = getRenderNode(Math.min(partialTick + 0.01f, 1));
+                    Vec3 nextPos = nextNode.pos().add(Vec3.directionFromRotation(nextNode.pitch(), nextNode.yaw()).normalize().scale(factor));
+                    Vec3 subtract = nextPos.subtract(currentPos);
+                    float range = 0.1f;
+                    Vec3 velocity = nextPos.add(subtract.normalize()).add(random.nextFloat(-range, range), random.nextFloat(-range, range), random.nextFloat(-range, range)).subtract(currentPos).normalize();
+                    float scale = random.nextFloat(0.01f, 0.03f);
+                    float speed = random.nextFloat(0.3F, 0.6F);
+                    float friction = random.nextFloat(0.5F, 0.75F);
                     int life = random.nextInt(5, 15) + i * 2;
                     ParticleHelper.create(getLevel())
                             .type(new ZenithParticleOptions(renderType.getColor(), life, friction, scale))
-                            .pos(pos)
+                            .pos(currentPos)
                             .velocity(velocity.scale(speed))
                             .count(0)
                             .emit();
@@ -110,11 +113,14 @@ public class Zenith extends AttachmentEntity implements IEntityCollision<Zenith>
     public Ellipse getRenderEllipse(float partialTick) {
         Vec3 currentPos = owner.getPosition(partialTick).add(0, owner.getBbHeight() / 2, 0);
         Vec3 pointA = target != null ? target.getPosition(partialTick).add(0, target.getBbHeight() / 2, 0) : currentPos.add(offest);
-        Vec3 pointB = currentPos.add(currentPos.subtract(pointA).normalize().scale(2));
+        Vec3 pointB = currentPos.add(currentPos.subtract(pointA).normalize().scale(4));
+        if (pointA.distanceTo(pointB) < 8) {
+            pointA = pointB.add(pointA.subtract(pointB).normalize().scale(8));
+        }
         RandomSource random = getRandom();
         random.setSeed(getUuid().hashCode());
         Vec3 normal = Ellipse.randomPlaneNormal(random, pointA, pointB);
-        float curvature = 0.3f + random.nextFloat() * 0.6f;
+        float curvature = 0.1f + random.nextFloat() * 0.4f + Math.min(0.6f, 6 / (float) (pointA.distanceTo(pointB) + 1));
         return new Ellipse(pointA, pointB, normal, curvature);
     }
 
@@ -145,12 +151,12 @@ public class Zenith extends AttachmentEntity implements IEntityCollision<Zenith>
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.35, -0.1, -1.5, 0.35, 0.1, 1.5);
+        return new AABB(-0.35, -0.1, -3.2, 0.35, 0.1, 0.2);
     }
 
     @Override
-    public boolean isValidCollisionTarget(Zenith entity, LivingEntity target) {
-        return owner != target;
+    public boolean isValidCollisionTarget(Zenith zenith, LivingEntity target) {
+        return owner != target && !(target instanceof Player player && (player.isSpectator() || player.isCreative()));
     }
 
     @Override

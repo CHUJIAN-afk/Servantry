@@ -26,8 +26,6 @@ public class ZenithTrailContext extends RibbonTrailContext<Zenith> {
                 result.add(new InterpolatedNode(node.pos(), node.toQuaternion()));
                 tick -= 0.05f;
             }
-            PathNode node = entity.getRenderNodeFromTickCount(0);
-            result.add(new InterpolatedNode(node.pos(), node.toQuaternion()));
         }
         return result;
     }
