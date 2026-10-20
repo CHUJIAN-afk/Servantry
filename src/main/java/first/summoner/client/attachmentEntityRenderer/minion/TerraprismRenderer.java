@@ -1,7 +1,7 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.api.LyraAPI;
+import first.lyra.client.light.LyraLights;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
@@ -12,6 +12,7 @@ import first.summoner.common.minion.minion.Terraprism;
 import first.summoner.register.SummonerModelRegister;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.util.Color;
 
 public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terraprism> {
@@ -32,10 +33,18 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
 
     @Override
     protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
+        Color color = context.color;
         LyraModelRenderer.json(SummonerModelRegister.TERRAPRISM)
-                .color(context.color.argbInt())
+                .color(color.argbInt())
                 .light(context.packedLight)
                 .render(poseStack, bufferSource);
-        LyraAPI.light(context.visualNode.pos(), 8);
+        Vec3 pos = context.visualNode.pos();
+        LyraLights.next().point()
+                .at(pos.x(), pos.y(), pos.z())
+                .color(color.getRed(), color.getGreen(), color.getBlue())
+                .intensity(0.01f)
+                .range(1.5f)
+                .volumetric(0.5f)
+                .shadows(false);
     }
 }

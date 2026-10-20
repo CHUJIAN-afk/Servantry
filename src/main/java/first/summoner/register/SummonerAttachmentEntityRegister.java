@@ -116,8 +116,6 @@ public class SummonerAttachmentEntityRegister {
 
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MiniChlorophyteCrystal>> MINI_CHLOROPHYTE_CRYSTAL = register("mini_chlorophyte_crystal", MiniChlorophyteCrystal::new);
 
-    public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<Zenith>> ZENITH = register("zenith", Zenith::new);
-
     public static final DeferredHolder<AttachmentEntityType<?>, AttachmentEntityType<MoonPortalLaser>> MOON_PORTAL_LASER = register("moon_portal_laser", MoonPortalLaser::new);
 
 

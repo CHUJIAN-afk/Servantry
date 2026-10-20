@@ -135,6 +135,7 @@ tasks.named('processResources', ProcessResources).configure {
 
 repositories {
     mavenLocal()
+    maven { url 'https://maven.firstdark.dev/snapshots' }
     maven {
         url "https://cursemaven.com"
     }
@@ -152,7 +153,8 @@ repositories {
 }
 
 dependencies {
-    // 独立库 mod Lyra (first.lyra.*)
+    api('com.lowdragmc.photon:photon-neoforge-1.21.1:2.2.8') { transitive = false }
+    implementation 'com.lowdragmc.ldlib2:ldlib2-neoforge-1.21.1:2.2.42:all'
     api "first:Lyra:${lyra_version}"
     api "top.theillusivec4.curios:curios-neoforge:${curios_version}"
 }

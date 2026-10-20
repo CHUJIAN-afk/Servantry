@@ -82,7 +82,6 @@ public class SummonerAttachmentEntityRenderRegister {
         register(SummonerAttachmentEntityRegister.SHARK_DRAGON, SharkDragonRenderer::new);
         register(SummonerAttachmentEntityRegister.SHATTERED_STELLAR_CORE, ShatteredStellarCoreRenderer::new);
         register(SummonerAttachmentEntityRegister.MINI_CHLOROPHYTE_CRYSTAL, MiniChlorophyteCrystalRenderer::new);
-        register(SummonerAttachmentEntityRegister.ZENITH, ZenithRenderer::new);
         register(SummonerAttachmentEntityRegister.MOON_PORTAL_LASER, MoonPortalLaserRenderer::new);
         register(SummonerAttachmentEntityRegister.VOID_EATER_LASER, VoidEaterLaserRenderer::new);
         register(SummonerAttachmentEntityRegister.MINI_RAINBOW_CRYSTAL, RainbowCrystalRenderer::new);

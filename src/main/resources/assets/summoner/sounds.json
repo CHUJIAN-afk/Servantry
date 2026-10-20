@@ -1,9 +1,4 @@
 {
-  "zenith": {
-    "sounds": [
-      "summoner:zenith"
-    ]
-  },
   "use_terraprism": {
     "sounds": [
       "summoner:use_terraprism"
