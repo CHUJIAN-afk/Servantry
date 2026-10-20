@@ -3,12 +3,11 @@ package first.summoner.common.projectile;
 import first.lyra.common.attachmentEntity.AttachmentEntity;
 import first.lyra.common.attachmentEntity.IEntityCollision;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
-import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.projectile.Projectile;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.register.SummonerMobEffectRegister;
-import first.summoner.utils.ParticleHelper;
 import first.summoner.utils.SummonerStreamCodecs;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
@@ -19,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 月亮传送门激光：沿预先铺好的折线飞行 20 tick，沿途射线检测方块截断碰撞箱，命中施加月噬。
@@ -29,6 +29,7 @@ public class MoonPortalLaser extends Projectile implements IEntityCollision<Moon
 
     private static final float RADIUS = 0.15f;
 
+    private AABB lastHitbox = new AABB(0, 0, 0, 0, 0, 0);
     private AABB hitbox = new AABB(0, 0, 0, 0, 0, 0);
     /** 以下两个字段只在服务端 tick() 中使用（tick() 仅服务端调用），无需同步 */
     private Vec3 origin = Vec3.ZERO;
@@ -46,6 +47,7 @@ public class MoonPortalLaser extends Projectile implements IEntityCollision<Moon
     protected void registerSyncFields(SyncFieldDispatcher fields) {
         super.registerSyncFields(fields);
         fields.field(SummonerStreamCodecs.AABB, this::getHitbox, this::setHitbox);
+        fields.field(SummonerStreamCodecs.AABB, () -> lastHitbox, value -> lastHitbox = value);
     }
 
     /** 设定发射原点与追踪目标，需在加入世界前调用 */
@@ -56,6 +58,9 @@ public class MoonPortalLaser extends Projectile implements IEntityCollision<Moon
 
     public void setHitbox(AABB hitbox) {
         this.hitbox = hitbox;
+        if (Objects.equals(lastHitbox, new AABB(0, 0, 0, 0, 0, 0))) {
+            lastHitbox = hitbox;
+        }
     }
 
     /** 以线段长度作为激光长度，构造朝向 +Z 的局部碰撞箱 */
@@ -71,6 +76,7 @@ public class MoonPortalLaser extends Projectile implements IEntityCollision<Moon
     @Override
     public void tick() {
         super.tick();
+        lastHitbox = hitbox;
         float yaw = getCurrentPathNode().yaw();
         float pitch = getCurrentPathNode().pitch();
         Vec3 dir = Vec3.directionFromRotation(pitch, yaw);
@@ -78,7 +84,7 @@ public class MoonPortalLaser extends Projectile implements IEntityCollision<Moon
         HitResult hit = getLevel().clip(new ClipContext(origin, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner));
         Vec3 hitPos = hit.getType() != HitResult.Type.MISS ? hit.getLocation() : end;
         setHitbox(origin, hitPos, RADIUS);
-        emitParticles(hitPos, 0.25, 10, 0.35);
+        //emitParticles(hitPos, 0.25, 10, 0.35);
     }
 
     public void follow(AttachmentEntity source) {
@@ -97,29 +103,11 @@ public class MoonPortalLaser extends Projectile implements IEntityCollision<Moon
             if (attack(living, getDamage(), 3)) {
                 living.addEffect(new MobEffectInstance(SummonerMobEffectRegister.MoonBite, 60));
             }
-            emitParticles(living.getBoundingBox().getCenter(), 0.35, 2, 0.65);
+            //emitParticles(living.getBoundingBox().getCenter(), 0.35, 2, 0.65);
         }
     }
 
-    private void emitParticles(Vec3 pos, double offset, int count, double speed) {
-        ParticleHelper.create(getLevel())
-                .generic(GenericParticleBuilder.create()
-                                 .centerColor(0x00fdd6)
-                                 .edgeColor(0x00d4b0)
-                                 .lifetime(5)
-                                 .lifetimeRandom(5)
-                                 .spin(0.1f)
-                                 .spinRandom(0.05F)
-                                 .friction(0.75F)
-                                 .scale(0.045f)
-                                 .scaleRandom(0.005f)
-                )
-                .pos(pos)
-                .offset(offset)
-                .velocity(pos.offsetRandom(getRandom(), 2).subtract(pos).normalize())
-                .count(count)
-                .speed(speed)
-                .spread(2)
-                .emit();
+    public float getLength(float partialTick) {
+        return (float) Mth.lerp(partialTick, lastHitbox.getZsize(), hitbox.getZsize());
     }
 }

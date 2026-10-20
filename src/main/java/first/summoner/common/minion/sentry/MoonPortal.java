@@ -1,6 +1,7 @@
 package first.summoner.common.minion.sentry;
 
 import first.lyra.api.LyraHelper;
+import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.Minion;
 import first.summoner.common.projectile.MoonPortalLaser;
@@ -37,6 +38,19 @@ public class MoonPortal extends Minion {
     @Override
     public int getSearchDistance() {
         return 32;
+    }
+
+    @Override
+    public LivingEntity searchTarget() {
+        int distance = this.getSearchDistance();
+        if (distance > 0 && this.owner != null) {
+            TargetCache targetCache = this.getTargetCache();
+            List<LivingEntity> targets = targetCache.getEntitiesInRadius(getPos(), distance, (living) -> targetCache.isVisibility(this.owner, living) && targetCache.isTarget(living));
+            if (!targets.isEmpty()) {
+                return targetCache.getNewTarget(this, targets, 0.0F, true);
+            }
+        }
+        return null;
     }
 
     private void fireLaser(LivingEntity target) {

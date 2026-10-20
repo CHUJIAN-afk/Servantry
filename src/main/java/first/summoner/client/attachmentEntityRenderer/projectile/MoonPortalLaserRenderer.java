@@ -1,11 +1,11 @@
 package first.summoner.client.attachmentEntityRenderer.projectile;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import first.lyra.api.LyraAPI;
 import first.lyra.client.light.LyraLights;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
-import first.lyra.client.render.rendererHelper.LaserRendererHelper;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.summoner.common.projectile.MoonPortalLaser;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -30,14 +30,24 @@ public class MoonPortalLaserRenderer extends AbstractAttachmentEntityRenderer<Mo
 
     @Override
     protected void render(PoseStack poseStack, MultiBufferSource bufferSource) {
-        AABB hitbox = context.entity.getHitbox();
-        float length = (float) hitbox.getZsize();
+        MoonPortalLaser entity = context.entity;
+        AABB hitbox = entity.getHitbox();
         float width = (float) hitbox.getXsize() * 0.5f;
         PathNode visualNode = context.visualNode;
         Vec3 pos = visualNode.pos();
-        Color color = Color.ofOpaque(0x00fdd6);
         Vec3 normalize = Vec3.directionFromRotation(visualNode.pitch(), visualNode.yaw()).normalize();
-        LyraLights.next().spot(0f, 4)
+        Color color = Color.ofOpaque(0x00fdd6);
+        LyraAPI.flowingLaser()
+                .inner(0xd3fffa, 1f)
+                .edge(0x00fdd6, 3f)
+                .from(pos)
+                .direction(normalize)
+                .length(entity.getLength(context.partialTick))
+                .spread(60, 300f)
+                .radius(0, width, 0)
+                .flowSpeed(150)
+                .render(context.partialTick);
+        LyraLights.next().spot(0f, 3)
                 .at(pos.x(), pos.y(), pos.z())
                 .direction((float) normalize.x(), (float) normalize.y(), (float) normalize.z())
                 .range((float) hitbox.getZsize())
@@ -45,14 +55,5 @@ public class MoonPortalLaserRenderer extends AbstractAttachmentEntityRenderer<Mo
                 .intensity(3f)
                 .volumetric(1f)
                 .shadows(false);
-        LaserRendererHelper.builder()
-                .length(length)
-                .radius(0, width * 2)
-                .layers(3)
-                .segments(8)
-                .color(COLOR)
-                .alpha(0.95f)
-                .innerRatio(0.35f)
-                .render(poseStack, bufferSource);
     }
 }

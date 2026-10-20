@@ -12,6 +12,7 @@ import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
     private boolean isLaserEye = true;
     private Twins other = null;
     private int trailTimer = 0;
+    private Vec3 lastRenderPos = Vec3.ZERO;
 
     public Twins() {
         super(SummonerAttachmentEntityRegister.TWINS);
@@ -98,6 +100,18 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
         if (trailTimer > 0) {
             trailTimer--;
         }
+    }
+
+    public boolean updateLastRenderPos(Vec3 vec3) {
+        if (lastRenderPos == Vec3.ZERO) {
+            lastRenderPos = vec3;
+            return false;
+        }
+        if (lastRenderPos.distanceTo(vec3) > 0.35) {
+            lastRenderPos = vec3;
+            return true;
+        }
+        return false;
     }
 
     public int getSearchDistance() {
