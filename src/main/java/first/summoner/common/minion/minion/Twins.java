@@ -96,10 +96,7 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
     @Override
     public void tick() {
         super.tick();
-
-        if (trailTimer > 0) {
-            trailTimer--;
-        }
+        trailTimer = target != null ? 1 : 0;
     }
 
     public boolean updateLastRenderPos(Vec3 vec3) {
@@ -107,7 +104,7 @@ public class Twins extends MomentumMinion implements IEntityCollision<Twins>, IB
             lastRenderPos = vec3;
             return false;
         }
-        if (lastRenderPos.distanceTo(vec3) > 0.35) {
+        if (lastRenderPos.distanceTo(vec3) > 0.2) {
             lastRenderPos = vec3;
             return true;
         }

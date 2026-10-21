@@ -35,12 +35,12 @@ public class MoonPortalLaserRenderer extends AbstractAttachmentEntityRenderer<Mo
         Vec3 pos = visualNode.pos();
         Vec3 normalize = Vec3.directionFromRotation(visualNode.pitch(), visualNode.yaw()).normalize();
         LyraAPI.flowingLaser()
-                .inner(0xd8ffff, 1f)
-                .edge(0x019999, 3f)
+                .inner(0x72fcfc, 1f)
+                .edge(0x14eded, 2f)
                 .from(pos)
                 .direction(normalize)
                 .length(entity.getLength(context.partialTick))
-                .spread(60, 300f)
+                .spread(20, 400)
                 .radius(0, width, 0)
                 .flowSpeed(30)
                 .render(context.partialTick);

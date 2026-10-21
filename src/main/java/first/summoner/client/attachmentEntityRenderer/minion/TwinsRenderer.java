@@ -23,8 +23,8 @@ public class TwinsRenderer extends AbstractAttachmentEntityRenderer<Twins> {
                                .scale(0.5f)
                                .translateOffset(-0.5f, -0.25f, -0.5f)
                                .rotationOffset(180, 0, 0));
-        if (trailTimer > 0 && twins.updateLastRenderPos(visualNode.pos())) {
-            renderContext = renderContext.afterimage(new AfterimageContext().color(Color.ofOpaque(0xce4949)));
+        if (twins.getTrailTimer() > 0 && twins.updateLastRenderPos(visualNode.pos())) {
+            renderContext = renderContext.afterimage(new AfterimageContext().color(Color.ofOpaque(0xce4949)).lifetime(3));
         }
         return renderContext;
     }

@@ -59,7 +59,6 @@ public class TwinsCursedFlameAttackGoal extends AttachmentEntityGoal<Twins> {
                         cooldown = 14 + random.nextInt(-2, 2);
                         Vec3 direction = toTarget.offsetRandom(random, 0.25f).normalize();
                         minion.addVelocity(direction);
-                        minion.setTrailTimer(8);
                     }
                 }
             } else {
