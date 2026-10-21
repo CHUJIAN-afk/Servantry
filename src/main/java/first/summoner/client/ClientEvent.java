@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import first.summoner.Summoner;
 import first.summoner.client.render.FlameEffect;
 import first.summoner.client.render.MoonPortalEffect;
+import first.summoner.client.render.RainbowCrystalEffect;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
@@ -23,12 +24,19 @@ public class ClientEvent {
     public static void shaders(RegisterShadersEvent event) throws IOException {
         MoonPortalEffect.close();
         FlameEffect.close();
+        RainbowCrystalEffect.close();
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("moon_portal"), DefaultVertexFormat.POSITION), MoonPortalEffect::setShader);
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("moon_portal_beam"), DefaultVertexFormat.POSITION), MoonPortalEffect::setBeamShader);
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("moon_portal_resolve"), DefaultVertexFormat.POSITION), MoonPortalEffect::setResolveShader);
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("flame"), DefaultVertexFormat.POSITION), FlameEffect::setShader);
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("flame_color"), DefaultVertexFormat.POSITION), FlameEffect::setColorShader);
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("flame_composite"), DefaultVertexFormat.POSITION), FlameEffect::setCompositeShader);
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("rainbow_crystal"), DefaultVertexFormat.POSITION), RainbowCrystalEffect::setCrystalShader);
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("rainbow_crystal_projectile"), DefaultVertexFormat.POSITION), RainbowCrystalEffect::setProjectileShader);
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("rainbow_crystal_beam"), DefaultVertexFormat.POSITION), RainbowCrystalEffect::setBeamShader);
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("rainbow_crystal_spark"), DefaultVertexFormat.POSITION), RainbowCrystalEffect::setSparkShader);
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("rainbow_crystal_glow"), DefaultVertexFormat.POSITION), RainbowCrystalEffect::setGlowShader);
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("rainbow_crystal_resolve"), DefaultVertexFormat.POSITION), RainbowCrystalEffect::setResolveShader);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -36,6 +44,7 @@ public class ClientEvent {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) {
             MoonPortalEffect.render();
             FlameEffect.render();
+            RainbowCrystalEffect.render();
         }
     }
 
@@ -44,6 +53,7 @@ public class ClientEvent {
         if (event.getLevel().isClientSide()) {
             MoonPortalEffect.close();
             FlameEffect.close();
+            RainbowCrystalEffect.close();
         }
     }
 

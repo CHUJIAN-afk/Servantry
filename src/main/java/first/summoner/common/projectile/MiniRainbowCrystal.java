@@ -1,75 +1,54 @@
 package first.summoner.common.projectile;
 
-
 import first.lyra.common.attachment.TargetCache;
-import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.projectile.Projectile;
+import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.register.SummonerAttachmentEntityRegister;
-import first.summoner.utils.ParticleHelper;
-import net.minecraft.util.FastColor;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import java.util.List;
 
 public class MiniRainbowCrystal extends Projectile {
 
-    public MiniRainbowCrystal(){
+    public static final int PULSE_TICKS = 10;
+    public static final int SPARK_MIN_LIFE = 5;
+    public static final int SPARK_MAX_LIFE = 20;
+    public static final int LIFETIME = 40;
+    private Vec3 sourcePosition = Vec3.ZERO;
+
+    public MiniRainbowCrystal() {
         super(SummonerAttachmentEntityRegister.MINI_RAINBOW_CRYSTAL);
-        setDrag(1);
-        setMaxTickCount(20);
+        setPhysics(false);
+        setMaxTickCount(LIFETIME);
     }
 
-    public int getLife() {
-        return getTickCount();
+    @Override
+    protected void registerSyncFields(SyncFieldDispatcher fields) {
+        super.registerSyncFields(fields);
+        fields.field(LyraStreamCodecs.VEC_3, this::getSourcePosition, this::setSourcePosition);
+    }
+
+    public Vec3 getSourcePosition() {
+        return sourcePosition;
+    }
+
+    public void setSourcePosition(Vec3 sourcePosition) {
+        this.sourcePosition = sourcePosition;
     }
 
     @Override
     public void tick() {
         super.tick();
-
-        if (getTickCount() > 0 && getTickCount() % 9 == 0) {
-            Vec3 pos = getPos();
-            Vec3 direction = pos.subtract(pos.offsetRandom(getRandom(), 1)).normalize();
-            ParticleHelper.create(getLevel())
-                    .generic(GenericParticleBuilder.create()
-                                     .centerColor(getColor(0))
-                                     .edgeColor(getColor(0))
-                                     .lifetime(5)
-                                     .lifetimeRandom(5)
-                                     .spin(0.1f)
-                                     .spinRandom(0.05F)
-                                     .friction(0.75F)
-                                     .scale(0.06f)
-                                     .scaleRandom(0.006f)
-                    )
-                    .pos(pos)
-                    .offset(0.5)
-                    .velocity(direction)
-                    .count(100)
-                    .speed(0.5)
-                    .spread(2)
-                    .emit();
-            DamageSource damageSource = getDamageSource();
-            if (damageSource != null) {
-                TargetCache targetCache = getTargetCache();
-                List<LivingEntity> entities = targetCache.getEntitiesInRadius(pos, 3.5, living -> targetCache.isTarget(living));
-                for (LivingEntity living : entities) {
-                    attack(living, getDamage(), 0);
-                }
+        // Lyra 在 tick() 后推进 tickCount，伤害与同步后的视觉年龄保持一致。
+        int age = getTickCount() + 1;
+        if (age == PULSE_TICKS || age == PULSE_TICKS * 2) {
+            TargetCache targets = getTargetCache();
+            for (LivingEntity target : targets.getEntitiesInRadius(getPos(), 3.5, targets::isTarget)) {
+                attack(target, getDamage(), 0);
             }
         }
-    }
-
-    public int getColor(float partialTick) {
-        float t = (float) ((Math.toRadians(getUuid().hashCode() + tickCount + partialTick) % (Math.PI * 2)) / (Math.PI * 2));
-        float r = 0.5f + 0.5f * (float) Math.sin(t * Math.PI * 2);
-        float g = 0.5f + 0.5f * (float) Math.sin(t * Math.PI * 2 - Math.PI * 2 / 3);
-        float b = 0.5f + 0.5f * (float) Math.sin(t * Math.PI * 2 - Math.PI * 4 / 3);
-        return FastColor.ARGB32.color(255, (int) (r * 255), (int) (g * 255), (int) (b * 255));
-    }
-
-    @Override
-    public void tickPhysics() {
+        if (age >= LIFETIME) {
+            setRemove();
+        }
     }
 }

@@ -1,0 +1,24 @@
+{
+  "vertex": "summoner:rainbow_crystal_beam",
+  "fragment": "summoner:rainbow_crystal_beam",
+  "samplers": [
+    { "name": "SceneDepth" }
+  ],
+  "attributes": ["Position"],
+  "uniforms": [
+    { "name": "EffectToView", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "ViewToEffect", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "InverseProjection", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "CameraInEffect", "type": "float", "count": 3, "values": [0, 0, 0] },
+    { "name": "EffectProjection", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "EffectSize", "type": "float", "count": 2, "values": [1, 1] },
+    { "name": "EffectAlpha", "type": "float", "count": 1, "values": [1] },
+    { "name": "EffectPhase", "type": "float", "count": 1, "values": [0] },
+    { "name": "FogStart", "type": "float", "count": 1, "values": [0] },
+    { "name": "FogEnd", "type": "float", "count": 1, "values": [1000] },
+    { "name": "SourcePosition", "type": "float", "count": 3, "values": [0, 0, 1] },
+    { "name": "EffectAge", "type": "float", "count": 1, "values": [0] },
+    { "name": "EffectTime", "type": "float", "count": 1, "values": [0] },
+    { "name": "PulseTicks", "type": "float", "count": 1, "values": [10] }
+  ]
+}
