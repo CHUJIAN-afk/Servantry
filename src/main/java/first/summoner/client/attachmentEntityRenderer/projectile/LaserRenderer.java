@@ -38,9 +38,8 @@ public class LaserRenderer extends AbstractAttachmentEntityRenderer<Laser> {
         LyraLights.next().point()
                 .at(pos.x(), pos.y(), pos.z())
                 .color(color.getRed(), color.getGreen(), color.getBlue())
-                .intensity(0.01f)
-                .range(1.5f)
-                .volumetric(0.5f)
+                .intensity(0.005f)
+                .range(1f)
                 .shadows(false);
     }
 }

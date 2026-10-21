@@ -1,7 +1,6 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import first.lyra.api.LyraAPI;
 import first.lyra.client.render.AbstractAttachmentEntityRenderer;
 import first.lyra.client.render.ModelContext;
 import first.lyra.client.render.RenderContext;
@@ -34,6 +33,5 @@ public class EnchantedThrowingKnivesRenderer extends AbstractAttachmentEntityRen
                 .color(context.color.argbInt())
                 .light(context.packedLight)
                 .render(poseStack, bufferSource);
-        LyraAPI.light(context.visualNode.pos(), 4);
     }
 }

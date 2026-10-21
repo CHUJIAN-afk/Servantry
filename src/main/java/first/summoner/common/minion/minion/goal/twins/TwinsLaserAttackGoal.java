@@ -4,12 +4,10 @@ package first.summoner.common.minion.minion.goal.twins;
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.lyra.common.attachmentEntity.PathNode;
-import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
 import first.lyra.common.sound.Playable;
 import first.summoner.common.minion.minion.Twins;
 import first.summoner.common.projectile.Laser;
 import first.summoner.register.SummonerSoundRegister;
-import first.summoner.utils.ParticleHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -75,23 +73,5 @@ public class TwinsLaserAttackGoal extends AttachmentEntityGoal<Twins> {
         projectile.setDamage(minion.getDamage() * 1.1f);
         LyraHelper.get(owner).add(projectile);
         Playable.play(SummonerSoundRegister.Laser, level, start, minion.getSoundSource());
-        ParticleHelper.create(level)
-                .generic(GenericParticleBuilder.create()
-                        .centerColor(0xb70700)
-                        .edgeColor(0xFF0700)
-                        .lifetime(5)
-                        .lifetimeRandom(5)
-                        .spin(0.1f)
-                        .spinRandom(0.05F)
-                        .friction(0.75F)
-                        .scale(0.045f)
-                        .scaleRandom(0.005f)
-                )
-                .pos(start)
-                .velocity(direction)
-                .count(2)
-                .speed(0.65)
-                .spread(0.2)
-                .emit();
     }
 }

@@ -1,0 +1,23 @@
+{
+  "vertex": "summoner:flame",
+  "fragment": "summoner:flame",
+  "samplers": [
+    { "name": "SceneDepth" }
+  ],
+  "attributes": ["Position"],
+  "uniforms": [
+    { "name": "FlameToView", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "ViewToFlame", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "FlameProjection", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "InverseProjection", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "CameraInFlame", "type": "float", "count": 3, "values": [0, 0, 0] },
+    { "name": "FlameColor", "type": "float", "count": 3, "values": [1, 1, 1] },
+    { "name": "EffectSize", "type": "float", "count": 2, "values": [1, 1] },
+    { "name": "FlameAge", "type": "float", "count": 1, "values": [0] },
+    { "name": "Opacity", "type": "float", "count": 1, "values": [1] },
+    { "name": "FlameTime", "type": "float", "count": 1, "values": [0] },
+    { "name": "FlamePhase", "type": "float", "count": 1, "values": [0] },
+    { "name": "FogStart", "type": "float", "count": 1, "values": [0] },
+    { "name": "FogEnd", "type": "float", "count": 1, "values": [1000] }
+  ]
+}

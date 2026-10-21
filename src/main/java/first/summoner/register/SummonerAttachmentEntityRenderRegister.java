@@ -1,6 +1,5 @@
 package first.summoner.register;
 
-import first.lyra.client.light.LyraLights;
 import first.lyra.client.render.AttachmentEntityRenderDispatcher;
 import first.lyra.client.render.IAttachmentEntityRenderer;
 import first.lyra.client.render.RenderContext;
@@ -12,14 +11,12 @@ import first.summoner.client.attachmentEntityRenderer.SimpleRenderer;
 import first.summoner.client.attachmentEntityRenderer.minion.*;
 import first.summoner.client.attachmentEntityRenderer.projectile.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.util.Color;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -82,17 +79,7 @@ public class SummonerAttachmentEntityRenderRegister {
         // ===================== 射弹 =====================
         register(SummonerAttachmentEntityRegister.MINI_STARDUST_CELL, MiniStardustRenderer::new);
         register(SummonerAttachmentEntityRegister.LASER, LaserRenderer::new);
-        register(SummonerAttachmentEntityRegister.DEMON_FLAME, () -> simpleRenderer(null, 0, context -> {
-            Vec3 pos = context.visualNode.pos();
-            Color color = Color.ofOpaque(0x24d509);
-            LyraLights.next().point()
-                    .at(pos.x(), pos.y(), pos.z())
-                    .color(color.getRed(), color.getGreen(), color.getBlue())
-                    .intensity(0.01f)
-                    .range(1.5f)
-                    .volumetric(0.5f)
-                    .shadows(false);
-        }));
+        register(SummonerAttachmentEntityRegister.DEMON_FLAME, DemonFlameRenderer::new);
         register(SummonerAttachmentEntityRegister.SHARK_DRAGON, SharkDragonRenderer::new);
         register(SummonerAttachmentEntityRegister.SHATTERED_STELLAR_CORE, ShatteredStellarCoreRenderer::new);
         register(SummonerAttachmentEntityRegister.MINI_CHLOROPHYTE_CRYSTAL, MiniChlorophyteCrystalRenderer::new);

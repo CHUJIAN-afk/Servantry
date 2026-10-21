@@ -17,7 +17,7 @@ public class DemonFlame extends Projectile implements IEntityCollision<DemonFlam
     public DemonFlame() {
         super(SummonerAttachmentEntityRegister.DEMON_FLAME);
         setMaxTickCount(7);
-        setGravity(0);
+        setGravity(0.025f);
     }
 
     @Override

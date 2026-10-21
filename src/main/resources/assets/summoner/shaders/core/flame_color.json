@@ -1,0 +1,11 @@
+{
+  "vertex": "summoner:flame_resolve",
+  "fragment": "summoner:flame_color",
+  "samplers": [
+    { "name": "FlameField" }
+  ],
+  "attributes": ["Position"],
+  "uniforms": [
+    { "name": "EffectSize", "type": "float", "count": 2, "values": [1, 1] }
+  ]
+}
