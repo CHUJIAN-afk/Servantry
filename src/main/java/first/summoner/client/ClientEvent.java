@@ -22,6 +22,7 @@ public class ClientEvent {
     public static void shaders(RegisterShadersEvent event) throws IOException {
         MoonPortalEffect.close();
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("moon_portal"), DefaultVertexFormat.POSITION), MoonPortalEffect::setShader);
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("moon_portal_beam"), DefaultVertexFormat.POSITION), MoonPortalEffect::setBeamShader);
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("moon_portal_resolve"), DefaultVertexFormat.POSITION), MoonPortalEffect::setResolveShader);
     }
 

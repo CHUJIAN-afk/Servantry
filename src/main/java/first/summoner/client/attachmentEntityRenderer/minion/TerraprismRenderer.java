@@ -42,9 +42,9 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
         LyraLights.next().point()
                 .at(pos.x(), pos.y(), pos.z())
                 .color(color.getRed(), color.getGreen(), color.getBlue())
-                .intensity(0.01f)
-                .range(1.5f)
-                .volumetric(0.5f)
+                .intensity(0.001f)
+                .range(1f)
+                .volumetric(1f)
                 .shadows(false);
     }
 }

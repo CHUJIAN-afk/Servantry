@@ -36,8 +36,8 @@ public class MoonPortalRenderer extends AbstractAttachmentEntityRenderer<MoonPor
         LyraLights.next().point()
                 .at(pos.x(), pos.y(), pos.z())
                 .color(color.getRed(), color.getGreen(), color.getBlue())
-                .intensity(0.05f)
-                .volumetric(0.75f)
+                .intensity(0.004f)
+                .volumetric(1f)
                 .range(2.5f)
                 .shadows(false);
     }
