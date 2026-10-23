@@ -1,5 +1,6 @@
 package first.summoner.client.attachmentEntityRenderer.minion;
 
+import com.lowdragmc.lowdraglib2.math.HDRColor;
 import com.lowdragmc.photon.client.compat.iris.IrisCompat;
 import com.lowdragmc.photon.client.gameobject.emitter.data.MaterialSetting;
 import com.lowdragmc.photon.client.gameobject.emitter.data.RendererSetting;
@@ -13,7 +14,7 @@ import com.lowdragmc.photon.client.gameobject.particle.IParticle;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import first.lyra.Lyra;
+import first.summoner.Summoner;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -32,23 +33,29 @@ import java.util.function.Function;
 
 public class TerraprismTrailPass extends PhotonFXRenderPass {
 
-    private static final TerraprismTrailPass PASS = new TerraprismTrailPass();
+    private static final TerraprismTrailPass PASS = new TerraprismTrailPass(false);
+    private static final TerraprismTrailPass HIGHLIGHT = new TerraprismTrailPass(true);
     private static final RandomSource RANDOM = RandomSource.create();
     private static Carrier carrier;
 
-    private TerraprismTrailPass() {
-        super(createRenderer(), VertexFormat.Mode.QUADS, DefaultVertexFormat.BLOCK);
+    private TerraprismTrailPass(boolean highlight) {
+        super(createRenderer(highlight), VertexFormat.Mode.QUADS, DefaultVertexFormat.BLOCK);
     }
 
-    private static RendererSetting.Runtime createRenderer() {
-        TextureMaterial texture = new TextureMaterial(Lyra.rl("textures/trail.png"));
+    private static RendererSetting.Runtime createRenderer(boolean highlight) {
+        TextureMaterial texture = new TextureMaterial(Summoner.rl("textures/particle/terraprism_trail.png"));
         texture.setDiscardThreshold(0.001f);
+        if (highlight) {
+            texture.setHdr(HDRColor.white().withIntensity(3f));
+            texture.setHdrMode(TextureMaterial.HDRMode.MULTIPLICATIVE);
+        }
         MaterialSetting material = new MaterialSetting(texture).setCull(false).setDepthTest(true).setDepthMask(false);
-        material.setBlend(BlendMode.Preset.ALPHA.create());
+        material.setBlend((highlight ? BlendMode.Preset.ADDITIVE : BlendMode.Preset.ALPHA).create());
         RendererSetting setting = new RendererSetting();
         setting.setMaterials(List.of(material));
         setting.setVertexSortingMode(RendererSetting.SortMode.DISTANCE);
         setting.setCompositeMode(FXCompositeMode.LATE);
+        setting.setOrderInLayer(highlight ? 1 : 0);
         return new RendererSetting.Runtime(setting) {
         };
     }
@@ -59,13 +66,14 @@ public class TerraprismTrailPass extends PhotonFXRenderPass {
         }
     }
 
-    public static void submit(List<Vertex> vertices) {
+    public static void submit(List<Vertex> vertices, List<Vertex> highlight) {
         if (carrier == null) {
             Minecraft minecraft = Minecraft.getInstance();
             carrier = new Carrier(minecraft.level);
             minecraft.particleEngine.add(carrier);
         }
-        carrier.ribbons.add(new Ribbon(vertices));
+        carrier.ribbons.add(new Ribbon(vertices, false));
+        carrier.ribbons.add(new Ribbon(highlight, true));
     }
 
     public static void close() {
@@ -108,7 +116,9 @@ public class TerraprismTrailPass extends PhotonFXRenderPass {
         public void render(VertexConsumer buffer, Camera camera, float partialTick) {
             if (!IrisCompat.isShadowPass() && buffer instanceof RenderPassPipeline pipeline && !ribbons.isEmpty()) {
                 pipeline.setupRenderingState(camera, partialTick);
-                pipeline.pipeQueue(PASS, ribbons);
+                for (IParticle ribbon : ribbons) {
+                    pipeline.pipeQueue(ribbon.getRenderType(), List.of(ribbon));
+                }
                 ribbons.clear();
             }
         }
@@ -124,11 +134,11 @@ public class TerraprismTrailPass extends PhotonFXRenderPass {
         }
     }
 
-    private record Ribbon(List<Vertex> vertices) implements IParticle {
+    private record Ribbon(List<Vertex> vertices, boolean highlight) implements IParticle {
 
         @Override
         public PhotonFXRenderPass getRenderType() {
-            return PASS;
+            return highlight ? HIGHLIGHT : PASS;
         }
 
         @Override

@@ -8,6 +8,7 @@ import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.attachmentEntity.RenderKeyframe;
 import first.summoner.common.minion.minion.Terraprism;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -17,10 +18,9 @@ public class TerraprismTrailContext extends RibbonTrailContext<Terraprism> {
     private final Map<Terraprism, History> histories = new WeakHashMap<>();
 
     public TerraprismTrailContext() {
-        upOffset = 1.015f;
-        downOffset = -0.5f;
+        upOffset = 0;
+        downOffset = -1.515f;
         historyLength = 3;
-        colorFunction = Terraprism::getColor;
     }
 
     @Override
@@ -28,36 +28,53 @@ public class TerraprismTrailContext extends RibbonTrailContext<Terraprism> {
         if (!IrisCompat.isShadowPass() && context.color.getAlphaFloat() > 0f) {
             List<InterpolatedNode> nodes = buildSmoothNodes(context.entity, context.visualNode, context.partialTick);
             if (nodes.size() > 1) {
-                List<TerraprismTrailPass.Vertex> vertices = new ArrayList<>((nodes.size() - 1) * 4);
-                Vector3f tip = new Vector3f();
-                Vector3f base = new Vector3f();
-                Vector3f previousTip = new Vector3f();
-                Vector3f previousBase = new Vector3f();
-                for (int i = 0; i < nodes.size() - 1; i++) {
-                    InterpolatedNode current = nodes.get(i);
-                    InterpolatedNode previous = nodes.get(i + 1);
-                    float progress = (float) i / (nodes.size() - 1);
-                    float previousProgress = (float) (i + 1) / (nodes.size() - 1);
-                    tip.set(0, 0, upOffset).rotate(current.rot());
-                    base.set(0, 0, downOffset).rotate(current.rot());
-                    previousTip.set(0, 0, upOffset).rotate(previous.rot());
-                    previousBase.set(0, 0, downOffset).rotate(previous.rot());
-                    int color = colorFunction.getColor(context.entity, progress, context.partialTick);
-                    int previousColor = colorFunction.getColor(context.entity, previousProgress, context.partialTick);
-                    float alpha = fadeOut.getFade(progress) * context.color.getAlphaFloat();
-                    float previousAlpha = fadeOut.getFade(previousProgress) * context.color.getAlphaFloat();
-                    int tipColor = packColor(color, alpha * 0.8f);
-                    int baseColor = packColor(color, alpha * 0.08f);
-                    int previousTipColor = packColor(previousColor, previousAlpha * 0.8f);
-                    int previousBaseColor = packColor(previousColor, previousAlpha * 0.08f);
-                    vertices.add(new TerraprismTrailPass.Vertex(current.pos().add(tip.x, tip.y, tip.z), tipColor, 0, 0));
-                    vertices.add(new TerraprismTrailPass.Vertex(current.pos().add(base.x, base.y, base.z), baseColor, 1, 0));
-                    vertices.add(new TerraprismTrailPass.Vertex(previous.pos().add(previousBase.x, previousBase.y, previousBase.z), previousBaseColor, 1, 1));
-                    vertices.add(new TerraprismTrailPass.Vertex(previous.pos().add(previousTip.x, previousTip.y, previousTip.z), previousTipColor, 0, 1));
+                double[] lengths = new double[nodes.size()];
+                for (int i = 1; i < nodes.size(); i++) {
+                    lengths[i] = lengths[i - 1] + nodes.get(i - 1).pos().distanceTo(nodes.get(i).pos());
                 }
-                TerraprismTrailPass.submit(vertices);
+                double length = lengths[lengths.length - 1];
+                List<TerraprismTrailPass.Vertex> vertices = new ArrayList<>((nodes.size() - 1) * 4);
+                List<TerraprismTrailPass.Vertex> highlight = new ArrayList<>((nodes.size() - 1) * 4);
+                int color = context.color.argbInt();
+                float opacity = context.color.getAlphaFloat();
+                Edge previous = edge(nodes.getFirst(), 0f, color, opacity);
+                for (int i = 1; i < nodes.size(); i++) {
+                    float progress = length > 1.0E-6 ? (float) (lengths[i] / length) : (float) i / (nodes.size() - 1);
+                    Edge current = edge(nodes.get(i), progress, color, opacity);
+                    vertices.add(previous.tip);
+                    vertices.add(previous.base);
+                    vertices.add(current.base);
+                    vertices.add(current.tip);
+                    highlight.add(previous.highlightTip);
+                    highlight.add(previous.highlightBase);
+                    highlight.add(current.highlightBase);
+                    highlight.add(current.highlightTip);
+                    previous = current;
+                }
+                TerraprismTrailPass.submit(vertices, highlight);
             }
         }
+    }
+
+    private Edge edge(InterpolatedNode node, float progress, int color, float opacity) {
+        Vector3f direction = new Vector3f(0, 0, 1).rotate(node.rot());
+        Vec3 axis = new Vec3(direction.x, direction.y, direction.z);
+        Vec3 tip = node.pos().add(axis.scale(upOffset));
+        float width = (upOffset - downOffset) * (1f - progress);
+        float alpha = fadeOut.getFade(progress) * opacity;
+        int bodyColor = packColor(color, alpha * 0.5f);
+        int highlightColor = packColor(color, alpha * 0.35f);
+        float margin = Math.min(0.008f, width * 0.15f);
+        float height = Math.min(0.04f, width * 0.5f);
+        return new Edge(
+                new TerraprismTrailPass.Vertex(tip, bodyColor, 0, progress),
+                new TerraprismTrailPass.Vertex(tip.subtract(axis.scale(width)), bodyColor, 1, progress),
+                new TerraprismTrailPass.Vertex(tip.subtract(axis.scale(margin)), highlightColor, 0, progress),
+                new TerraprismTrailPass.Vertex(tip.subtract(axis.scale(margin + height)), highlightColor, 1, progress));
+    }
+
+    private record Edge(TerraprismTrailPass.Vertex tip, TerraprismTrailPass.Vertex base,
+                        TerraprismTrailPass.Vertex highlightTip, TerraprismTrailPass.Vertex highlightBase) {
     }
 
     @Override

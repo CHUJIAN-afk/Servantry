@@ -81,12 +81,12 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
 
     @Override
     public int getSearchDistance() {
-        return 64;
+        return 32;
     }
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.15, -0.06, -0.5, 0.15, 0.06, 1.05);
+        return new AABB(-0.15, -0.06, -1.55, 0.15, 0.06, 0);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
             trailTimer = Math.max(0, trailTimer - 1);
         }
         if (getGoalSelector().getCurrentGoal() instanceof TerraprismIdleGoal && attackTimer == 0) {
-            idleBlend = Math.min(1f, idleBlend + 0.05f);
+            idleBlend = Math.min(1f, idleBlend + 0.25f);
         } else {
             idleBlend = Math.max(0f, idleBlend - 0.25f);
         }
@@ -160,15 +160,11 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     }
 
     public int getColor(float partialTick) {
-        return getColor(0f, partialTick);
-    }
-
-    public int getColor(float progress, float partialTick) {
+        int order = getOrder();
         int total = Math.max(1, getSameSize());
-        float phase = (float) Math.floorMod(getUuid().hashCode(), total) / total;
-        int animationTick = owner != null ? owner.tickCount : tickCount;
-        float hue = (phase + (animationTick + partialTick) / 60f + progress * 0.5f + 0.5f) % 1f;
-        return Mth.hsvToRgb(hue, 1f, 1f);
+        int animationTick = owner.tickCount;
+        float hueShift = ((float) order / total + (animationTick + partialTick) * 0.015f) % 1.0f;
+        return Mth.hsvToRgb(hueShift, 1, 1);
     }
 
     @Override
@@ -194,13 +190,12 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
             float rightX = (float) Math.cos(rad);
             float rightZ = (float) -Math.sin(rad);
             int order = getOrder();
+            Vec3 tipOffset = Vec3.directionFromRotation(75 - order * 5f, playerYaw - 90).scale(0.75 * Math.sqrt(2));
             double localZ = 0.75 + order * 0.12;
             double floatSpeed = 0.08 + order * 0.01;
             double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;
             Vec3 playerPos = owner.getPosition(partialTick);
-            Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX,
-                    owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075,
-                    localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
+            Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ).add(tipOffset);
             node = new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
         }
         return node;
