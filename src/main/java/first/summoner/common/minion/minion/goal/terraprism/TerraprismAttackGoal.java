@@ -1,27 +1,26 @@
 package first.summoner.common.minion.minion.goal.terraprism;
 
-
 import first.lyra.common.attachmentEntity.AttachmentEntityGoal;
 import first.lyra.common.attachmentEntity.Ellipse;
 import first.lyra.common.attachmentEntity.PathNode;
-import first.lyra.common.attachmentEntity.PlannedPath;
-import first.lyra.utils.EasingCurve;
 import first.summoner.common.minion.minion.Terraprism;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Function;
 
-/**
- * 泰拉棱镜仆从的攻击状态机。
- */
 public class TerraprismAttackGoal extends AttachmentEntityGoal<Terraprism> {
 
-    private boolean firstStrike = true;
-    private boolean lastEllipse = false;
-    private boolean flipRoll = false;
-    private Vec3 lastTargetPos = Vec3.ZERO;
+    private boolean dash;
+    private boolean resetHits;
+    private int frame;
+    private Vec3 start;
+    private Vec3 planeNormal;
+    private Vec3 lastTargetPos;
+    private Vec3 lastOwnerPos;
+    private Vec3 velocity = Vec3.ZERO;
+    private float curvature;
+    private float direction;
 
     public TerraprismAttackGoal(Terraprism minion) {
         super(minion);
@@ -29,223 +28,123 @@ public class TerraprismAttackGoal extends AttachmentEntityGoal<Terraprism> {
 
     @Override
     public boolean canUse() {
-        return minion.getTarget() != null && minion.attacking;
+        return minion.attacking && minion.getTarget() != null;
     }
 
     @Override
     public void start() {
-        firstStrike = true;
-        lastTargetPos = minion.getTarget().getBoundingBox().getCenter();
+        velocity = Vec3.ZERO;
+        beginAttack(true);
+    }
+
+    @Override
+    public void stop() {
+        minion.attacking = false;
     }
 
     @Override
     public void tick() {
-        PlannedPath currentPath = minion.getCurrentPath();
-        if (currentPath != null && currentPath.getCurrentIndex() == (currentPath.getNodes().size() / 3)) {
-            minion.hitTargets.clear();
-        }
-        applyPositionCorrection();
-        if (minion.isTargetChange()) {
-            planChainStrike();
-            lastEllipse = false;
-        }
-        if (!minion.isExecutingPath()) {
-            if (firstStrike) {
-                planFirstStrike();
-                firstStrike = false;
-                lastEllipse = false;
+        if (frame >= (dash ? 39 : 40) || !minion.getTargetCache().isTarget(minion.getTarget())) {
+            minion.setTarget(minion.findAttackTarget(true));
+            if (minion.getTarget() != null) {
+                beginAttack(minion.getRandom().nextBoolean());
             } else {
-                if (minion.getRandom().nextDouble() < 0.75 && !flipRoll) {
-                    planEllipseSlash();
-                    lastEllipse = true;
-                } else {
-                    planHourglassSlash();
-                    lastEllipse = false;
-                    flipRoll = false;
-                }
+                minion.attacking = false;
+                minion.attackTimer = -1;
             }
         }
+        if (minion.attacking) {
+            planTick();
+        }
     }
 
-    /**
-     * 规划直线攻击路径。
-     */
-    private void planFirstStrike() {
-        LivingEntity target = minion.getTarget();
-        Vec3 start = minion.getPos();
-        Vec3 end = target.getBoundingBox().getCenter();
-        Vec3 direction = end.subtract(start);
-        if (direction.lengthSqr() < 1e-4) {
-            direction = new Vec3(0, 0, 1);
+    private void beginAttack(boolean dash) {
+        this.dash = dash;
+        frame = 0;
+        resetHits = true;
+        start = minion.getPos();
+        lastTargetPos = minion.getTarget().getBoundingBox().getCenter();
+        lastOwnerPos = minion.getOwner().getBoundingBox().getCenter();
+        Vec3 axis = lastTargetPos.subtract(start);
+        if (axis.lengthSqr() < 1.0E-6) {
+            axis = minion.getLookAngle();
         }
-        end = end.add(direction.normalize().scale(2));
-        Vec3 planeNormal = direction.cross(new Vec3(0, 1, 0)).normalize();
-        if (planeNormal.lengthSqr() < 1e-4) {
-            planeNormal = new Vec3(1, 0, 0);
-        }
-        List<PathNode> nodes = new ArrayList<>();
-        int duration = 7;
-        for (int i = 1; i <= duration; i++) {
-            float progress = (float) i / duration;
-            nodes.add(minion.getEulerNode(start.lerp(end, EasingCurve.EASE_IN_OUT_QUAD.apply(progress)), direction, planeNormal));
-        }
-        minion.setPath(nodes);
+        planeNormal = Ellipse.randomPlaneNormal(minion.getRandom(), Vec3.ZERO, axis);
+        curvature = (float) (0.4 + 0.1 * Math.sin(minion.getUuid().hashCode() * 2.3));
+        Vec3 forward = minion.getOwner().getLookAngle();
+        Vec3 right = new Vec3(forward.z, 0, -forward.x);
+        direction = start.subtract(lastTargetPos).dot(right) < 0 ? -1f : 1f;
     }
 
-    /**
-     * 规划椭圆斩击攻击路径。
-     * <p>
-     * 50%概率后半段翻滚：以终点和初始位置的镜像点构成同平面椭圆，剑尖朝心，形成自然翻滚。
-     * </p>
-     */
-    private void planEllipseSlash() {
-        // 目标头顶4格、半径4格的圆上，选择离startPos最近的位置
-        Vec3 center = lastTargetPos.add(0, 3, 0);
-        Vec3 startPos = minion.getPos();
-        Vec3 toStart = startPos.subtract(center);
-        double angle = Math.atan2(toStart.z, toStart.x);
-        Vec3 attackPrepPos = center.add(Math.cos(angle) * 5, 0, Math.sin(angle) * 5);
+    private void planTick() {
+        int duration = dash ? 39 : 40;
+        int startFrame = frame;
+        Vec3 previousTarget = lastTargetPos;
+        Vec3 previousOwner = lastOwnerPos;
+        Vec3 target = minion.getTarget().getBoundingBox().getCenter();
+        Vec3 owner = minion.getOwner().getBoundingBox().getCenter();
+        PathNode from = minion.getCurrentPathNode();
+        Function<Float, PathNode> curve = partialTick -> {
+            float elapsed = Math.min(startFrame + partialTick * 3f, duration);
+            float progress = Mth.clamp((elapsed - 1f) / (duration - 1f), 0f, 1f);
+            Vec3 targetPos = previousTarget.lerp(target, partialTick);
+            Vec3 ownerPos = previousOwner.lerp(owner, partialTick);
+            return dash ? dashNode(progress, targetPos, from, (elapsed - startFrame) * 36f)
+                    : sweepNode(progress, targetPos, ownerPos);
+        };
+        Vec3 correction = from.pos().subtract(curve.apply(0f).pos());
+        minion.move(dash ? "terraprism_dash" : "terraprism_sweep", partialTick -> {
+            PathNode node = curve.apply(partialTick);
+            return node.modifyPos(node.pos().add(correction.scale(1f - partialTick)));
+        }, true, resetHits,
+                (1 + (duration - 1) * (dash ? 0.4f : 0.5f) - startFrame) / 3f,
+                (1 + (duration - 1) * (dash ? 0.6f : 1f) - startFrame) / 3f);
+        frame = Math.min(frame + 3, duration);
+        minion.attackTimer = (dash ? 80 : 40) - frame;
+        resetHits = false;
+        lastTargetPos = target;
+        lastOwnerPos = owner;
+        if (!dash) {
+            PathNode end = curve.apply(1f);
+            velocity = Vec3.directionFromRotation(end.pitch(), end.yaw()).scale(10.0 / 16);
+        }
+    }
 
-        // 获取当前运动状态
-        Vec3 currentVel = minion.getCurrentVelocity();
+    private PathNode dashNode(float progress, Vec3 target, PathNode from, float maxRotation) {
+        Vec3 lift = start.add(0, Mth.clamp(progress / 0.4f, 0f, 1f) * 100.0 / 16, 0);
+        Vec3 aim = target.subtract(lift);
+        double distance = aim.length();
+        Vec3 tip = distance > 1.0E-6 ? aim.scale(1 / distance) : minion.getLookAngle();
+        Vec3 beyond = target.add(tip.scale(Mth.clamp(distance, 60.0 / 16, 150.0 / 16)));
+        Vec3 pos = progress < 0.6f
+                ? lift.lerp(target, Mth.clamp((progress - 0.4f) / 0.2f, 0f, 1f))
+                : target.lerp(beyond, (progress - 0.6f) / 0.4f);
+        PathNode node = minion.getEulerNode(pos.add(velocity), tip, planeNormal);
+        float dot = Math.abs(from.toQuaternion().dot(node.toQuaternion()));
+        float angle = (float) Math.toDegrees(2 * Math.acos(Mth.clamp(dot, 0f, 1f)));
+        float amount = angle > 0f ? Math.min(1f, maxRotation / angle) : 1f;
+        return from.lerp(node, amount).modifyPos(node.pos());
+    }
 
-        Vec3 planeNormal = lastEllipse ? minion.getCurrentNormal() : Ellipse.randomPlaneNormal(minion.getRandom(), lastTargetPos, attackPrepPos);
-
-        Ellipse ellipse = new Ellipse(lastTargetPos, attackPrepPos, planeNormal, 0.45f);
-
-        PathNode attackPrepPathNode = minion.getEulerNode(ellipse.getPoint(0), ellipse.getPoint(0)
-                .subtract(ellipse.getCenter()).normalize(), planeNormal);
-
-        List<PathNode> nodes = new ArrayList<>();
-
-        int duration = 14;
-        int prepTicks = Math.min(4, (int) (startPos.distanceTo(attackPrepPos)));
-        if (prepTicks > 0) {
-            for (int i = 0; i <= prepTicks; i++) {
-                float progress = (float) i / prepTicks;
-                Vec3 point = minion.calculateBezierPoint(progress, startPos, startPos.add(currentVel), attackPrepPos);
-                PathNode lerp = minion.getCurrentPathNode().lerp(attackPrepPathNode, progress);
-                nodes.add(new PathNode(point, lerp.yaw(), lerp.pitch(), lerp.roll()));
+    private PathNode sweepNode(float progress, Vec3 target, Vec3 owner) {
+        Vec3 pivot = progress < 0.5f ? start : target.lerp(owner, 0.5);
+        Vec3 axis = target.subtract(pivot);
+        double radius = axis.length() * 0.5;
+        Vec3 major = radius > 1.0E-6 ? axis.scale(0.5 / radius) : minion.getLookAngle();
+        Vec3 minor = planeNormal.cross(major);
+        if (minor.lengthSqr() < 1.0E-6) {
+            minor = new Vec3(0, 1, 0).cross(major);
+            if (minor.lengthSqr() < 1.0E-6) {
+                minor = new Vec3(1, 0, 0).cross(major);
             }
         }
-        int attackTicks = duration - prepTicks;
-        int halfTicks = attackTicks / 2;
-
-        for (int i = 0; i < halfTicks; i++) {
-            float progress = (float) i / attackTicks;
-            Vec3 point = ellipse.getPoint(progress);
-            Vec3 tipDir = point.subtract(ellipse.getCenter()).normalize();
-            nodes.add(minion.getEulerNode(point, tipDir, planeNormal));
-        }
-
-        flipRoll = minion.getRandom().nextDouble() < 0.25;
-        Ellipse flipEllipse = null;
-        if (flipRoll) {
-            Vec3 mirrorPos = lastTargetPos.add(lastTargetPos.x - attackPrepPos.x, attackPrepPos.y - lastTargetPos.y, lastTargetPos.z - attackPrepPos.z);
-            flipEllipse = new Ellipse(lastTargetPos, mirrorPos, planeNormal.scale(-1), 0.6f);
-        }
-
-        for (int i = halfTicks; i < attackTicks; i++) {
-            float progress = (float) i / attackTicks;
-            if (flipRoll && flipEllipse != null) {
-                Vec3 point = flipEllipse.getPoint(progress);
-                Vec3 tipDir = flipEllipse.getCenter().subtract(point).normalize();
-                nodes.add(minion.getEulerNode(point, tipDir, planeNormal));
-            } else {
-                Vec3 point = ellipse.getPoint(progress);
-                Vec3 tipDir = point.subtract(ellipse.getCenter()).normalize();
-                nodes.add(minion.getEulerNode(point, tipDir, planeNormal));
-            }
-        }
-        minion.setPath(nodes);
-    }
-
-    /**
-     * 规划刺击路径。
-     */
-    private void planHourglassSlash() {
-        LivingEntity target = minion.getTarget();
-        Vec3 startPos = minion.getPos();
-        // 目标头顶4格、半径4格的圆上，选择离startPos最近的位置
-        Vec3 center = new Vec3(target.getX(), target.getY() + 3, target.getZ());
-        Vec3 toStart = startPos.subtract(center);
-        double angle = Math.atan2(toStart.z, toStart.x);
-        Vec3 attackPrepPos = center.add(Math.cos(angle) * 5, 0, Math.sin(angle) * 5);
-        Vec3 endPos = target.getBoundingBox().getCenter();
-
-        // 计算攻击方向
-        Vec3 attackDir = endPos.subtract(attackPrepPos);
-        if (attackDir.lengthSqr() < 1e-5) {
-            attackDir = new Vec3(0, -1, 0);
-        }
-        endPos = endPos.add(attackDir.normalize().scale(3));
-
-        // 获取当前运动状态
-        Vec3 currentVel = minion.getCurrentVelocity();
-        Vec3 currentTip = Vec3.directionFromRotation(minion.getPitch(), minion.getYaw()).normalize();
-        Vec3 currentNormal = minion.getCurrentNormal();
-
-        List<PathNode> nodes = new ArrayList<>();
-
-        PathNode attackStartNode = null;
-        int prepTicks = 7;
-        for (int i = 0; i <= prepTicks; i++) {
-            float progress = EasingCurve.EASE_OUT_QUAD.apply((float) i / prepTicks);
-            Vec3 point = minion.calculateBezierPoint(progress, startPos, startPos.add(currentVel), attackPrepPos);
-            Vec3 tipDir = currentTip.lerp(attackDir, progress);
-            PathNode pathNode = minion.getEulerNode(point, tipDir, currentNormal);
-            nodes.add(pathNode);
-            attackStartNode = pathNode;
-        }
-
-        PathNode attackEndNode = new PathNode(endPos, attackStartNode.yaw(), attackStartNode.pitch(), attackStartNode.roll());
-        int attackTicks = 5;
-        for (int i = 0; i <= attackTicks; i++) {
-            float progress = EasingCurve.EASE_IN_QUAD.apply((float) i / attackTicks);
-            nodes.add(attackStartNode.lerp(attackEndNode, progress));
-        }
-        minion.setPath(nodes);
-    }
-
-    /**
-     * 规划连锁攻击路径。
-     */
-    private void planChainStrike() {
-        Vec3 endPos = minion.getTarget().getBoundingBox().getCenter();
-        int duration = 7;
-        Vec3 currentNormal = minion.getCurrentNormal();
-        List<PathNode> nodes = new ArrayList<>();
-        Ellipse ellipse = new Ellipse(endPos, minion.getPos(), currentNormal, 0.25f);
-        for (int i = 1; i <= duration; i++) {
-            float progress = (float) i / duration;
-            Vec3 ellipseP = ellipse.getPoint(progress * 0.5f);
-            Vec3 tipDir = ellipseP.subtract(ellipse.getCenter()).normalize();
-            nodes.add(minion.getEulerNode(ellipseP, tipDir, currentNormal));
-        }
-        minion.setPath(nodes);
-    }
-
-    /**
-     * 位置修正机制使,仆从轨迹能够实时追踪移动中的目标。
-     */
-    private void applyPositionCorrection() {
-        LivingEntity target = minion.getTarget();
-        Vec3 currentTargetCenter = target.getBoundingBox().getCenter();
-        Vec3 offset = currentTargetCenter.subtract(lastTargetPos);
-        if (offset.lengthSqr() > 1e-5) {
-            PlannedPath path = minion.getCurrentPath();
-            if (path != null) {
-                List<PathNode> nodes = path.getNodes();
-                int startIdx = path.getCurrentIndex();
-                int remaining = nodes.size() - startIdx;
-                for (int i = 0; i < remaining; i++) {
-                    PathNode node = nodes.get(startIdx + i);
-                    float weight = (float) (i + 1) / remaining;
-                    Vec3 blendedOffset = offset.scale(weight);
-                    nodes.set(startIdx + i, new PathNode(node.pos().add(blendedOffset), node.yaw(), node.pitch(), node.roll()));
-                }
-            }
-        }
-        lastTargetPos = currentTargetCenter;
+        minor = minor.normalize();
+        double angle = direction * Math.PI * (1 - 2 * progress);
+        double cosine = Math.cos(angle);
+        double sine = Math.sin(angle);
+        Vec3 pos = pivot.lerp(target, 0.5).add(major.scale(cosine * radius))
+                .add(minor.scale(sine * radius * curvature));
+        Vec3 tip = major.scale(cosine).add(minor.scale(sine));
+        return minion.getEulerNode(pos, tip, major.cross(minor).normalize());
     }
 }

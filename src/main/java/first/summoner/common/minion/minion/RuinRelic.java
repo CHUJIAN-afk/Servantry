@@ -1,16 +1,19 @@
 package first.summoner.common.minion.minion;
 
 
+import first.lyra.api.LyraAPI;
 import first.lyra.api.LyraHelper;
 import first.lyra.common.attachmentEntity.AttachmentEntityGoalSelector;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.minion.MomentumMinion;
 import first.lyra.common.particle.genericParticle.GenericParticleBuilder;
+import first.lyra.common.sound.Playable;
 import first.summoner.common.minion.minion.goal.ruinSigil.RuinSigilAttackGoal;
 import first.summoner.common.minion.minion.goal.ruinSigil.RuinSigilIdleGoal;
 import first.summoner.common.projectile.ForbiddenOrb;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import first.summoner.utils.ParticleHelper;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
@@ -87,6 +90,8 @@ public class RuinRelic extends MomentumMinion {
                 .speed(0.6)
                 .spread(0.4)
                 .emit();
+        LyraAPI.shakeCamera(getLevel(), getPos(), 8, 0.5f);
+        Playable.play(SoundEvents.GENERIC_EXPLODE, getLevel(), getPos(), getSoundSource());
     }
 
     /**

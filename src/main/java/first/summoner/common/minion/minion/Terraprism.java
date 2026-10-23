@@ -1,13 +1,12 @@
 package first.summoner.common.minion.minion;
 
-
 import first.lyra.common.attachment.TargetCache;
 import first.lyra.common.attachmentEntity.*;
 import first.lyra.common.minion.Minion;
+import first.lyra.register.LyraAttachmentRegister;
 import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.common.minion.minion.goal.terraprism.TerraprismAttackGoal;
 import first.summoner.common.minion.minion.goal.terraprism.TerraprismIdleGoal;
-import first.summoner.common.minion.minion.goal.terraprism.TerraprismPrepGoal;
 import first.summoner.register.SummonerAttachmentEntityRegister;
 import net.minecraft.core.Holder;
 import net.minecraft.util.Mth;
@@ -15,10 +14,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+
+import java.util.*;
+import java.util.function.Function;
 
 public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
 
@@ -26,15 +24,19 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     public final Set<LivingEntity> hitTargets = new HashSet<>();
 
     public int trailTimer = 0;
+    public int attackTimer = 0;
     public float lastIdleBlend = 0f;
     public float idleBlend = 0f;
+    private boolean damageActive;
 
     @Override
     protected void registerSyncFields(SyncFieldDispatcher fields) {
         super.registerSyncFields(fields);
         fields.field(LyraStreamCodecs.INT, () -> trailTimer, value -> trailTimer = value);
+        fields.field(LyraStreamCodecs.INT, () -> attackTimer, value -> attackTimer = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> lastIdleBlend, value -> lastIdleBlend = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> idleBlend, value -> idleBlend = value);
+        fields.field(LyraStreamCodecs.BOOL, () -> damageActive, value -> damageActive = value);
     }
 
     public Terraprism() {
@@ -48,26 +50,38 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
     @Override
     public void registerGoals(AttachmentEntityGoalSelector goalSelector) {
         goalSelector.addGoal(0, new TerraprismAttackGoal(this));
-        goalSelector.addGoal(1, new TerraprismPrepGoal(this));
-        goalSelector.addGoal(2, new TerraprismIdleGoal(this));
+        goalSelector.addGoal(1, new TerraprismIdleGoal(this));
     }
 
     @Override
     public LivingEntity searchTarget() {
-        int distance = this.getSearchDistance();
-        if (distance > 0) {
-            TargetCache targetCache = getTargetCache();
-            List<LivingEntity> targets = targetCache.getEntitiesInRadius(owner.getBoundingBox().getCenter(), (float) distance, (living) -> (attacking || (targetCache.isVisibility(owner, living))) && targetCache.isTarget(living));
-            if (!targets.isEmpty()) {
-                return targetCache.getNewTarget(this, targets, 8, false);
+        return target;
+    }
+
+    public LivingEntity findAttackTarget(boolean skipVisibility) {
+        TargetCache cache = getTargetCache();
+        Vec3 center = owner.getBoundingBox().getCenter();
+        float range = cache.getSummonSearchRange(owner, getSearchDistance());
+        List<LivingEntity> targets = cache.getEntitiesInRadius(center, range, living -> cache.isTarget(living) && (skipVisibility || cache.isVisibility(owner, living)));
+        LivingEntity marked = owner.getData(LyraAttachmentRegister.SummonMarkData).getTarget();
+        LivingEntity nearest = null;
+        double nearestDistance = Double.MAX_VALUE;
+        for (LivingEntity living : targets) {
+            if (living == marked) {
+                return living;
+            }
+            double distance = living.getBoundingBox().getCenter().distanceToSqr(center);
+            if (distance < nearestDistance) {
+                nearest = living;
+                nearestDistance = distance;
             }
         }
-        return null;
+        return nearest;
     }
 
     @Override
     public int getSearchDistance() {
-        return 32;
+        return 64;
     }
 
     @Override
@@ -77,7 +91,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
 
     @Override
     public boolean canCollideAttack() {
-        return getTarget() != null;
+        return damageActive;
     }
 
     @Override
@@ -91,34 +105,76 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
 
     @Override
     public void tick() {
-        super.tick();
-
-        lastIdleBlend = idleBlend;
-        if (attacking) {
-            trailTimer = Math.min(trailTimer + 1, 12);
-        } else {
-            trailTimer = 0;
+        if (getPos().distanceToSqr(owner.getBoundingBox().getCenter()) > 125 * 125) {
+            resetAttack();
         }
-        if (getGoalSelector().getCurrentGoal() instanceof TerraprismIdleGoal) {
-            idleBlend = Math.min(1.0f, idleBlend + 0.05f);
+        super.tick();
+        lastIdleBlend = idleBlend;
+        if (attacking || attackTimer < 0) {
+            trailTimer = Math.min(trailTimer + 1, 3);
         } else {
-            idleBlend = Math.max(0.0f, idleBlend - 0.25f);
+            trailTimer = Math.max(0, trailTimer - 1);
+        }
+        if (getGoalSelector().getCurrentGoal() instanceof TerraprismIdleGoal && attackTimer == 0) {
+            idleBlend = Math.min(1f, idleBlend + 0.05f);
+        } else {
+            idleBlend = Math.max(0f, idleBlend - 0.25f);
         }
     }
 
+    @Override
+    public void onLevelChange() {
+        super.onLevelChange();
+        resetAttack();
+    }
+
+    private void resetAttack() {
+        attacking = false;
+        attackTimer = 0;
+        damageActive = false;
+        hitTargets.clear();
+        setTarget(null);
+        setPlannedPath(null);
+    }
+
+    public void move(String identifier, Function<Float, PathNode> sampler, boolean damaging, boolean resetHits, float... boundaries) {
+        TreeSet<Float> times = new TreeSet<>();
+        for (int i = 1; i < 6; i++) {
+            times.add(i / 6f);
+        }
+        for (float time : boundaries) {
+            if (time > 0f && time < 1f) {
+                times.add(time);
+            }
+        }
+        List<RenderKeyframe> frames = times.stream().map(time -> new RenderKeyframe(time, sampler.apply(time))).toList();
+        PlannedPath path = new PlannedPath(identifier, List.of(sampler.apply(1f))).render(0, frames);
+        // 先结算上一段碰撞，再为下一段更新伤害与命中记录。
+        path.run(0, () -> {
+            damageActive = damaging;
+            if (resetHits) {
+                hitTargets.clear();
+            }
+        });
+        setPlannedPath(path);
+    }
+
     public int getColor(float partialTick) {
-        int order = getOrder();
+        return getColor(0f, partialTick);
+    }
+
+    public int getColor(float progress, float partialTick) {
         int total = Math.max(1, getSameSize());
+        float phase = (float) Math.floorMod(getUuid().hashCode(), total) / total;
         int animationTick = owner != null ? owner.tickCount : tickCount;
-        float hueShift = ((float) order / total + (animationTick + partialTick) * 0.015f) % 1.0f;
-        float breathFactor = 0.5f + 0.5f * Mth.sin(hueShift * Mth.TWO_PI);
-        return Mth.hsvToRgb(hueShift, 0.75f - 0.35f * breathFactor, 1.0f);
+        float hue = (phase + (animationTick + partialTick) / 60f + progress * 0.5f + 0.5f) % 1f;
+        return Mth.hsvToRgb(hue, 1f, 1f);
     }
 
     @Override
     public PathNode getRenderNode(float partialTick) {
-        PathNode renderNode = super.getRenderNode(partialTick);
-        return renderNode.lerp(getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, lastIdleBlend, idleBlend));
+        PathNode node = super.getRenderNode(partialTick);
+        return node.lerp(getInterpolatedIdleState(partialTick), Mth.lerp(partialTick, lastIdleBlend, idleBlend));
     }
 
     @Override
@@ -142,7 +198,9 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
             double floatSpeed = 0.08 + order * 0.01;
             double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;
             Vec3 playerPos = owner.getPosition(partialTick);
-            Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
+            Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX,
+                    owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075,
+                    localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
             node = new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
         }
         return node;

@@ -2,6 +2,7 @@ package first.summoner.client;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import first.summoner.Summoner;
+import first.summoner.client.attachmentEntityRenderer.minion.TerraprismTrailPass;
 import first.summoner.client.render.FlameEffect;
 import first.summoner.client.render.MoonPortalEffect;
 import first.summoner.client.render.RainbowCrystalEffect;
@@ -22,6 +23,7 @@ public class ClientEvent {
 
     @SubscribeEvent
     public static void shaders(RegisterShadersEvent event) throws IOException {
+        TerraprismTrailPass.close();
         MoonPortalEffect.close();
         FlameEffect.close();
         RainbowCrystalEffect.close();
@@ -39,6 +41,13 @@ public class ClientEvent {
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("rainbow_crystal_resolve"), DefaultVertexFormat.POSITION), RainbowCrystalEffect::setResolveShader);
     }
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void trails(RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_ENTITIES) {
+            TerraprismTrailPass.beginFrame();
+        }
+    }
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void renderPortals(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) {
@@ -51,6 +60,7 @@ public class ClientEvent {
     @SubscribeEvent
     public static void unload(LevelEvent.Unload event) {
         if (event.getLevel().isClientSide()) {
+            TerraprismTrailPass.close();
             MoonPortalEffect.close();
             FlameEffect.close();
             RainbowCrystalEffect.close();
