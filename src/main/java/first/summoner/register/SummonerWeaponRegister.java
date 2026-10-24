@@ -15,6 +15,7 @@ import first.lyra.register.LyraItemRegistries;
 import first.summoner.Summoner;
 import first.summoner.common.dataComponent.ScabbardContainer;
 import first.summoner.common.item.GildedWandItem;
+import first.summoner.common.item.StarlightCommunicator;
 import first.summoner.common.minion.minion.*;
 import first.summoner.common.minion.sentry.*;
 import net.minecraft.advancements.critereon.EntityPredicate;
@@ -72,6 +73,19 @@ public class SummonerWeaponRegister {
     });
 
     public static final Section MINION_WEAPON = new Section(0, Summoner.rl("textures/item/banner/default_banner.png"), new AnimBanner(18, 1, 1), SummonerItemTagsRegister.SectionMinionWeapon);
+
+    public static final DeferredItem<StarlightCommunicator> StarlightCommunicator =
+            REGISTRIES.build("starlight_communicator", resourceLocation ->
+                            new StarlightCommunicator(
+                                    new Item.Properties()
+                                            .stacksTo(1)
+                                            .rarity(Rarity.EPIC)
+                                            .component(LyraDataComponentRegister.RARITY, new LyraRarity(0x9814FE)))
+                    )
+                    .itemLanguage("Starlight Communicator", "星辉发讯器")
+                    .itemTag(SummonerItemTagsRegister.SectionMinionWeaponTool)
+                    .itemModel(ItemModelProvider::basicItem)
+                    .build();
 
     public static final DeferredItem<GildedWandItem> GildedWand =
             REGISTRIES.build("gilded_wand", ResourceLocation -> new GildedWandItem(() -> new Item.Properties()

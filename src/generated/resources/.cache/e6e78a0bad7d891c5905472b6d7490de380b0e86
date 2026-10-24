@@ -1,4 +1,4 @@
-// 1.21.1	2026-09-24T23:49:16.432654	Item Models: summoner
+// 1.21.1	2026-10-24T16:19:13.7218938	Item Models: summoner
 dfd235cedf5a4c6ed82a229e3aea00f38c65a735 assets/summoner/models/item/apprentices_scarf.json
 eaa95ce6bcf921e88836c38085395aa77d00a18a assets/summoner/models/item/ballista_cane.json
 7f4b58794f5d75080a2787052e62b231324f4f2b assets/summoner/models/item/ballista_rod.json
@@ -85,6 +85,7 @@ eafced68f7dcfa44f2faf6e97d3d2ad5a57d9ddc assets/summoner/models/item/stardust_bo
 12c796940e2c395dcac5e95ef030697ff0551fdc assets/summoner/models/item/stardust_fragment.json
 c33fa60e875e3b4725daf022c9e7197356c5c5d9 assets/summoner/models/item/stardust_helmet.json
 c9e3c9540571fb01f2ec5ddbc42aa292b5249a42 assets/summoner/models/item/stardust_leggings.json
+4f6816ffe89e905f9ac0b5b2215d892c2e9c7fa3 assets/summoner/models/item/starlight_communicator.json
 033cd3eea88a0ec19ebf4bcf55e74967c37e0e3b assets/summoner/models/item/summoner_emblem.json
 88622c5dcd78341577f18a9dca19b373efd3a0a7 assets/summoner/models/item/survey_drone_remote.json
 c56c09f55964836ddef22fdac0c913e04b113c34 assets/summoner/models/item/tempest_staff.json

@@ -7,6 +7,7 @@ import first.lyra.common.attachmentEntity.AttachmentEntityDamageSource;
 import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.Summoner;
 import first.summoner.common.dataComponent.ScabbardContainer;
+import first.summoner.common.entity.Astrageldon;
 import first.summoner.common.minion.minion.ChlorophyteCrystal;
 import first.summoner.common.minion.minion.StardustCell;
 import first.summoner.common.minion.minion.VoidEater;
@@ -29,6 +30,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemFishedEvent;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;
@@ -37,6 +39,11 @@ import java.util.List;
 
 @EventBusSubscriber(modid = Summoner.MODID)
 public class Event {
+
+    @SubscribeEvent
+    private static void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
+        event.put(SummonerEntityRegister.ASTRAGELDON.get(), Astrageldon.createAttributes().build());
+    }
 
     @SubscribeEvent
     public static void onItemStackedOnOther(ItemStackedOnOtherEvent event) {

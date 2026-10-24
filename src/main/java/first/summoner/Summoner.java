@@ -21,6 +21,7 @@ public class Summoner {
             SummonerCurioRegister.register();
             SummonerWeaponRegister.register();
         });
+        SummonerEntityRegister.register(eventBus);
         SummonerCreativeTabRegister.register(eventBus);
         SummonerDataComponentRegister.register(eventBus);
         SummonerAttachmentEntityRegister.register(eventBus);
