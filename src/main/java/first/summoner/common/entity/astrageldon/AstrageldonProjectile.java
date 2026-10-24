@@ -12,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -77,6 +78,12 @@ public abstract class AstrageldonProjectile extends Projectile implements IPathE
 
     private PathNode node() {
         return new PathNode(position(), getYRot(), getXRot(), getRoll());
+    }
+
+    protected void setCenterPose(Vec3 center, Vec3 direction) {
+        setPos(center.add(0, -getBbHeight() / 2, 0));
+        setYRot(PathNode.yawFromDirection(direction));
+        setXRot(PathNode.pitchFromDirection(direction));
     }
 
     protected int substeps() {

@@ -3,6 +3,7 @@ package first.summoner.register;
 import first.lyra.register.LyraAttributeRegister;
 import first.lyra.register.SimpleMobEffectBuilder;
 import first.summoner.Summoner;
+import first.summoner.common.effect.InterstellarCorruption;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -93,6 +94,9 @@ public class SummonerMobEffectRegister {
                     .addAttributeModifier(Attributes.ARMOR, Summoner.rl("astral_blight"), -24, AttributeModifier.Operation.ADD_VALUE)
                     .addAttributeModifier(LyraAttributeRegister.HealthRegen, Summoner.rl("astral_blight"), -2, AttributeModifier.Operation.ADD_VALUE)
                     .build());
+
+    public static final DeferredHolder<MobEffect, MobEffect> InterstellarCorruption =
+            Register.register("interstellar_corruption", InterstellarCorruption::new);
 
     public static final DeferredHolder<MobEffect, MobEffect> BallistaPanicked =
             Register.register("ballista_panicked", () -> new SimpleMobEffectBuilder(MobEffectCategory.BENEFICIAL, 0xffa219)

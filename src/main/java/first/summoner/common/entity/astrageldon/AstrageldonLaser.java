@@ -1,6 +1,5 @@
 package first.summoner.common.entity.astrageldon;
 
-import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.register.SummonerEntityRegister;
@@ -26,7 +25,7 @@ public class AstrageldonLaser extends AstrageldonProjectile {
         laser.setOwner(owner);
         laser.velocity = velocity;
         laser.damage = damage;
-        laser.setPos(center.add(0, -laser.getBbHeight() / 2, 0));
+        laser.setCenterPose(center, velocity);
         owner.level().addFreshEntity(laser);
     }
 
@@ -41,9 +40,7 @@ public class AstrageldonLaser extends AstrageldonProjectile {
     protected void step() {
         alpha = Math.max(alpha - 20, 0);
         velocity = velocity.add(velocity.normalize().scale(0.7));
-        setPos(position().add(velocity.scale(1.0 / 32)));
-        setYRot(PathNode.yawFromDirection(velocity));
-        setXRot(PathNode.pitchFromDirection(velocity));
+        setCenterPose(getBoundingBox().getCenter().add(velocity.scale(1.0 / 32)), velocity);
     }
 
     @Override

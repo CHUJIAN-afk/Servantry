@@ -19,5 +19,7 @@ public class SummonerEntityRenderRegister {
         event.registerEntityRenderer(SummonerEntityRegister.ASTRAGELDON_STAR.get(), NoopRenderer::new);
         event.registerEntityRenderer(SummonerEntityRegister.ASTRAGELDON_LASER.get(), NoopRenderer::new);
         event.registerEntityRenderer(SummonerEntityRegister.NOVA_SLIME.get(), NoopRenderer::new);
+        event.registerEntityRenderer(SummonerEntityRegister.NOVA_SLIMER.get(), NoopRenderer::new);
+        event.registerEntityRenderer(SummonerEntityRegister.SLIMER_SPEAR.get(), NoopRenderer::new);
     }
 }

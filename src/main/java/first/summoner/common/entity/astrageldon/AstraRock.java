@@ -3,6 +3,7 @@ package first.summoner.common.entity.astrageldon;
 import first.lyra.common.attachmentEntity.PathNode;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.utils.LyraStreamCodecs;
+import first.summoner.common.entity.Astrageldon;
 import first.summoner.register.SummonerEntityRegister;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
@@ -18,6 +19,10 @@ public class AstraRock extends AstrageldonProjectile {
     private Vec3 target = Vec3.ZERO;
     private Vec3 velocity = Vec3.ZERO;
     private int alpha = 255;
+    private boolean orbiting;
+    private float angle;
+    private float orbitCounter;
+    private long orbitStart;
 
     public AstraRock(EntityType<? extends AstraRock> type, Level level) {
         super(type, level, 960);
@@ -32,17 +37,64 @@ public class AstraRock extends AstrageldonProjectile {
         owner.level().addFreshEntity(rock);
     }
 
+    public static void spawnOrbiting(Astrageldon boss, float angle) {
+        AstraRock rock = new AstraRock(SummonerEntityRegister.ASTRA_ROCK.get(), boss.level());
+        rock.setOwner(boss);
+        rock.orbiting = true;
+        rock.angle = angle;
+        rock.orbitStart = boss.level().getGameTime();
+        rock.damage = AstrageldonCombat.STAR_DAMAGE;
+        double rotation = Math.toRadians(angle);
+        Vec3 outward = new Vec3(Math.cos(rotation), 0, Math.sin(rotation));
+        rock.setCenterPose(boss.getBoundingBox().getCenter().add(outward.scale(40.0 / 32)), outward);
+        boss.level().addFreshEntity(rock);
+    }
+
     @Override
     public void registerSyncFields(SyncFieldDispatcher fields) {
         super.registerSyncFields(fields);
         fields.field(LyraStreamCodecs.VEC_3, () -> target, value -> target = value);
         fields.field(LyraStreamCodecs.VEC_3, () -> velocity, value -> velocity = value);
         fields.field(LyraStreamCodecs.INT, () -> alpha, value -> alpha = value);
+        fields.field(LyraStreamCodecs.BOOL, () -> orbiting, value -> orbiting = value);
+        fields.field(LyraStreamCodecs.FLOAT, () -> angle, value -> angle = value);
+        fields.field(LyraStreamCodecs.FLOAT, () -> orbitCounter, value -> orbitCounter = value);
+        fields.field(LyraStreamCodecs.VAR_LONG, () -> orbitStart, value -> orbitStart = value);
+    }
+
+    @Override
+    protected int substeps() {
+        return orbiting ? 6 : 3;
     }
 
     @Override
     protected void step() {
         alpha = life < 51 ? Math.min(alpha + 5, 255) : Math.max(alpha - 5, 0);
+        if (orbiting) {
+            if (getOwner() instanceof Astrageldon boss && boss.isAlive()) {
+                tickOrbit(boss);
+            } else {
+                discard();
+            }
+        } else {
+            tickFalling();
+        }
+    }
+
+    private void tickOrbit(Astrageldon boss) {
+        // 整环使用相同时基和旋转，所有岩石始终共面。
+        orbitCounter = (level().getGameTime() - orbitStart) * 3 + (age % 6 + 1) * 0.5f;
+        double radius = 40 + Math.min(orbitCounter * 4.4, 680);
+        double rotation = Math.toRadians(angle + orbitCounter * 2);
+        Vec3 offset = new Vec3(Math.cos(rotation), 0, Math.sin(rotation)).scale(radius / 32)
+                .xRot((float) Math.toRadians(orbitCounter * 0.75))
+                .yRot((float) Math.toRadians(orbitCounter * 0.5));
+        Vec3 center = boss.getBoundingBox().getCenter().add(offset);
+        Vec3 movement = center.subtract(getBoundingBox().getCenter());
+        setCenterPose(center, movement);
+    }
+
+    private void tickFalling() {
         int counter = (age + 1) * 6;
         Vec3 center = getBoundingBox().getCenter();
         Vec3 offset = target.subtract(center).normalize().scale(Math.sin(Math.toRadians(counter)) * (3 + counter * 0.01));
@@ -77,6 +129,10 @@ public class AstraRock extends AstrageldonProjectile {
         tag.putDouble("VelocityY", velocity.y);
         tag.putDouble("VelocityZ", velocity.z);
         tag.putInt("Alpha", alpha);
+        tag.putBoolean("Orbiting", orbiting);
+        tag.putFloat("Angle", angle);
+        tag.putFloat("OrbitCounter", orbitCounter);
+        tag.putLong("OrbitStart", orbitStart);
     }
 
     @Override
@@ -85,5 +141,9 @@ public class AstraRock extends AstrageldonProjectile {
         target = new Vec3(tag.getDouble("TargetX"), tag.getDouble("TargetY"), tag.getDouble("TargetZ"));
         velocity = new Vec3(tag.getDouble("VelocityX"), tag.getDouble("VelocityY"), tag.getDouble("VelocityZ"));
         alpha = tag.getInt("Alpha");
+        orbiting = tag.getBoolean("Orbiting");
+        angle = tag.getFloat("Angle");
+        orbitCounter = tag.getFloat("OrbitCounter");
+        orbitStart = tag.contains("OrbitStart") ? tag.getLong("OrbitStart") : level().getGameTime() - age / 6;
     }
 }

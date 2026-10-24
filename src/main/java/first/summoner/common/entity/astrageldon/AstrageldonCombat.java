@@ -27,13 +27,16 @@ public class AstrageldonCombat {
         Vec3 to = current.getCenter();
         for (Player player : direct.level().getEntitiesOfClass(Player.class, previous.minmax(current), player -> player.isAlive() && !player.isSpectator())) {
             AABB hitbox = player.getBoundingBox().inflate(direct.getBbWidth() / 2, direct.getBbHeight() / 2, direct.getBbWidth() / 2);
-            if (hitbox.contains(from) || hitbox.clip(from, to).isPresent()) {
-                DamageSource source = new DamageSource(direct.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DAMAGE), direct, owner);
-                if (player.hurt(source, damage)) {
+            if (!direct.isRemoved() && (hitbox.contains(from) || hitbox.clip(from, to).isPresent())) {
+                if (player.hurt(source(direct, owner), damage)) {
                     onHit.accept(player);
                 }
             }
         }
+    }
+
+    public static DamageSource source(Entity direct, @Nullable Entity owner) {
+        return new DamageSource(direct.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DAMAGE), direct, owner);
     }
 
     public static void armorCrunch(Player player) {
@@ -42,5 +45,16 @@ public class AstrageldonCombat {
 
     public static void astralBlight(Player player) {
         player.addEffect(new MobEffectInstance(SummonerMobEffectRegister.AstralBlight, 80));
+    }
+
+    public static void interstellarCorruption(Player player) {
+        long time = player.level().getGameTime();
+        if (time >= player.getPersistentData().getLong("SummonerCorruptionCooldown")) {
+            MobEffectInstance current = player.getEffect(SummonerMobEffectRegister.InterstellarCorruption);
+            int duration = current == null ? 800 : (2 + (current.getDuration() - 1) / 400) * 400;
+            player.removeEffect(SummonerMobEffectRegister.InterstellarCorruption);
+            player.addEffect(new MobEffectInstance(SummonerMobEffectRegister.InterstellarCorruption, duration));
+            player.getPersistentData().putLong("SummonerCorruptionCooldown", time + 14);
+        }
     }
 }

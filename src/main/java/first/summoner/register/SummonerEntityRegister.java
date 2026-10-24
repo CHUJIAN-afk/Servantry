@@ -58,6 +58,21 @@ public class SummonerEntityRegister {
                     .updateInterval(1)
                     .build(location.getPath()));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<NovaSlimer>> NOVA_SLIMER =
+            Register.register("nova_slimer", location -> EntityType.Builder.of(NovaSlimer::new, MobCategory.MONSTER)
+                    .sized(52F / 32, 44F / 32)
+                    .fireImmune()
+                    .clientTrackingRange(128)
+                    .updateInterval(1)
+                    .build(location.getPath()));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SlimerSpear>> SLIMER_SPEAR =
+            Register.register("slimer_spear", location -> EntityType.Builder.of(SlimerSpear::new, MobCategory.MISC)
+                    .sized(48F / 32, 48F / 32)
+                    .clientTrackingRange(128)
+                    .updateInterval(1)
+                    .build(location.getPath()));
+
     public static void register(IEventBus eventBus) {
         Register.register(eventBus);
     }

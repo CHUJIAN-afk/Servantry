@@ -9,6 +9,7 @@ import first.summoner.Summoner;
 import first.summoner.common.dataComponent.ScabbardContainer;
 import first.summoner.common.entity.Astrageldon;
 import first.summoner.common.entity.astrageldon.NovaSlime;
+import first.summoner.common.entity.astrageldon.NovaSlimer;
 import first.summoner.common.minion.minion.ChlorophyteCrystal;
 import first.summoner.common.minion.minion.StardustCell;
 import first.summoner.common.minion.minion.VoidEater;
@@ -48,11 +49,12 @@ public class Event {
     private static void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
         // 末世星的生命与护甲超出原版属性上限。
         RangedAttribute health = (RangedAttribute) Attributes.MAX_HEALTH.value();
-        ((RangedAttributeAccessor) health).setMaxValue(Math.max(health.getMaxValue(), 33600));
+        ((RangedAttributeAccessor) health).setMaxValue(Math.max(health.getMaxValue(), Float.MAX_VALUE));
         RangedAttribute armor = (RangedAttribute) Attributes.ARMOR.value();
         ((RangedAttributeAccessor) armor).setMaxValue(Math.max(armor.getMaxValue(), 40));
         event.put(SummonerEntityRegister.ASTRAGELDON.get(), Astrageldon.createAttributes().build());
         event.put(SummonerEntityRegister.NOVA_SLIME.get(), NovaSlime.createAttributes().build());
+        event.put(SummonerEntityRegister.NOVA_SLIMER.get(), NovaSlimer.createAttributes().build());
     }
 
     @SubscribeEvent

@@ -8,6 +8,8 @@ import first.lyra.common.entity.IPathEntity;
 import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.common.entity.astrageldon.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -41,6 +43,11 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     private int despawn;
     private boolean pathMovement;
     private boolean damageImmune;
+    private boolean terrainCollision = true;
+    private boolean secondPhase;
+    private Vec3 arenaCenter = Vec3.ZERO;
+    private float arenaRadius = 150;
+    private float targetArenaRadius = 50;
     private Vec3 velocity = Vec3.ZERO;
 
     public Astrageldon(EntityType<Astrageldon> entityType, Level level) {
@@ -51,7 +58,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 20000.0)
+                .add(Attributes.MAX_HEALTH, 200.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.25)
                 .add(Attributes.ATTACK_DAMAGE, 27.5)
                 .add(Attributes.ARMOR, 40.0)
@@ -72,6 +79,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             case Phase13 -> -70;
             case Phase14 -> -90;
             case Phase15 -> -60;
+            case Phase16 -> -70;
+            case Phase21, Phase22 -> -120;
             default -> 0;
         }) * speedUp());
         attackTimer2 = 0;
@@ -93,6 +102,10 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         });
         fields.field(LyraStreamCodecs.VEC_3, () -> velocity, value -> velocity = value);
         fields.field(LyraStreamCodecs.BOOL, () -> damageImmune, value -> damageImmune = value);
+        fields.field(LyraStreamCodecs.BOOL, () -> secondPhase, value -> secondPhase = value);
+        fields.field(LyraStreamCodecs.VEC_3, () -> arenaCenter, value -> arenaCenter = value);
+        fields.field(LyraStreamCodecs.FLOAT, () -> arenaRadius, value -> arenaRadius = value);
+        fields.field(LyraStreamCodecs.FLOAT, () -> targetArenaRadius, value -> targetArenaRadius = value);
     }
 
     @Override
@@ -130,10 +143,13 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         List<PathNode> nodes = new ArrayList<>(3);
         boolean airborne = false;
         for (int i = 0; i < 3; i++) {
-            if (phase.ordinal() <= Phase.Phase14.ordinal()) {
+            if (phase.ordinal() <= Phase.Phase21.ordinal()) {
                 substep(player);
             } else {
                 velocity = Vec3.ZERO;
+            }
+            if (phase.ordinal() >= Phase.Phase17.ordinal()) {
+                arenaRadius = Mth.lerp(0.08f, arenaRadius, targetArenaRadius);
             }
             airborne |= !onGround();
             nodes.add(currentNode());
@@ -141,6 +157,9 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         pathMovement = !onGround();
         setNoGravity(pathMovement);
         setDeltaMovement(velocity.scale(3.0 / 32));
+        if (secondPhase) {
+            constrainArena();
+        }
         if (airborne) {
             List<RenderKeyframe> frames = List.of(new RenderKeyframe(1f / 3, nodes.get(0)), new RenderKeyframe(2f / 3, nodes.get(1)));
             setCurrentPathNode(from);
@@ -155,6 +174,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     private void substep(Player player) {
+        terrainCollision = true;
         if (slamTimer > 0) {
             slamTimer--;
         } else if (slamTimer < 0 && slamTimer > -60) {
@@ -165,18 +185,18 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             velocity = new Vec3(0, velocity.y, 0);
         }
         double gravity = 0.5;
-        if (slamTimer == 0) {
+        if (slamTimer == 0 && phase.ordinal() <= Phase.Phase16.ordinal()) {
             if (velocity.y == 0) {
                 groundBlades(switch (phase) {
                     case Phase11 -> 55;
-                    case Phase13 -> 40;
+                    case Phase13, Phase16 -> 40;
                     case Phase14 -> 30 + attackTimer2 * 10;
                     default -> 20 + attackTimer2 * 10;
                 });
                 if (phase == Phase.Phase14 && attackTimer2 < 3) {
                     summonSlimeRain();
                 }
-                if (getHealth() < getMaxHealth() * 0.75f) {
+                if (phase != Phase.Phase15 && getHealth() < getMaxHealth() * 0.75f) {
                     groundRocks(player);
                 }
                 slamTimer = -1;
@@ -195,6 +215,18 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         }
         if (phase == Phase.Phase14) {
             gravity = tickSlimeRain(player, gravity);
+        }
+        if (phase == Phase.Phase15) {
+            gravity = tickRevengeanceJumpSlam(player, gravity);
+        }
+        if (phase == Phase.Phase16) {
+            gravity = tickOrbitingRocks(player, gravity);
+        }
+        if (phase == Phase.Phase17) {
+            gravity = tickTransition(player);
+        }
+        if (phase == Phase.Phase21) {
+            gravity = tickSummonAndAscend(player);
         }
         if (velocity.y > -gravity * 20) {
             velocity = velocity.add(0, -gravity, 0);
@@ -276,7 +308,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             if (attackTimer >= 100) {
                 int progress = attackTimer % 100;
                 if (progress == 0) {
-                    summonStars(12 + (int) (4 * (1 - speedUp()) + 0.5f));
+                    summonSphericalStars((12 + (int) (4 * (1 - speedUp()) + 0.5f)) * 4);
                 }
                 if (progress >= 40) {
                     double sin = Math.sin(Math.toRadians((progress - 40) * 3));
@@ -307,7 +339,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         }
         if (attackTimer >= 0 && attackTimer2 < 30) {
             gravity *= 0.5;
-            flyTowards(target, 0.175 + 0.825 * flying, speed);
+            flyTowards(target, 0.175 + 0.825 * flying, speed, 0);
         } else if (attackTimer2 >= 30) {
             velocity = velocity.add(0, 0.05, 0);
         }
@@ -324,7 +356,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                 if (attackTimer > 60) {
                     if (attackTimer < 240) {
                         float flying = Math.min((attackTimer - 60) / 60f, 1);
-                        flyTowards(player.getBoundingBox().getCenter().add(0, 1200.0 / 32, 0), 0.25 + 0.75 * flying, 32);
+                        flyTowards(player.getBoundingBox().getCenter().add(0, 1200.0 / 32, 0), 0.25 + 0.75 * flying, 32, 0);
                         damageImmune = true;
                     } else {
                         if (attackTimer < 285) {
@@ -370,33 +402,220 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         return gravity;
     }
 
-    private void flyTowards(Vec3 target, double blend, double speed) {
-        Vec3 difference = target.subtract(getBoundingBox().getCenter()).scale(32);
-        velocity = velocity.scale(1 - blend * blend).add(difference.normalize().scale(blend * Math.min(speed, difference.length())));
+    private double tickRevengeanceJumpSlam(Player player, double gravity) {
+        if (attackTimer == 0) {
+            summonSphericalStars(10 + (int) (4 * (1 - speedUp()) + 0.5f));
+        }
+        if (velocity.y == 0 || attackTimer > 0) {
+            attackTimer++;
+        }
+        if (attackTimer == 20) {
+            attackTimer++;
+            jumpAt(player, 14.5 + attackTimer2 * 5, 1.125, 0.5, 10 + attackTimer2 * 2);
+        }
+        if (attackTimer >= 20) {
+            velocity = velocity.multiply(1.045, 1, 1.045);
+            if (velocity.y == 0) {
+                attackTimer2++;
+                attackTimer = (int) (16 * (1 - speedUp()));
+                if (attackTimer != 0 && attackTimer2 < 3) {
+                    summonSphericalStars(10 + (int) (4 * (1 - speedUp()) + 0.5f));
+                }
+            }
+            if (attackTimer >= 21) {
+                if (attackTimer == 31) {
+                    slamTimer = 50;
+                }
+                if (attackTimer < 90) {
+                    gravity -= 0.45;
+                    velocity = attackTimer > 40 ? velocity.scale(0.9775) : velocity.multiply(1, 0.9875, 1);
+                }
+            }
+        }
+        if (attackTimer2 >= 3) {
+            setPhase(Phase.Phase16);
+        }
+        return gravity;
     }
 
-    private void summonStars(int count) {
-        float angle = random.nextFloat() * 360;
-        for (int i = 0; i < count; i++) {
-            AstrageldonStar.spawn(this, (angle + i * 360f / count) % 360);
+    private double tickOrbitingRocks(Player player, double gravity) {
+        Vec3 center = getBoundingBox().getCenter();
+        Vec3 playerCenter = player.getBoundingBox().getCenter();
+        Vec3 target = playerCenter.add(0, 360.0 / 32, 0);
+        float flying = Mth.clamp(attackTimer / 30f, 0, 1);
+        if (attackTimer == 0) {
+            attackTimer++;
+            double speed = 16.5 + attackTimer2 * 4;
+            velocity = target.subtract(center).normalize().multiply(-speed * 1.25, -speed * 0.75, -speed * 1.25);
+        } else if (attackTimer < 0) {
+            attackTimer++;
+        } else if (attackTimer < 60) {
+            attackTimer++;
+            gravity -= 0.25;
+        } else if (attackTimer2 < 4) {
+            terrainCollision = false;
+            double sin = Math.sin(Math.toRadians(attackTimer * 2.5));
+            double radius = (380 + 60 * sin) / 32;
+            target = playerCenter.add(center.subtract(playerCenter).normalize().scale(radius)).add(0, -1.5 * sin / 32, 0);
+            if (attackTimer == 60) {
+                summonRocks(20);
+            }
+            attackTimer++;
+            if (attackTimer >= 540) {
+                attackTimer2++;
+            }
+        } else {
+            target = playerCenter.add(0, 600.0 / 32, 0);
+            if (attackTimer2 == 4) {
+                slamTimer = 50;
+            }
+            attackTimer2++;
+            if (attackTimer2 < 54) {
+                gravity -= 0.5;
+            }
+            if (velocity.y == 0 && slamTimer < 0) {
+                setPhase(Phase.Phase11);
+            }
         }
+        if (attackTimer >= 0 && attackTimer2 < 30) {
+            gravity *= 0.5;
+            flyTowards(target, 0.175 + 0.825 * flying, 12, 0.005);
+        } else if (attackTimer2 >= 30) {
+            velocity = velocity.add(0, 0.05, 0);
+        }
+        return gravity;
+    }
+
+    private void flyTowards(Vec3 target, double blend, double speed, double distanceScale) {
+        Vec3 difference = target.subtract(getBoundingBox().getCenter()).scale(32);
+        speed = Math.min(speed, difference.length()) + difference.length() * distanceScale;
+        velocity = velocity.scale(1 - blend * blend).add(difference.normalize().scale(blend * speed));
+    }
+
+    private void summonSphericalStars(int count) {
+        double rotation = random.nextDouble() * Math.PI * 2;
+        // 等面积纬度配合黄金角，避免球面极点堆积。
+        for (int i = 0; i < count; i++) {
+            double y = 1 - 2 * (i + 0.5) / count;
+            double radius = Math.sqrt(1 - y * y);
+            double angle = rotation + i * Math.PI * (3 - Math.sqrt(5));
+            AstrageldonStar.spawn(this, new Vec3(Math.cos(angle) * radius, y, Math.sin(angle) * radius));
+        }
+    }
+
+    private void summonRocks(int count) {
+        for (int i = 0; i < count * 2; i++) {
+            AstraRock.spawnOrbiting(this, i * 360f / (count * 2));
+        }
+    }
+
+    private double tickTransition(Player player) {
+        terrainCollision = false;
+        damageImmune = true;
+        slamTimer = -60;
+        attackTimer++;
+        setHealth(Math.min((int) (getMaxHealth() / 180f * attackTimer), getMaxHealth()));
+        if (attackTimer <= 240) {
+            velocity = velocity.add(0, 0.5, 0).scale(1 - 0.65 * attackTimer / 240);
+        } else {
+            velocity = velocity.scale(0.3);
+            setPos(position().add(0, -3 * Math.sin(Math.toRadians((attackTimer - 120) * 12)) / 32, 0));
+            if (attackTimer == 360) {
+                for (int i = 0; i < 8; i++) {
+                    double y = 1 - 2 * (i + 0.5) / 8;
+                    double radius = Math.sqrt(1 - y * y);
+                    double angle = i * Math.PI * (3 - Math.sqrt(5));
+                    Vec3 direction = new Vec3(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+                    AstraRock.spawn(this, getBoundingBox().getCenter().add(direction.scale(3)), player.getBoundingBox().getCenter(), direction.scale(7.2));
+                }
+            }
+            if (attackTimer >= 420) {
+                setPhase(Phase.Phase21);
+                setHealth(getMaxHealth());
+            }
+        }
+        return 0;
+    }
+
+    private double tickSummonAndAscend(Player player) {
+        terrainCollision = false;
+        double gravity = attackTimer > 0 ? -0.1 : 0.3;
+        if (attackTimer == -30) {
+            for (int i = -6; i <= 6; i++) {
+                if (i != 0) {
+                    NovaSlimer.spawn(this, i * 60f);
+                }
+            }
+            velocity = velocity.add(0, 10, 0);
+        }
+        attackTimer++;
+        targetArenaRadius = 1000f / 32;
+        secondPhase = true;
+        if (attackTimer >= 30) {
+            if (attackTimer > 50) {
+                if (attackTimer < 120) {
+                    float flying = Math.min((attackTimer - 50) / 50f, 1);
+                    flyTowards(player.getBoundingBox().getCenter().add(0, 1600.0 / 32, 0), 0.25 + 0.75 * flying, 30, 0);
+                } else {
+                    setPhase(Phase.Phase22);
+                }
+            } else {
+                velocity = velocity.add(0, 8, 0);
+            }
+        }
+        return gravity;
+    }
+
+    private void constrainArena() {
+        damageImmune = getBoundingBox().getCenter().distanceTo(arenaCenter) > targetArenaRadius + 200f / 32;
+        double limit = arenaRadius + 200.0 / 32;
+        for (ServerPlayer player : ((ServerLevel) level()).players()) {
+            if (player.isAlive() && !player.isSpectator()) {
+                Vec3 offset = player.getBoundingBox().getCenter().subtract(arenaCenter);
+                double distance = offset.length();
+                if (distance > arenaRadius + 156.0 / 32 && distance < limit + 2) {
+                    if (player.hurt(AstrageldonCombat.source(this, this), 16.4f)) {
+                        AstrageldonCombat.interstellarCorruption(player);
+                    }
+                }
+                if (distance > limit && distance < limit + 2250.0 / 32) {
+                    Vec3 normal = offset.normalize();
+                    Vec3 position = player.position().subtract(normal.scale(distance - limit));
+                    player.connection.teleport(position.x, position.y, position.z, player.getYRot(), player.getXRot());
+                    Vec3 motion = player.getDeltaMovement();
+                    player.setDeltaMovement(motion.subtract(normal.scale(Math.max(motion.dot(normal), 0))));
+                    player.hurtMarked = true;
+                }
+            }
+        }
+    }
+
+    public boolean isBeyondArena(Vec3 center) {
+        return secondPhase && center.distanceTo(arenaCenter) > arenaRadius + 156.0 / 32;
+    }
+
+    public Vec3 getArenaCenter() {
+        return arenaCenter;
+    }
+
+    public float getArenaRadius() {
+        return arenaRadius;
     }
 
     private void summonSlimeRain() {
         int count = 7 + attackTimer2 / 2;
-        int side = random.nextBoolean() ? 1 : -1;
-        int shift = random.nextInt(51) - 25;
-        Vec3 direction = Vec3.directionFromRotation(0, getYRot());
+        double rotation = random.nextDouble() * Math.PI * 2;
         for (int i = 0; i < count; i++) {
-            Vec3 offset = direction.scale((shift + 175 * i * side) / 32.0);
+            double radius = 10 * Math.sqrt((i + 0.5) / count);
+            double angle = rotation + i * Math.PI * (3 - Math.sqrt(5));
+            Vec3 offset = new Vec3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
             NovaSlime.spawn(this, offset, (700 + random.nextFloat() * 140) / 32.0);
-            side = -side;
         }
     }
 
     private void moveSubstep(Player player) {
         Vec3 movement = velocity.scale(1.0 / 160);
-        boolean collide = velocity.y <= 0 && player.getY() + 2 > getY();
+        boolean collide = terrainCollision && velocity.y <= 0 && player.getY() + 2 > getY();
         boolean grounded = false;
         for (int i = 0; i < 5; i++) {
             var previous = getBoundingBox();
@@ -418,7 +637,30 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     private float speedUp() {
+        if (phase.ordinal() >= Phase.Phase17.ordinal()) {
+            return 1;
+        }
         return Mth.clamp(getHealth() / getMaxHealth(), 0.1f, 1f);
+    }
+
+    @Override
+    public void die(@NotNull DamageSource source) {
+        if (!secondPhase) {
+            long players = level().players().stream().filter(player -> player.isAlive() && !player.isSpectator()).count();
+            getAttribute(Attributes.MAX_HEALTH).setBaseValue(33600 * (1 + 0.5 * (Math.max(players, 1) - 1)));
+            setHealth(1);
+            arenaCenter = getBoundingBox().getCenter();
+            targetArenaRadius = 4000f / 32;
+            arenaRadius = 150;
+            setPhase(Phase.Phase17);
+            damageImmune = true;
+            slamTimer = -60;
+            setNoGravity(true);
+            setOnGround(false);
+            setPlannedPath(null);
+        } else {
+            super.die(source);
+        }
     }
 
     private void groundBlades(int length) {
@@ -478,6 +720,12 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         state.putInt("Despawn", despawn);
         state.putBoolean("PathMovement", pathMovement);
         state.putBoolean("DamageImmune", damageImmune);
+        state.putBoolean("SecondPhase", secondPhase);
+        state.putDouble("ArenaX", arenaCenter.x);
+        state.putDouble("ArenaY", arenaCenter.y);
+        state.putDouble("ArenaZ", arenaCenter.z);
+        state.putFloat("ArenaRadius", arenaRadius);
+        state.putFloat("TargetArenaRadius", targetArenaRadius);
         state.putDouble("VelocityX", velocity.x);
         state.putDouble("VelocityY", velocity.y);
         state.putDouble("VelocityZ", velocity.z);
@@ -497,8 +745,16 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             despawn = state.getInt("Despawn");
             pathMovement = state.getBoolean("PathMovement");
             damageImmune = state.getBoolean("DamageImmune");
+            secondPhase = state.getBoolean("SecondPhase");
+            arenaCenter = new Vec3(state.getDouble("ArenaX"), state.getDouble("ArenaY"), state.getDouble("ArenaZ"));
+            arenaRadius = state.contains("ArenaRadius") ? state.getFloat("ArenaRadius") : 150;
+            targetArenaRadius = state.contains("TargetArenaRadius") ? state.getFloat("TargetArenaRadius") : 50;
             velocity = new Vec3(state.getDouble("VelocityX"), state.getDouble("VelocityY"), state.getDouble("VelocityZ"));
             setNoGravity(pathMovement);
+            if (phase.ordinal() <= Phase.Phase16.ordinal()) {
+                getAttribute(Attributes.MAX_HEALTH).setBaseValue(200);
+                setHealth(Math.min(getHealth(), 200));
+            }
         }
     }
 
