@@ -34,6 +34,7 @@ import java.util.List;
 
 public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
+    private static final float ARENA_EDGE = 156f / 32;
     private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
     private Phase phase = Phase.Phase11;
     private int attackTimer = -120;
@@ -47,6 +48,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     private boolean secondPhase;
     private Vec3 arenaCenter = Vec3.ZERO;
     private float arenaRadius = 150;
+    private float previousArenaRadius = 150;
     private float targetArenaRadius = 50;
     private Vec3 velocity = Vec3.ZERO;
 
@@ -105,6 +107,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         fields.field(LyraStreamCodecs.BOOL, () -> secondPhase, value -> secondPhase = value);
         fields.field(LyraStreamCodecs.VEC_3, () -> arenaCenter, value -> arenaCenter = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> arenaRadius, value -> arenaRadius = value);
+        fields.field(LyraStreamCodecs.FLOAT, () -> previousArenaRadius, value -> previousArenaRadius = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> targetArenaRadius, value -> targetArenaRadius = value);
     }
 
@@ -139,6 +142,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     private void tickCombat(Player player) {
+        previousArenaRadius = arenaRadius;
         PathNode from = currentNode();
         List<PathNode> nodes = new ArrayList<>(3);
         boolean airborne = false;
@@ -308,7 +312,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             if (attackTimer >= 100) {
                 int progress = attackTimer % 100;
                 if (progress == 0) {
-                    summonSphericalStars((12 + (int) (4 * (1 - speedUp()) + 0.5f)) * 4);
+                    summonSphericalStars(scatterStarCount());
                 }
                 if (progress >= 40) {
                     double sin = Math.sin(Math.toRadians((progress - 40) * 3));
@@ -404,7 +408,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     private double tickRevengeanceJumpSlam(Player player, double gravity) {
         if (attackTimer == 0) {
-            summonSphericalStars(10 + (int) (4 * (1 - speedUp()) + 0.5f));
+            summonSphericalStars(scatterStarCount());
         }
         if (velocity.y == 0 || attackTimer > 0) {
             attackTimer++;
@@ -419,7 +423,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                 attackTimer2++;
                 attackTimer = (int) (16 * (1 - speedUp()));
                 if (attackTimer != 0 && attackTimer2 < 3) {
-                    summonSphericalStars(10 + (int) (4 * (1 - speedUp()) + 0.5f));
+                    summonSphericalStars(scatterStarCount());
                 }
             }
             if (attackTimer >= 21) {
@@ -503,9 +507,18 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         }
     }
 
+    private int scatterStarCount() {
+        return (12 + (int) (4 * (1 - speedUp()) + 0.5f)) * 4;
+    }
+
     private void summonRocks(int count) {
-        for (int i = 0; i < count * 2; i++) {
-            AstraRock.spawnOrbiting(this, i * 360f / (count * 2));
+        for (int plane = 0; plane < 2; plane++) {
+            for (int i = 0; i < count; i++) {
+                AstraRock.spawnOrbiting(this, i * 360f / count, 1, plane == 1);
+                float radius = 0.9f * (float) Math.sqrt((i + 0.5) / count);
+                float angle = (float) Math.toDegrees(i * Math.PI * (3 - Math.sqrt(5)));
+                AstraRock.spawnOrbiting(this, angle, radius, plane == 1);
+            }
         }
     }
 
@@ -573,7 +586,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             if (player.isAlive() && !player.isSpectator()) {
                 Vec3 offset = player.getBoundingBox().getCenter().subtract(arenaCenter);
                 double distance = offset.length();
-                if (distance > arenaRadius + 156.0 / 32 && distance < limit + 2) {
+                if (distance > getArenaBoundaryRadius() && distance < limit + 2) {
                     if (player.hurt(AstrageldonCombat.source(this, this), 16.4f)) {
                         AstrageldonCombat.interstellarCorruption(player);
                     }
@@ -591,7 +604,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     public boolean isBeyondArena(Vec3 center) {
-        return secondPhase && center.distanceTo(arenaCenter) > arenaRadius + 156.0 / 32;
+        return secondPhase && center.distanceTo(arenaCenter) > getArenaBoundaryRadius();
     }
 
     public Vec3 getArenaCenter() {
@@ -600,6 +613,18 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     public float getArenaRadius() {
         return arenaRadius;
+    }
+
+    public float getArenaBoundaryRadius() {
+        return arenaRadius + ARENA_EDGE;
+    }
+
+    public float getRenderArenaRadius(float partialTick) {
+        return Mth.lerp(partialTick, previousArenaRadius, arenaRadius) + ARENA_EDGE;
+    }
+
+    public boolean hasArena() {
+        return secondPhase && isAlive();
     }
 
     private void summonSlimeRain() {
@@ -652,6 +677,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             arenaCenter = getBoundingBox().getCenter();
             targetArenaRadius = 4000f / 32;
             arenaRadius = 150;
+            previousArenaRadius = arenaRadius;
             setPhase(Phase.Phase17);
             damageImmune = true;
             slamTimer = -60;
@@ -748,6 +774,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             secondPhase = state.getBoolean("SecondPhase");
             arenaCenter = new Vec3(state.getDouble("ArenaX"), state.getDouble("ArenaY"), state.getDouble("ArenaZ"));
             arenaRadius = state.contains("ArenaRadius") ? state.getFloat("ArenaRadius") : 150;
+            previousArenaRadius = arenaRadius;
             targetArenaRadius = state.contains("TargetArenaRadius") ? state.getFloat("TargetArenaRadius") : 50;
             velocity = new Vec3(state.getDouble("VelocityX"), state.getDouble("VelocityY"), state.getDouble("VelocityZ"));
             setNoGravity(pathMovement);

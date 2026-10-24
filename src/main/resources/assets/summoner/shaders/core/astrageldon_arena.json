@@ -1,0 +1,13 @@
+{
+  "vertex": "summoner:astrageldon_arena",
+  "fragment": "summoner:astrageldon_arena",
+  "attributes": ["Position"],
+  "samplers": [],
+  "uniforms": [
+    { "name": "ClipToCamera", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "EffectSize", "type": "float", "count": 2, "values": [1, 1] },
+    { "name": "ArenaCenter", "type": "float", "count": 3, "values": [0, 0, 0] },
+    { "name": "ArenaRadius", "type": "float", "count": 1, "values": [1] },
+    { "name": "ArenaTime", "type": "float", "count": 1, "values": [0] }
+  ]
+}

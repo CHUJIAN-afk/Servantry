@@ -23,6 +23,8 @@ public class AstraRock extends AstrageldonProjectile {
     private float angle;
     private float orbitCounter;
     private long orbitStart;
+    private float radiusScale = 1;
+    private boolean perpendicular;
 
     public AstraRock(EntityType<? extends AstraRock> type, Level level) {
         super(type, level, 960);
@@ -37,16 +39,18 @@ public class AstraRock extends AstrageldonProjectile {
         owner.level().addFreshEntity(rock);
     }
 
-    public static void spawnOrbiting(Astrageldon boss, float angle) {
+    public static void spawnOrbiting(Astrageldon boss, float angle, float radiusScale, boolean perpendicular) {
         AstraRock rock = new AstraRock(SummonerEntityRegister.ASTRA_ROCK.get(), boss.level());
         rock.setOwner(boss);
         rock.orbiting = true;
         rock.angle = angle;
+        rock.radiusScale = radiusScale;
+        rock.perpendicular = perpendicular;
         rock.orbitStart = boss.level().getGameTime();
         rock.damage = AstrageldonCombat.STAR_DAMAGE;
         double rotation = Math.toRadians(angle);
-        Vec3 outward = new Vec3(Math.cos(rotation), 0, Math.sin(rotation));
-        rock.setCenterPose(boss.getBoundingBox().getCenter().add(outward.scale(40.0 / 32)), outward);
+        Vec3 outward = perpendicular ? new Vec3(Math.cos(rotation), Math.sin(rotation), 0) : new Vec3(Math.cos(rotation), 0, Math.sin(rotation));
+        rock.setCenterPose(boss.getBoundingBox().getCenter().add(outward.scale(radiusScale * 40 / 32)), outward);
         boss.level().addFreshEntity(rock);
     }
 
@@ -60,6 +64,8 @@ public class AstraRock extends AstrageldonProjectile {
         fields.field(LyraStreamCodecs.FLOAT, () -> angle, value -> angle = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> orbitCounter, value -> orbitCounter = value);
         fields.field(LyraStreamCodecs.VAR_LONG, () -> orbitStart, value -> orbitStart = value);
+        fields.field(LyraStreamCodecs.FLOAT, () -> radiusScale, value -> radiusScale = value);
+        fields.field(LyraStreamCodecs.BOOL, () -> perpendicular, value -> perpendicular = value);
     }
 
     @Override
@@ -82,11 +88,12 @@ public class AstraRock extends AstrageldonProjectile {
     }
 
     private void tickOrbit(Astrageldon boss) {
-        // 整环使用相同时基和旋转，所有岩石始终共面。
+        // 两个圆盘共用旋转，保持各自共面且始终互相垂直。
         orbitCounter = (level().getGameTime() - orbitStart) * 3 + (age % 6 + 1) * 0.5f;
         double radius = 40 + Math.min(orbitCounter * 4.4, 680);
         double rotation = Math.toRadians(angle + orbitCounter * 2);
-        Vec3 offset = new Vec3(Math.cos(rotation), 0, Math.sin(rotation)).scale(radius / 32)
+        Vec3 local = perpendicular ? new Vec3(Math.cos(rotation), Math.sin(rotation), 0) : new Vec3(Math.cos(rotation), 0, Math.sin(rotation));
+        Vec3 offset = local.scale(radiusScale * radius / 32)
                 .xRot((float) Math.toRadians(orbitCounter * 0.75))
                 .yRot((float) Math.toRadians(orbitCounter * 0.5));
         Vec3 center = boss.getBoundingBox().getCenter().add(offset);
@@ -133,6 +140,8 @@ public class AstraRock extends AstrageldonProjectile {
         tag.putFloat("Angle", angle);
         tag.putFloat("OrbitCounter", orbitCounter);
         tag.putLong("OrbitStart", orbitStart);
+        tag.putFloat("RadiusScale", radiusScale);
+        tag.putBoolean("Perpendicular", perpendicular);
     }
 
     @Override
@@ -145,5 +154,7 @@ public class AstraRock extends AstrageldonProjectile {
         angle = tag.getFloat("Angle");
         orbitCounter = tag.getFloat("OrbitCounter");
         orbitStart = tag.contains("OrbitStart") ? tag.getLong("OrbitStart") : level().getGameTime() - age / 6;
+        radiusScale = tag.contains("RadiusScale") ? tag.getFloat("RadiusScale") : 1;
+        perpendicular = tag.getBoolean("Perpendicular");
     }
 }

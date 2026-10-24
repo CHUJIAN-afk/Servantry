@@ -9,6 +9,12 @@
     "SoundEngineAccessor"
   ],
   "client": [
+    "ArenaBlockEntityMixin",
+    "ArenaLevelRendererMixin",
+    "ArenaProgramMixin",
+    "ArenaShaderMixin",
+    "ArenaSodiumProgramMixin",
+    "ArenaSodiumShaderMixin",
     "ItemEnchantmentsMixin",
     "LocalPlayerMixin",
     "SoundManagerAccessor"

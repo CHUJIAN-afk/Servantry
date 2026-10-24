@@ -1,0 +1,13 @@
+{
+  "vertex": "summoner:astrageldon_arena_resolve",
+  "fragment": "summoner:astrageldon_arena_resolve",
+  "attributes": ["Position"],
+  "samplers": [{ "name": "ArenaColor" }, { "name": "GlowColor" }],
+  "uniforms": [
+    { "name": "ClipToCamera", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "CameraToClip", "type": "matrix4x4", "count": 16, "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] },
+    { "name": "EffectSize", "type": "float", "count": 2, "values": [1, 1] },
+    { "name": "ArenaCenter", "type": "float", "count": 3, "values": [0, 0, 0] },
+    { "name": "ArenaRadius", "type": "float", "count": 1, "values": [1] }
+  ]
+}

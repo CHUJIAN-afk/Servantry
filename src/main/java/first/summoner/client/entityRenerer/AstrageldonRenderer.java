@@ -2,6 +2,7 @@ package first.summoner.client.entityRenerer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.EntityPathRender;
+import first.summoner.client.render.AstrageldonArenaEffect;
 import first.summoner.common.entity.Astrageldon;
 import first.summoner.register.SummonerEntityRegister;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -19,6 +20,7 @@ public class AstrageldonRenderer extends GeoEntityRenderer<Astrageldon> {
 
     @Override
     public void render(@NotNull Astrageldon entity, float entityYaw, float partialTick, @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight) {
+        AstrageldonArenaEffect.submit(entity, partialTick);
         poseStack.pushPose();
         EntityPathRender.translate(entity, poseStack, partialTick);
         EntityPathRender.rotate(entity, poseStack, partialTick);

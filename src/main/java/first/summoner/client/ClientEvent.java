@@ -3,6 +3,7 @@ package first.summoner.client;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import first.summoner.Summoner;
 import first.summoner.client.attachmentEntityRenderer.minion.TerraprismTrailPass;
+import first.summoner.client.render.AstrageldonArenaEffect;
 import first.summoner.client.render.FlameEffect;
 import first.summoner.client.render.MoonPortalEffect;
 import first.summoner.client.render.RainbowCrystalEffect;
@@ -27,6 +28,9 @@ public class ClientEvent {
         MoonPortalEffect.close();
         FlameEffect.close();
         RainbowCrystalEffect.close();
+        AstrageldonArenaEffect.close();
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("astrageldon_arena"), DefaultVertexFormat.POSITION), AstrageldonArenaEffect::setShader);
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("astrageldon_arena_resolve"), DefaultVertexFormat.POSITION), AstrageldonArenaEffect::setResolveShader);
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("moon_portal"), DefaultVertexFormat.POSITION), MoonPortalEffect::setShader);
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("moon_portal_beam"), DefaultVertexFormat.POSITION), MoonPortalEffect::setBeamShader);
         event.registerShader(new ShaderInstance(event.getResourceProvider(), Summoner.rl("moon_portal_resolve"), DefaultVertexFormat.POSITION), MoonPortalEffect::setResolveShader);
@@ -51,6 +55,7 @@ public class ClientEvent {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void renderPortals(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL) {
+            AstrageldonArenaEffect.render();
             MoonPortalEffect.render();
             FlameEffect.render();
             RainbowCrystalEffect.render();
@@ -64,6 +69,7 @@ public class ClientEvent {
             MoonPortalEffect.close();
             FlameEffect.close();
             RainbowCrystalEffect.close();
+            AstrageldonArenaEffect.close();
         }
     }
 
