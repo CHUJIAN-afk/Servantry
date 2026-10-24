@@ -22,7 +22,7 @@ public class TerraprismRenderer extends AbstractAttachmentEntityRenderer<Terrapr
                 .packedLight(LightTexture.FULL_BRIGHT)
                 .color(Color.ofOpaque(entity.getColor(partialTick)))
                 .trail(trail.timer(entity.trailTimer))
-                .model(new ModelContext().scale(1.5f).translateOffset(-1f, -1f, -0.5f).rotationOffset(0, 90, 45));
+                .model(new ModelContext().scale(1.5f).translateOffset(-0.5f, -0.5f, -0.5f).rotationOffset(0, 90, 45));
     }
 
     @Override

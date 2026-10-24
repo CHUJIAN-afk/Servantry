@@ -18,8 +18,8 @@ public class TerraprismTrailContext extends RibbonTrailContext<Terraprism> {
     private final Map<Terraprism, History> histories = new WeakHashMap<>();
 
     public TerraprismTrailContext() {
-        upOffset = 0;
-        downOffset = -1.515f;
+        upOffset = 1.015f;
+        downOffset = -0.5f;
         historyLength = 3;
     }
 

@@ -86,7 +86,7 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
 
     @Override
     public @NotNull AABB getHitbox() {
-        return new AABB(-0.15, -0.06, -1.55, 0.15, 0.06, 0);
+        return new AABB(-0.2, -0.2, -0.9, 0.2, 0.2, 1.05);
     }
 
     @Override
@@ -190,12 +190,11 @@ public class Terraprism extends Minion implements IEntityCollision<Terraprism> {
             float rightX = (float) Math.cos(rad);
             float rightZ = (float) -Math.sin(rad);
             int order = getOrder();
-            Vec3 tipOffset = Vec3.directionFromRotation(75 - order * 5f, playerYaw - 90).scale(0.75 * Math.sqrt(2));
             double localZ = 0.75 + order * 0.12;
             double floatSpeed = 0.08 + order * 0.01;
             double floatAngle = (owner.tickCount + partialTick) * floatSpeed + order * 1.33;
             Vec3 playerPos = owner.getPosition(partialTick);
-            Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ).add(tipOffset);
+            Vec3 targetPos = playerPos.add(localZ * backX + Math.cos(floatAngle) * 0.075 * rightX, owner.getBbHeight() * 0.6 + Math.sin(floatAngle) * 0.075, localZ * backZ + Math.cos(floatAngle) * 0.075 * rightZ);
             node = new PathNode(targetPos, playerYaw - 90, 75 - order * 5f, 100);
         }
         return node;
