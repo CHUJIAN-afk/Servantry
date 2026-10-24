@@ -88,6 +88,12 @@ public class SummonerMobEffectRegister {
                     .build()
             );
 
+    public static final DeferredHolder<MobEffect, MobEffect> AstralBlight =
+            Register.register("astral_blight", () -> new SimpleMobEffectBuilder(MobEffectCategory.HARMFUL, 0x833EC4)
+                    .addAttributeModifier(Attributes.ARMOR, Summoner.rl("astral_blight"), -24, AttributeModifier.Operation.ADD_VALUE)
+                    .addAttributeModifier(LyraAttributeRegister.HealthRegen, Summoner.rl("astral_blight"), -2, AttributeModifier.Operation.ADD_VALUE)
+                    .build());
+
     public static final DeferredHolder<MobEffect, MobEffect> BallistaPanicked =
             Register.register("ballista_panicked", () -> new SimpleMobEffectBuilder(MobEffectCategory.BENEFICIAL, 0xffa219)
                     .build()

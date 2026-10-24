@@ -21,7 +21,8 @@ public class StarlightCommunicator extends Item {
         ItemStack itemStack = player.getItemInHand(usedHand);
         if (!level.isClientSide()) {
             Astrageldon astrageldon = new Astrageldon(SummonerEntityRegister.ASTRAGELDON.get(), level);
-            astrageldon.setPos(player.getX(), player.getY() + 4, player.getZ());
+            astrageldon.setPos(player.getX(), player.getY() + 1200.0 / 32, player.getZ());
+            astrageldon.setTarget(player);
             level.addFreshEntity(astrageldon);
         }
         return InteractionResultHolder.success(itemStack);

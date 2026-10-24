@@ -8,9 +8,11 @@ import first.lyra.register.LyraAttachmentRegister;
 import first.summoner.Summoner;
 import first.summoner.common.dataComponent.ScabbardContainer;
 import first.summoner.common.entity.Astrageldon;
+import first.summoner.common.entity.astrageldon.NovaSlime;
 import first.summoner.common.minion.minion.ChlorophyteCrystal;
 import first.summoner.common.minion.minion.StardustCell;
 import first.summoner.common.minion.minion.VoidEater;
+import first.summoner.mixin.RangedAttributeAccessor;
 import first.summoner.register.*;
 import first.summoner.utils.CuriosUtil;
 import net.minecraft.sounds.SoundEvents;
@@ -18,6 +20,8 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
@@ -42,7 +46,13 @@ public class Event {
 
     @SubscribeEvent
     private static void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
+        // 末世星的生命与护甲超出原版属性上限。
+        RangedAttribute health = (RangedAttribute) Attributes.MAX_HEALTH.value();
+        ((RangedAttributeAccessor) health).setMaxValue(Math.max(health.getMaxValue(), 33600));
+        RangedAttribute armor = (RangedAttribute) Attributes.ARMOR.value();
+        ((RangedAttributeAccessor) armor).setMaxValue(Math.max(armor.getMaxValue(), 40));
         event.put(SummonerEntityRegister.ASTRAGELDON.get(), Astrageldon.createAttributes().build());
+        event.put(SummonerEntityRegister.NOVA_SLIME.get(), NovaSlime.createAttributes().build());
     }
 
     @SubscribeEvent
