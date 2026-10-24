@@ -15,6 +15,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.sound.SoundEngineLoadEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 
 import java.io.IOException;
@@ -65,6 +66,8 @@ public class ClientEvent {
     @SubscribeEvent
     public static void unload(LevelEvent.Unload event) {
         if (event.getLevel().isClientSide()) {
+            AstrageldonMusic.clear();
+            MusicManager.clear();
             TerraprismTrailPass.close();
             MoonPortalEffect.close();
             FlameEffect.close();
@@ -74,7 +77,14 @@ public class ClientEvent {
     }
 
     @SubscribeEvent
+    public static void soundEngine(SoundEngineLoadEvent event) {
+        AstrageldonMusic.clear();
+        MusicManager.clear();
+    }
+
+    @SubscribeEvent
     public static void handler(ClientTickEvent.Post event) {
+        AstrageldonMusic.tick();
         MusicManager.handler(event);
     }
 }

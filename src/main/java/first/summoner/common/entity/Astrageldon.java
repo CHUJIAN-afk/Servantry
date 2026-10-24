@@ -627,6 +627,10 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         return secondPhase && isAlive();
     }
 
+    public boolean usesSecondPhaseMusic() {
+        return phase.ordinal() >= Phase.Phase17.ordinal();
+    }
+
     private void summonSlimeRain() {
         int count = 7 + attackTimer2 / 2;
         double rotation = random.nextDouble() * Math.PI * 2;
