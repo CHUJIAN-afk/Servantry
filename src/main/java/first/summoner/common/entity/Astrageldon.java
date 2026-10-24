@@ -10,8 +10,6 @@ import first.summoner.common.entity.astrageldon.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -37,7 +35,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     private static final float ARENA_EDGE = 156f / 32;
     private static final double DASH_SPACING = 4;
-    private static final int SPIRAL_HALF_LAYERS = 4;
+    private static final int SPIRAL_HALF_LAYERS = 20;
+    private static final double SPIRAL_LAYER_SPACING = 1.5;
     private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
     private Phase phase = Phase.Phase11;
     private int attackTimer = -120;
@@ -50,6 +49,13 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     private boolean terrainCollision = true;
     private boolean secondPhase;
     private Vec3 arenaCenter = Vec3.ZERO;
+    private Vec3 previousArenaCenter = Vec3.ZERO;
+    private Vec3 targetArenaCenter = Vec3.ZERO;
+    private Vec3 frameArenaCenter = Vec3.ZERO;
+    private Vec3 previousFrameArenaCenter = Vec3.ZERO;
+    private float frameArenaRadius;
+    private float previousFrameArenaRadius;
+    private boolean arenaFrameReady;
     private float arenaRadius = 150;
     private float previousArenaRadius = 150;
     private float targetArenaRadius = 50;
@@ -120,6 +126,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         fields.field(LyraStreamCodecs.BOOL, () -> damageImmune, value -> damageImmune = value);
         fields.field(LyraStreamCodecs.BOOL, () -> secondPhase, value -> secondPhase = value);
         fields.field(LyraStreamCodecs.VEC_3, () -> arenaCenter, value -> arenaCenter = value);
+        fields.field(LyraStreamCodecs.VEC_3, () -> previousArenaCenter, value -> previousArenaCenter = value);
+        fields.field(LyraStreamCodecs.VEC_3, () -> targetArenaCenter, value -> targetArenaCenter = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> arenaRadius, value -> arenaRadius = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> previousArenaRadius, value -> previousArenaRadius = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> targetArenaRadius, value -> targetArenaRadius = value);
@@ -149,6 +157,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     public void tick() {
         super.tick();
         if (!level().isClientSide() && isAlive()) {
+            previousArenaCenter = arenaCenter;
+            previousArenaRadius = arenaRadius;
             removeAllEffects();
             if (getTarget() == null || !getTarget().isAlive() || getTarget().isSpectator() || distanceToSqr(getTarget()) > 40000) {
                 setTarget(level().getNearestPlayer(this, 200));
@@ -166,7 +176,6 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     private void tickCombat(Player player) {
-        previousArenaRadius = arenaRadius;
         PathNode from = currentNode();
         List<PathNode> nodes = new ArrayList<>(3);
         boolean airborne = false;
@@ -178,6 +187,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             }
             if (phase.ordinal() >= Phase.Phase17.ordinal()) {
                 arenaRadius = Mth.lerp(0.08f, arenaRadius, targetArenaRadius);
+                arenaCenter = arenaCenter.lerp(targetArenaCenter, 0.08);
             }
             airborne |= !onGround();
             nodes.add(currentNode());
@@ -186,7 +196,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         setNoGravity(pathMovement);
         setDeltaMovement(velocity.scale(3.0 / 32));
         if (secondPhase) {
-            constrainArena();
+            updateArenaImmunity();
         }
         if (airborne) {
             List<RenderKeyframe> frames = List.of(new RenderKeyframe(1f / 3, nodes.get(0)), new RenderKeyframe(2f / 3, nodes.get(1)));
@@ -632,12 +642,12 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                     dashAxis = Vec3.directionFromRotation(0, player.getYRot());
                 }
                 int difference = attackTimer2 % 2 * 2 - 1;
-                Vec3 center = arenaCenter.add(0, -targetArenaRadius + (160 * (attackTimer2 + 1) - attackTimer3) / 32, 0);
+                Vec3 center = targetArenaCenter.add(0, -targetArenaRadius + (160 * (attackTimer2 + 1) - attackTimer3) / 32, 0);
                 Vec3 offset = dashAxis.scale(targetArenaRadius + 160f / 32).add(0, -80.0 / 32 * difference, 0);
                 dashes.add(new AstrageldonDash(center.add(offset), center.subtract(offset), 1));
                 if (attackTimer2 > 8) {
                     attackTimer3 += 200;
-                    arenaCenter = arenaCenter.add(0, 200.0 / 32, 0);
+                    targetArenaCenter = targetArenaCenter.add(0, 200.0 / 32, 0);
                 }
                 attackTimer2++;
             }
@@ -789,7 +799,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     private void spawnSpiralLayers(Vec3 center, Vec3 motion, float spin) {
         for (int i = -SPIRAL_HALF_LAYERS; i <= SPIRAL_HALF_LAYERS; i++) {
-            AstrageldonStar2.spawn(this, center.add(0, i * 0.5, 0), motion, spin);
+            AstrageldonStar2.spawn(this, center.add(0, i * SPIRAL_LAYER_SPACING, 0), motion, spin);
         }
     }
 
@@ -880,7 +890,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             Vec3 radial = horizontal.scale(Math.cos(angle)).add(0, Math.sin(angle), 0);
             Vec3 target = arenaCenter.add(radial.scale(targetArenaRadius - 1));
             flyTowards(target, 0.25 + 0.75 * Math.min(attackTimer / 60.0, 1), 48, 0);
-            arenaCenter = arenaCenter.subtract(radial.scale(3.0 / 32)).add(0, 1.2 / 32, 0);
+            targetArenaCenter = targetArenaCenter.subtract(radial.scale(3.0 / 32)).add(0, 1.2 / 32, 0);
             if (attackTimer < 720) {
                 Vec3 center = getBoundingBox().getCenter();
                 Vec3 toPlayer = player.getBoundingBox().getCenter().subtract(center).normalize();
@@ -920,28 +930,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         return nebulaForm ? EntityDimensions.scalable(170F / 32, 170F / 32) : super.getDefaultDimensions(pose);
     }
 
-    private void constrainArena() {
+    private void updateArenaImmunity() {
         damageImmune = getBoundingBox().getCenter().distanceTo(arenaCenter) > targetArenaRadius + 200f / 32;
-        double limit = arenaRadius + 200.0 / 32;
-        for (ServerPlayer player : ((ServerLevel) level()).players()) {
-            if (player.isAlive() && !player.isSpectator()) {
-                Vec3 offset = player.getBoundingBox().getCenter().subtract(arenaCenter);
-                double distance = offset.length();
-                if (distance > getArenaBoundaryRadius() && distance < limit + 2) {
-                    if (player.hurt(AstrageldonCombat.source(this, this), 16.4f)) {
-                        AstrageldonCombat.interstellarCorruption(player);
-                    }
-                }
-                if (distance > limit && distance < limit + 2250.0 / 32) {
-                    Vec3 normal = offset.normalize();
-                    Vec3 position = player.position().subtract(normal.scale(distance - limit));
-                    player.connection.teleport(position.x, position.y, position.z, player.getYRot(), player.getXRot());
-                    Vec3 motion = player.getDeltaMovement();
-                    player.setDeltaMovement(motion.subtract(normal.scale(Math.max(motion.dot(normal), 0))));
-                    player.hurtMarked = true;
-                }
-            }
-        }
     }
 
     public boolean isBeyondArena(Vec3 center) {
@@ -950,6 +940,26 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     public Vec3 getArenaCenter() {
         return arenaCenter;
+    }
+
+    public Vec3 getRenderArenaCenter(float partialTick) {
+        return arenaFrameReady ? previousFrameArenaCenter.lerp(frameArenaCenter, partialTick) : previousArenaCenter.lerp(arenaCenter, partialTick);
+    }
+
+    public void captureArenaFrame() {
+        if (hasArena()) {
+            previousFrameArenaCenter = arenaFrameReady ? frameArenaCenter : arenaCenter;
+            previousFrameArenaRadius = arenaFrameReady ? frameArenaRadius : arenaRadius;
+            frameArenaCenter = arenaCenter;
+            frameArenaRadius = arenaRadius;
+            arenaFrameReady = true;
+        } else {
+            arenaFrameReady = false;
+        }
+    }
+
+    public double getArenaSyncMargin() {
+        return 2 + arenaCenter.distanceTo(previousArenaCenter) * 3 + Math.abs(arenaRadius - previousArenaRadius) * 3;
     }
 
     public float getArenaRadius() {
@@ -961,7 +971,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     public float getRenderArenaRadius(float partialTick) {
-        return Mth.lerp(partialTick, previousArenaRadius, arenaRadius) + ARENA_EDGE;
+        return (arenaFrameReady ? Mth.lerp(partialTick, previousFrameArenaRadius, frameArenaRadius)
+                : Mth.lerp(partialTick, previousArenaRadius, arenaRadius)) + ARENA_EDGE;
     }
 
     public boolean hasArena() {
@@ -1061,6 +1072,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             getAttribute(Attributes.MAX_HEALTH).setBaseValue(33600 * (1 + 0.5 * (Math.max(players, 1) - 1)));
             setHealth(1);
             arenaCenter = getBoundingBox().getCenter();
+            previousArenaCenter = arenaCenter;
+            targetArenaCenter = arenaCenter;
             targetArenaRadius = 4000f / 32;
             arenaRadius = 150;
             previousArenaRadius = arenaRadius;
@@ -1136,6 +1149,9 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         state.putDouble("ArenaX", arenaCenter.x);
         state.putDouble("ArenaY", arenaCenter.y);
         state.putDouble("ArenaZ", arenaCenter.z);
+        state.putDouble("TargetArenaX", targetArenaCenter.x);
+        state.putDouble("TargetArenaY", targetArenaCenter.y);
+        state.putDouble("TargetArenaZ", targetArenaCenter.z);
         state.putFloat("ArenaRadius", arenaRadius);
         state.putFloat("TargetArenaRadius", targetArenaRadius);
         state.putDouble("VelocityX", velocity.x);
@@ -1172,6 +1188,9 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             damageImmune = state.getBoolean("DamageImmune");
             secondPhase = state.getBoolean("SecondPhase");
             arenaCenter = new Vec3(state.getDouble("ArenaX"), state.getDouble("ArenaY"), state.getDouble("ArenaZ"));
+            previousArenaCenter = arenaCenter;
+            targetArenaCenter = state.contains("TargetArenaX")
+                    ? new Vec3(state.getDouble("TargetArenaX"), state.getDouble("TargetArenaY"), state.getDouble("TargetArenaZ")) : arenaCenter;
             arenaRadius = state.contains("ArenaRadius") ? state.getFloat("ArenaRadius") : 150;
             previousArenaRadius = arenaRadius;
             targetArenaRadius = state.contains("TargetArenaRadius") ? state.getFloat("TargetArenaRadius") : 50;

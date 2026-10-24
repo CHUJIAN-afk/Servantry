@@ -66,6 +66,7 @@ public class ClientEvent {
     @SubscribeEvent
     public static void unload(LevelEvent.Unload event) {
         if (event.getLevel().isClientSide()) {
+            AstrageldonArenaClient.clear();
             AstrageldonMusic.clear();
             MusicManager.clear();
             TerraprismTrailPass.close();
@@ -80,6 +81,11 @@ public class ClientEvent {
     public static void soundEngine(SoundEngineLoadEvent event) {
         AstrageldonMusic.clear();
         MusicManager.clear();
+    }
+
+    @SubscribeEvent
+    public static void arenaTick(ClientTickEvent.Pre event) {
+        AstrageldonArenaClient.beginTick();
     }
 
     @SubscribeEvent

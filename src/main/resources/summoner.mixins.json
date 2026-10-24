@@ -10,7 +10,9 @@
   ],
   "client": [
     "ArenaBlockEntityMixin",
+    "ArenaCameraMixin",
     "ArenaLevelRendererMixin",
+    "ArenaPlayerMixin",
     "ArenaProgramMixin",
     "ArenaShaderMixin",
     "ArenaSodiumProgramMixin",

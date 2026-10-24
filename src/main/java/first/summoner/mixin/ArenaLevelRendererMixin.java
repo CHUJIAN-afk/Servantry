@@ -17,6 +17,6 @@ public class ArenaLevelRendererMixin {
 
     @Inject(method = "renderLevel", at = @At("HEAD"))
     private void summoner$arena(DeltaTracker delta, boolean outline, Camera camera, GameRenderer renderer, LightTexture light, Matrix4f view, Matrix4f projection, CallbackInfo ci) {
-        AstrageldonArenaEffect.beginFrame(camera, view, projection, delta.getGameTimeDeltaPartialTick(false));
+        AstrageldonArenaEffect.beginFrame(camera, view, projection, camera.getPartialTickTime());
     }
 }

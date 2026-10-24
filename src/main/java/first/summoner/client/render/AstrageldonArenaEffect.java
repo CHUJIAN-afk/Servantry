@@ -10,6 +10,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import first.summoner.common.entity.Astrageldon;
+import first.summoner.common.entity.astrageldon.AstrageldonArena;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -38,6 +39,8 @@ public final class AstrageldonArenaEffect {
     private static HDRTarget effect;
     private static Astrageldon terrainArena;
     private static Vec3 cameraPosition = Vec3.ZERO;
+    private static Vec3 terrainCenter = Vec3.ZERO;
+    private static float arenaPartialTick;
 
     private AstrageldonArenaEffect() {
     }
@@ -56,22 +59,17 @@ public final class AstrageldonArenaEffect {
             terrainArena = null;
             TERRAIN_SPHERE.zero();
             cameraPosition = camera.getPosition();
+            arenaPartialTick = partialTick;
             CAMERA_TO_CLIP.set(projection).mul(view);
             CLIP_TO_CAMERA.set(CAMERA_TO_CLIP).invert();
             GRID_OFFSET.set((float) (cameraPosition.x - Math.floor(cameraPosition.x)),
                     (float) (cameraPosition.y - Math.floor(cameraPosition.y)), (float) (cameraPosition.z - Math.floor(cameraPosition.z)));
-            double nearest = Double.MAX_VALUE;
-            for (var entity : Minecraft.getInstance().level.entitiesForRendering()) {
-                if (entity instanceof Astrageldon boss && boss.hasArena()) {
-                    double distance = boss.getArenaCenter().distanceToSqr(cameraPosition);
-                    if (distance < nearest) {
-                        nearest = distance;
-                        terrainArena = boss;
-                    }
-                }
-            }
+            var minecraft = Minecraft.getInstance();
+            Vec3 selection = minecraft.player == null ? cameraPosition : minecraft.player.getPosition(partialTick).add(0, minecraft.player.getBbHeight() / 2, 0);
+            terrainArena = AstrageldonArena.nearest(minecraft.level.entitiesForRendering(), selection, Double.MAX_VALUE, partialTick);
             if (terrainArena != null) {
-                Vec3 center = terrainArena.getArenaCenter().subtract(cameraPosition);
+                terrainCenter = terrainArena.getRenderArenaCenter(partialTick);
+                Vec3 center = terrainCenter.subtract(cameraPosition);
                 TERRAIN_SPHERE.set((float) center.x, (float) center.y, (float) center.z, terrainArena.getRenderArenaRadius(partialTick));
             }
         }
@@ -79,15 +77,15 @@ public final class AstrageldonArenaEffect {
 
     public static void submit(Astrageldon boss, float partialTick) {
         if (boss.hasArena() && !IrisCompat.isShadowPass()) {
-            Vec3 relative = boss.getArenaCenter().subtract(cameraPosition);
+            Vec3 relative = boss.getRenderArenaCenter(arenaPartialTick).subtract(cameraPosition);
             float time = (boss.level().getGameTime() % 240000 + partialTick) / 20f;
-            ARENAS.add(new Arena(relative.toVector3f(), boss.getRenderArenaRadius(partialTick), time));
+            ARENAS.add(new Arena(relative.toVector3f(), boss.getRenderArenaRadius(arenaPartialTick), time));
         }
     }
 
     public static boolean outlineBlockEntity(BlockEntity block, PoseStack poses, MultiBufferSource buffers) {
         boolean inside = terrainArena != null && !IrisCompat.isShadowPass()
-                && Vec3.atCenterOf(block.getBlockPos()).distanceToSqr(terrainArena.getArenaCenter()) < TERRAIN_SPHERE.w * TERRAIN_SPHERE.w;
+                && Vec3.atCenterOf(block.getBlockPos()).distanceToSqr(terrainCenter) < TERRAIN_SPHERE.w * TERRAIN_SPHERE.w;
         if (inside) {
             VertexConsumer lines = buffers.getBuffer(RenderType.lines());
             PoseStack.Pose pose = poses.last();
@@ -168,6 +166,7 @@ public final class AstrageldonArenaEffect {
     public static void close() {
         ARENAS.clear();
         terrainArena = null;
+        terrainCenter = Vec3.ZERO;
         TERRAIN_SPHERE.zero();
         if (effect != null) {
             effect.destroyBuffers();
