@@ -58,6 +58,20 @@ public class SummonerEntityRegister {
                     .updateInterval(1)
                     .build(location.getPath()));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<NebulaResidue>> NEBULA_RESIDUE =
+            Register.register("nebula_residue", location -> EntityType.Builder.of(NebulaResidue::new, MobCategory.MISC)
+                    .sized(34F / 32, 34F / 32)
+                    .clientTrackingRange(128)
+                    .updateInterval(1)
+                    .build(location.getPath()));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<AstrageldonStar2>> ASTRAGELDON_STAR_2 =
+            Register.register("astrageldon_star_2", location -> EntityType.Builder.of(AstrageldonStar2::new, MobCategory.MISC)
+                    .sized(36F / 32, 36F / 32)
+                    .clientTrackingRange(128)
+                    .updateInterval(1)
+                    .build(location.getPath()));
+
     public static final DeferredHolder<EntityType<?>, EntityType<NovaSlimer>> NOVA_SLIMER =
             Register.register("nova_slimer", location -> EntityType.Builder.of(NovaSlimer::new, MobCategory.MONSTER)
                     .sized(52F / 32, 44F / 32)
@@ -69,6 +83,27 @@ public class SummonerEntityRegister {
     public static final DeferredHolder<EntityType<?>, EntityType<SlimerSpear>> SLIMER_SPEAR =
             Register.register("slimer_spear", location -> EntityType.Builder.of(SlimerSpear::new, MobCategory.MISC)
                     .sized(48F / 32, 48F / 32)
+                    .clientTrackingRange(128)
+                    .updateInterval(1)
+                    .build(location.getPath()));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<AstrageldonAfterimage>> ASTRAGELDON_AFTERIMAGE =
+            Register.register("astrageldon_afterimage", location -> EntityType.Builder.of(AstrageldonAfterimage::new, MobCategory.MISC)
+                    .sized(170F / 32, 170F / 32)
+                    .clientTrackingRange(128)
+                    .updateInterval(1)
+                    .build(location.getPath()));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<AstrageldonStar3>> ASTRAGELDON_STAR_3 =
+            Register.register("astrageldon_star_3", location -> EntityType.Builder.of(AstrageldonStar3::new, MobCategory.MISC)
+                    .sized(42F / 32, 42F / 32)
+                    .clientTrackingRange(128)
+                    .updateInterval(1)
+                    .build(location.getPath()));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<StarLaser>> STAR_LASER =
+            Register.register("star_laser", location -> EntityType.Builder.of(StarLaser::new, MobCategory.MISC)
+                    .sized(8F / 32, 8F / 32)
                     .clientTrackingRange(128)
                     .updateInterval(1)
                     .build(location.getPath()));

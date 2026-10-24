@@ -8,19 +8,20 @@ import first.lyra.common.entity.IPathEntity;
 import first.lyra.utils.LyraStreamCodecs;
 import first.summoner.common.entity.astrageldon.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +36,8 @@ import java.util.List;
 public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     private static final float ARENA_EDGE = 156f / 32;
+    private static final double DASH_SPACING = 4;
+    private static final int SPIRAL_HALF_LAYERS = 4;
     private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
     private Phase phase = Phase.Phase11;
     private int attackTimer = -120;
@@ -51,6 +54,14 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     private float previousArenaRadius = 150;
     private float targetArenaRadius = 50;
     private Vec3 velocity = Vec3.ZERO;
+    private boolean nebulaForm;
+    private boolean contactDamage = true;
+    private double platformY = Double.NaN;
+    private int totalPhase2Cycles;
+    private int resolveDirection = 1;
+    private Vec3 dashAxis = new Vec3(1, 0, 0);
+    private List<AstrageldonDash> dashes = new ArrayList<>();
+    private Vec3 savedDashVelocity = Vec3.ZERO;
 
     public Astrageldon(EntityType<Astrageldon> entityType, Level level) {
         super(entityType, level);
@@ -76,17 +87,20 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         this.phase = phase;
         damageImmune = false;
         attackTimer = (int) ((switch (phase) {
-            case Phase11 -> -60;
+            case Phase11, Phase23, Phase25 -> -60;
             case Phase12 -> -40;
             case Phase13 -> -70;
             case Phase14 -> -90;
             case Phase15 -> -60;
             case Phase16 -> -70;
             case Phase21, Phase22 -> -120;
+            case Phase24 -> -110;
+            case Phase28 -> -50;
             default -> 0;
         }) * speedUp());
-        attackTimer2 = 0;
-        attackTimer3 = 0;
+        attackTimer2 = phase == Phase.Phase25 ? 90 : 0;
+        attackTimer3 = phase == Phase.Phase25 ? 90 : 0;
+        savedDashVelocity = Vec3.ZERO;
     }
 
     @Override
@@ -109,6 +123,16 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         fields.field(LyraStreamCodecs.FLOAT, () -> arenaRadius, value -> arenaRadius = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> previousArenaRadius, value -> previousArenaRadius = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> targetArenaRadius, value -> targetArenaRadius = value);
+        fields.field(LyraStreamCodecs.BOOL, () -> nebulaForm, value -> {
+            nebulaForm = value;
+            refreshDimensions();
+        });
+        fields.field(LyraStreamCodecs.DOUBLE, () -> platformY, value -> platformY = value);
+        fields.field(LyraStreamCodecs.INT, () -> totalPhase2Cycles, value -> totalPhase2Cycles = value);
+        fields.field(LyraStreamCodecs.INT, () -> resolveDirection, value -> resolveDirection = value);
+        fields.field(LyraStreamCodecs.VEC_3, () -> dashAxis, value -> dashAxis = value);
+        fields.field(AstrageldonDash.CODEC.apply(ByteBufCodecs.list()), () -> dashes, value -> dashes = value);
+        fields.field(LyraStreamCodecs.VEC_3, () -> savedDashVelocity, value -> savedDashVelocity = value);
     }
 
     @Override
@@ -147,7 +171,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         List<PathNode> nodes = new ArrayList<>(3);
         boolean airborne = false;
         for (int i = 0; i < 3; i++) {
-            if (phase.ordinal() <= Phase.Phase21.ordinal()) {
+            if (phase.ordinal() <= Phase.Phase25.ordinal()) {
                 substep(player);
             } else {
                 velocity = Vec3.ZERO;
@@ -179,6 +203,9 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     private void substep(Player player) {
         terrainCollision = true;
+        contactDamage = true;
+        dashes.removeIf(AstrageldonDash::finished);
+        dashes.replaceAll(AstrageldonDash::update);
         if (slamTimer > 0) {
             slamTimer--;
         } else if (slamTimer < 0 && slamTimer > -60) {
@@ -189,19 +216,23 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             velocity = new Vec3(0, velocity.y, 0);
         }
         double gravity = 0.5;
-        if (slamTimer == 0 && phase.ordinal() <= Phase.Phase16.ordinal()) {
+        if (slamTimer == 0 && (phase.ordinal() <= Phase.Phase16.ordinal() || phase == Phase.Phase23)) {
             if (velocity.y == 0) {
-                groundBlades(switch (phase) {
-                    case Phase11 -> 55;
-                    case Phase13, Phase16 -> 40;
-                    case Phase14 -> 30 + attackTimer2 * 10;
-                    default -> 20 + attackTimer2 * 10;
-                });
-                if (phase == Phase.Phase14 && attackTimer2 < 3) {
-                    summonSlimeRain();
-                }
-                if (phase != Phase.Phase15 && getHealth() < getMaxHealth() * 0.75f) {
-                    groundRocks(player);
+                if (phase == Phase.Phase23) {
+                    summonSpiralStars();
+                } else {
+                    groundBlades(switch (phase) {
+                        case Phase11 -> 55;
+                        case Phase13, Phase16 -> 40;
+                        case Phase14 -> 30 + attackTimer2 * 10;
+                        default -> 20 + attackTimer2 * 10;
+                    });
+                    if (phase == Phase.Phase14 && attackTimer2 < 3) {
+                        summonSlimeRain();
+                    }
+                    if (phase != Phase.Phase15 && getHealth() < getMaxHealth() * 0.75f) {
+                        groundRocks(player);
+                    }
                 }
                 slamTimer = -1;
             } else {
@@ -232,7 +263,19 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         if (phase == Phase.Phase21) {
             gravity = tickSummonAndAscend(player);
         }
-        if (velocity.y > -gravity * 20) {
+        if (phase == Phase.Phase22) {
+            gravity = tickAscendWithDashes(player);
+        }
+        if (phase == Phase.Phase23) {
+            gravity = tickPhase2StarSlam(player, gravity);
+        }
+        if (phase == Phase.Phase24) {
+            gravity = tickCrossStarDash(player, gravity);
+        }
+        if (phase == Phase.Phase25) {
+            gravity = tickStarShotgun(player);
+        }
+        if (!nebulaForm && velocity.y > -gravity * 20) {
             velocity = velocity.add(0, -gravity, 0);
         }
         moveSubstep(player);
@@ -492,7 +535,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     private void flyTowards(Vec3 target, double blend, double speed, double distanceScale) {
         Vec3 difference = target.subtract(getBoundingBox().getCenter()).scale(32);
-        speed = Math.min(speed, difference.length()) + difference.length() * distanceScale;
+        speed = Math.min(speed + difference.length() * distanceScale, difference.length());
         velocity = velocity.scale(1 - blend * blend).add(difference.normalize().scale(blend * speed));
     }
 
@@ -579,6 +622,304 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         return gravity;
     }
 
+    private double tickAscendWithDashes(Player player) {
+        terrainCollision = false;
+        velocity = velocity.scale(0.9);
+        attackTimer++;
+        if (attackTimer > 0) {
+            if (attackTimer2 < 16 && attackTimer % 15 == 0) {
+                if (attackTimer2 == 0) {
+                    dashAxis = Vec3.directionFromRotation(0, player.getYRot());
+                }
+                int difference = attackTimer2 % 2 * 2 - 1;
+                Vec3 center = arenaCenter.add(0, -targetArenaRadius + (160 * (attackTimer2 + 1) - attackTimer3) / 32, 0);
+                Vec3 offset = dashAxis.scale(targetArenaRadius + 160f / 32).add(0, -80.0 / 32 * difference, 0);
+                dashes.add(new AstrageldonDash(center.add(offset), center.subtract(offset), 1));
+                if (attackTimer2 > 8) {
+                    attackTimer3 += 200;
+                    arenaCenter = arenaCenter.add(0, 200.0 / 32, 0);
+                }
+                attackTimer2++;
+            }
+            if (attackTimer2 > 8) {
+                if (resolveAll(0, 4)) {
+                    setPhase(Phase.Phase23);
+                }
+            } else if (!dashes.isEmpty()) {
+                setCenterPosition(dashes.getFirst().start());
+                if (attackTimer2 > 1) {
+                    setNebulaForm(true);
+                }
+            }
+        }
+        return 0;
+    }
+
+    private boolean resolveAll(int direction, float speed) {
+        boolean finished = dashes.isEmpty();
+        if (!finished) {
+            AstrageldonDash dash = dashes.getFirst();
+            if (!dash.resolving()) {
+                if (dash.counter() <= 0) {
+                    resolveDirection = direction == 0 ? -resolveDirection : direction;
+                    dashes.set(0, dash.resolve(speed));
+                    setCenterPosition(resolveDirection < 0 ? dash.end() : dash.start());
+                    if (phase == Phase.Phase22) {
+                        int count = dashWingCount();
+                        for (int i = -count; i <= count; i++) {
+                            if (i != 0) {
+                                AstrageldonAfterimage.spawn(this, dash, i * DASH_SPACING, resolveDirection);
+                            }
+                        }
+                    }
+                }
+            } else {
+                float progress = dash.progress(resolveDirection);
+                Vec3 center = dash.start().lerp(dash.end(), progress);
+                Vec3 outward = center.subtract(getBoundingBox().getCenter());
+                savedDashVelocity = outward.scale(32);
+                Vec3 movement = outward.scale(0.2);
+                for (int i = 0; i < 5; i++) {
+                    AABB previous = getBoundingBox();
+                    setPos(position().add(movement));
+                    hurtContact(previous);
+                }
+                if (phase == Phase.Phase22 && progress >= 0.2f && progress <= 0.8f) {
+                    int count = dashWingCount();
+                    for (int wing = -count; wing <= count; wing++) {
+                        Vec3 position = dash.formationPosition(progress, resolveDirection, wing * DASH_SPACING);
+                        for (int i = 1; i <= 2; i++) {
+                            Vec3 spawn = position.subtract(outward.scale(0.33 * i)).add(randomSphere(80.0 / 32));
+                            Vec3 motion = randomSphere(1).multiply(4, 3, 4).add(-outward.x * 32 * 0.015, 5.5, -outward.z * 32 * 0.015);
+                            NebulaResidue.spawn(this, spawn, motion);
+                        }
+                    }
+                }
+                if (phase == Phase.Phase24 && attackTimer % 2 == 0 && progress >= 0.2f && progress <= 0.8f) {
+                    AstrageldonStar3.spawn(this, center.subtract(outward.scale(0.5)), savedDashVelocity.scale(0.1).add(randomSphere(1)), savedDashVelocity);
+                }
+            }
+        }
+        return finished;
+    }
+
+    private int dashWingCount() {
+        return (int) Math.ceil((getArenaBoundaryRadius() - 72.0 / 32) / DASH_SPACING);
+    }
+
+    public @Nullable AstrageldonDash getResolvingDash() {
+        return !dashes.isEmpty() && dashes.getFirst().resolving() ? dashes.getFirst() : null;
+    }
+
+    private Vec3 randomSphere(double radius) {
+        return new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize()
+                .scale(Math.cbrt(random.nextDouble()) * radius);
+    }
+
+    private double tickPhase2StarSlam(Player player, double gravity) {
+        targetArenaRadius = 1000f / 32;
+        if (attackTimer < 20) {
+            contactDamage = false;
+            if (nebulaForm) {
+                attackTimer3++;
+                if (attackTimer3 >= 70) {
+                    float blend = Math.min((attackTimer3 - 70) / 70, 1);
+                    double height = (350 - 90 * Math.cos(Math.toRadians(attackTimer3))) / 32;
+                    flyTowards(player.getBoundingBox().getCenter().add(0, height, 0), 0.25 + 0.75 * blend, 32, 0.002);
+                    if (attackTimer3 >= 140) {
+                        startSlam();
+                        setNebulaForm(false);
+                    }
+                } else {
+                    Vec3 target = attackTimer3 > 30 ? player.getBoundingBox().getCenter().add(0, 320.0 / 32, 0)
+                            : getBoundingBox().getCenter().add(0, 1600.0 / 32, 0);
+                    flyTowards(target, 0.25 + 0.75 * Math.min(attackTimer3 / 60, 1), 16, 0);
+                }
+            } else {
+                attackTimer++;
+            }
+        } else {
+            if (velocity.y == 0 || attackTimer > 0) {
+                if (attackTimer2 < 1) {
+                    attackTimer2++;
+                }
+                attackTimer++;
+            }
+            if (attackTimer == 36) {
+                attackTimer++;
+                jumpAt(player, 15.5 + attackTimer2 * 4, 1.1, 1, 5 + attackTimer2 * 2);
+            }
+            if (attackTimer >= 36) {
+                velocity = velocity.multiply(1.05, 1, 1.05);
+                if (velocity.y == 0) {
+                    attackTimer = 20;
+                    attackTimer2++;
+                }
+                if (attackTimer >= 37) {
+                    if (attackTimer == 37) {
+                        startSlam();
+                    }
+                    if (attackTimer < 70) {
+                        gravity -= 0.5;
+                    }
+                    velocity = velocity.multiply(1, 0.985, 1);
+                }
+            }
+            if (attackTimer2 >= 4) {
+                setPhase(Phase.Phase24);
+            }
+        }
+        return gravity;
+    }
+
+    private void startSlam() {
+        platformY = Double.NaN;
+        if (slamTimer < 0) {
+            slamTimer = 35;
+        }
+    }
+
+    private void summonSpiralStars() {
+        double speed = 2 + 0.3 * totalPhase2Cycles;
+        for (int i = 0; i < 8; i++) {
+            double angle = i * Math.PI / 4;
+            spawnSpiralLayers(getBoundingBox().getCenter(), new Vec3(Math.cos(angle), 0, Math.sin(angle)).scale(speed), attackTimer2 % 2 * 2 - 1);
+        }
+    }
+
+    private void spawnSpiralLayers(Vec3 center, Vec3 motion, float spin) {
+        for (int i = -SPIRAL_HALF_LAYERS; i <= SPIRAL_HALF_LAYERS; i++) {
+            AstrageldonStar2.spawn(this, center.add(0, i * 0.5, 0), motion, spin);
+        }
+    }
+
+    private double tickCrossStarDash(Player player, double gravity) {
+        terrainCollision = false;
+        attackTimer++;
+        if (!nebulaForm) {
+            targetArenaRadius = 1000f / 32;
+            if (attackTimer == -109) {
+                dashAxis = Vec3.directionFromRotation(0, getYRot());
+            }
+            attackTimer2 = getBoundingBox().getCenter().subtract(arenaCenter).dot(dashAxis) > 0 ? -1 : 1;
+            if (attackTimer == -30) {
+                velocity = velocity.add(0, 10, 0);
+            } else if (attackTimer >= 0) {
+                setNebulaForm(true);
+            } else {
+                gravity = -0.1;
+            }
+        } else {
+            if (attackTimer > 10 && attackTimer < 20) {
+                velocity = velocity.scale(0.9);
+            }
+            if (attackTimer > 20) {
+                if (attackTimer < 50) {
+                    velocity = velocity.multiply(1, 0.7, 1).scale(0.9825)
+                            .add(dashAxis.scale(attackTimer2 * Math.sin(Math.toRadians(attackTimer * 9)) * 2.4));
+                } else if (attackTimer < 110) {
+                    velocity = velocity.add(dashAxis.scale(attackTimer2 * 4.5));
+                } else if (attackTimer == 110) {
+                    Vec3 outward = getBoundingBox().getCenter().subtract(arenaCenter).normalize();
+                    setCenterPosition(arenaCenter.add(outward.scale(targetArenaRadius + 240.0 / 32)));
+                }
+                if (attackTimer > 962) {
+                    setPhase(Phase.Phase25);
+                    attackTimer = -90;
+                } else if (attackTimer > 110) {
+                    int timer = attackTimer - 110;
+                    int progress = timer % 140;
+                    if (progress == 80) {
+                        velocity = velocity.scale(0.1);
+                        Vec3 center = getBoundingBox().getCenter();
+                        Vec3 target = player.getBoundingBox().getCenter().add(player.getDeltaMovement().scale(1.0 / 3));
+                        dashes.add(new AstrageldonDash(center, center.add(target.subtract(center).normalize().scale(960.0 / 32)), 1.34f));
+                    }
+                    if (progress < 80) {
+                        Vec3 toPlayer = player.getBoundingBox().getCenter().subtract(getBoundingBox().getCenter()).normalize();
+                        velocity = velocity.add(toPlayer.scale((60 - progress) / 60.0 * 2));
+                        if (timer % 3 == 0 && progress < 12 && attackTimer > 230) {
+                            AstrageldonStar3.spawn(this, getBoundingBox().getCenter().subtract(velocity.scale(0.5 / 32)),
+                                    velocity.scale(0.1).add(randomSphere(1)), velocity);
+                        }
+                    }
+                    if (progress >= 110) {
+                        if (resolveAll(1, 3)) {
+                            velocity = velocity.subtract(savedDashVelocity.scale(1.05));
+                            setCenterPosition(getBoundingBox().getCenter().subtract(savedDashVelocity.scale(1.0 / 32)));
+                            attackTimer += 139 - progress;
+                        } else {
+                            velocity = velocity.scale(0.1);
+                        }
+                    }
+                    if (timer < 1000) {
+                        targetArenaRadius -= 1f / 32;
+                    }
+                }
+            }
+        }
+        return gravity;
+    }
+
+    private double tickStarShotgun(Player player) {
+        terrainCollision = false;
+        contactDamage = false;
+        targetArenaRadius = Mth.lerp(0.03f, targetArenaRadius, 600f / 32);
+        if (attackTimer < 0) {
+            velocity = velocity.scale(0.9);
+            attackTimer++;
+        } else {
+            if (attackTimer == 0) {
+                setCenterPosition(arenaCenter.add(0, targetArenaRadius + 240.0 / 32, 0));
+            }
+            attackTimer++;
+            int timer = attackTimer % 180;
+            int orbitTime = Math.min(attackTimer, 720);
+            double angle = Math.toRadians(90 + orbitTime * 2);
+            Vec3 horizontal = dashAxis.yRot((float) Math.toRadians(orbitTime * 0.25));
+            Vec3 radial = horizontal.scale(Math.cos(angle)).add(0, Math.sin(angle), 0);
+            Vec3 target = arenaCenter.add(radial.scale(targetArenaRadius - 1));
+            flyTowards(target, 0.25 + 0.75 * Math.min(attackTimer / 60.0, 1), 48, 0);
+            arenaCenter = arenaCenter.subtract(radial.scale(3.0 / 32)).add(0, 1.2 / 32, 0);
+            if (attackTimer < 720) {
+                Vec3 center = getBoundingBox().getCenter();
+                Vec3 toPlayer = player.getBoundingBox().getCenter().subtract(center).normalize();
+                int cooldown = Math.max(30 - totalPhase2Cycles * 5, 10);
+                if (timer % cooldown == 0 && timer <= 120) {
+                    NebulaResidue.spawn(this, center.add(toPlayer.scale(80.0 / 32)), toPlayer.scale(2), AstrageldonCombat.PROJECTILE_DAMAGE, 200);
+                } else if (timer == 150) {
+                    for (int i = 0; i < 8; i++) {
+                        Vec3 shot = toPlayer.yRot((float) Math.toRadians(i * 150.0 / 8 - 90)).scale(2);
+                        Vec3 position = center.add(shot);
+                        spawnSpiralLayers(position, shot, -0.33f);
+                        spawnSpiralLayers(position, shot, 0.33f);
+                    }
+                }
+            } else if (attackTimer >= 800) {
+                setPhase(totalPhase2Cycles == 0 ? Phase.Phase28 : Phase.Phase27);
+            }
+        }
+        return 0;
+    }
+
+    private void setCenterPosition(Vec3 center) {
+        setPos(center.add(0, -getBbHeight() / 2, 0));
+    }
+
+    private void setNebulaForm(boolean value) {
+        if (nebulaForm != value) {
+            Vec3 center = getBoundingBox().getCenter();
+            nebulaForm = value;
+            refreshDimensions();
+            setCenterPosition(center);
+        }
+    }
+
+    @Override
+    protected @NotNull EntityDimensions getDefaultDimensions(@NotNull Pose pose) {
+        return nebulaForm ? EntityDimensions.scalable(170F / 32, 170F / 32) : super.getDefaultDimensions(pose);
+    }
+
     private void constrainArena() {
         damageImmune = getBoundingBox().getCenter().distanceTo(arenaCenter) > targetArenaRadius + 200f / 32;
         double limit = arenaRadius + 200.0 / 32;
@@ -643,9 +984,10 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     private void moveSubstep(Player player) {
+        boolean grounded = constrainBody(player);
         Vec3 movement = velocity.scale(1.0 / 160);
-        boolean collide = terrainCollision && velocity.y <= 0 && player.getY() + 2 > getY();
-        boolean grounded = false;
+        boolean collide = terrainCollision && !nebulaForm && (!secondPhase || phase.ordinal() <= Phase.Phase22.ordinal())
+                && velocity.y <= 0 && player.getY() + 2 > getY();
         for (int i = 0; i < 5; i++) {
             var previous = getBoundingBox();
             Vec3 resolved = collide ? Entity.collideBoundingBox(this, movement, previous, level(), List.of()) : movement;
@@ -660,9 +1002,49 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                 velocity = new Vec3(velocity.x, 0, velocity.z);
                 grounded = true;
             }
-            AstrageldonCombat.hurtPlayers(this, this, (float) getAttributeValue(Attributes.ATTACK_DAMAGE), previous, AstrageldonCombat::armorCrunch);
+            hurtContact(previous);
         }
         setOnGround(grounded);
+    }
+
+    private boolean constrainBody(Player player) {
+        boolean grounded = false;
+        if (secondPhase) {
+            if (nebulaForm || terrainCollision && phase.ordinal() >= Phase.Phase23.ordinal()) {
+                Vec3 offset = getBoundingBox().getCenter().subtract(arenaCenter);
+                double radius = targetArenaRadius + (nebulaForm ? 400.0 : 40.0) / 32;
+                if (offset.length() > radius) {
+                    Vec3 normal = offset.normalize();
+                    setCenterPosition(arenaCenter.add(normal.scale(radius)));
+                    if (!nebulaForm) {
+                        velocity = velocity.subtract(normal.scale(Math.max(velocity.dot(normal), 0)));
+                    }
+                }
+                if (!nebulaForm && (!Double.isNaN(platformY) || velocity.y < 0
+                        && (getY() < player.getY() || getY() < arenaCenter.y - arenaRadius + 40.0 / 32))) {
+                    // 虚拟落脚面只停止 Boss 下落，不放置方块或影响玩家。
+                    if (Double.isNaN(platformY)) {
+                        platformY = getY();
+                    }
+                    velocity = new Vec3(velocity.x, 0, velocity.z);
+                    grounded = true;
+                }
+            } else {
+                platformY = Double.NaN;
+            }
+        }
+        return grounded;
+    }
+
+    private void hurtContact(AABB previous) {
+        if (contactDamage) {
+            float damage = (float) getAttributeValue(Attributes.ATTACK_DAMAGE);
+            if (nebulaForm) {
+                AstrageldonCombat.hurtPlayersSphere(this, this, damage, 72.0 / 32, AstrageldonCombat::armorCrunch);
+            } else {
+                AstrageldonCombat.hurtPlayers(this, this, damage, previous, AstrageldonCombat::armorCrunch);
+            }
+        }
     }
 
     private float speedUp() {
@@ -759,6 +1141,19 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
         state.putDouble("VelocityX", velocity.x);
         state.putDouble("VelocityY", velocity.y);
         state.putDouble("VelocityZ", velocity.z);
+        state.putBoolean("NebulaForm", nebulaForm);
+        state.putDouble("PlatformY", platformY);
+        state.putInt("TotalPhase2Cycles", totalPhase2Cycles);
+        state.putInt("ResolveDirection", resolveDirection);
+        state.putDouble("DashAxisX", dashAxis.x);
+        state.putDouble("DashAxisY", dashAxis.y);
+        state.putDouble("DashAxisZ", dashAxis.z);
+        state.putDouble("SavedDashVelocityX", savedDashVelocity.x);
+        state.putDouble("SavedDashVelocityY", savedDashVelocity.y);
+        state.putDouble("SavedDashVelocityZ", savedDashVelocity.z);
+        ListTag dashTags = new ListTag();
+        dashes.forEach(dash -> dashTags.add(dash.save()));
+        state.put("Dashes", dashTags);
         tag.put("Astrageldon", state);
     }
 
@@ -781,6 +1176,18 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             previousArenaRadius = arenaRadius;
             targetArenaRadius = state.contains("TargetArenaRadius") ? state.getFloat("TargetArenaRadius") : 50;
             velocity = new Vec3(state.getDouble("VelocityX"), state.getDouble("VelocityY"), state.getDouble("VelocityZ"));
+            nebulaForm = state.getBoolean("NebulaForm");
+            platformY = state.contains("PlatformY") ? state.getDouble("PlatformY") : Double.NaN;
+            totalPhase2Cycles = state.getInt("TotalPhase2Cycles");
+            resolveDirection = state.contains("ResolveDirection") ? state.getInt("ResolveDirection") : 1;
+            dashAxis = state.contains("DashAxisX") ? new Vec3(state.getDouble("DashAxisX"), state.getDouble("DashAxisY"), state.getDouble("DashAxisZ")) : new Vec3(1, 0, 0);
+            savedDashVelocity = new Vec3(state.getDouble("SavedDashVelocityX"), state.getDouble("SavedDashVelocityY"), state.getDouble("SavedDashVelocityZ"));
+            dashes.clear();
+            ListTag dashTags = state.getList("Dashes", 10);
+            for (int i = 0; i < dashTags.size(); i++) {
+                dashes.add(AstrageldonDash.load(dashTags.getCompound(i)));
+            }
+            refreshDimensions();
             setNoGravity(pathMovement);
             if (phase.ordinal() <= Phase.Phase16.ordinal()) {
                 getAttribute(Attributes.MAX_HEALTH).setBaseValue(200);

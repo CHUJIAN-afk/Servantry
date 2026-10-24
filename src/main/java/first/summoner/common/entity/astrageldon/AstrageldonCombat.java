@@ -4,6 +4,7 @@ import first.summoner.Summoner;
 import first.summoner.register.SummonerMobEffectRegister;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -31,6 +32,19 @@ public class AstrageldonCombat {
                 if (player.hurt(source(direct, owner), damage)) {
                     onHit.accept(player);
                 }
+            }
+        }
+    }
+
+    public static void hurtPlayersSphere(Entity direct, @Nullable Entity owner, float damage, double radius, Consumer<Player> onHit) {
+        Vec3 center = direct.getBoundingBox().getCenter();
+        AABB bounds = new AABB(center, center).inflate(radius);
+        for (Player player : direct.level().getEntitiesOfClass(Player.class, bounds, player -> player.isAlive() && !player.isSpectator())) {
+            AABB box = player.getBoundingBox();
+            Vec3 nearest = new Vec3(Mth.clamp(center.x, box.minX, box.maxX), Mth.clamp(center.y, box.minY, box.maxY),
+                    Mth.clamp(center.z, box.minZ, box.maxZ));
+            if (center.distanceToSqr(nearest) < radius * radius && player.hurt(source(direct, owner), damage)) {
+                onHit.accept(player);
             }
         }
     }

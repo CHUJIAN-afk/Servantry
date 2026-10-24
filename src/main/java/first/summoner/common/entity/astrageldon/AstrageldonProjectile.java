@@ -32,7 +32,7 @@ public abstract class AstrageldonProjectile extends Projectile implements IPathE
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    protected void defineSynchedData(SynchedEntityData.@NotNull Builder builder) {
     }
 
     @Override

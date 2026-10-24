@@ -54,31 +54,45 @@ public class AstrageldonStar extends AstrageldonProjectile {
     protected void step() {
         if (getOwner() instanceof Astrageldon boss && boss.isAlive()) {
             alpha = life < 28 ? Math.min(alpha + 9, 255) : Math.max(alpha - 10, 0);
-            float increment = (40 - age) / 70f;
-            if (age > 40) {
-                increment *= 1 - (age - 40) / 30f;
-            }
-            orbitCounter += increment;
-            if (age + 1 >= 70) {
-                // 从上一帧已同步的星体姿态发射，不再追加一次随 Boss 位移。
-                Vec3 outward = Vec3.directionFromRotation(getXRot(), getYRot());
-                Vec3 tangent = new Vec3(outward.z, 0, -outward.x).normalize();
-                for (int i = -1; i <= 1; i++) {
-                    double spread = Math.toRadians(i * 4);
-                    Vec3 shot = outward.scale(Math.cos(spread)).add(tangent.scale(Math.sin(spread)));
-                    AstrageldonLaser.spawn(boss, getBoundingBox().getCenter(), shot.scale(5), damage);
+            if (age < 70) {
+                float increment = (40 - age) / 70f;
+                if (age > 40) {
+                    increment *= 1 - (age - 40) / 30f;
                 }
-                discard();
-            } else {
+                orbitCounter += increment;
                 double orbitAngle = Math.toRadians(angle + orbitCounter * 10);
                 Vec3 outward = sphereDirection.lengthSqr() > 0 ? sphereDirection : direction(orbitAngle);
                 Vec3 center = boss.getBoundingBox().getCenter().add(outward.scale((140 + orbitCounter * 0.5) / 32));
                 setCenterPose(center, outward);
                 setRoll(0);
+                if (age + 1 == 70) {
+                    fireLasers(boss, outward);
+                }
+            } else if (age >= 72) {
+                // 保留一个同步 tick 的发射姿态，避免销毁前客户端仍停在旧位置。
+                discard();
             }
         } else {
             discard();
         }
+    }
+
+    private void fireLasers(Astrageldon boss, Vec3 outward) {
+        Vec3 reference = Math.abs(outward.y) < 0.9 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
+        Vec3 tangent = outward.cross(reference).normalize();
+        Vec3 bitangent = outward.cross(tangent);
+        double spread = Math.toRadians(4);
+        for (int i = 0; i < 3; i++) {
+            double angle = i * Math.PI * 2 / 3;
+            Vec3 side = tangent.scale(Math.cos(angle)).add(bitangent.scale(Math.sin(angle)));
+            Vec3 shot = outward.scale(Math.cos(spread)).add(side.scale(Math.sin(spread)));
+            AstrageldonLaser.spawn(boss, getBoundingBox().getCenter(), shot.scale(5), damage);
+        }
+    }
+
+    @Override
+    protected boolean canDamage() {
+        return age < 70;
     }
 
     private Vec3 direction(double rotation) {
