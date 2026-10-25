@@ -35,8 +35,6 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     private static final float ARENA_EDGE = 156f / 32;
     private static final double DASH_SPACING = 4;
-    private static final int SPIRAL_HALF_LAYERS = 20;
-    private static final double SPIRAL_LAYER_SPACING = 1.5;
     private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
     private Phase phase = Phase.Phase11;
     private int attackTimer = -120;
@@ -53,8 +51,10 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     private Vec3 targetArenaCenter = Vec3.ZERO;
     private Vec3 frameArenaCenter = Vec3.ZERO;
     private Vec3 previousFrameArenaCenter = Vec3.ZERO;
+    private Vec3 previousFrameArenaMotion = Vec3.ZERO;
     private float frameArenaRadius;
     private float previousFrameArenaRadius;
+    private float previousFrameRadiusMotion;
     private boolean arenaFrameReady;
     private float arenaRadius = 150;
     private float previousArenaRadius = 150;
@@ -791,15 +791,9 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
 
     private void summonSpiralStars() {
         double speed = 2 + 0.3 * totalPhase2Cycles;
-        for (int i = 0; i < 8; i++) {
-            double angle = i * Math.PI / 4;
-            spawnSpiralLayers(getBoundingBox().getCenter(), new Vec3(Math.cos(angle), 0, Math.sin(angle)).scale(speed), attackTimer2 % 2 * 2 - 1);
-        }
-    }
-
-    private void spawnSpiralLayers(Vec3 center, Vec3 motion, float spin) {
-        for (int i = -SPIRAL_HALF_LAYERS; i <= SPIRAL_HALF_LAYERS; i++) {
-            AstrageldonStar2.spawn(this, center.add(0, i * SPIRAL_LAYER_SPACING, 0), motion, spin);
+        for (int i = 0; i < 16; i++) {
+            double angle = i * Math.PI / 8;
+            AstrageldonStar2.spawn(this, new Vec3(Math.cos(angle), 0, Math.sin(angle)).scale(speed), attackTimer2 % 2 * 2 - 1);
         }
     }
 
@@ -902,11 +896,12 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                     NebulaResidue.spawn(this, center.add(toPlayer.scale(80.0 / 32)), toPlayer.scale(2), AstrageldonCombat.PROJECTILE_DAMAGE, 200);
                 }
                 if (attackTimer % 90 == 60) {
-                    for (int i = 0; i < 8; i++) {
-                        Vec3 shot = toPlayer.yRot((float) Math.toRadians(i * 150.0 / 8 - 90)).scale(2);
-                        Vec3 position = center.add(shot);
-                        spawnSpiralLayers(position, shot, -0.33f);
-                        spawnSpiralLayers(position, shot, 0.33f);
+                    double heading = Math.atan2(toPlayer.z, toPlayer.x);
+                    for (int i = 0; i < 16; i++) {
+                        double shotAngle = heading + Math.toRadians(i * 150.0 / 16 - 90);
+                        Vec3 shot = new Vec3(Math.cos(shotAngle), 0, Math.sin(shotAngle)).scale(2);
+                        AstrageldonStar2.spawn(this, shot, -0.33f);
+                        AstrageldonStar2.spawn(this, shot, 0.33f);
                     }
                 }
             } else if (attackTimer >= 800) {
@@ -939,7 +934,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     public boolean isBeyondArena(Vec3 center) {
-        return secondPhase && center.distanceTo(arenaCenter) > getArenaBoundaryRadius();
+        return hasArena() && center.distanceToSqr(arenaCenter) > Mth.square(getArenaBoundaryRadius() + 2);
     }
 
     public Vec3 getArenaCenter() {
@@ -947,15 +942,24 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     public Vec3 getRenderArenaCenter(float partialTick) {
-        return arenaFrameReady ? previousFrameArenaCenter.lerp(frameArenaCenter, partialTick) : previousArenaCenter.lerp(arenaCenter, partialTick);
+        Vec3 result = previousArenaCenter.lerp(arenaCenter, partialTick);
+        if (arenaFrameReady) {
+            Vec3 motion = frameArenaCenter.subtract(previousFrameArenaCenter);
+            // 延续上一段末速度，避免同步更新在 tick 交界处产生速度折点。
+            double blend = partialTick * (1 - partialTick) * (1 - partialTick);
+            result = previousFrameArenaCenter.lerp(frameArenaCenter, partialTick).add(previousFrameArenaMotion.subtract(motion).scale(blend));
+        }
+        return result;
     }
 
     public void captureArenaFrame() {
         if (hasArena()) {
+            previousFrameArenaMotion = arenaFrameReady ? frameArenaCenter.subtract(previousFrameArenaCenter) : Vec3.ZERO;
+            previousFrameRadiusMotion = arenaFrameReady ? frameArenaRadius - previousFrameArenaRadius : 0;
             previousFrameArenaCenter = arenaFrameReady ? frameArenaCenter : arenaCenter;
             previousFrameArenaRadius = arenaFrameReady ? frameArenaRadius : arenaRadius;
-            frameArenaCenter = arenaCenter;
-            frameArenaRadius = arenaRadius;
+            frameArenaCenter = previousFrameArenaCenter.lerp(arenaCenter, 0.5);
+            frameArenaRadius = Mth.lerp(0.5f, previousFrameArenaRadius, arenaRadius);
             arenaFrameReady = true;
         } else {
             arenaFrameReady = false;
@@ -963,7 +967,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     public double getArenaSyncMargin() {
-        return 2 + arenaCenter.distanceTo(previousArenaCenter) * 3 + Math.abs(arenaRadius - previousArenaRadius) * 3;
+        double smoothing = arenaFrameReady ? arenaCenter.distanceTo(frameArenaCenter) + Math.abs(arenaRadius - frameArenaRadius) : 0;
+        return 2 + arenaCenter.distanceTo(previousArenaCenter) * 3 + Math.abs(arenaRadius - previousArenaRadius) * 3 + smoothing;
     }
 
     public float getArenaRadius() {
@@ -975,8 +980,13 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     public float getRenderArenaRadius(float partialTick) {
-        return (arenaFrameReady ? Mth.lerp(partialTick, previousFrameArenaRadius, frameArenaRadius)
-                : Mth.lerp(partialTick, previousArenaRadius, arenaRadius)) + ARENA_EDGE;
+        float result = Mth.lerp(partialTick, previousArenaRadius, arenaRadius);
+        if (arenaFrameReady) {
+            float motion = frameArenaRadius - previousFrameArenaRadius;
+            float blend = partialTick * (1 - partialTick) * (1 - partialTick);
+            result = Mth.lerp(partialTick, previousFrameArenaRadius, frameArenaRadius) + (previousFrameRadiusMotion - motion) * blend;
+        }
+        return result + ARENA_EDGE;
     }
 
     public boolean hasArena() {

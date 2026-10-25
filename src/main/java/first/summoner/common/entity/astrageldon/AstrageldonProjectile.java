@@ -6,6 +6,7 @@ import first.lyra.common.attachmentEntity.RenderKeyframe;
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.common.entity.IPathEntity;
 import first.lyra.utils.LyraStreamCodecs;
+import first.summoner.common.entity.Astrageldon;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
@@ -47,12 +48,14 @@ public abstract class AstrageldonProjectile extends Projectile implements IPathE
     public void tick() {
         super.tick();
         if (!level().isClientSide()) {
+            checkArena();
             PathNode from = node();
             List<RenderKeyframe> frames = new ArrayList<>();
             int steps = substeps();
             for (int i = 0; i < steps && !isRemoved(); i++) {
                 var previous = getBoundingBox();
                 step();
+                checkArena();
                 if (!isRemoved() && canDamage()) {
                     AstrageldonCombat.hurtPlayers(this, getOwner(), damage, previous, this::onHitPlayer);
                 }
@@ -78,6 +81,12 @@ public abstract class AstrageldonProjectile extends Projectile implements IPathE
 
     private PathNode node() {
         return new PathNode(position(), getYRot(), getXRot(), getRoll());
+    }
+
+    private void checkArena() {
+        if (getOwner() instanceof Astrageldon boss && boss.isBeyondArena(getBoundingBox().getCenter())) {
+            discard();
+        }
     }
 
     protected void setCenterPose(Vec3 center, Vec3 direction) {

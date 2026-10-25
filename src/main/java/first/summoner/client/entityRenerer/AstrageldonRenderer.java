@@ -4,8 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import first.lyra.client.render.EntityPathRender;
 import first.lyra.common.entity.IPathEntity;
 import first.summoner.Summoner;
-import first.summoner.client.render.AstrageldonArenaEffect;
-import first.summoner.common.entity.Astrageldon;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -24,9 +22,6 @@ public class AstrageldonRenderer<T extends Entity & GeoAnimatable & IPathEntity>
 
     @Override
     public void render(@NotNull T entity, float entityYaw, float partialTick, @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight) {
-        if (entity instanceof Astrageldon boss) {
-            AstrageldonArenaEffect.submit(boss, partialTick);
-        }
         poseStack.pushPose();
         EntityPathRender.translate(entity, poseStack, partialTick);
         EntityPathRender.rotate(entity, poseStack, partialTick);

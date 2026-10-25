@@ -2,7 +2,6 @@ package first.summoner.common.entity.astrageldon;
 
 import first.lyra.common.attachmentEntity.SyncFieldDispatcher;
 import first.lyra.utils.LyraStreamCodecs;
-import first.summoner.common.entity.Astrageldon;
 import first.summoner.register.SummonerEntityRegister;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
@@ -43,9 +42,6 @@ public class SlimerSpear extends AstrageldonProjectile {
     @Override
     protected void step() {
         setCenterPose(getBoundingBox().getCenter().add(velocity.scale(1.0 / 32)), velocity);
-        if (getOwner() instanceof Astrageldon boss && boss.isBeyondArena(getBoundingBox().getCenter())) {
-            discard();
-        }
     }
 
     @Override

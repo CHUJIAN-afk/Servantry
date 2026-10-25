@@ -16,6 +16,8 @@ public final class AstrageldonArenaClient {
 
     private static UUID arena;
     private static Vec3 lastCenter = Vec3.ZERO;
+    private static Vec3 previousCarry = Vec3.ZERO;
+    private static Vec3 currentCarry = Vec3.ZERO;
 
     private AstrageldonArenaClient() {
     }
@@ -23,6 +25,8 @@ public final class AstrageldonArenaClient {
     public static void beginTick() {
         var minecraft = Minecraft.getInstance();
         if (minecraft.level != null && !minecraft.isPaused()) {
+            previousCarry = currentCarry;
+            currentCarry = Vec3.ZERO;
             // 在玩家移动前固定本 tick 的球面，避免实体更新顺序导致边界与玩家错开一帧。
             for (var entity : minecraft.level.entitiesForRendering()) {
                 if (entity instanceof Astrageldon boss) {
@@ -53,9 +57,22 @@ public final class AstrageldonArenaClient {
             Vec3 carry = boss.getUUID().equals(arena) ? center.subtract(lastCenter) : Vec3.ZERO;
             arena = boss.getUUID();
             lastCenter = center;
+            Vec3 offset = player.getBoundingBox().getCenter().subtract(center);
+            double radius = AstrageldonArena.playerRadius(player, boss.getRenderArenaRadius(1), offset);
+            currentCarry = currentCarry.add(carry.scale(AstrageldonArena.edgeWeight(offset.length(), radius)));
             result = AstrageldonArena.constrainMovement(player, center, boss.getRenderArenaRadius(1), movement, carry);
         } else {
             clear();
+        }
+        return result;
+    }
+
+    public static Vec3 cameraOffset(Camera camera) {
+        Vec3 result = Vec3.ZERO;
+        if (!IrisCompat.isShadowPass() && camera.getEntity() instanceof LocalPlayer && arena != null) {
+            float partialTick = camera.getPartialTickTime();
+            double blend = partialTick * (1 - partialTick) * (1 - partialTick);
+            result = previousCarry.subtract(currentCarry).scale(blend);
         }
         return result;
     }
@@ -102,5 +119,7 @@ public final class AstrageldonArenaClient {
     public static void clear() {
         arena = null;
         lastCenter = Vec3.ZERO;
+        previousCarry = Vec3.ZERO;
+        currentCarry = Vec3.ZERO;
     }
 }

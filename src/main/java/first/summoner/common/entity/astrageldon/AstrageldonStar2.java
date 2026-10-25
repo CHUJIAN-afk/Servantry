@@ -29,9 +29,9 @@ public class AstrageldonStar2 extends AstrageldonProjectile {
     public static void spawn(Astrageldon boss, Vec3 center, Vec3 velocity, float spin) {
         AstrageldonStar2 star = new AstrageldonStar2(SummonerEntityRegister.ASTRAGELDON_STAR_2.get(), boss.level());
         star.setOwner(boss);
-        star.velocity = velocity;
+        star.velocity = new Vec3(velocity.x, 12, velocity.z);
         star.spin = spin;
-        star.setCenterPose(center, velocity);
+        star.setCenterPose(center, star.velocity);
         boss.level().addFreshEntity(star);
     }
 
@@ -55,7 +55,7 @@ public class AstrageldonStar2 extends AstrageldonProjectile {
     protected void step() {
         if (getOwner() instanceof Astrageldon boss && boss.isAlive()) {
             Vec3 center = getBoundingBox().getCenter().add(velocity.scale(1.0 / 32));
-            velocity = velocity.scale(1.018).yRot((float) Math.toRadians(1.5 * spin));
+            velocity = velocity.multiply(1.018, 1, 1.018).yRot((float) Math.toRadians(1.5 * spin)).add(0, -0.3, 0);
             scale *= 0.998f;
             refreshDimensions();
             setCenterPose(center, velocity);

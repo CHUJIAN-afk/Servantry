@@ -9,6 +9,7 @@ import com.lowdragmc.photon.client.postprocessing.PhotonPostProcessing;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import first.summoner.client.AstrageldonArenaClient;
 import first.summoner.common.entity.Astrageldon;
 import first.summoner.common.entity.astrageldon.AstrageldonArena;
 import net.minecraft.client.Camera;
@@ -40,7 +41,6 @@ public final class AstrageldonArenaEffect {
     private static Astrageldon terrainArena;
     private static Vec3 cameraPosition = Vec3.ZERO;
     private static Vec3 terrainCenter = Vec3.ZERO;
-    private static float arenaPartialTick;
 
     private AstrageldonArenaEffect() {
     }
@@ -59,27 +59,34 @@ public final class AstrageldonArenaEffect {
             terrainArena = null;
             TERRAIN_SPHERE.zero();
             cameraPosition = camera.getPosition();
-            arenaPartialTick = partialTick;
             CAMERA_TO_CLIP.set(projection).mul(view);
             CLIP_TO_CAMERA.set(CAMERA_TO_CLIP).invert();
             GRID_OFFSET.set((float) (cameraPosition.x - Math.floor(cameraPosition.x)),
                     (float) (cameraPosition.y - Math.floor(cameraPosition.y)), (float) (cameraPosition.z - Math.floor(cameraPosition.z)));
             var minecraft = Minecraft.getInstance();
-            Vec3 selection = minecraft.player == null ? cameraPosition : minecraft.player.getPosition(partialTick).add(0, minecraft.player.getBbHeight() / 2, 0);
+            Vec3 selection = minecraft.player == null ? cameraPosition : minecraft.player.getPosition(partialTick)
+                    .add(0, minecraft.player.getBbHeight() / 2, 0).add(AstrageldonArenaClient.cameraOffset(camera));
             terrainArena = AstrageldonArena.nearest(minecraft.level.entitiesForRendering(), selection, Double.MAX_VALUE, partialTick);
             if (terrainArena != null) {
                 terrainCenter = terrainArena.getRenderArenaCenter(partialTick);
                 Vec3 center = terrainCenter.subtract(cameraPosition);
                 TERRAIN_SPHERE.set((float) center.x, (float) center.y, (float) center.z, terrainArena.getRenderArenaRadius(partialTick));
             }
-        }
-    }
-
-    public static void submit(Astrageldon boss, float partialTick) {
-        if (boss.hasArena() && !IrisCompat.isShadowPass()) {
-            Vec3 relative = boss.getRenderArenaCenter(arenaPartialTick).subtract(cameraPosition);
-            float time = (boss.level().getGameTime() % 240000 + partialTick) / 20f;
-            ARENAS.add(new Arena(relative.toVector3f(), boss.getRenderArenaRadius(arenaPartialTick), time));
+            // 场地独立于 Boss 的可见性收集，升空或跨越实体渲染区段时仍绘制球面。
+            for (var entity : minecraft.level.entitiesForRendering()) {
+                if (entity instanceof Astrageldon boss && boss.hasArena()) {
+                    Vec3 relative = boss.getRenderArenaCenter(partialTick).subtract(cameraPosition);
+                    float radius = boss.getRenderArenaRadius(partialTick);
+                    float time = (boss.level().getGameTime() % 240000 + partialTick) / 20f;
+                    Vector4f warning = new Vector4f();
+                    if (boss == terrainArena && minecraft.player != null && minecraft.player.isAlive() && !minecraft.player.isSpectator()) {
+                        Vec3 offset = selection.subtract(boss.getRenderArenaCenter(partialTick));
+                        double playerRadius = AstrageldonArena.playerRadius(minecraft.player, radius, offset);
+                        warning.set(offset.normalize().toVector3f(), (float) AstrageldonArena.edgeWeight(offset.length(), playerRadius));
+                    }
+                    ARENAS.add(new Arena(relative.toVector3f(), radius, time, warning));
+                }
+            }
         }
     }
 
@@ -125,6 +132,7 @@ public final class AstrageldonArenaEffect {
                 shader.safeGetUniform("ArenaCenter").set(arena.center);
                 shader.safeGetUniform("ArenaRadius").set(arena.radius);
                 shader.safeGetUniform("ArenaTime").set(arena.time);
+                shader.safeGetUniform("EdgeWarning").set(arena.warning);
                 shader.apply();
                 RenderSystem.disableDepthTest();
                 RenderSystem.depthMask(false);
@@ -174,6 +182,6 @@ public final class AstrageldonArenaEffect {
         }
     }
 
-    private record Arena(Vector3f center, float radius, float time) {
+    private record Arena(Vector3f center, float radius, float time, Vector4f warning) {
     }
 }

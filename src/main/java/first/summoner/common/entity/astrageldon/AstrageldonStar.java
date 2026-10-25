@@ -16,6 +16,7 @@ public class AstrageldonStar extends AstrageldonProjectile {
     private float angle;
     private float orbitCounter;
     private Vec3 sphereDirection = Vec3.ZERO;
+    private Vec3 velocity = Vec3.ZERO;
     private int alpha = 255;
 
     public AstrageldonStar(EntityType<? extends AstrageldonStar> type, Level level) {
@@ -47,6 +48,7 @@ public class AstrageldonStar extends AstrageldonProjectile {
         fields.field(LyraStreamCodecs.FLOAT, () -> angle, value -> angle = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> orbitCounter, value -> orbitCounter = value);
         fields.field(LyraStreamCodecs.VEC_3, () -> sphereDirection, value -> sphereDirection = value);
+        fields.field(LyraStreamCodecs.VEC_3, () -> velocity, value -> velocity = value);
         fields.field(LyraStreamCodecs.INT, () -> alpha, value -> alpha = value);
     }
 
@@ -66,33 +68,18 @@ public class AstrageldonStar extends AstrageldonProjectile {
                 setCenterPose(center, outward);
                 setRoll(0);
                 if (age + 1 == 70) {
-                    fireLasers(boss, outward);
+                    velocity = outward.scale(5);
                 }
-            } else if (age >= 72) {
-                // 保留一个同步 tick 的发射姿态，避免销毁前客户端仍停在旧位置。
-                discard();
+            } else {
+                if (age == 70) {
+                    life = 90;
+                }
+                velocity = velocity.add(velocity.normalize().scale(0.7));
+                setCenterPose(getBoundingBox().getCenter().add(velocity.scale(1.0 / 32)), velocity);
             }
         } else {
             discard();
         }
-    }
-
-    private void fireLasers(Astrageldon boss, Vec3 outward) {
-        Vec3 reference = Math.abs(outward.y) < 0.9 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
-        Vec3 tangent = outward.cross(reference).normalize();
-        Vec3 bitangent = outward.cross(tangent);
-        double spread = Math.toRadians(4);
-        for (int i = 0; i < 3; i++) {
-            double angle = i * Math.PI * 2 / 3;
-            Vec3 side = tangent.scale(Math.cos(angle)).add(bitangent.scale(Math.sin(angle)));
-            Vec3 shot = outward.scale(Math.cos(spread)).add(side.scale(Math.sin(spread)));
-            AstrageldonLaser.spawn(boss, getBoundingBox().getCenter(), shot.scale(5), damage);
-        }
-    }
-
-    @Override
-    protected boolean canDamage() {
-        return age < 70;
     }
 
     private Vec3 direction(double rotation) {
@@ -113,6 +100,9 @@ public class AstrageldonStar extends AstrageldonProjectile {
         tag.putDouble("SphereX", sphereDirection.x);
         tag.putDouble("SphereY", sphereDirection.y);
         tag.putDouble("SphereZ", sphereDirection.z);
+        tag.putDouble("VelocityX", velocity.x);
+        tag.putDouble("VelocityY", velocity.y);
+        tag.putDouble("VelocityZ", velocity.z);
         tag.putInt("Alpha", alpha);
     }
 
@@ -122,6 +112,7 @@ public class AstrageldonStar extends AstrageldonProjectile {
         angle = tag.getFloat("Angle");
         orbitCounter = tag.getFloat("OrbitCounter");
         sphereDirection = new Vec3(tag.getDouble("SphereX"), tag.getDouble("SphereY"), tag.getDouble("SphereZ"));
+        velocity = new Vec3(tag.getDouble("VelocityX"), tag.getDouble("VelocityY"), tag.getDouble("VelocityZ"));
         alpha = tag.getInt("Alpha");
     }
 }

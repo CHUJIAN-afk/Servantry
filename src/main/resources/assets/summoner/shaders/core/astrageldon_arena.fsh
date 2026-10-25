@@ -5,6 +5,7 @@ uniform vec2 EffectSize;
 uniform vec3 ArenaCenter;
 uniform float ArenaRadius;
 uniform float ArenaTime;
+uniform vec4 EdgeWarning;
 out vec4 fragColor;
 
 float hash(vec3 p) {
@@ -150,5 +151,7 @@ void main() {
     vec3 exitPoint = origin + direction * interval.y;
     float rim = pow(max(1.0 - abs(dot(normalize(exitPoint), direction)), 0.0), 4.0);
     color += vec3(0.35, 0.055, 0.75) * rim;
+    float patch = 1.0 - smoothstep(0.0, 7.0, length(normalize(exitPoint) - EdgeWarning.xyz) * ArenaRadius);
+    color += vec3(0.7, 0.45, 1.0) * EdgeWarning.w * patch * patch * 1.2;
     fragColor = vec4(color, 1.0);
 }
