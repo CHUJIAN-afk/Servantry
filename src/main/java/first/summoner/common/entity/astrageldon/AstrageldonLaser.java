@@ -26,7 +26,7 @@ public class AstrageldonLaser extends AstrageldonProjectile {
         laser.velocity = velocity;
         laser.damage = damage;
         laser.setCenterPose(center, velocity);
-        owner.level().addFreshEntity(laser);
+        laser.addToLevel();
     }
 
     @Override

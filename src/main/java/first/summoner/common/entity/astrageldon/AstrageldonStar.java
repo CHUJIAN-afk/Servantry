@@ -39,7 +39,7 @@ public class AstrageldonStar extends AstrageldonProjectile {
         star.sphereDirection = direction;
         Vec3 outward = direction.lengthSqr() > 0 ? direction : star.direction(Math.toRadians(angle));
         star.setCenterPose(boss.getBoundingBox().getCenter().add(outward.scale(140.0 / 32)), outward);
-        boss.level().addFreshEntity(star);
+        star.addToLevel();
     }
 
     @Override

@@ -37,7 +37,7 @@ public class AstrageldonAfterimage extends AstrageldonProjectile implements GeoA
         image.damage = (float) boss.getAttributeValue(Attributes.ATTACK_DAMAGE);
         Vec3 forward = dash.end().subtract(dash.start()).normalize().scale(direction);
         image.setCenterPose(dash.formationPosition(direction < 0 ? 1 : 0, direction, wing), forward);
-        boss.level().addFreshEntity(image);
+        image.addToLevel();
     }
 
     @Override

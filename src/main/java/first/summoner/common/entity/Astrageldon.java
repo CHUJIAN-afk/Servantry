@@ -824,37 +824,32 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                 } else if (attackTimer < 110) {
                     velocity = velocity.add(dashAxis.scale(attackTimer2 * 4.5));
                 } else if (attackTimer == 110) {
-                    Vec3 outward = getBoundingBox().getCenter().subtract(arenaCenter).normalize();
-                    setCenterPosition(arenaCenter.add(outward.scale(targetArenaRadius + 240.0 / 32)));
+                    setCenterPosition(arenaCenter.add(0, getArenaBoundaryRadius() + 3, 0));
+                    velocity = Vec3.ZERO;
                 }
                 if (attackTimer > 962) {
                     targetArenaRadius = 1000f / 32;
                     setPhase(Phase.Phase25);
                     attackTimer = -90;
                 } else if (attackTimer > 110) {
+                    velocity = Vec3.ZERO;
                     int timer = attackTimer - 110;
                     int progress = timer % 140;
                     if (progress == 80) {
-                        velocity = velocity.scale(0.1);
                         Vec3 center = getBoundingBox().getCenter();
                         Vec3 target = player.getBoundingBox().getCenter().add(player.getDeltaMovement().scale(1.0 / 3));
-                        dashes.add(new AstrageldonDash(center, center.add(target.subtract(center).normalize().scale(960.0 / 32)), 1.34f));
-                    }
-                    if (progress < 80) {
-                        Vec3 toPlayer = player.getBoundingBox().getCenter().subtract(getBoundingBox().getCenter()).normalize();
-                        velocity = velocity.add(toPlayer.scale((60 - progress) / 60.0 * 2));
-                        if (timer % 3 == 0 && progress < 12 && attackTimer > 230) {
-                            spawnCrossStar(getBoundingBox().getCenter().subtract(velocity.scale(0.5 / 32)), velocity);
-                        }
+                        Vec3 direction = target.subtract(center).normalize();
+                        Vec3 offset = center.subtract(arenaCenter);
+                        double radius = getArenaBoundaryRadius() + 3;
+                        double b = offset.dot(direction);
+                        // 穿过玩家方向后取远侧球面交点，终点留在球外三格。
+                        double distance = -b + Math.sqrt(Math.max(0, b * b - offset.lengthSqr() + radius * radius));
+                        dashes.add(new AstrageldonDash(center, center.add(direction.scale(distance)), 1.34f));
                     }
                     if (progress >= 110) {
                         if (resolveAll(1, 3)) {
-                            targetArenaRadius -= 2;
-                            velocity = velocity.subtract(savedDashVelocity.scale(1.05));
-                            setCenterPosition(getBoundingBox().getCenter().subtract(savedDashVelocity.scale(1.0 / 32)));
+                            targetArenaRadius -= 4;
                             attackTimer += 139 - progress;
-                        } else {
-                            velocity = velocity.scale(0.1);
                         }
                     }
                 }
@@ -930,11 +925,11 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     }
 
     private void updateArenaImmunity() {
-        damageImmune = getBoundingBox().getCenter().distanceTo(arenaCenter) > targetArenaRadius + 200f / 32;
+        damageImmune = isBeyondArena(getBoundingBox().getCenter(), 0);
     }
 
-    public boolean isBeyondArena(Vec3 center) {
-        return hasArena() && center.distanceToSqr(arenaCenter) > Mth.square(getArenaBoundaryRadius() + 2);
+    public boolean isBeyondArena(Vec3 center, double margin) {
+        return hasArena() && center.distanceToSqr(arenaCenter) > Mth.square(getArenaBoundaryRadius() + margin);
     }
 
     public Vec3 getArenaCenter() {
@@ -1035,7 +1030,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     private boolean constrainBody(Player player) {
         boolean grounded = false;
         if (secondPhase) {
-            if (nebulaForm || terrainCollision && phase.ordinal() >= Phase.Phase23.ordinal()) {
+            // 交叉星冲由球外端点约束，缩圈后仍保留上一轮终点。
+            if ((phase != Phase.Phase24 || attackTimer < 110) && (nebulaForm || terrainCollision && phase.ordinal() >= Phase.Phase23.ordinal())) {
                 Vec3 offset = getBoundingBox().getCenter().subtract(arenaCenter);
                 double radius = targetArenaRadius + (nebulaForm ? 400.0 : 40.0) / 32;
                 if (offset.length() > radius) {
@@ -1144,7 +1140,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
     @Override
     public boolean hurt(@NotNull DamageSource source, float amount) {
         float multiplier = source.getDirectEntity() == source.getEntity() && source.getEntity() instanceof LivingEntity ? 0.8f : 1f;
-        return !damageImmune && super.hurt(source, amount * 0.9f * multiplier);
+        return !damageImmune && !isBeyondArena(getBoundingBox().getCenter(), 0) && super.hurt(source, amount * 0.9f * multiplier);
     }
 
     @Override

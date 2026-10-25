@@ -32,7 +32,7 @@ public class AstrageldonStar2 extends AstrageldonProjectile {
         star.velocity = new Vec3(velocity.x, 12, velocity.z);
         star.spin = spin;
         star.setCenterPose(center, star.velocity);
-        boss.level().addFreshEntity(star);
+        star.addToLevel();
     }
 
     @Override

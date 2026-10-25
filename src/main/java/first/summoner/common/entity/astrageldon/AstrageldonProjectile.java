@@ -84,8 +84,14 @@ public abstract class AstrageldonProjectile extends Projectile implements IPathE
     }
 
     private void checkArena() {
-        if (getOwner() instanceof Astrageldon boss && boss.isBeyondArena(getBoundingBox().getCenter())) {
+        if (!(this instanceof AstrageldonAfterimage) && getOwner() instanceof Astrageldon boss && boss.isBeyondArena(getBoundingBox().getCenter(), 2)) {
             discard();
+        }
+    }
+
+    protected void addToLevel() {
+        if (this instanceof AstrageldonAfterimage || !(getOwner() instanceof Astrageldon boss) || !boss.isBeyondArena(getBoundingBox().getCenter(), 0)) {
+            level().addFreshEntity(this);
         }
     }
 

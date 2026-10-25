@@ -26,7 +26,7 @@ public class StarLaser extends AstrageldonProjectile {
         laser.direction = direction;
         laser.damage = damage;
         laser.setCenterPose(center, direction);
-        owner.level().addFreshEntity(laser);
+        laser.addToLevel();
     }
 
     @Override

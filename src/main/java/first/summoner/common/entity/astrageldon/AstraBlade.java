@@ -31,7 +31,7 @@ public class AstraBlade extends AstrageldonProjectile {
         blade.direction = direction;
         blade.remaining = remaining;
         blade.setPos(center.add(0, -blade.getBbHeight() / 2, 0));
-        owner.level().addFreshEntity(blade);
+        blade.addToLevel();
     }
 
     @Override

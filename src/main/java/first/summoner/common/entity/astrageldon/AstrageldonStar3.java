@@ -34,7 +34,7 @@ public class AstrageldonStar3 extends AstrageldonProjectile {
         star.direction = direction.lengthSqr() > 0 ? direction.normalize() : Vec3.directionFromRotation(0, boss.getYRot());
         star.axisRoll = axisRoll;
         star.setCenterPose(center, star.direction);
-        boss.level().addFreshEntity(star);
+        star.addToLevel();
     }
 
     @Override

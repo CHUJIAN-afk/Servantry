@@ -25,7 +25,7 @@ public class SlimerSpear extends AstrageldonProjectile {
         spear.setOwner(owner);
         spear.velocity = direction.normalize().scale(14);
         spear.setCenterPose(center, direction);
-        owner.level().addFreshEntity(spear);
+        spear.addToLevel();
     }
 
     @Override

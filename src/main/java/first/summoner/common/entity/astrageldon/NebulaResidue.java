@@ -30,7 +30,7 @@ public class NebulaResidue extends AstrageldonProjectile {
         residue.damage = damage;
         residue.life = life;
         residue.setCenterPose(center, velocity);
-        owner.level().addFreshEntity(residue);
+        residue.addToLevel();
     }
 
     @Override

@@ -36,7 +36,7 @@ public class AstraRock extends AstrageldonProjectile {
         rock.target = target;
         rock.velocity = velocity;
         rock.setPos(center.add(0, -rock.getBbHeight() / 2, 0));
-        owner.level().addFreshEntity(rock);
+        rock.addToLevel();
     }
 
     public static void spawnOrbiting(Astrageldon boss, float angle, float radiusScale, boolean perpendicular) {
@@ -51,7 +51,7 @@ public class AstraRock extends AstrageldonProjectile {
         double rotation = Math.toRadians(angle);
         Vec3 outward = perpendicular ? new Vec3(Math.cos(rotation), Math.sin(rotation), 0) : new Vec3(Math.cos(rotation), 0, Math.sin(rotation));
         rock.setCenterPose(boss.getBoundingBox().getCenter().add(outward.scale(radiusScale * 40 / 32)), outward);
-        boss.level().addFreshEntity(rock);
+        rock.addToLevel();
     }
 
     @Override
