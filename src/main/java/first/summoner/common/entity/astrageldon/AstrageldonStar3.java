@@ -20,17 +20,19 @@ public class AstrageldonStar3 extends AstrageldonProjectile {
     private Vec3 direction = new Vec3(0, 0, 1);
     private float scale = 0.4f;
     private float spin = 360;
+    private float axisRoll;
 
     public AstrageldonStar3(EntityType<? extends AstrageldonStar3> type, Level level) {
         super(type, level, 360);
         damage = 10.9f;
     }
 
-    public static void spawn(Astrageldon boss, Vec3 center, Vec3 velocity, Vec3 direction) {
+    public static void spawn(Astrageldon boss, Vec3 center, Vec3 velocity, Vec3 direction, float axisRoll) {
         AstrageldonStar3 star = new AstrageldonStar3(SummonerEntityRegister.ASTRAGELDON_STAR_3.get(), boss.level());
         star.setOwner(boss);
         star.velocity = velocity;
         star.direction = direction.lengthSqr() > 0 ? direction.normalize() : Vec3.directionFromRotation(0, boss.getYRot());
+        star.axisRoll = axisRoll;
         star.setCenterPose(center, star.direction);
         boss.level().addFreshEntity(star);
     }
@@ -42,11 +44,14 @@ public class AstrageldonStar3 extends AstrageldonProjectile {
         fields.field(LyraStreamCodecs.VEC_3, () -> direction, value -> direction = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> scale, value -> scale = value);
         fields.field(LyraStreamCodecs.FLOAT, () -> spin, value -> spin = value);
+        fields.field(LyraStreamCodecs.FLOAT, () -> axisRoll, value -> axisRoll = value);
     }
 
     public List<Vec3> getAxes() {
         Vec3 reference = Math.abs(direction.y) < 0.9 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
         Vec3 tangent = direction.cross(reference).normalize();
+        double roll = Math.toRadians(axisRoll);
+        tangent = tangent.scale(Math.cos(roll)).add(direction.cross(tangent).scale(Math.sin(roll)));
         return List.of(direction.add(tangent).normalize(), direction.subtract(tangent).normalize(), direction.cross(tangent));
     }
 
@@ -64,7 +69,7 @@ public class AstrageldonStar3 extends AstrageldonProjectile {
                 scale = Math.min(1, scale + 0.02f);
                 spin = Math.max(0, spin * 0.95f - 2.3f);
                 setCenterPose(getBoundingBox().getCenter().add(velocity.scale(1.0 / 32)), direction);
-                setRoll(spin);
+                setRoll(spin + axisRoll);
                 if (age + 1 == 70) {
                     for (Vec3 axis : getAxes()) {
                         StarLaser.spawn(boss, getBoundingBox().getCenter(), axis, damage);
@@ -100,6 +105,7 @@ public class AstrageldonStar3 extends AstrageldonProjectile {
         tag.putDouble("DirectionZ", direction.z);
         tag.putFloat("Scale", scale);
         tag.putFloat("Spin", spin);
+        tag.putFloat("AxisRoll", axisRoll);
     }
 
     @Override
@@ -109,5 +115,6 @@ public class AstrageldonStar3 extends AstrageldonProjectile {
         direction = new Vec3(tag.getDouble("DirectionX"), tag.getDouble("DirectionY"), tag.getDouble("DirectionZ"));
         scale = tag.getFloat("Scale");
         spin = tag.getFloat("Spin");
+        axisRoll = tag.getFloat("AxisRoll");
     }
 }

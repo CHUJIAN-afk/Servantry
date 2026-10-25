@@ -705,8 +705,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                         }
                     }
                 }
-                if (phase == Phase.Phase24 && attackTimer % 2 == 0 && progress >= 0.2f && progress <= 0.8f) {
-                    AstrageldonStar3.spawn(this, center.subtract(outward.scale(0.5)), savedDashVelocity.scale(0.1).add(randomSphere(1)), savedDashVelocity);
+                if (phase == Phase.Phase24 && progress >= 0.2f && progress <= 0.8f) {
+                    spawnCrossStar(center.subtract(outward.scale(0.5)), savedDashVelocity);
                 }
             }
         }
@@ -834,6 +834,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                     setCenterPosition(arenaCenter.add(outward.scale(targetArenaRadius + 240.0 / 32)));
                 }
                 if (attackTimer > 962) {
+                    targetArenaRadius = 1000f / 32;
                     setPhase(Phase.Phase25);
                     attackTimer = -90;
                 } else if (attackTimer > 110) {
@@ -849,12 +850,12 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                         Vec3 toPlayer = player.getBoundingBox().getCenter().subtract(getBoundingBox().getCenter()).normalize();
                         velocity = velocity.add(toPlayer.scale((60 - progress) / 60.0 * 2));
                         if (timer % 3 == 0 && progress < 12 && attackTimer > 230) {
-                            AstrageldonStar3.spawn(this, getBoundingBox().getCenter().subtract(velocity.scale(0.5 / 32)),
-                                    velocity.scale(0.1).add(randomSphere(1)), velocity);
+                            spawnCrossStar(getBoundingBox().getCenter().subtract(velocity.scale(0.5 / 32)), velocity);
                         }
                     }
                     if (progress >= 110) {
                         if (resolveAll(1, 3)) {
+                            targetArenaRadius -= 2;
                             velocity = velocity.subtract(savedDashVelocity.scale(1.05));
                             setCenterPosition(getBoundingBox().getCenter().subtract(savedDashVelocity.scale(1.0 / 32)));
                             attackTimer += 139 - progress;
@@ -862,13 +863,15 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                             velocity = velocity.scale(0.1);
                         }
                     }
-                    if (timer < 1000) {
-                        targetArenaRadius -= 1f / 32;
-                    }
                 }
             }
         }
         return gravity;
+    }
+
+    private void spawnCrossStar(Vec3 center, Vec3 motion) {
+        AstrageldonStar3.spawn(this, center, motion.scale(0.1).add(randomSphere(1)), motion, attackTimer3);
+        attackTimer3 += 12;
     }
 
     private double tickStarShotgun(Player player) {
@@ -888,7 +891,7 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
             double angle = Math.toRadians(90 + orbitTime * 2);
             Vec3 horizontal = dashAxis.yRot((float) Math.toRadians(orbitTime * 0.25));
             Vec3 radial = horizontal.scale(Math.cos(angle)).add(0, Math.sin(angle), 0);
-            Vec3 target = arenaCenter.add(radial.scale(targetArenaRadius - 1));
+            Vec3 target = arenaCenter.add(radial.scale((targetArenaRadius - 1) * 0.5));
             flyTowards(target, 0.25 + 0.75 * Math.min(attackTimer / 60.0, 1), 48, 0);
             targetArenaCenter = targetArenaCenter.subtract(radial.scale(3.0 / 32)).add(0, 1.2 / 32, 0);
             if (attackTimer < 720) {
@@ -897,7 +900,8 @@ public class Astrageldon extends Monster implements GeoAnimatable, IPathEntity {
                 int cooldown = Math.max(30 - totalPhase2Cycles * 5, 10);
                 if (timer % cooldown == 0 && timer <= 120) {
                     NebulaResidue.spawn(this, center.add(toPlayer.scale(80.0 / 32)), toPlayer.scale(2), AstrageldonCombat.PROJECTILE_DAMAGE, 200);
-                } else if (timer == 150) {
+                }
+                if (attackTimer % 90 == 60) {
                     for (int i = 0; i < 8; i++) {
                         Vec3 shot = toPlayer.yRot((float) Math.toRadians(i * 150.0 / 8 - 90)).scale(2);
                         Vec3 position = center.add(shot);

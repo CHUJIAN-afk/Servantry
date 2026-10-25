@@ -34,32 +34,82 @@ vec2 sphere(vec3 origin, vec3 direction, float radius) {
     return h > 0.0 ? vec2(-b - root, -b + root) : vec2(-1.0);
 }
 
-vec3 stars(vec3 origin, vec3 direction, float radius, float layer) {
-    vec2 interval = sphere(origin, direction, radius);
-    vec3 p = normalize(origin + direction * interval.y);
-    float scale = 65.0 + layer * 31.0;
-    float width = max(length(fwidth(p)) * scale * 0.9, 0.025);
-    vec3 a = abs(p);
-    vec2 face;
-    float side;
-    if (a.x > a.y && a.x > a.z) {
-        face = p.yz / a.x;
-        side = p.x > 0.0 ? 1.0 : 2.0;
-    } else if (a.y > a.z) {
-        face = p.xz / a.y;
-        side = p.y > 0.0 ? 3.0 : 4.0;
-    } else {
-        face = p.xy / a.z;
-        side = p.z > 0.0 ? 5.0 : 6.0;
+vec3 stars(vec3 origin, vec3 direction, float pixelAngle, float pixelOrigin, float sceneDepth) {
+    // 按原星点占比调整胞元体积，密度提高 50%，星点大小不变。
+    const float cellSize = 0.3689651;
+    float distance = max(sphere(origin, direction, 1.12).y, 0.0);
+    vec3 cell = floor((origin + direction * (distance + 0.0001)) / cellSize);
+    vec3 stepDirection = mix(vec3(-1.0), vec3(1.0), step(vec3(0.0), direction));
+    vec3 inverse = stepDirection / max(abs(direction), vec3(0.00001));
+    vec3 next = ((cell + step(vec3(0.0), direction)) * cellSize - origin) * inverse;
+    vec3 stride = cellSize * abs(inverse);
+    vec3 color = vec3(0.0);
+    // 星体位于随机三维坐标，逐胞元追踪避免球壳分层和移动采样闪烁。
+    for (int i = 0; i < 64; i++) {
+        float end = min(min(next.x, next.y), next.z);
+        float seed = hash(cell);
+        vec3 center = (cell + vec3(hash(cell + 9.1), hash(cell - 6.7), hash(cell + 21.3)) * 0.5 + 0.25) * cellSize;
+        float along = dot(center - origin, direction);
+        if (seed > 0.22 && along > distance && along < min(end, sceneDepth)) {
+            vec3 delta = origin + direction * along - center;
+            float radius = mix(0.00168, 0.00504, hash(cell + 4.8));
+            float width = max(radius, pixelOrigin + pixelAngle * along * 0.7);
+            float light = exp(-dot(delta, delta) / (width * width)) * radius * radius / (width * width);
+            float flicker = 0.5 + 0.5 * sin(ArenaTime * (1.1 + seed * 3.7) + seed * 120.0);
+            float twinkle = 0.35 + 1.65 * flicker * flicker;
+            vec3 tint = mix(vec3(0.52, 0.38, 1.0), vec3(1.0, 0.86, 1.0), hash(cell - 12.5));
+            color += tint * light * twinkle * (1.6 + seed) * (1.0 - smoothstep(4.5, 6.0, length(center)));
+        }
+        if (end >= sceneDepth) {
+            break;
+        }
+        vec3 crossed = step(next, vec3(end + 0.00001));
+        cell += crossed * stepDirection;
+        next += crossed * stride;
+        distance = end;
     }
-    vec2 grid = face * scale;
-    vec3 cell = vec3(floor(grid), side + layer * 7.0);
-    float seed = hash(cell);
-    vec2 center = vec2(hash(cell + 9.1), hash(cell - 6.7)) * 0.7 + 0.15;
-    vec2 delta = fract(grid) - center;
-    float light = exp(-dot(delta, delta) / (width * width)) * step(0.965, seed);
-    float twinkle = 0.8 + 0.2 * sin(ArenaTime * 1.6 + seed * 120.0);
-    return mix(vec3(0.48, 0.38, 0.95), vec3(1.0, 0.82, 0.63), seed) * light * twinkle * (1.5 + seed);
+    return color;
+}
+
+vec3 galaxy(vec3 origin, vec3 direction, float sceneDepth) {
+    float first = max(sphere(origin, direction, 1.05).y, 0.0);
+    origin -= vec3(0.4, 1.7, -2.8);
+    mat2 tilt = mat2(0.8, -0.6, 0.6, 0.8);
+    mat2 turn = mat2(0.6, -0.8, 0.8, 0.6);
+    origin.xy = tilt * origin.xy;
+    direction.xy = tilt * direction.xy;
+    origin.yz = turn * origin.yz;
+    direction.yz = turn * direction.yz;
+    vec2 bounds = sphere(origin, direction, 3.6);
+    first = max(first, bounds.x);
+    float last = min(sceneDepth, bounds.y);
+    if (abs(direction.y) > 0.0001) {
+        vec2 slab = (vec2(-0.85, 0.85) - origin.y) / direction.y;
+        first = max(first, min(slab.x, slab.y));
+        last = min(last, max(slab.x, slab.y));
+    }
+    float stride = max(last - first, 0.0) / 28.0;
+    vec3 color = vec3(0.0);
+    float transmission = 1.0;
+    for (int i = 0; i < 28; i++) {
+        vec3 p = origin + direction * (first + (float(i) + 0.5) * stride);
+        float radius = length(p.xz);
+        float height = 0.1 + radius * 0.055;
+        float disk = exp(-p.y * p.y / (height * height) - radius * 0.6) * (1.0 - smoothstep(2.7, 3.5, radius));
+        float angle = radius > 0.0001 ? atan(p.z, p.x) : 0.0;
+        float armDistance = sin((angle * 3.0 - log(max(radius, 0.06)) * 5.0 + ArenaTime * 0.015) * 0.5) / 0.2;
+        float arm = exp(-armDistance * armDistance);
+        float core = exp(-dot(p * vec3(2.5, 4.5, 2.5), p * vec3(2.5, 4.5, 2.5)));
+        float density = disk * (0.08 + arm * 0.92) + core;
+        if (density > 0.001) {
+            float grain = cloud(p * 5.0 + 31.0);
+            float alpha = 1.0 - exp(-density * (0.45 + grain) * stride * 4.0);
+            vec3 tint = mix(vec3(0.13, 0.015, 0.36), vec3(0.75, 0.22, 1.1), grain * arm);
+            color += transmission * alpha * (tint + vec3(0.8, 0.48, 1.0) * core);
+            transmission *= 1.0 - alpha;
+        }
+    }
+    return color;
 }
 
 void main() {
@@ -70,6 +120,13 @@ void main() {
     vec3 direction = normalize(farPoint.xyz / farPoint.w - rayOrigin);
     vec3 origin = rayOrigin - ArenaCenter;
     vec2 interval = sphere(origin, direction, ArenaRadius);
+    vec3 sceneOrigin = origin / ArenaRadius;
+    float pixelAngle = max(length(dFdx(direction)), length(dFdy(direction)));
+    float pixelOrigin = max(length(dFdx(sceneOrigin)), length(dFdy(sceneOrigin)));
+    // 在完整片元组上计算导数，再剔除球外射线。
+    if (interval.y <= 0.0) {
+        discard;
+    }
 
     float first = max(interval.x, 0.0);
     float stride = max(interval.y - first, 0.0) / 20.0;
@@ -87,15 +144,11 @@ void main() {
         color += transmission * alpha * tint * (0.9 + density * 1.4);
         transmission *= 1.0 - alpha;
     }
-    // 有限距离的三层星空与体积云共用世界坐标，移动相机时产生视差。
-    vec3 starColor = stars(origin, direction, ArenaRadius * 1.1, 0.0)
-            + stars(origin, direction, ArenaRadius * 1.7, 1.0) * 0.65
-            + stars(origin, direction, ArenaRadius * 2.6, 2.0) * 0.4;
-    color += starColor * (0.35 + transmission * 0.65);
+    float sceneDepth = sphere(sceneOrigin, direction, 6.0).y;
+    vec3 starColor = stars(sceneOrigin, direction, pixelAngle, pixelOrigin, sceneDepth);
+    color += (starColor + galaxy(sceneOrigin, direction, sceneDepth)) * (0.35 + transmission * 0.65);
     vec3 exitPoint = origin + direction * interval.y;
     float rim = pow(max(1.0 - abs(dot(normalize(exitPoint), direction)), 0.0), 4.0);
     color += vec3(0.35, 0.055, 0.75) * rim;
-    // 星空导数在完整片元组上计算，之后才剔除球外射线。
-    if (interval.y <= 0.0) discard;
     fragColor = vec4(color, 1.0);
 }
